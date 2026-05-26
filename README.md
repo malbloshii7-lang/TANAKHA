@@ -16,6 +16,22 @@ uvicorn app.main:app --reload
 Works **with zero API keys**: the renderer defaults to an offline mock and the design brief
 falls back to per-style templates. Add keys (below) to switch on real AI.
 
+## Deploy (get a public link)
+
+The repo ships a `render.yaml` blueprint and a `Procfile`.
+
+**Render (free, easiest):**
+1. Go to [render.com](https://render.com) → **New** → **Blueprint**.
+2. Connect this GitHub repo (`malbloshii7-lang/TANAKHA`). Render reads `render.yaml`
+   and deploys the `claude/chat-session-TlNKl` branch.
+3. In a minute you get a public URL like `https://tanakha.onrender.com`.
+4. (Optional) Add `IMAGE_PROVIDER=replicate` + `IMAGE_API_KEY`, and `ANTHROPIC_API_KEY`,
+   in the dashboard to turn on real AI renders and Claude briefs.
+
+The `Procfile` also lets you deploy on Railway/Heroku-style hosts with the same start command.
+Note: the free tier's filesystem is ephemeral, so uploaded images and the SQLite leads DB
+reset on redeploy/restart — fine for a demo; use a managed DB + object storage for production.
+
 ## How it works
 
 ```

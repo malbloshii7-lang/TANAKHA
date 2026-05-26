@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tanakha
+    runtime: python
+    plan: free
+    branch: claude/chat-session-TlNKl
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # Optional — add these in the Render dashboard to enable real AI:
+      #   IMAGE_PROVIDER=replicate
+      #   IMAGE_API_KEY=<your Replicate token>   (real "after" images)
+      #   ANTHROPIC_API_KEY=<your key>           (real Claude design briefs)
