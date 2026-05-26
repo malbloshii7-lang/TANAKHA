@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TANAKHA — See Your Yard Transformed</title>
+  <meta name="description" content="Upload a photo of your yard and see a photorealistic AI landscape makeover in seconds — free." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap">
+      <div class="logo">TANAKHA<span>.</span></div>
+      <a class="nav-cta" href="#studio">Try it free</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap">
+    <span class="eyebrow">AI Landscape Studio</span>
+    <h1>See your yard <span class="grad">transformed</span><br />in 30 seconds.</h1>
+    <p class="sub">Upload one photo. Our AI designs a stunning, photorealistic makeover of your
+      outdoor space — and connects you with a vetted local pro to build it.</p>
+    <a class="btn" href="#studio">Transform my yard →</a>
+  </header>
+
+  <!-- STEP 1+2: upload + style -->
+  <section class="section wrap" id="studio">
+    <span class="step-tag reveal">Step 1</span>
+    <h2 class="reveal">Show us your space</h2>
+    <p class="lead reveal">Drag in a photo of your yard, patio, or front lawn.</p>
+
+    <div class="dropzone reveal" id="dropzone">
+      <input type="file" id="fileInput" accept="image/*" hidden />
+      <div id="dzEmpty">
+        <div class="icon">🌿</div>
+        <div><b>Click to upload</b> or drag a photo here</div>
+        <div class="hint">JPG or PNG · up to 12 MB</div>
+      </div>
+      <img id="dzPreview" class="preview hidden" alt="Your yard" />
+    </div>
+
+    <span class="step-tag reveal" style="margin-top:46px;">Step 2</span>
+    <h2 class="reveal">Pick a style</h2>
+    <div class="styles reveal" id="styles">
+      <div class="style-card" data-style="lush garden">
+        <div class="emoji">🌷</div><div class="name">Lush Garden</div>
+        <div class="desc">Vibrant, layered, full of color</div>
+      </div>
+      <div class="style-card" data-style="modern">
+        <div class="emoji">◻️</div><div class="name">Modern</div>
+        <div class="desc">Clean lines, sleek hardscape</div>
+      </div>
+      <div class="style-card" data-style="desert xeriscape">
+        <div class="emoji">🌵</div><div class="name">Desert</div>
+        <div class="desc">Water-wise, sculptural</div>
+      </div>
+      <div class="style-card" data-style="family yard">
+        <div class="emoji">🏡</div><div class="name">Family Yard</div>
+        <div class="desc">Open lawn, kid &amp; pet friendly</div>
+      </div>
+    </div>
+
+    <div class="center reveal">
+      <button class="btn" id="visualizeBtn" disabled>Generate my makeover ✨</button>
+    </div>
+  </section>
+
+  <!-- processing -->
+  <section class="section wrap hidden" id="processing">
+    <div class="spinner"></div>
+    <div class="msg">Designing your new yard… our AI is planting trees and laying stone.</div>
+  </section>
+
+  <!-- result -->
+  <section class="section wrap hidden" id="result">
+    <span class="step-tag">The reveal</span>
+    <h2>Here's your new yard</h2>
+    <p class="lead">Drag the slider to compare before &amp; after.</p>
+
+    <div class="ba" id="ba">
+      <img class="after" id="afterImg" alt="After" />
+      <img class="before" id="beforeImg" alt="Before" />
+      <span class="label l">Before</span>
+      <span class="label r">After</span>
+      <div class="divider" id="baDivider"></div>
+      <div class="handle" id="baHandle">⇆</div>
+      <input type="range" id="baRange" min="0" max="100" value="50" aria-label="Compare before and after" />
+    </div>
+
+    <div class="brief" id="brief"></div>
+
+    <!-- lead form -->
+    <div class="section" style="padding-bottom:0;">
+      <span class="step-tag">Make it real</span>
+      <h2>Get matched with a local pro</h2>
+      <p class="lead">We'll send your design to a vetted landscaper in your area for a free, no-obligation quote.</p>
+      <div class="lead-card">
+        <form id="leadForm">
+          <div class="field">
+            <label for="leadName">Name</label>
+            <input type="text" id="leadName" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label for="leadEmail">Email *</label>
+            <input type="email" id="leadEmail" placeholder="you@email.com" required />
+          </div>
+          <div class="field">
+            <label for="leadZip">ZIP code</label>
+            <input type="text" id="leadZip" placeholder="e.g. 90210" />
+          </div>
+          <button class="btn" type="submit" id="leadBtn">Get my free quote →</button>
+          <div class="fineprint">By submitting, you agree to be contacted about your project. No spam, ever.</div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- thank you -->
+  <section class="section wrap hidden" id="thankyou">
+    <div class="check">✓</div>
+    <h2>You're all set!</h2>
+    <p class="lead">Your design and details are in. A local pro will reach out shortly with a free quote.</p>
+    <div class="center"><a class="btn ghost" href="/">Transform another yard</a></div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">TANAKHA · AI Landscape Studio — previews are AI-generated concepts, not exact build plans.</div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
