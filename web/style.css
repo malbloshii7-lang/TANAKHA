@@ -80,6 +80,16 @@ body {
 .btn.ghost:hover { border-color: var(--accent); }
 .btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
+.trustrow { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin-top: 28px; color: var(--muted); font-size: 0.9rem; }
+
+/* ---- how it works ---- */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 16px; }
+.step { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px 24px; transition: transform 0.22s ease, border-color 0.22s ease; }
+.step:hover { transform: translateY(-4px); border-color: rgba(74,222,128,0.4); }
+.step .num { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #06210f; background: linear-gradient(100deg, var(--accent), var(--accent-2)); margin-bottom: 16px; }
+.step h3 { font-size: 1.15rem; margin-bottom: 8px; }
+.step p { color: var(--muted); font-size: 0.95rem; }
+
 /* ---- sections ---- */
 .section { padding: 60px 0; }
 .section h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; text-align: center; }
@@ -184,6 +194,7 @@ body {
 
 @media (max-width: 720px) {
   .styles { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: 1fr; }
   .brief .grid { grid-template-columns: 1fr; }
   .hero { padding: 70px 0 50px; }
 }
