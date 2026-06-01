@@ -8,3 +8,5 @@
 ## Known mistakes
 
 <!-- Append each entry as: `- YYYY-MM-DD — <what went wrong> → <what to do instead>` -->
+
+- 2026-06-01 — Waited for the user to prompt/remind me of next steps → Be proactive: I should remind the user of pending actions, next steps, and follow-ups, not wait for them to remind me.
