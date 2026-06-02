@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-06-02T06:00:00+00:00",
+  "sources_ok": 9,
+  "sources_failed": 0,
+  "count": 8,
+  "note": "Sample data so the interface renders before live feeds are wired. Replace by running: python -m metfeed.fetch",
+  "items": [
+    {
+      "title": "WMO Executive Council opens 79th session with focus on Early Warnings for All",
+      "summary": "The Executive Council convened in Geneva to review progress on the Early Warnings for All initiative, with member states pressing for accelerated coverage across least-developed countries and small island states.",
+      "link": "https://wmo.int/",
+      "published": "2026-06-02T05:10:00+00:00",
+      "source_id": "wmo",
+      "source": "WMO",
+      "source_full": "World Meteorological Organization",
+      "category": "Governance",
+      "tier": 1
+    },
+    {
+      "title": "ECMWF brings AIFS machine-learning forecasts into operational suite",
+      "summary": "The centre announced its Artificial Intelligence Forecasting System has moved to operational status, running alongside the physics-based model and delivering competitive medium-range skill at a fraction of the compute cost.",
+      "link": "https://www.ecmwf.int/",
+      "published": "2026-06-01T14:30:00+00:00",
+      "source_id": "ecmwf",
+      "source": "ECMWF",
+      "source_full": "European Centre for Medium-Range Weather Forecasts",
+      "category": "Operations",
+      "tier": 1
+    },
+    {
+      "title": "UNFCCC publishes synthesis of updated national climate plans ahead of COP",
+      "summary": "A new synthesis report aggregates the latest nationally determined contributions, signalling incremental ambition but a persistent gap against the 1.5°C pathway as parties prepare for the next Conference.",
+      "link": "https://unfccc.int/",
+      "published": "2026-06-01T09:00:00+00:00",
+      "source_id": "unfccc",
+      "source": "UNFCCC",
+      "source_full": "UN Climate Change",
+      "category": "Governance",
+      "tier": 1
+    },
+    {
+      "title": "Copernicus: May 2026 ranks among warmest on record globally",
+      "summary": "The Copernicus Climate Change Service reports surface air temperatures well above the 1991–2020 average, with notable marine heatwave activity across the Mediterranean and Arabian Gulf.",
+      "link": "https://climate.copernicus.eu/",
+      "published": "2026-05-31T08:15:00+00:00",
+      "source_id": "copernicus",
+      "source": "Copernicus",
+      "source_full": "Copernicus Climate Change Service",
+      "category": "Climate",
+      "tier": 1
+    },
+    {
+      "title": "NOAA upgrades Global Forecast System with revised convection scheme",
+      "summary": "The latest GFS implementation improves tropical cyclone track guidance and precipitation timing, following a multi-season parallel evaluation.",
+      "link": "https://www.noaa.gov/",
+      "published": "2026-05-30T16:45:00+00:00",
+      "source_id": "noaa",
+      "source": "NOAA",
+      "source_full": "US National Oceanic and Atmospheric Administration",
+      "category": "Operations",
+      "tier": 1
+    },
+    {
+      "title": "WMO Hydrology: new guidance on transboundary flood forecasting cooperation",
+      "summary": "Fresh operational guidance encourages neighbouring services to share real-time gauge data and harmonise warning thresholds along shared river basins to reduce downstream flood impacts.",
+      "link": "https://community.wmo.int/",
+      "published": "2026-05-29T11:20:00+00:00",
+      "source_id": "wmo_water",
+      "source": "WMO Hydrology",
+      "source_full": "WMO Water & Cryosphere",
+      "category": "Water",
+      "tier": 2
+    },
+    {
+      "title": "IPCC agrees outline for special report on climate and the cryosphere",
+      "summary": "Meeting in plenary, the panel approved the scope and timeline for a new assessment focused on changes in snow, ice and permafrost and their cascading consequences for water security.",
+      "link": "https://www.ipcc.ch/",
+      "published": "2026-05-28T13:00:00+00:00",
+      "source_id": "ipcc",
+      "source": "IPCC",
+      "source_full": "Intergovernmental Panel on Climate Change",
+      "category": "Science",
+      "tier": 1
+    },
+    {
+      "title": "Carbon Brief analysis: how AI weather models are reshaping operational forecasting",
+      "summary": "A detailed look at the rapid adoption of data-driven forecast systems by national services, the questions they raise about verification and observations, and what it means for the public-private weather enterprise.",
+      "link": "https://www.carbonbrief.org/",
+      "published": "2026-05-27T10:00:00+00:00",
+      "source_id": "carbonbrief",
+      "source": "Carbon Brief",
+      "source_full": "Carbon Brief",
+      "category": "Climate",
+      "tier": 2
+    }
+  ]
+}
