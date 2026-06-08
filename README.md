@@ -86,6 +86,28 @@ pytest -q
 
 Runs fully offline (mock provider + templated briefs).
 
+## WMO Presidential Campaign Portal (`/portal`)
+
+A separate, **team-only bilingual (Arabic / English) PWA** for a WMO presidential
+campaign, mounted on the same app. Plan: [`docs/wmo-campaign-portal-plan.md`](docs/wmo-campaign-portal-plan.md).
+
+- Open **`/portal`** — installable on iPhone/iPad/PC (Add to Home Screen).
+- First-run seeds an admin account from `PORTAL_ADMIN_USER` / `PORTAL_ADMIN_PASSWORD`
+  (defaults `admin` / `changeme` — **change these**). Set `PORTAL_SECRET` in production.
+- Phase 1 features: **contact database** (PR / MFA / embassy, region, stance, owner,
+  next action), **document library** (CV/portfolio) with one-tap **WhatsApp / email /
+  copy** share links (trackable views, optional expiry), and an editable **election
+  status** banner. Full RTL + language switcher.
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/portal/login` | `{username, password}` → `{token, user}` |
+| GET/POST/PUT/DELETE | `/api/portal/contacts[/{id}]` | contact CRUD |
+| GET/POST/DELETE | `/api/portal/documents[/{id}]` | list / upload / delete |
+| POST | `/api/portal/documents/{id}/share` | mint a public share link |
+| GET/POST | `/api/portal/status` | read / update election status |
+| GET | `/s/{token}` | public, no-auth document link (for WhatsApp/email) |
+
 ## Notes & roadmap
 
 - **Deliberately out of scope** for now: address→photo lookup (Google Street View),

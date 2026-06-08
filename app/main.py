@@ -8,6 +8,8 @@ from PIL import Image
 from pydantic import BaseModel
 
 from . import db, design, storage
+from .portal import db as portal_db
+from .portal import routes as portal_routes
 from .providers import get_provider
 from .providers.mock import MockProvider
 
@@ -19,11 +21,49 @@ MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 
 # Initialize side-effects at import so the app (and tests) are ready immediately.
 db.init_db()
+portal_routes.bootstrap()
 storage.ensure_media_dir()
 
 app = FastAPI(title="TANAKHA — AI Yard Makeover Visualizer")
 app.mount("/media", StaticFiles(directory=storage.ensure_media_dir()), name="media")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+
+# --- WMO Presidential Campaign Portal (team-only bilingual PWA) ---
+app.include_router(portal_routes.router, prefix="/api/portal")
+PORTAL_DIR = os.path.join(WEB_DIR, "portal")
+app.mount("/portal/assets", StaticFiles(directory=PORTAL_DIR), name="portal_assets")
+
+
+@app.get("/portal")
+@app.get("/portal/")
+def portal_index() -> FileResponse:
+    return FileResponse(os.path.join(PORTAL_DIR, "index.html"))
+
+
+@app.get("/portal/manifest.webmanifest")
+def portal_manifest() -> FileResponse:
+    return FileResponse(os.path.join(PORTAL_DIR, "manifest.webmanifest"),
+                        media_type="application/manifest+json")
+
+
+@app.get("/portal/sw.js")
+def portal_sw() -> FileResponse:
+    # Served from /portal/ so the service worker scope covers the whole portal.
+    return FileResponse(os.path.join(PORTAL_DIR, "sw.js"),
+                        media_type="application/javascript")
+
+
+@app.get("/s/{token}")
+def open_share_link(token: str):
+    """Public, no-auth document link for sharing via WhatsApp/email."""
+    rec = portal_db.resolve_share_link(token)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Link not found or expired.")
+    rel = rec["url"].removeprefix("/media/")
+    path = os.path.join(storage.media_dir(), rel)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File missing.")
+    return FileResponse(path)
 
 
 @app.get("/")

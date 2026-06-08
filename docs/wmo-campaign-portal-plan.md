@@ -154,9 +154,11 @@ User         ── name, email, role(Admin/Editor/Viewer), language, MFA
 **Phase 0 — Foundations (setup)**
 Auth + MFA, bilingual/RTL shell, roles, responsive PWA skeleton, managed DB.
 
-**Phase 1 — MVP (the daily-use core)**
+**Phase 1 — MVP (the daily-use core)** ✅ *Built — live at `/portal`*
 Contact database + the share-ready document library (CV/portfolio) with WhatsApp/email
 sharing, and the editable election-status banner. *This alone is usable on day one.*
+Team-only login (signed sessions), Admin/Editor/Viewer roles, full Arabic/English RTL,
+and an installable PWA. See README → "WMO Presidential Campaign Portal".
 
 **Phase 2 — Correspondence & intelligence**
 Correspondence log linked to contacts, stance/next-action tracking, segmentation and

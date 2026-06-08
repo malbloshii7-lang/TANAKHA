@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b3d6b" />
+  <title>WMO Campaign Portal</title>
+  <link rel="manifest" href="/portal/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/portal/assets/icon-192.png" />
+  <link rel="stylesheet" href="/portal/assets/style.css" />
+</head>
+<body>
+  <!-- Login -->
+  <section id="login" class="login">
+    <div class="login-card">
+      <div class="brand">
+        <img src="/portal/assets/icon-192.png" alt="" class="brand-logo" />
+        <h1 data-i18n="appTitle">WMO Presidential Campaign Portal</h1>
+        <p class="muted" data-i18n="teamOnly">Private — campaign team only</p>
+      </div>
+      <form id="loginForm">
+        <label data-i18n="username">Username</label>
+        <input id="username" autocomplete="username" required />
+        <label data-i18n="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required />
+        <button type="submit" data-i18n="signIn">Sign in</button>
+        <p id="loginError" class="error" hidden></p>
+      </form>
+      <button class="lang-toggle ghost" id="loginLang">العربية</button>
+    </div>
+  </section>
+
+  <!-- App -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="topbar-title" data-i18n="appShort">Campaign Portal</div>
+      <div class="topbar-actions">
+        <button class="ghost" id="langToggle">العربية</button>
+        <button class="ghost" id="logout" data-i18n="logout">Logout</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="status" data-i18n="navStatus">Status</button>
+      <button class="tab" data-tab="contacts" data-i18n="navContacts">Contacts</button>
+      <button class="tab" data-tab="documents" data-i18n="navDocuments">Documents</button>
+    </nav>
+
+    <main>
+      <!-- STATUS -->
+      <section id="tab-status" class="panel">
+        <div id="statusCard" class="card status-card"></div>
+        <button class="editor-only" id="editStatusBtn" data-i18n="editStatus">Update status</button>
+        <form id="statusForm" class="card" hidden>
+          <h3 data-i18n="editStatus">Update status</h3>
+          <label data-i18n="phase">Phase</label>
+          <input id="s_phase" />
+          <label data-i18n="voteEstimate">Vote estimate</label>
+          <input id="s_vote" />
+          <label data-i18n="regionalSnapshot">Regional snapshot</label>
+          <input id="s_region" />
+          <label data-i18n="keyDates">Key dates</label>
+          <input id="s_dates" />
+          <label data-i18n="noteEn">Note (English)</label>
+          <input id="s_note_en" />
+          <label data-i18n="noteAr">Note (Arabic)</label>
+          <input id="s_note_ar" dir="rtl" />
+          <div class="row">
+            <button type="submit" data-i18n="save">Save</button>
+            <button type="button" class="ghost" id="cancelStatus" data-i18n="cancel">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- CONTACTS -->
+      <section id="tab-contacts" class="panel" hidden>
+        <div class="toolbar">
+          <input id="contactSearch" data-i18n-ph="searchContacts" placeholder="Search contacts…" />
+          <select id="filterRole">
+            <option value="" data-i18n="allRoles">All roles</option>
+            <option value="PR">PR</option>
+            <option value="MFA">MFA</option>
+            <option value="Embassy" data-i18n="embassy">Embassy</option>
+            <option value="Other" data-i18n="other">Other</option>
+          </select>
+          <select id="filterStance">
+            <option value="" data-i18n="allStances">All stances</option>
+            <option value="supportive" data-i18n="supportive">Supportive</option>
+            <option value="neutral" data-i18n="neutral">Neutral</option>
+            <option value="opposed" data-i18n="opposed">Opposed</option>
+            <option value="unknown" data-i18n="unknown">Unknown</option>
+          </select>
+          <button class="editor-only" id="addContactBtn" data-i18n="addContact">+ Add</button>
+        </div>
+        <div id="contactList" class="grid"></div>
+      </section>
+
+      <!-- DOCUMENTS -->
+      <section id="tab-documents" class="panel" hidden>
+        <div class="toolbar">
+          <h3 data-i18n="navDocuments">Documents</h3>
+          <button class="editor-only" id="addDocBtn" data-i18n="uploadDoc">+ Upload</button>
+        </div>
+        <div id="docList" class="grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal host -->
+  <div id="modal" class="modal" hidden><div class="modal-body" id="modalBody"></div></div>
+
+  <script src="/portal/assets/app.js"></script>
+</body>
+</html>
