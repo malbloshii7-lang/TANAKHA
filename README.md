@@ -23,8 +23,11 @@ The repo ships a `render.yaml` blueprint and a `Procfile`.
 **Render (free, easiest):**
 1. Go to [render.com](https://render.com) → **New** → **Blueprint**.
 2. Connect this GitHub repo (`malbloshii7-lang/TANAKHA`). Render reads `render.yaml`
-   and deploys the `claude/chat-session-TlNKl` branch.
-3. In a minute you get a public URL like `https://tanakha.onrender.com`.
+   and deploys the `claude/kind-hamilton-HPaJy` branch. When prompted, set
+   **`PORTAL_ADMIN_PASSWORD`** (the portal admin login); `PORTAL_SECRET` is
+   auto-generated.
+3. In a minute you get a public URL like `https://tanakha.onrender.com` — the yard
+   visualizer is at `/` and the **campaign portal is at `/portal`**.
 4. (Optional) Add `IMAGE_PROVIDER=replicate` + `IMAGE_API_KEY`, and `ANTHROPIC_API_KEY`,
    in the dashboard to turn on real AI renders and Claude briefs.
 

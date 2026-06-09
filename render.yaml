@@ -3,13 +3,23 @@ services:
     name: tanakha
     runtime: python
     plan: free
-    branch: claude/chat-session-TlNKl
+    branch: claude/kind-hamilton-HPaJy
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
-      # Optional — add these in the Render dashboard to enable real AI:
+      # ── WMO Campaign Portal (served at /portal) ──
+      # Signing secret for team sessions — auto-generated, kept stable across deploys.
+      - key: PORTAL_SECRET
+        generateValue: true
+      # First-run admin account. Render prompts for sync:false vars at Blueprint
+      # creation, so the password is set before the first boot seeds the admin user.
+      - key: PORTAL_ADMIN_USER
+        value: admin
+      - key: PORTAL_ADMIN_PASSWORD
+        sync: false
+      # Optional — add these in the Render dashboard to enable real AI (yard app):
       #   IMAGE_PROVIDER=replicate
       #   IMAGE_API_KEY=<your Replicate token>   (real "after" images)
       #   ANTHROPIC_API_KEY=<your key>           (real Claude design briefs)
