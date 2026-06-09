@@ -18,21 +18,30 @@ falls back to per-style templates. Add keys (below) to switch on real AI.
 
 ## Deploy (get a public link)
 
-The repo ships a `render.yaml` blueprint and a `Procfile`.
+The repo ships a `railway.json` + `nixpacks.toml` (Railway), a `render.yaml`
+blueprint (Render), and a `Procfile`.
 
-**Render (free, easiest):**
-1. Go to [render.com](https://render.com) → **New** → **Blueprint**.
-2. Connect this GitHub repo (`malbloshii7-lang/TANAKHA`). Render reads `render.yaml`
-   and deploys the `claude/kind-hamilton-HPaJy` branch. When prompted, set
-   **`PORTAL_ADMIN_PASSWORD`** (the portal admin login); `PORTAL_SECRET` is
-   auto-generated.
-3. In a minute you get a public URL like `https://tanakha.onrender.com` — the yard
-   visualizer is at `/` and the **campaign portal is at `/portal`**.
-4. (Optional) Add `IMAGE_PROVIDER=replicate` + `IMAGE_API_KEY`, and `ANTHROPIC_API_KEY`,
-   in the dashboard to turn on real AI renders and Claude briefs.
+**Railway (recommended):**
+1. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
+2. Pick `malbloshii7-lang/TANAKHA` and the `claude/kind-hamilton-HPaJy` branch.
+   Railway reads `railway.json`/`nixpacks.toml` and builds automatically.
+3. In the service's **Variables**, set:
+   - `PORTAL_ADMIN_PASSWORD` — your portal admin login password.
+   - `PORTAL_SECRET` — a long random string (e.g. `python -c "import secrets;print(secrets.token_hex(32))"`).
+4. **Settings → Networking → Generate Domain** to get a public URL. The yard
+   visualizer is at `/` and the **campaign portal is at `/portal`** (login `admin` /
+   the password you set).
 
-The `Procfile` also lets you deploy on Railway/Heroku-style hosts with the same start command.
-Note: the free tier's filesystem is ephemeral, so uploaded images and the SQLite leads DB
+**Render (alternative):**
+1. [render.com](https://render.com) → **New** → **Blueprint** → connect the repo.
+2. Render reads `render.yaml` and deploys `claude/kind-hamilton-HPaJy`. When prompted,
+   set **`PORTAL_ADMIN_PASSWORD`**; `PORTAL_SECRET` is auto-generated.
+3. You get a URL like `https://tanakha.onrender.com` — portal at `/portal`.
+
+(Optional, both hosts) Add `IMAGE_PROVIDER=replicate` + `IMAGE_API_KEY`, and
+`ANTHROPIC_API_KEY`, in the dashboard to turn on real AI renders and Claude briefs.
+
+Note: free tiers have an ephemeral filesystem, so uploaded files and the SQLite DB
 reset on redeploy/restart — fine for a demo; use a managed DB + object storage for production.
 
 ## How it works
