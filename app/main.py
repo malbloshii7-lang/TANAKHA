@@ -31,6 +31,11 @@ def index() -> FileResponse:
     return FileResponse(os.path.join(WEB_DIR, "index.html"))
 
 
+@app.get("/team")
+def team_portal() -> FileResponse:
+    return FileResponse(os.path.join(WEB_DIR, "team.html"))
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
