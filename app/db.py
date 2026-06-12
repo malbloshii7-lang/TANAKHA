@@ -33,6 +33,19 @@ def init_db() -> None:
             )
             """
         )
+        c.execute(
+            """
+            CREATE TABLE IF NOT EXISTS transfers (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                token       TEXT NOT NULL UNIQUE,
+                filename    TEXT NOT NULL,
+                stored_path TEXT NOT NULL,
+                size_bytes  INTEGER NOT NULL,
+                created_at  TEXT NOT NULL,
+                expires_at  TEXT NOT NULL
+            )
+            """
+        )
 
 
 def insert_lead(data: dict) -> int:
@@ -59,6 +72,45 @@ def insert_lead(data: dict) -> int:
             ),
         )
         return int(cur.lastrowid)
+
+
+def insert_transfer(
+    token: str,
+    filename: str,
+    stored_path: str,
+    size_bytes: int,
+    created_at: str,
+    expires_at: str,
+) -> int:
+    with _conn() as c:
+        cur = c.execute(
+            """
+            INSERT INTO transfers
+                (token, filename, stored_path, size_bytes, created_at, expires_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (token, filename, stored_path, size_bytes, created_at, expires_at),
+        )
+        return int(cur.lastrowid)
+
+
+def get_transfer(token: str) -> dict | None:
+    with _conn() as c:
+        row = c.execute("SELECT * FROM transfers WHERE token = ?", (token,)).fetchone()
+    return dict(row) if row else None
+
+
+def delete_transfer(token: str) -> None:
+    with _conn() as c:
+        c.execute("DELETE FROM transfers WHERE token = ?", (token,))
+
+
+def list_expired_transfers(now_iso: str) -> list[dict]:
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM transfers WHERE expires_at <= ?", (now_iso,)
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def list_leads() -> list[dict]:

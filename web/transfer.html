@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TANAKHA — Send a Heavy File</title>
+  <meta name="description" content="Upload a heavy file, get a share link, and send it by email or WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap">
+      <a class="logo" href="/" style="text-decoration:none;color:inherit;">TANAKHA<span>.</span></a>
+      <a class="nav-cta" href="/">Yard studio</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap" style="padding-bottom:40px;">
+    <span class="eyebrow">File Transfer</span>
+    <h1>Send <span class="grad">heavy files</span><br />in one link.</h1>
+    <p class="sub">Drop in any file up to 2 GB. We give you a download link you can
+      share by email or WhatsApp. Links expire after 7 days.</p>
+  </header>
+
+  <!-- upload -->
+  <section class="section wrap" id="uploadSection" style="padding-top:0;">
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" hidden />
+      <div id="dzEmpty">
+        <div class="icon">📦</div>
+        <div><b>Click to upload</b> or drag a file here</div>
+        <div class="hint">Any file · up to 2 GB</div>
+      </div>
+      <div id="dzFile" class="hidden">
+        <div class="icon">📄</div>
+        <div><b id="dzFileName"></b></div>
+        <div class="hint" id="dzFileSize"></div>
+      </div>
+    </div>
+    <div class="error hidden" id="uploadError"></div>
+    <div class="center" style="margin-top:28px;">
+      <button class="btn" id="sendBtn" disabled>Get my share link →</button>
+    </div>
+  </section>
+
+  <!-- progress -->
+  <section class="section wrap hidden" id="progressSection" style="padding-top:0;">
+    <div class="progress-card">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Uploading… 0%</div>
+    </div>
+  </section>
+
+  <!-- result -->
+  <section class="section wrap hidden" id="resultSection" style="padding-top:0;">
+    <div class="result-card">
+      <div class="check">✓</div>
+      <h2>Your link is ready</h2>
+      <p class="lead" id="expiryNote"></p>
+      <div class="link-box">
+        <input type="text" id="linkInput" readonly />
+        <button class="btn ghost copy-btn" id="copyBtn">Copy link</button>
+      </div>
+      <div class="share-row">
+        <a class="btn share-btn" id="whatsappBtn" target="_blank" rel="noopener">💬 WhatsApp</a>
+        <a class="btn ghost share-btn" id="emailBtn">✉️ Email</a>
+      </div>
+      <div class="center" style="margin-top:30px;">
+        <a href="/transfer" class="reset-link">Send another file</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">TANAKHA · File Transfer — links expire automatically after 7 days.</div>
+  </footer>
+
+  <script src="/static/transfer.js"></script>
+</body>
+</html>

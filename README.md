@@ -56,6 +56,22 @@ photo ──▶ Claude vision ──▶ design brief ──▶ image provider �
 | POST | `/api/visualize` | multipart `image` + `style` → `{before_url, after_url, brief, style}` |
 | POST | `/api/leads` | JSON lead → `{id, status}` |
 | GET | `/api/leads` | List captured leads |
+| GET | `/transfer` | File-transfer front-end |
+| POST | `/api/transfers` | multipart `file` → `{token, filename, size_bytes, expires_at, download_url}` |
+| GET | `/d/{token}` | Download a shared file (404 once expired) |
+
+## File transfer (send heavy files)
+
+Open `/transfer`, drop in any file up to **2 GB**, and get a download link you can share
+with one click via **WhatsApp** (`wa.me`) or **email** (`mailto:`), or just copy it.
+Uploads stream to disk in 1 MB chunks (memory stays flat), links use unguessable
+`secrets.token_urlsafe` tokens, and every link **expires after 7 days** — expired files
+are deleted automatically at startup and on access.
+
+Caveats on free-tier hosting (Render): the disk is ephemeral, so uploaded files do not
+survive a redeploy/restart — stale links degrade gracefully to 404. The platform proxy
+may also cap very large request bodies or time out multi-GB uploads; for serious volume,
+move storage to S3/R2 presigned uploads.
 
 ## Configuration
 
@@ -70,6 +86,8 @@ Copy `.env.example` and set what you need:
 | `TANAKHA_DISABLE_CLAUDE` | — | set `1` to force templated briefs |
 | `MEDIA_DIR` | `media` | image storage dir |
 | `DATABASE_PATH` | `tanakha.db` | SQLite path |
+| `TRANSFER_DIR` | `transfers` | file-transfer storage dir |
+| `MAX_TRANSFER_BYTES` | `2147483648` (2 GB) | per-file upload cap |
 
 ### Going live with real "after" images
 

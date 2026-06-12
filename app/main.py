@@ -1,3 +1,4 @@
+import datetime
 import io
 import os
 
@@ -7,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel
 
-from . import db, design, storage
+from . import db, design, storage, transfer
 from .providers import get_provider
 from .providers.mock import MockProvider
 
@@ -20,6 +21,11 @@ MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 # Initialize side-effects at import so the app (and tests) are ready immediately.
 db.init_db()
 storage.ensure_media_dir()
+transfer.ensure_transfer_dir()
+try:
+    transfer.purge_expired()
+except Exception:
+    pass  # cleanup must never block startup
 
 app = FastAPI(title="TANAKHA — AI Yard Makeover Visualizer")
 app.mount("/media", StaticFiles(directory=storage.ensure_media_dir()), name="media")
@@ -68,6 +74,59 @@ async def visualize(image: UploadFile = File(...), style: str = Form("lush garde
     after_url = storage.save_image(after_bytes, "jpg")
 
     return {"before_url": before_url, "after_url": after_url, "brief": brief, "style": style}
+
+
+@app.get("/transfer")
+def transfer_page() -> FileResponse:
+    return FileResponse(os.path.join(WEB_DIR, "transfer.html"))
+
+
+@app.post("/api/transfers")
+async def create_transfer(file: UploadFile = File(...)) -> dict:
+    token = transfer.new_token()
+    safe_name = transfer.sanitize_filename(file.filename or "")
+    dest = os.path.join(transfer.ensure_transfer_dir(), token)
+
+    try:
+        size = await transfer.save_upload(file, dest)
+    except transfer.TransferTooLarge:
+        max_gb = transfer.max_transfer_bytes() / 1024**3
+        raise HTTPException(status_code=413, detail=f"File too large (max {max_gb:g} GB).")
+    if size == 0:
+        transfer.remove_quiet(dest)
+        raise HTTPException(status_code=400, detail="Empty file upload.")
+
+    now = transfer.now_utc()
+    expires_at = transfer.iso(now + datetime.timedelta(days=transfer.TRANSFER_TTL_DAYS))
+    db.insert_transfer(token, safe_name, dest, size, transfer.iso(now), expires_at)
+
+    return {
+        "token": token,
+        "filename": safe_name,
+        "size_bytes": size,
+        "expires_at": expires_at,
+        "download_url": f"/d/{token}",
+    }
+
+
+@app.get("/d/{token}")
+def download_transfer(token: str) -> FileResponse:
+    not_found = HTTPException(status_code=404, detail="Link expired or not found.")
+    row = db.get_transfer(token)
+    if row is None:
+        raise not_found
+    if row["expires_at"] <= transfer.iso(transfer.now_utc()):
+        transfer.purge_expired()
+        raise not_found
+    if not os.path.exists(row["stored_path"]):
+        # Ephemeral disk wiped the file (e.g. redeploy); drop the stale row.
+        db.delete_transfer(token)
+        raise not_found
+    return FileResponse(
+        row["stored_path"],
+        filename=row["filename"],
+        media_type="application/octet-stream",
+    )
 
 
 class LeadIn(BaseModel):
