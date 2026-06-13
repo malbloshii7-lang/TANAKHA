@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arnault&rsquo;s Luxury Empire — A Maison Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital@0;1&family=Oswald:wght@300;400;500&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1813;
+    --ink-soft:#6f685d;
+    --ink-faint:#a59d90;
+    --paper:#f6f2ea;
+    --paper-2:#efe9de;
+    --hair:#e2dacc;
+    --hair-strong:#cfc6b4;
+    --shadow:24px 30px 60px -28px rgba(40,33,22,.45);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #fbf8f1 0%, var(--paper) 46%, var(--paper-2) 100%);
+    color:var(--ink);
+    font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .wrap{max-width:1240px;margin:0 auto;padding:clamp(28px,6vw,80px) clamp(20px,5vw,56px) 80px}
+
+  /* ---------- Masthead ---------- */
+  header.mast{
+    border-bottom:1px solid var(--hair-strong);
+    padding-bottom:clamp(22px,3vw,34px);
+    margin-bottom:clamp(30px,4vw,48px);
+  }
+  .kicker{
+    font:500 12px/1 "Archivo";
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin:0 0 18px;
+  }
+  h1.title{
+    font-family:"Playfair Display",serif;
+    font-weight:500;
+    font-size:clamp(40px,8vw,92px);
+    line-height:.96;
+    letter-spacing:-.01em;
+    margin:0;
+  }
+  h1.title em{font-style:italic;font-weight:400}
+  .lede{
+    max-width:60ch;
+    margin:22px 0 0;
+    font-size:clamp(15px,1.4vw,17px);
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+  .lede b{color:var(--ink);font-weight:600}
+  .meta{
+    display:flex;flex-wrap:wrap;gap:10px 26px;
+    margin-top:24px;
+    font:500 12px/1 "Archivo";
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .meta span{display:inline-flex;align-items:center;gap:9px}
+  .meta .dot{width:7px;height:7px;border-radius:50%;background:var(--ink)}
+
+  .hint{
+    margin-top:26px;
+    display:inline-flex;align-items:center;gap:12px;
+    font:400 12.5px/1 "Archivo";
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+  }
+  .hint .pulse{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--ink);
+    box-shadow:0 0 0 0 rgba(27,24,19,.5);
+    animation:pulse 2.6s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(27,24,19,.45)}
+    70%{box-shadow:0 0 0 9px rgba(27,24,19,0)}
+    100%{box-shadow:0 0 0 0 rgba(27,24,19,0)}
+  }
+
+  /* ---------- Division section ---------- */
+  .division{margin-top:clamp(40px,5vw,68px)}
+  .division-head{
+    display:flex;align-items:baseline;gap:18px;
+    padding-bottom:14px;margin-bottom:26px;
+    border-bottom:1px solid var(--hair);
+  }
+  .division-head h2{
+    font-family:"Cormorant Garamond",serif;
+    font-weight:600;
+    font-size:clamp(22px,2.4vw,30px);
+    letter-spacing:.01em;
+    margin:0;
+  }
+  .division-head .count{
+    font:500 12px/1 "Archivo";
+    letter-spacing:.2em;
+    color:var(--ink-faint);
+  }
+  .division-head .line{flex:1;height:1px;background:var(--hair)}
+
+  /* ---------- Grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(196px,1fr));
+    gap:clamp(12px,1.2vw,18px);
+  }
+
+  .card{
+    position:relative;
+    display:flex;flex-direction:column;justify-content:space-between;
+    min-height:158px;
+    padding:18px 18px 16px;
+    background:rgba(255,255,255,.35);
+    border:1px solid var(--hair);
+    border-radius:2px;
+    cursor:default;
+    overflow:hidden;
+    isolation:isolate;
+    transition:transform .5s cubic-bezier(.16,.84,.3,1),
+               box-shadow .5s ease,
+               border-color .5s ease,
+               background-color .5s ease,
+               color .5s ease;
+  }
+  /* signature-color flood, painted from behind */
+  .card::before{
+    content:"";
+    position:absolute;inset:0;z-index:-1;
+    background:var(--accent);
+    transform:scale(1.04);
+    opacity:0;
+    transition:opacity .5s ease;
+  }
+  /* resting seal: the only color at rest */
+  .seal{
+    position:absolute;top:15px;right:15px;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 3px rgba(255,255,255,.55);
+    transition:transform .5s ease, opacity .4s ease;
+  }
+
+  .card .name{
+    font-size:clamp(20px,2vw,24px);
+    line-height:1.04;
+    letter-spacing:-.005em;
+    margin:0;
+    transition:color .5s ease;
+  }
+  .card .essence{
+    margin:10px 0 0;
+    font:italic 400 13px/1.4 "Cormorant Garamond",serif;
+    color:var(--ink-soft);
+    transition:color .5s ease;
+  }
+  .card .foot{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-top:16px;
+    font:500 10.5px/1 "Archivo";
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    transition:color .5s ease;
+  }
+  .card .foot .craft{opacity:.9}
+
+  /* type archetypes — each brand's DNA voice */
+  .t-didone .name{font-family:"Playfair Display",serif;font-weight:500}
+  .t-oldstyle .name{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(22px,2.1vw,27px)}
+  .t-condensed .name{font-family:"Oswald",sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.04em}
+  .t-modern .name{font-family:"Archivo",sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(17px,1.7vw,21px)}
+  .t-mono .name{font-family:"Space Mono",monospace;font-weight:700;text-transform:uppercase;font-size:clamp(15px,1.5vw,18px);letter-spacing:-.02em}
+  .t-press .name{font-family:"EB Garamond",serif;font-weight:400;font-size:clamp(21px,2vw,26px)}
+
+  /* hover / focus = DNA bloom */
+  .card:hover,.card:focus-visible{
+    transform:translateY(-6px);
+    box-shadow:var(--shadow);
+    border-color:var(--accent);
+    color:var(--on);
+    outline:none;
+  }
+  .card:hover::before,.card:focus-visible::before{opacity:1}
+  .card:hover .name,.card:focus-visible .name{color:var(--on)}
+  .card:hover .essence,.card:focus-visible .essence,
+  .card:hover .foot,.card:focus-visible .foot{color:var(--on);opacity:.82}
+  .card:hover .seal,.card:focus-visible .seal{
+    transform:scale(1.6);
+    background:var(--on);
+    box-shadow:0 0 0 3px rgba(255,255,255,.12);
+  }
+  .card.former .name::after{
+    content:"°";
+    color:var(--ink-faint);
+    font-family:"Archivo";
+  }
+  .card:hover.former .name::after,.card:focus-visible.former .name::after{color:var(--on)}
+
+  /* ---------- Footer ---------- */
+  footer.colophon{
+    margin-top:clamp(50px,6vw,84px);
+    padding-top:26px;
+    border-top:1px solid var(--hair-strong);
+    display:flex;flex-wrap:wrap;gap:14px 40px;justify-content:space-between;
+    font:400 12px/1.7 "Archivo";
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+  }
+  footer.colophon b{color:var(--ink-soft);font-weight:600}
+  footer .legend{display:flex;gap:8px;align-items:center}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:opacity .2s ease, color .2s ease!important}
+    .card:hover,.card:focus-visible{transform:none}
+  }
+  @media (max-width:520px){
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+    .card{min-height:138px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="kicker">The Maison Archive</p>
+    <h1 class="title">Arnault&rsquo;s <em>Luxury</em> Empire</h1>
+    <p class="lede">
+      Every notable house gathered under <b>LVMH</b> since Bernard Arnault took the helm —
+      from the <b>1854</b> trunk-maker to a <b>2019</b> beauty disruptor. Revenue is up
+      roughly <b>24&times;</b> since 1989, but the empire is really a collection of singular identities.
+    </p>
+    <div class="meta">
+      <span><i class="dot"></i> 6 divisions</span>
+      <span><i class="dot"></i> 50 maisons</span>
+      <span><i class="dot"></i> 1593 &rarr; 2019 founding span</span>
+    </div>
+    <div class="hint"><i class="pulse"></i> Hover or tab through a house to reveal its signature — one identity at a time.</div>
+  </header>
+
+  <main id="archive"></main>
+
+  <footer class="colophon">
+    <div>
+      <b>The catch, answered:</b> at rest the archive is a single ink-on-ivory voice.
+      Each house keeps its DNA in two strokes — its <b>typeface</b> and a single <b>signature colour</b>,
+      which floods in only on touch. No noise, just fifty quiet identities.
+    </div>
+    <div class="legend"><span>°</span> former holding / no longer a subsidiary &nbsp;·&nbsp; structure after the Quartr chart</div>
+  </footer>
+
+</div>
+
+<script>
+/* Brand DNA: type = voice archetype, accent = signature colour, on = legible ink on that colour */
+const DIVISIONS = [
+  { name:"Fashion & Leather Goods", brands:[
+    {n:"Louis Vuitton", t:"modern",    a:"#7d5a32", o:"#fbf6ec", e:"The 1854 monogram", y:1854, c:"Maroquinerie"},
+    {n:"Dior",          t:"didone",    a:"#15140f", o:"#f4f0e6", e:"Couture, in grey & ivory", y:1946, c:"Couture"},
+    {n:"Givenchy",      t:"didone",    a:"#262320", o:"#f1ece2", e:"Aristocratic minimalism", y:1952, c:"Couture"},
+    {n:"Celine",        t:"didone",    a:"#c9b79b", o:"#23201a", e:"Quiet Parisian line", y:1945, c:"Prêt-à-porter"},
+    {n:"Loewe",         t:"modern",    a:"#8a5a2b", o:"#fbf3e8", e:"Spanish leather craft", y:1846, c:"Maroquinerie"},
+    {n:"Fendi",         t:"didone",    a:"#f4dd00", o:"#1a1810", e:"Roman fur & the double-F", y:1925, c:"Maison"},
+    {n:"Kenzo",         t:"modern",    a:"#d8002a", o:"#fff0ef", e:"The roaring tiger", y:1970, c:"Prêt-à-porter"},
+    {n:"Marc Jacobs",   t:"modern",    a:"#e4003a", o:"#fff0f2", e:"New York irreverence", y:1984, c:"Prêt-à-porter"},
+    {n:"Berluti",       t:"condensed", a:"#5c1414", o:"#f6e7df", e:"Venezia patina", y:1895, c:"Soulier"},
+    {n:"Loro Piana",    t:"didone",    a:"#9c7d57", o:"#fbf4e9", e:"Vicuña & cashmere", y:1924, c:"Cashmere"},
+    {n:"Emilio Pucci",  t:"modern",    a:"#d6006e", o:"#fff0f6", e:"Kaleidoscopic prints", y:1947, c:"Prêt-à-porter"},
+    {n:"Rimowa",        t:"modern",    a:"#3c3f42", o:"#f0f1f1", e:"Grooved aluminium", y:1898, c:"Bagagerie"},
+    {n:"Off-White",     t:"mono",      a:"#171717", o:"#f3f3f0", e:'"QUOTES" & caution', y:2012, c:"Streetwear"},
+    {n:"Patou",         t:"didone",    a:"#2c5a3a", o:"#f0f6f0", e:"The house of Joy", y:1914, c:"Couture"},
+    {n:"Nicholas Kirkwood", t:"modern",a:"#1d1d1d", o:"#f2f1ef", e:"Sculptural footwear", y:2004, c:"Soulier"},
+    {n:"Rossimoda",     t:"modern",    a:"#6a6256", o:"#f4f1ea", e:"Venetian shoemaker", y:1942, c:"Soulier"},
+    {n:"Thomas Pink",   t:"modern",    a:"#e7a8c1", o:"#5a1a35", e:"Jermyn Street shirts", y:1984, c:"Chemiserie", former:true},
+    {n:"DKNY",          t:"modern",    a:"#171717", o:"#f3f3f0", e:"Donna Karan, downtown", y:1984, c:"Prêt-à-porter", former:true},
+  ]},
+  { name:"Wines & Spirits", brands:[
+    {n:"Moët & Chandon", t:"oldstyle", a:"#14110a", o:"#caa227", e:"The imperial star", y:1743, c:"Champagne"},
+    {n:"Dom Pérignon",   t:"oldstyle", a:"#0b1c2c", o:"#c9a227", e:"Vintage only", y:1668, c:"Champagne"},
+    {n:"Veuve Clicquot", t:"oldstyle", a:"#f6b600", o:"#1a150a", e:"The yellow label", y:1772, c:"Champagne"},
+    {n:"Krug",           t:"oldstyle", a:"#7a1530", o:"#efd2a0", e:"Multi-vintage art", y:1843, c:"Champagne"},
+    {n:"Hennessy",       t:"oldstyle", a:"#23170a", o:"#d4af37", e:"Four houses of cognac", y:1765, c:"Cognac"},
+    {n:"Ardbeg",         t:"press",    a:"#1b5e20", o:"#eef3e6", e:"Islay peat smoke", y:1815, c:"Whisky"},
+    {n:"Glenmorangie",   t:"press",    a:"#df8a1e", o:"#1c1408", e:"The orange Highland malt", y:1843, c:"Whisky"},
+    {n:"Belvedere",      t:"condensed",a:"#0a2240", o:"#e9eef5", e:"Polish rye, silver night", y:1993, c:"Vodka"},
+  ]},
+  { name:"Perfumes & Cosmetics", brands:[
+    {n:"Guerlain",          t:"oldstyle", a:"#14213d", o:"#c9a227", e:"The bee bottle, since 1828", y:1828, c:"Parfum"},
+    {n:"Acqua di Parma",    t:"didone",   a:"#efc100", o:"#1a160a", e:"Colonia, Parma yellow", y:1916, c:"Parfum"},
+    {n:"Make Up For Ever",  t:"modern",   a:"#161616", o:"#f2f2f0", e:"Backstage to street", y:1984, c:"Maquillage"},
+    {n:"Benefit",           t:"modern",   a:"#e6488f", o:"#fff0f6", e:"Cheeky San Francisco glam", y:1976, c:"Maquillage"},
+    {n:"Fenty Beauty",      t:"modern",   a:"#1a1a1a", o:"#f3f3f0", e:"Shade-inclusive, by Rihanna", y:2017, c:"Maquillage"},
+    {n:"Buly 1803",         t:"oldstyle", a:"#1f4a38", o:"#eadfc4", e:"L&rsquo;Officine Universelle", y:1803, c:"Apothicaire"},
+  ]},
+  { name:"Watches & Jewellery", brands:[
+    {n:"Tiffany & Co.", t:"didone",    a:"#0abab5", o:"#063a39", e:"The 1845 robin&rsquo;s-egg box", y:1837, c:"Joaillerie"},
+    {n:"Bvlgari",       t:"condensed", a:"#00533e", o:"#e7d29a", e:"Roman colour & Serpenti", y:1884, c:"Joaillerie"},
+    {n:"Chaumet",       t:"didone",    a:"#14213d", o:"#c9a227", e:"Joséphine&rsquo;s jeweller", y:1780, c:"Joaillerie"},
+    {n:"Fred",          t:"modern",    a:"#0f4c81", o:"#eaf1f7", e:"Force 10, Riviera blue", y:1936, c:"Joaillerie"},
+    {n:"Repossi",       t:"didone",    a:"#b76e79", o:"#fbf1f2", e:"Architectural ear cuffs", y:1957, c:"Joaillerie"},
+    {n:"TAG Heuer",     t:"condensed", a:"#d2002e", o:"#fff0f1", e:"The racing chronograph", y:1860, c:"Horlogerie"},
+    {n:"Hublot",        t:"condensed", a:"#1a1a1a", o:"#f2f2f0", e:"Art of fusion", y:1980, c:"Horlogerie"},
+    {n:"Zenith",        t:"condensed", a:"#0a2a5e", o:"#e8edf5", e:"El Primero, the star", y:1865, c:"Horlogerie"},
+    {n:"De Beers",      t:"press",     a:"#1c2b39", o:"#e9edf1", e:"A diamond&rsquo;s forever", y:1888, c:"Joaillerie", former:true},
+    {n:"Pedemonte Group", t:"modern",  a:"#6a635a", o:"#f4f1ea", e:"High-jewellery atelier", y:1971, c:"Manufacture"},
+  ]},
+  { name:"Selective Retailing", brands:[
+    {n:"Sephora",   t:"modern",    a:"#171717", o:"#f3f3f0", e:"The black-&-white flame", y:1969, c:"Distribution"},
+    {n:"DFS",       t:"modern",    a:"#b8232f", o:"#fdeeef", e:"Duty free, worldwide", y:1960, c:"Travel retail"},
+    {n:"Starboard", t:"modern",    a:"#00609c", o:"#eaf3fa", e:"Boutiques at sea", y:1958, c:"Cruise retail"},
+  ]},
+  { name:"Media, Hospitality & Other", brands:[
+    {n:"Les Echos",   t:"press",  a:"#f3b7ab", o:"#5e1a26", e:"France&rsquo;s salmon-pink daily", y:1908, c:"Presse"},
+    {n:"Le Parisien", t:"press",  a:"#e2001a", o:"#fff0f0", e:"The capital&rsquo;s paper", y:1944, c:"Presse"},
+    {n:"Investir",    t:"press",  a:"#0a4d8c", o:"#eaf1f8", e:"Markets weekly", y:1974, c:"Presse"},
+    {n:"Royal Van Lent", t:"oldstyle", a:"#0a2240", o:"#e9eef5", e:"Feadship superyachts", y:1849, c:"Yachts"},
+    {n:"Belmond",     t:"oldstyle", a:"#1f3a2d", o:"#cdb98a", e:"Legendary trains & hotels", y:1976, c:"Hospitalité"},
+  ]},
+];
+
+const main = document.getElementById('archive');
+const esc = s => s; // strings already contain intended entities
+
+DIVISIONS.forEach(div => {
+  const sec = document.createElement('section');
+  sec.className = 'division';
+  sec.innerHTML = `
+    <div class="division-head">
+      <h2>${div.name}</h2>
+      <span class="line"></span>
+      <span class="count">${String(div.brands.length).padStart(2,'0')} maisons</span>
+    </div>
+    <div class="grid"></div>`;
+  const grid = sec.querySelector('.grid');
+  div.brands.forEach(b => {
+    const card = document.createElement('article');
+    card.className = `card t-${b.t}${b.former ? ' former':''}`;
+    card.tabIndex = 0;
+    card.style.setProperty('--accent', b.a);
+    card.style.setProperty('--on', b.o);
+    card.setAttribute('aria-label', `${b.n}, ${div.name}, founded ${b.y}`);
+    card.innerHTML = `
+      <span class="seal" aria-hidden="true"></span>
+      <h3 class="name">${b.n}</h3>
+      <div>
+        <p class="essence">${b.e}</p>
+        <div class="foot"><span class="est">Est. ${b.y}</span><span class="craft">${b.c}</span></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  main.appendChild(sec);
+});
+</script>
+</body>
+</html>
