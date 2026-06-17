@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "ts-node": {
+    "transpileOnly": true
+  },
+  "include": ["engine/**/*.ts"]
+}
