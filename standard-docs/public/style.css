@@ -1,0 +1,270 @@
+/* STANDARD — Web Cockpit Styling (Navy + Gold, Quiet Luxury) */
+
+:root {
+  --navy: #0A1F3C;
+  --gold: #BFA15A;
+  --ink: #14181F;
+  --paper: #FBFAF7;
+  --border: #D8D3C4;
+  --muted: #5C6470;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Trebuchet MS, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.6;
+}
+
+.header {
+  background: var(--navy);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  border-bottom: 2px solid var(--gold);
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.15em;
+  font-weight: 300;
+}
+
+.header p {
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.form {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2rem;
+}
+
+.fieldset {
+  margin-bottom: 2rem;
+  border: none;
+  padding: 0;
+}
+
+.fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--gold);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(191, 161, 90, 0.1);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#bodyItems {
+  margin-bottom: 1.5rem;
+}
+
+.body-item {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.body-item-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.body-item-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.body-item-controls input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.body-item button {
+  margin-left: auto;
+}
+
+.body-item textarea {
+  width: 100%;
+  min-height: 80px;
+  margin-bottom: 0.5rem;
+  font-family: "Verdana", monospace;
+}
+
+.list-items {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.list-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-item input {
+  flex: 1;
+}
+
+.list-item button {
+  padding: 0.5rem 1rem;
+  background: #ddd;
+  color: #333;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 2px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: white;
+  border: 2px solid var(--navy);
+}
+
+.btn-primary:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--navy);
+  border: 2px solid var(--gold);
+}
+
+.btn-secondary:hover {
+  background: var(--gold);
+  color: white;
+}
+
+.status {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 2px;
+  display: none;
+  text-align: center;
+}
+
+.status.loading {
+  display: block;
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+}
+
+.status.success {
+  display: block;
+  background: #e8f5e9;
+  color: #388e3c;
+  border: 1px solid #388e3c;
+}
+
+.status.error {
+  display: block;
+  background: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .form {
+    padding: 1.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
