@@ -1,7 +1,10 @@
 /**
- * STANDARD — Frontend Logic
+ * STANDARD — H.E. Speech Builder · Frontend Logic
  *
- * Form intake, dynamic paragraphs, submission to /api/render
+ * - "Prepare H.E. speech" -> POST /api/prepare -> on-page preview (offline draft)
+ * - "English copy" / "Arabic copy" -> POST /api/copy?lang=.. -> .docx download
+ *
+ * All requests hit the local server only. No external calls.
  */
 
 let paragraphCount = 0;
@@ -11,7 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.getElementById("addParagraph");
 
   addBtn.addEventListener("click", addParagraph);
-  form.addEventListener("submit", handleSubmit);
+  form.addEventListener("submit", handlePrepare);
+  document.getElementById("copyEN").addEventListener("click", () => downloadCopy("en"));
+  document.getElementById("copyAR").addEventListener("click", () => downloadCopy("ar"));
 
   addParagraph();
 });
@@ -34,7 +39,7 @@ function addParagraph() {
       </label>
       <button type="button" class="btn-secondary" onclick="removeParagraph(${paragraphCount})">Remove</button>
     </div>
-    <textarea class="para-text" placeholder="Paragraph text..."></textarea>
+    <textarea class="para-text" placeholder="Paragraph text or talking point..."></textarea>
     <div class="list-items" style="display: none;">
       <div class="list-item">
         <input type="text" class="list-item-input" placeholder="List item 1...">
@@ -46,7 +51,6 @@ function addParagraph() {
 
   const listCheckbox = item.querySelector(".list-checkbox");
   const listItems = item.querySelector(".list-items");
-
   listCheckbox.addEventListener("change", () => {
     listItems.style.display = listCheckbox.checked ? "block" : "none";
   });
@@ -74,69 +78,113 @@ function removeListItem(button) {
   button.parentElement.remove();
 }
 
-async function handleSubmit(e) {
-  e.preventDefault();
+/** Collect the form into the intake shape the server expects. */
+function gatherIntake() {
+  const intake = {
+    occasion: document.getElementById("occasion").value,
+    principal: document.getElementById("principal").value,
+    audience: document.getElementById("audience").value,
+    location: document.getElementById("location").value,
+    date: document.getElementById("date").value,
+    language: document.getElementById("language").value,
+    closing: document.getElementById("closing").value,
+    body: [],
+  };
 
+  document.querySelectorAll(".body-item").forEach((item) => {
+    const text = item.querySelector(".para-text").value;
+    const bold = item.querySelector(".bold-checkbox").checked;
+    const hasList = item.querySelector(".list-checkbox").checked;
+
+    if (text || hasList) {
+      const bodyItem = { text, bold };
+      if (hasList) {
+        const listInputs = item.querySelectorAll(".list-item-input");
+        bodyItem.list = {
+          marker: "bullet",
+          items: Array.from(listInputs).map((inp) => inp.value).filter((v) => v),
+        };
+      }
+      intake.body.push(bodyItem);
+    }
+  });
+
+  return intake;
+}
+
+function setStatus(kind, msg) {
   const status = document.getElementById("status");
-  status.className = "status loading";
-  status.textContent = "Generating document...";
+  status.className = `status ${kind}`;
+  status.textContent = msg;
+}
+
+async function errorMessage(response, fallback) {
+  try {
+    const j = await response.json();
+    if (j && j.error) return j.error;
+  } catch (_) {}
+  return fallback;
+}
+
+async function handlePrepare(e) {
+  e.preventDefault();
+  setStatus("loading", "Preparing H.E. speech…");
 
   try {
-    const occasion = document.getElementById("occasion").value;
-    const principal = document.getElementById("principal").value;
-    const audience = document.getElementById("audience").value;
-    const location = document.getElementById("location").value;
-    const date = document.getElementById("date").value;
-    const language = document.getElementById("language").value;
-    const closing = document.getElementById("closing").value;
-
-    const bodyItems = [];
-    document.querySelectorAll(".body-item").forEach((item) => {
-      const text = item.querySelector(".para-text").value;
-      const bold = item.querySelector(".bold-checkbox").checked;
-      const hasList = item.querySelector(".list-checkbox").checked;
-
-      if (text || hasList) {
-        const bodyItem = { text, bold };
-        if (hasList) {
-          const listInputs = item.querySelectorAll(".list-item-input");
-          const items = Array.from(listInputs).map((inp) => inp.value).filter((v) => v);
-          bodyItem.list = { marker: "bullet", items };
-        }
-        bodyItems.push(bodyItem);
-      }
-    });
-
-    if (!occasion || !principal || !audience || !language || !closing) {
-      throw new Error("Please fill in all required fields");
+    const intake = gatherIntake();
+    if (!intake.occasion || !intake.principal) {
+      throw new Error("Occasion and Principal are required.");
     }
 
-    const response = await fetch("/api/render", {
+    const response = await fetch("/api/prepare", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ occasion, principal, audience, location, date, language, body: bodyItems, closing })
+      body: JSON.stringify(intake),
     });
+    if (!response.ok) throw new Error(await errorMessage(response, "Failed to prepare speech"));
 
-    if (!response.ok) {
-      let msg = "Failed to render document";
-      try { const j = await response.json(); if (j.error) msg = j.error; } catch (_) {}
-      throw new Error(msg);
+    const data = await response.json();
+    const block = document.getElementById("previewBlock");
+    const pre = document.getElementById("preview");
+    pre.textContent = data.preview;
+    pre.dir = data.language === "ar" ? "rtl" : "ltr";
+    block.style.display = "block";
+
+    setStatus("success", `✓ Draft ready (${data.language === "ar" ? "Arabic" : "English"}). Review the preview, then download a copy.`);
+  } catch (error) {
+    setStatus("error", `✗ ${error.message}`);
+  }
+}
+
+async function downloadCopy(lang) {
+  setStatus("loading", `Generating ${lang === "ar" ? "Arabic" : "English"} copy…`);
+
+  try {
+    const intake = gatherIntake();
+    if (!intake.occasion || !intake.principal) {
+      throw new Error("Occasion and Principal are required.");
     }
+
+    const response = await fetch(`/api/copy?lang=${lang}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(intake),
+    });
+    if (!response.ok) throw new Error(await errorMessage(response, "Failed to render document"));
 
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
+    const safe = (intake.occasion || "speech").replace(/\s+/g, "-");
     a.href = url;
-    a.download = `${occasion.replace(/\s+/g, "-")}-${language}.docx`;
+    a.download = `${safe}-HE-${lang}.docx`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
     a.remove();
 
-    status.className = "status success";
-    status.textContent = "✓ Document generated and downloaded!";
+    setStatus("success", `✓ ${lang === "ar" ? "Arabic" : "English"} copy downloaded.`);
   } catch (error) {
-    status.className = "status error";
-    status.textContent = `✗ Error: ${error.message}`;
+    setStatus("error", `✗ ${error.message}`);
   }
 }

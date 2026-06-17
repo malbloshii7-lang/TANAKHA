@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STANDARD — Ministerial Document Cockpit</title>
+  <title>STANDARD — H.E. Speech Builder</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="header">
     <div class="header-content">
       <h1>STANDARD</h1>
-      <p>Ministerial Document Cockpit</p>
+      <p>H.E. Speech Builder</p>
+      <p class="offline-note">Runs locally · offline · no cloud</p>
     </div>
   </header>
 
@@ -67,12 +68,28 @@
         </div>
       </fieldset>
 
-      <div class="actions">
-        <button type="submit" class="btn-primary">Generate Document</button>
-        <button type="reset" class="btn-secondary">Clear Form</button>
-      </div>
+      <!-- Engine Bar -->
+      <fieldset class="fieldset engine-bar">
+        <legend>Engine Bar</legend>
+        <p class="engine-bar-hint">
+          The phrase-bank draft layer expands your inputs into a Kazakhstan-style speech —
+          formal opening, polished paragraphs, bullet sections, forward-looking closing.
+          Everything runs offline on this machine.
+        </p>
+        <div class="actions">
+          <button type="submit" class="btn-primary">Prepare H.E. speech</button>
+          <button type="button" id="copyEN" class="btn-secondary">English copy</button>
+          <button type="button" id="copyAR" class="btn-secondary">Arabic copy</button>
+          <button type="reset" class="btn-secondary">Clear Form</button>
+        </div>
+      </fieldset>
 
       <div id="status" class="status"></div>
+
+      <fieldset class="fieldset preview-block" id="previewBlock" style="display:none;">
+        <legend>Preview</legend>
+        <pre id="preview" class="preview"></pre>
+      </fieldset>
     </form>
   </main>
 

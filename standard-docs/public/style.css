@@ -43,6 +43,62 @@ body {
   font-weight: 300;
 }
 
+.header .offline-note {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.95;
+  text-transform: uppercase;
+}
+
+/* Engine Bar */
+.engine-bar {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  border-radius: 2px;
+  padding: 1.5rem;
+}
+
+.engine-bar legend {
+  padding: 0 0.5rem;
+}
+
+.engine-bar-hint {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.actions {
+  flex-wrap: wrap;
+}
+
+/* Preview pane */
+.preview-block legend {
+  border-bottom-color: var(--gold);
+}
+
+.preview {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.25rem;
+  font-family: "Verdana", "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 480px;
+  overflow: auto;
+}
+
+.preview[dir="rtl"] {
+  text-align: right;
+}
+
 .container {
   max-width: 900px;
   margin: 2rem auto;
