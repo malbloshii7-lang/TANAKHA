@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Art of Crafting Prompts — 10 Mastery Perks</title>
+<meta name="description" content="Ten mastery perks from The Art of Crafting Prompts, paired with the most powerful AI tools — built on the D.N.A of every great prompt. By Kimi." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#05060c;
+    --bg-2:#0a0d1a;
+    --panel:rgba(18,22,40,.55);
+    --panel-edge:rgba(120,160,255,.14);
+    --ink:#e9ecff;
+    --ink-soft:#9aa3c7;
+    --ink-faint:#5c648a;
+    --cyan:#41f1d6;
+    --violet:#8b5cff;
+    --pink:#ff5db1;
+    --glow:0 0 40px -8px rgba(65,241,214,.45);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    color:var(--ink);
+    font-family:"Sora",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Animated cosmic backdrop ---------- */
+  .field{position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(60% 50% at 18% 12%, rgba(139,92,255,.22) 0%, transparent 60%),
+      radial-gradient(55% 45% at 85% 18%, rgba(65,241,214,.18) 0%, transparent 60%),
+      radial-gradient(70% 60% at 50% 110%, rgba(255,93,177,.16) 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+  .grid{position:fixed;inset:-2px;z-index:-1;opacity:.35;
+    background-image:
+      linear-gradient(rgba(120,160,255,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,160,255,.06) 1px, transparent 1px);
+    background-size:54px 54px;
+    mask-image:radial-gradient(80% 60% at 50% 20%, #000 0%, transparent 85%);
+    animation:drift 24s linear infinite;
+  }
+  @keyframes drift{to{background-position:54px 54px,54px 54px}}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:clamp(26px,5vw,64px) clamp(18px,5vw,48px) 96px}
+
+  /* ---------- Nav ---------- */
+  nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:clamp(40px,8vw,90px)}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.02em}
+  .brand .dot{width:11px;height:11px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--pink),var(--cyan));
+    box-shadow:var(--glow);animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .src{font:700 11px/1 "Space Mono";letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);text-decoration:none;padding:9px 14px;border:1px solid var(--panel-edge);
+    border-radius:999px;background:var(--panel);backdrop-filter:blur(8px);transition:.25s}
+  .src:hover{color:var(--cyan);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
+
+  /* ---------- Hero ---------- */
+  .kicker{font:700 12px/1 "Space Mono";letter-spacing:.4em;text-transform:uppercase;color:var(--cyan);margin:0 0 22px}
+  h1{font-family:"Space Grotesk",sans-serif;font-weight:700;
+    font-size:clamp(40px,8.5vw,104px);line-height:.94;letter-spacing:-.02em;margin:0;
+    background:linear-gradient(120deg,#fff 0%,#c9d2ff 38%,var(--cyan) 70%,var(--violet) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  h1 em{font-style:italic;font-weight:400}
+  .lede{max-width:62ch;margin:26px 0 0;font-size:clamp(16px,2.1vw,21px);line-height:1.55;color:var(--ink-soft)}
+  .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+  .btn{font:600 14px/1 "Sora";text-decoration:none;padding:15px 26px;border-radius:14px;transition:.25s;border:1px solid transparent}
+  .btn.primary{color:#05060c;background:linear-gradient(120deg,var(--cyan),#7af);box-shadow:var(--glow)}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 0 56px -6px rgba(65,241,214,.6)}
+  .btn.ghost{color:var(--ink);border-color:var(--panel-edge);background:var(--panel);backdrop-filter:blur(8px)}
+  .btn.ghost:hover{border-color:rgba(139,92,255,.5);color:#fff}
+
+  /* ---------- D.N.A section ---------- */
+  .dna{margin-top:clamp(70px,10vw,120px);padding:clamp(28px,4vw,46px);border-radius:26px;
+    border:1px solid var(--panel-edge);background:var(--panel);backdrop-filter:blur(14px);
+    position:relative;overflow:hidden}
+  .dna::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(60% 120% at 80% 0%,rgba(139,92,255,.18),transparent 60%);pointer-events:none}
+  .dna .eyebrow{font:700 11px/1 "Space Mono";letter-spacing:.34em;text-transform:uppercase;color:var(--pink);margin:0 0 14px}
+  .dna h2{font-family:"Space Grotesk",sans-serif;font-size:clamp(26px,4vw,42px);margin:0;letter-spacing:-.01em}
+  .dna p{color:var(--ink-soft);max-width:70ch;margin:14px 0 30px;line-height:1.55}
+  .helix{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .gene{padding:22px;border-radius:18px;border:1px solid var(--panel-edge);
+    background:rgba(8,11,24,.5);transition:.3s}
+  .gene:hover{transform:translateY(-4px);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
+  .gene .letter{font-family:"Space Grotesk";font-weight:700;font-size:46px;line-height:1;
+    background:linear-gradient(120deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .gene h3{margin:10px 0 6px;font-size:18px}
+  .gene span{color:var(--ink-soft);font-size:14px;line-height:1.5}
+
+  /* ---------- Perks grid ---------- */
+  .section-head{margin:clamp(72px,11vw,128px) 0 34px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .section-head h2{font-family:"Space Grotesk";font-size:clamp(26px,4.4vw,46px);margin:0;letter-spacing:-.01em}
+  .section-head p{margin:0;color:var(--ink-faint);font:700 12px/1 "Space Mono";letter-spacing:.2em;text-transform:uppercase}
+
+  .perks{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .perk{position:relative;padding:26px 26px 22px;border-radius:22px;
+    border:1px solid var(--panel-edge);background:var(--panel);backdrop-filter:blur(12px);
+    overflow:hidden;transition:.3s;opacity:0;transform:translateY(22px)}
+  .perk.in{opacity:1;transform:none}
+  .perk::after{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;
+    background:linear-gradient(130deg,transparent,rgba(65,241,214,.5),transparent);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.3s}
+  .perk:hover{transform:translateY(-5px)}
+  .perk:hover::after{opacity:1}
+  .perk .no{font-family:"Space Mono";font-weight:700;font-size:13px;letter-spacing:.1em;color:var(--cyan)}
+  .perk h3{font-family:"Space Grotesk";font-size:clamp(19px,2.4vw,23px);margin:8px 0 10px;line-height:1.15}
+  .perk .body{color:var(--ink-soft);font-size:15px;line-height:1.58;margin:0 0 18px}
+  .perk .body b{color:var(--ink);font-weight:600}
+  .tools{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--panel-edge);padding-top:16px}
+  .tools .lab{width:100%;font:700 10px/1 "Space Mono";letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:2px}
+  .tool{font:600 12px/1 "Space Mono";letter-spacing:.02em;padding:7px 11px;border-radius:999px;
+    border:1px solid var(--panel-edge);background:rgba(8,11,24,.55);color:var(--ink);display:inline-flex;align-items:center;gap:6px;transition:.2s}
+  .tool::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .tool:hover{border-color:rgba(139,92,255,.5);color:#fff;transform:translateY(-1px)}
+  .tool.v::before{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+  .tool.p::before{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+
+  /* ---------- Footer ---------- */
+  footer{margin-top:clamp(80px,12vw,140px);padding-top:30px;border-top:1px solid var(--panel-edge);
+    display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  footer .meta{font:400 14px/1.6 "Sora";color:var(--ink-soft)}
+  footer a{color:var(--cyan);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  .sig{font:700 11px/1 "Space Mono";letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+
+  @media (max-width:760px){
+    .perks{grid-template-columns:1fr}
+    .helix{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important}
+    .perk{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+  <div class="field"></div>
+  <div class="grid"></div>
+
+  <div class="wrap">
+    <nav>
+      <div class="brand"><span class="dot"></span> THE ART OF CRAFTING PROMPTS</div>
+      <a class="src" href="https://dqhl26j56gqbg.kimi.page" target="_blank" rel="noopener">Source ↗</a>
+    </nav>
+
+    <!-- Hero -->
+    <header>
+      <p class="kicker">10 Mastery Perks · Engineered for the AI Era</p>
+      <h1>Speak to machines<br />like a <em>master.</em></h1>
+      <p class="lede">
+        Distilled from <b>“The Art of Crafting Prompts,”</b> these ten perks turn vague requests into
+        precise, repeatable results — each one mapped to the most capable AI tools so you can put it to
+        work today. Every great prompt shares the same <b>D.N.A.</b>
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="#perks">Unlock the 10 perks</a>
+        <a class="btn ghost" href="#dna">See the D.N.A →</a>
+      </div>
+    </header>
+
+    <!-- D.N.A framework -->
+    <section class="dna" id="dna">
+      <p class="eyebrow">The genetic code of every prompt</p>
+      <h2>D · N · A</h2>
+      <p>
+        Strip any world-class prompt down to its strands and you find the same three: <b>Define</b> the
+        intent, <b>Navigate</b> the constraints, <b>Adapt</b> from the response. Master these and the
+        ten perks below become muscle memory.
+      </p>
+      <div class="helix">
+        <div class="gene">
+          <div class="letter">D</div>
+          <h3>Define</h3>
+          <span>State the role, goal, and audience before a single instruction. Ambiguity in → ambiguity out.</span>
+        </div>
+        <div class="gene">
+          <div class="letter">N</div>
+          <h3>Navigate</h3>
+          <span>Set the rails — format, length, tone, what to avoid. Constraints are creative fuel, not cages.</span>
+        </div>
+        <div class="gene">
+          <div class="letter">A</div>
+          <h3>Adapt</h3>
+          <span>Read the output, isolate the gap, and refine. The prompt is a dialogue, never a one-shot.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Perks -->
+    <div class="section-head" id="perks">
+      <h2>The 10 Mastery Perks</h2>
+      <p>Each paired with its sharpest AI tools</p>
+    </div>
+
+    <main class="perks">
+
+      <article class="perk">
+        <div class="no">PERK 01</div>
+        <h3>Assign a role before a task</h3>
+        <p class="body">Open with <b>“Act as a…”</b> The model inherits the vocabulary, standards, and judgment of the persona — answers sharpen instantly.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude (Opus 4.8)</span>
+          <span class="tool v">ChatGPT</span>
+          <span class="tool p">Gemini</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 02</div>
+        <h3>Show, don’t just tell</h3>
+        <p class="body">Drop in <b>1–3 worked examples</b> (few-shot). The model mirrors your pattern far more reliably than it follows abstract description.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude</span>
+          <span class="tool v">GPT-4o</span>
+          <span class="tool p">Mistral</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 03</div>
+        <h3>Ask it to think out loud</h3>
+        <p class="body">Add <b>“reason step by step”</b> for logic, math, and planning. Visible reasoning catches its own mistakes before the final answer.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude (extended thinking)</span>
+          <span class="tool v">OpenAI o-series</span>
+          <span class="tool p">DeepSeek-R1</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 04</div>
+        <h3>Pin the output format</h3>
+        <p class="body">Demand <b>JSON, a table, or markdown headings</b>. Structure removes guesswork and makes results pipeable into the next tool.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude (tool use)</span>
+          <span class="tool v">GPT (JSON mode)</span>
+          <span class="tool p">Gemini</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 05</div>
+        <h3>Constrain to liberate</h3>
+        <p class="body">Box the answer — <b>“in 50 words,” “no jargon,” “avoid X.”</b> Tight limits force signal over filler.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude</span>
+          <span class="tool v">ChatGPT</span>
+          <span class="tool p">Copilot</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 06</div>
+        <h3>Feed it the ground truth</h3>
+        <p class="body">Paste the doc, data, or context the answer must rest on. <b>Grounded prompts</b> beat memory and slash hallucination.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude (Projects)</span>
+          <span class="tool v">Perplexity</span>
+          <span class="tool p">NotebookLM</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 07</div>
+        <h3>Iterate — never one-shot</h3>
+        <p class="body">Treat the first reply as a draft. <b>“Make it bolder / tighter / for execs”</b> — refinement is where mastery lives.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude</span>
+          <span class="tool v">ChatGPT (Canvas)</span>
+          <span class="tool p">Gemini</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 08</div>
+        <h3>Make it the critic</h3>
+        <p class="body">Ask the model to <b>red-team its own answer</b>: “List 3 weaknesses, then fix them.” Self-review compounds quality for free.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude</span>
+          <span class="tool v">GPT-4o</span>
+          <span class="tool p">Grok</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 09</div>
+        <h3>Set the visual DNA</h3>
+        <p class="body">For images, specify <b>subject, style, lighting, lens, mood</b> in that order. Precision in language is precision in pixels.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Midjourney</span>
+          <span class="tool v">DALL·E 3</span>
+          <span class="tool p">Stable Diffusion</span>
+        </div>
+      </article>
+
+      <article class="perk">
+        <div class="no">PERK 10</div>
+        <h3>Save what works as a template</h3>
+        <p class="body">A winning prompt is an <b>asset.</b> Parameterize it with <code>{{slots}}</code> and reuse — your personal compounding library.</p>
+        <div class="tools">
+          <span class="lab">Best with</span>
+          <span class="tool">Claude (Prompt Library)</span>
+          <span class="tool v">PromptPerfect</span>
+          <span class="tool p">LangChain</span>
+        </div>
+      </article>
+
+    </main>
+
+    <footer>
+      <div class="meta">
+        Perks distilled from <b>“The Art of Crafting Prompts.”</b><br />
+        Curated &amp; built by <b>Kimi</b> · <a href="https://dqhl26j56gqbg.kimi.page" target="_blank" rel="noopener">dqhl26j56gqbg.kimi.page</a>
+      </div>
+      <div class="sig">Define · Navigate · Adapt</div>
+    </footer>
+  </div>
+
+  <script>
+    // Reveal perks on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          e.target.style.transitionDelay = (e.target.dataset.d || 0) + "ms";
+          e.target.classList.add("in");
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".perk").forEach((el, i) => {
+      el.dataset.d = (i % 2) * 90;
+      io.observe(el);
+    });
+  </script>
+</body>
+</html>
