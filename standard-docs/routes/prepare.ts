@@ -1,11 +1,16 @@
 /**
- * STANDARD — Prepare Route (offline phrase-bank draft layer)
+ * STANDARD — Prepare / Parse / Copy routes (offline)
  *
- *   POST /api/prepare            -> JSON { speech, preview, language }  (on-page preview)
- *   POST /api/copy?lang=en|ar    -> .docx download, drafted in that language
+ *   POST /api/parse           -> JSON { speech, preview }   live preview of the editor text
+ *   POST /api/copy?lang=en|ar -> .docx download (faithful render of the editor text)
+ *   POST /api/prepare         -> JSON { salutation, closing, bodyText, preview }
+ *                                phrase-bank seed for the editor (Prepare H.E. speech)
  *
- * Fully offline: drafting uses the built-in phrase bank; rendering uses the
- * FROZEN engine + speech template. No network calls.
+ * Single source of truth: the body editor text. /parse and /copy both run it
+ * through the same parser, so the preview and the .docx always agree, and typed
+ * **bold** / "- " bullets become real DOCX bold runs + bullet numbering.
+ *
+ * Fully offline: drafting + parsing are local; rendering uses the FROZEN engine.
  */
 
 import { Router, Request, Response } from "express";
@@ -13,6 +18,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
+import { parseSpeechFromText, speechBodyToMarkup, ParseIntake } from "../templates/speech/parse";
 import { draftSpeech, speechToPreview, DraftIntake, Lang } from "../templates/speech/phrasebank";
 import { composeSpeech } from "../templates/speech/compose";
 const { renderDocxEnglish, renderDocxArabic } = require("../engine/render-docx");
@@ -22,33 +28,34 @@ function langOf(v: any): Lang {
   return v === "ar" ? "ar" : "en";
 }
 
-function requireCore(intake: DraftIntake, res: Response): boolean {
-  if (!intake || !intake.occasion || !intake.principal) {
-    res.status(400).json({ error: "Occasion and Principal are required to prepare a speech." });
-    return false;
-  }
-  return true;
-}
-
 const router = Router();
 
-// On-page preview — draft in the selected language, return text + structure.
-router.post("/prepare", (req: Request, res: Response) => {
-  const intake: DraftIntake = req.body;
-  if (!requireCore(intake, res)) return;
-  const lang = langOf((req.body && req.body.language) || req.query.lang);
-  const speech = draftSpeech(intake, lang);
-  res.json({ speech, preview: speechToPreview(speech), language: lang });
+// Live preview of whatever is in the editor (lenient — no required fields).
+router.post("/parse", (req: Request, res: Response) => {
+  const intake: ParseIntake = req.body || ({} as ParseIntake);
+  intake.language = langOf(intake.language || req.query.lang);
+  const speech = parseSpeechFromText(intake);
+  res.json({ speech, preview: speechToPreview(speech), language: intake.language });
 });
 
-// DOCX download — "English copy" / "Arabic copy".
+// Faithful DOCX render of the editor text — "English copy" / "Arabic copy".
 router.post("/copy", async (req: Request, res: Response) => {
   try {
-    const intake: DraftIntake = req.body;
-    if (!requireCore(intake, res)) return;
-    const lang = langOf(req.query.lang || (req.body && req.body.language));
+    const intake: ParseIntake = req.body || ({} as ParseIntake);
+    const lang = langOf(req.query.lang || intake.language);
+    intake.language = lang;
 
-    const speech = draftSpeech(intake, lang);
+    if (!intake.occasion || !intake.principal) {
+      return res.status(400).json({ error: "Occasion and Principal are required." });
+    }
+    if (!intake.audience) {
+      return res.status(400).json({ error: "Opening salutation is required." });
+    }
+
+    const speech = parseSpeechFromText(intake);
+    if (!speech.body.length) {
+      return res.status(400).json({ error: "The speech body is empty — write or paste some text first." });
+    }
 
     let paragraphs;
     try {
@@ -65,15 +72,30 @@ router.post("/copy", async (req: Request, res: Response) => {
     fs.unlink(tmp, () => {});
 
     const safe = (intake.occasion || "speech").replace(/[^\w؀-ۿ-]+/g, "-").replace(/^-+|-+$/g, "");
-    const filename = `${safe || "speech"}-HE-${lang}.docx`;
-
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safe || "speech"}-HE-${lang}.docx"`);
     res.send(buffer);
   } catch (error) {
     console.error("Copy render error:", error);
     res.status(500).json({ error: "Failed to render document" });
   }
+});
+
+// Phrase-bank seed: generate editable markup into the editor.
+router.post("/prepare", (req: Request, res: Response) => {
+  const intake: DraftIntake = req.body || ({} as DraftIntake);
+  if (!intake.occasion || !intake.principal) {
+    return res.status(400).json({ error: "Occasion and Principal are required to prepare a speech." });
+  }
+  const lang = langOf((req.body && req.body.language) || req.query.lang);
+  const speech = draftSpeech(intake, lang);
+  res.json({
+    language: lang,
+    salutation: typeof speech.salutationBlock.salutation === "string" ? speech.salutationBlock.salutation : "",
+    closing: speech.closing.text,
+    bodyText: speechBodyToMarkup(speech),
+    preview: speechToPreview(speech),
+  });
 });
 
 export default router;

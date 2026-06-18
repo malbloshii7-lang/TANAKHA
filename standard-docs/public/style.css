@@ -52,6 +52,21 @@ body {
   text-transform: uppercase;
 }
 
+/* Single body editor */
+.body-editor {
+  min-height: 260px;
+  font-family: "Verdana", "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.field-hint {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 /* Engine Bar */
 .engine-bar {
   background: var(--paper);

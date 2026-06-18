@@ -56,8 +56,16 @@
 
       <fieldset class="fieldset">
         <legend>Speech Body</legend>
-        <div id="bodyItems"></div>
-        <button type="button" id="addParagraph" class="btn-secondary">+ Add Paragraph</button>
+        <div class="form-group">
+          <label for="bodyText">Write or paste the speech</label>
+          <textarea id="bodyText" name="bodyText" class="body-editor"
+            placeholder="Paste or write the full speech here.&#10;&#10;Leave a blank line between paragraphs.&#10;Start a line with &quot;- &quot; for a bullet point.&#10;Wrap **text** in double asterisks to make it bold."></textarea>
+          <p class="field-hint">
+            <strong>Blank line</strong> → new paragraph &nbsp;·&nbsp;
+            line starting with <strong>“- ”</strong> → bullet &nbsp;·&nbsp;
+            <strong>**text**</strong> → bold — each is reflected in the Word file.
+          </p>
+        </div>
       </fieldset>
 
       <fieldset class="fieldset">
