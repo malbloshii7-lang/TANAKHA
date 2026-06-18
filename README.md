@@ -46,16 +46,26 @@ photo ──▶ Claude vision ──▶ design brief ──▶ image provider �
   `replicate` (real img2img, used when a key is present). `get_provider()` picks safely.
 - **`app/db.py`** — SQLite `leads` table.
 - **`app/storage.py`** — saves before/after images to `media/`.
-- **`web/`** — premium single-page front-end (upload → style → reveal → lead form).
+- **`web/`** — premium single-page front-end (upload → style → reveal → lead form), plus
+  the campaign team portal at `/team` (`team.html/css/js`).
 
 ## API
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/` | Front-end |
+| GET | `/team` | Campaign team portal — internal lead dashboard |
 | POST | `/api/visualize` | multipart `image` + `style` → `{before_url, after_url, brief, style}` |
 | POST | `/api/leads` | JSON lead → `{id, status}` |
 | GET | `/api/leads` | List captured leads |
+
+## Campaign team portal
+
+`/team` is the internal dashboard for the team working the leads: live KPIs (total,
+last 24 h, last 7 days, top style), search and style filters, expandable rows with the
+full design brief and before/after renders, and one-click CSV export. It reads the same
+`GET /api/leads` endpoint and — like that endpoint — ships **unauthenticated** in this MVP,
+so put it behind auth or a reverse proxy before sharing a production URL.
 
 ## Configuration
 

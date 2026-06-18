@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>TANAKHA — Campaign Team Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/team.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap">
+      <div class="logo">TANAKHA<span>.</span></div>
+      <a class="nav-cta" href="/">← Visualizer</a>
+    </div>
+  </nav>
+
+  <main class="wrap portal">
+    <header class="portal-head">
+      <div>
+        <span class="eyebrow">Campaign team portal</span>
+        <h1>Lead command center</h1>
+        <p class="sub">Every makeover request captured by the funnel, live from the leads database.</p>
+      </div>
+      <div class="portal-actions">
+        <button class="btn ghost small" id="refreshBtn">↻ Refresh</button>
+        <button class="btn small" id="exportBtn">Export CSV</button>
+      </div>
+    </header>
+
+    <section class="kpis">
+      <div class="kpi">
+        <div class="label">Total leads</div>
+        <div class="value" id="kpiTotal">—</div>
+        <div class="hint">all time</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Last 24 hours</div>
+        <div class="value" id="kpiDay">—</div>
+        <div class="hint">fresh &amp; hot</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Last 7 days</div>
+        <div class="value" id="kpiWeek">—</div>
+        <div class="hint">weekly pace</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Top style</div>
+        <div class="value text" id="kpiStyle">—</div>
+        <div class="hint" id="kpiStyleHint">most requested</div>
+      </div>
+    </section>
+
+    <section class="board">
+      <div class="toolbar">
+        <input type="search" id="searchInput" placeholder="Search name, email, ZIP…" />
+        <select id="styleFilter" aria-label="Filter by style">
+          <option value="all">All styles</option>
+        </select>
+        <span class="count" id="countLabel"></span>
+      </div>
+
+      <div class="table-wrap" id="tableWrap">
+        <table class="leads">
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Captured</th>
+              <th>Style</th>
+              <th>ZIP</th>
+              <th>Budget</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="state hidden" id="emptyState">
+        <div class="icon">🌱</div>
+        <p id="emptyMsg">No leads yet — share the visualizer and watch them sprout.</p>
+      </div>
+      <div class="state hidden" id="errorState">
+        <div class="icon">⚠️</div>
+        <p>Couldn't load leads. <button class="linkish" id="retryBtn">Retry</button></p>
+      </div>
+    </section>
+
+    <p class="portal-note">Internal tool — reads <code>/api/leads</code>. Put behind auth before sharing a public URL.</p>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">TANAKHA · Campaign Team Portal — internal lead dashboard.</div>
+  </footer>
+
+  <script src="/static/team.js"></script>
+</body>
+</html>

@@ -72,6 +72,13 @@ def test_lead_capture_roundtrip(client):
     assert match[0]["brief"]["style"] == "modern"
 
 
+def test_team_portal_serves_html(client):
+    res = client.get("/team")
+    assert res.status_code == 200
+    assert "text/html" in res.headers["content-type"]
+    assert "Campaign Team Portal" in res.text
+
+
 def test_lead_requires_valid_email(client):
     res = client.post("/api/leads", json={"email": "not-an-email"})
     assert res.status_code == 400
