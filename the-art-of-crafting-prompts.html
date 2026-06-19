@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +13,7 @@
     --bg:#05060c;
     --bg-2:#0a0d1a;
     --panel:rgba(18,22,40,.55);
+    --panel-solid:rgba(8,11,24,.55);
     --panel-edge:rgba(120,160,255,.14);
     --ink:#e9ecff;
     --ink-soft:#9aa3c7;
@@ -21,6 +22,28 @@
     --violet:#8b5cff;
     --pink:#ff5db1;
     --glow:0 0 40px -8px rgba(65,241,214,.45);
+    --field-1:rgba(139,92,255,.22);
+    --field-2:rgba(65,241,214,.18);
+    --field-3:rgba(255,93,177,.16);
+    --grid-line:rgba(120,160,255,.06);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1fb;
+    --bg-2:#e3e8f7;
+    --panel:rgba(255,255,255,.7);
+    --panel-solid:rgba(255,255,255,.85);
+    --panel-edge:rgba(40,60,120,.16);
+    --ink:#10142a;
+    --ink-soft:#4a5378;
+    --ink-faint:#8089ad;
+    --cyan:#0bb39b;
+    --violet:#6a37e0;
+    --pink:#d83a8e;
+    --glow:0 0 36px -10px rgba(11,179,155,.4);
+    --field-1:rgba(106,55,224,.16);
+    --field-2:rgba(11,179,155,.14);
+    --field-3:rgba(216,58,142,.12);
+    --grid-line:rgba(40,60,120,.07);
   }
 
   *{box-sizing:border-box}
@@ -33,20 +56,21 @@
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
     overflow-x:hidden;
+    transition:background .4s ease,color .4s ease;
   }
 
   /* ---------- Animated cosmic backdrop ---------- */
-  .field{position:fixed;inset:0;z-index:-2;
+  .field{position:fixed;inset:0;z-index:-2;transition:background .4s ease;
     background:
-      radial-gradient(60% 50% at 18% 12%, rgba(139,92,255,.22) 0%, transparent 60%),
-      radial-gradient(55% 45% at 85% 18%, rgba(65,241,214,.18) 0%, transparent 60%),
-      radial-gradient(70% 60% at 50% 110%, rgba(255,93,177,.16) 0%, transparent 60%),
+      radial-gradient(60% 50% at 18% 12%, var(--field-1) 0%, transparent 60%),
+      radial-gradient(55% 45% at 85% 18%, var(--field-2) 0%, transparent 60%),
+      radial-gradient(70% 60% at 50% 110%, var(--field-3) 0%, transparent 60%),
       linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
   }
   .grid{position:fixed;inset:-2px;z-index:-1;opacity:.35;
     background-image:
-      linear-gradient(rgba(120,160,255,.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(120,160,255,.06) 1px, transparent 1px);
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:54px 54px;
     mask-image:radial-gradient(80% 60% at 50% 20%, #000 0%, transparent 85%);
     animation:drift 24s linear infinite;
@@ -62,38 +86,43 @@
     background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--pink),var(--cyan));
     box-shadow:var(--glow);animation:spin 6s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .src{font:700 11px/1 "Space Mono";letter-spacing:.12em;text-transform:uppercase;
+  .nav-actions{display:flex;align-items:center;gap:10px}
+  .pill{font:700 11px/1 "Space Mono";letter-spacing:.12em;text-transform:uppercase;
     color:var(--ink-soft);text-decoration:none;padding:9px 14px;border:1px solid var(--panel-edge);
-    border-radius:999px;background:var(--panel);backdrop-filter:blur(8px);transition:.25s}
-  .src:hover{color:var(--cyan);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
+    border-radius:999px;background:var(--panel);backdrop-filter:blur(8px);transition:.25s;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px}
+  .pill:hover{color:var(--cyan);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
+  .pill.solid{color:#05060c;background:linear-gradient(120deg,var(--cyan),#7af);border-color:transparent}
+  .pill.solid:hover{color:#05060c;transform:translateY(-1px)}
+  #themeToggle{font-size:14px;padding:9px 12px}
 
   /* ---------- Hero ---------- */
   .kicker{font:700 12px/1 "Space Mono";letter-spacing:.4em;text-transform:uppercase;color:var(--cyan);margin:0 0 22px}
   h1{font-family:"Space Grotesk",sans-serif;font-weight:700;
     font-size:clamp(40px,8.5vw,104px);line-height:.94;letter-spacing:-.02em;margin:0;
-    background:linear-gradient(120deg,#fff 0%,#c9d2ff 38%,var(--cyan) 70%,var(--violet) 100%);
+    background:linear-gradient(120deg,var(--ink) 0%,#c9d2ff 38%,var(--cyan) 70%,var(--violet) 100%);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   h1 em{font-style:italic;font-weight:400}
   .lede{max-width:62ch;margin:26px 0 0;font-size:clamp(16px,2.1vw,21px);line-height:1.55;color:var(--ink-soft)}
   .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
-  .btn{font:600 14px/1 "Sora";text-decoration:none;padding:15px 26px;border-radius:14px;transition:.25s;border:1px solid transparent}
+  .btn{font:600 14px/1 "Sora";text-decoration:none;padding:15px 26px;border-radius:14px;transition:.25s;border:1px solid transparent;cursor:pointer}
   .btn.primary{color:#05060c;background:linear-gradient(120deg,var(--cyan),#7af);box-shadow:var(--glow)}
   .btn.primary:hover{transform:translateY(-2px);box-shadow:0 0 56px -6px rgba(65,241,214,.6)}
   .btn.ghost{color:var(--ink);border-color:var(--panel-edge);background:var(--panel);backdrop-filter:blur(8px)}
-  .btn.ghost:hover{border-color:rgba(139,92,255,.5);color:#fff}
+  .btn.ghost:hover{border-color:rgba(139,92,255,.5)}
 
   /* ---------- D.N.A section ---------- */
   .dna{margin-top:clamp(70px,10vw,120px);padding:clamp(28px,4vw,46px);border-radius:26px;
     border:1px solid var(--panel-edge);background:var(--panel);backdrop-filter:blur(14px);
     position:relative;overflow:hidden}
   .dna::before{content:"";position:absolute;inset:0;
-    background:radial-gradient(60% 120% at 80% 0%,rgba(139,92,255,.18),transparent 60%);pointer-events:none}
+    background:radial-gradient(60% 120% at 80% 0%,var(--field-1),transparent 60%);pointer-events:none}
   .dna .eyebrow{font:700 11px/1 "Space Mono";letter-spacing:.34em;text-transform:uppercase;color:var(--pink);margin:0 0 14px}
   .dna h2{font-family:"Space Grotesk",sans-serif;font-size:clamp(26px,4vw,42px);margin:0;letter-spacing:-.01em}
   .dna p{color:var(--ink-soft);max-width:70ch;margin:14px 0 30px;line-height:1.55}
   .helix{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .gene{padding:22px;border-radius:18px;border:1px solid var(--panel-edge);
-    background:rgba(8,11,24,.5);transition:.3s}
+    background:var(--panel-solid);transition:.3s}
   .gene:hover{transform:translateY(-4px);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
   .gene .letter{font-family:"Space Grotesk";font-weight:700;font-size:46px;line-height:1;
     background:linear-gradient(120deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -123,23 +152,42 @@
   .tools{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--panel-edge);padding-top:16px}
   .tools .lab{width:100%;font:700 10px/1 "Space Mono";letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:2px}
   .tool{font:600 12px/1 "Space Mono";letter-spacing:.02em;padding:7px 11px;border-radius:999px;
-    border:1px solid var(--panel-edge);background:rgba(8,11,24,.55);color:var(--ink);display:inline-flex;align-items:center;gap:6px;transition:.2s}
+    border:1px solid var(--panel-edge);background:var(--panel-solid);color:var(--ink);display:inline-flex;align-items:center;gap:6px;transition:.2s}
   .tool::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
-  .tool:hover{border-color:rgba(139,92,255,.5);color:#fff;transform:translateY(-1px)}
+  .tool:hover{border-color:rgba(139,92,255,.5);transform:translateY(-1px)}
   .tool.v::before{background:var(--violet);box-shadow:0 0 8px var(--violet)}
   .tool.p::before{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+  .copy{margin-top:16px;width:100%;justify-content:center;font:700 11px/1 "Space Mono";letter-spacing:.14em;text-transform:uppercase;
+    padding:11px 14px;border-radius:12px;border:1px dashed var(--panel-edge);background:transparent;color:var(--ink-soft);
+    cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+  .copy:hover{color:var(--cyan);border-color:rgba(65,241,214,.5);border-style:solid}
+  .copy.done{color:var(--cyan);border-color:var(--cyan);border-style:solid}
+
+  /* ---------- Share ---------- */
+  .share{margin-top:clamp(70px,10vw,110px);text-align:center}
+  .share h2{font-family:"Space Grotesk";font-size:clamp(22px,3.4vw,34px);margin:0 0 8px}
+  .share p{color:var(--ink-soft);margin:0 0 24px}
+  .share-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 
   /* ---------- Footer ---------- */
-  footer{margin-top:clamp(80px,12vw,140px);padding-top:30px;border-top:1px solid var(--panel-edge);
+  footer{margin-top:clamp(70px,11vw,120px);padding-top:30px;border-top:1px solid var(--panel-edge);
     display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
   footer .meta{font:400 14px/1.6 "Sora";color:var(--ink-soft)}
   footer a{color:var(--cyan);text-decoration:none}
   footer a:hover{text-decoration:underline}
   .sig{font:700 11px/1 "Space Mono";letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
 
+  /* ---------- Toast ---------- */
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:var(--panel-solid);border:1px solid var(--cyan);color:var(--ink);
+    padding:12px 20px;border-radius:999px;font:600 13px/1 "Sora";backdrop-filter:blur(10px);
+    box-shadow:var(--glow);opacity:0;pointer-events:none;transition:.3s;z-index:50}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
   @media (max-width:760px){
     .perks{grid-template-columns:1fr}
     .helix{grid-template-columns:1fr}
+    .brand{font-size:13px}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important}
@@ -154,7 +202,11 @@
   <div class="wrap">
     <nav>
       <div class="brand"><span class="dot"></span> THE ART OF CRAFTING PROMPTS</div>
-      <a class="src" href="https://dqhl26j56gqbg.kimi.page" target="_blank" rel="noopener">Source ↗</a>
+      <div class="nav-actions">
+        <a class="pill solid" href="builder.html">⚡ Prompt Builder</a>
+        <button class="pill" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">🌙</button>
+        <a class="pill" href="https://dqhl26j56gqbg.kimi.page" target="_blank" rel="noopener">Source ↗</a>
+      </div>
     </nav>
 
     <!-- Hero -->
@@ -168,7 +220,7 @@
       </p>
       <div class="cta">
         <a class="btn primary" href="#perks">Unlock the 10 perks</a>
-        <a class="btn ghost" href="#dna">See the D.N.A →</a>
+        <a class="btn ghost" href="builder.html">Build a prompt live →</a>
       </div>
     </header>
 
@@ -203,7 +255,7 @@
     <!-- Perks -->
     <div class="section-head" id="perks">
       <h2>The 10 Mastery Perks</h2>
-      <p>Each paired with its sharpest AI tools</p>
+      <p>Tap “copy prompt” on any card</p>
     </div>
 
     <main class="perks">
@@ -218,6 +270,7 @@
           <span class="tool v">ChatGPT</span>
           <span class="tool p">Gemini</span>
         </div>
+        <button class="copy" data-prompt="Act as a senior [role] with deep expertise in [domain]. Your task is to [goal] for [audience]. Bring the standards and judgment a top professional would.">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -230,6 +283,7 @@
           <span class="tool v">GPT-4o</span>
           <span class="tool p">Mistral</span>
         </div>
+        <button class="copy" data-prompt="Here are examples of the exact style I want:&#10;&#10;Example 1 — Input: [x] → Output: [y]&#10;Example 2 — Input: [x] → Output: [y]&#10;&#10;Now produce the same kind of output for: [new input]">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -242,6 +296,7 @@
           <span class="tool v">OpenAI o-series</span>
           <span class="tool p">DeepSeek-R1</span>
         </div>
+        <button class="copy" data-prompt="Solve this step by step. Show your reasoning first, then give the final answer on its own line prefixed with 'ANSWER:'.&#10;&#10;[problem]">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -254,6 +309,7 @@
           <span class="tool v">GPT (JSON mode)</span>
           <span class="tool p">Gemini</span>
         </div>
+        <button class="copy" data-prompt="Respond ONLY with valid JSON matching this schema, no prose before or after:&#10;{&#10;  &quot;title&quot;: string,&#10;  &quot;summary&quot;: string,&#10;  &quot;tags&quot;: string[]&#10;}">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -266,6 +322,7 @@
           <span class="tool v">ChatGPT</span>
           <span class="tool p">Copilot</span>
         </div>
+        <button class="copy" data-prompt="Answer in under 50 words. No jargon, no filler. Written for a busy executive. Avoid [topic/word]. Lead with the single most important point.">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -278,6 +335,7 @@
           <span class="tool v">Perplexity</span>
           <span class="tool p">NotebookLM</span>
         </div>
+        <button class="copy" data-prompt="Using ONLY the context below, answer the question. If the answer is not in the context, say &quot;Not in the provided context.&quot;&#10;&#10;Context:&#10;&quot;&quot;&quot;&#10;[paste source here]&#10;&quot;&quot;&quot;&#10;&#10;Question: [your question]">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -290,6 +348,7 @@
           <span class="tool v">ChatGPT (Canvas)</span>
           <span class="tool p">Gemini</span>
         </div>
+        <button class="copy" data-prompt="Good start. Now revise: make it bolder, 20% tighter, and aimed at [audience]. Keep the strongest sentence from the draft and tell me which one you kept.">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -302,6 +361,7 @@
           <span class="tool v">GPT-4o</span>
           <span class="tool p">Grok</span>
         </div>
+        <button class="copy" data-prompt="Review your previous answer critically. List the 3 most important weaknesses or risks, then rewrite the answer fixing each one. Label the final version 'REVISED:'.">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -314,6 +374,7 @@
           <span class="tool v">DALL·E 3</span>
           <span class="tool p">Stable Diffusion</span>
         </div>
+        <button class="copy" data-prompt="[subject], [art style], [lighting], shot on [lens/camera], [mood/atmosphere], ultra-detailed, [aspect ratio]">⧉ Copy prompt</button>
       </article>
 
       <article class="perk">
@@ -326,9 +387,22 @@
           <span class="tool v">PromptPerfect</span>
           <span class="tool p">LangChain</span>
         </div>
+        <button class="copy" data-prompt="ROLE: {{role}}&#10;GOAL: {{goal}}&#10;AUDIENCE: {{audience}}&#10;CONSTRAINTS: {{constraints}}&#10;FORMAT: {{output_format}}&#10;&#10;TASK: {{task}}">⧉ Copy prompt</button>
       </article>
 
     </main>
+
+    <!-- Share -->
+    <section class="share">
+      <h2>Share the playbook</h2>
+      <p>Pass the ten perks to someone who's still writing one-line prompts.</p>
+      <div class="share-row">
+        <button class="pill solid" id="shareNative">↗ Share</button>
+        <button class="pill" id="shareCopy">⧉ Copy link</button>
+        <a class="pill" id="shareX" target="_blank" rel="noopener">𝕏 Post</a>
+        <a class="pill" id="shareLinkedIn" target="_blank" rel="noopener">in LinkedIn</a>
+      </div>
+    </section>
 
     <footer>
       <div class="meta">
@@ -339,19 +413,78 @@
     </footer>
   </div>
 
+  <div id="toast">Copied ✓</div>
+
   <script>
-    // Reveal perks on scroll
+    // ---- Toast helper ----
+    const toast = document.getElementById("toast");
+    let toastTimer;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+    async function copyText(text){
+      try{ await navigator.clipboard.writeText(text); return true; }
+      catch(e){
+        const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+        document.body.appendChild(ta);ta.select();
+        let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+        document.body.removeChild(ta); return ok;
+      }
+    }
+
+    // ---- Theme toggle (persisted) ----
+    const root = document.documentElement;
+    const toggle = document.getElementById("themeToggle");
+    const saved = localStorage.getItem("aocp-theme");
+    if(saved){ root.setAttribute("data-theme", saved); }
+    function syncIcon(){ toggle.textContent = root.getAttribute("data-theme") === "light" ? "☀️" : "🌙"; }
+    syncIcon();
+    toggle.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      localStorage.setItem("aocp-theme", next);
+      syncIcon();
+    });
+
+    // ---- Copy prompt per perk ----
+    document.querySelectorAll(".copy").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const ok = await copyText(btn.dataset.prompt);
+        if(ok){
+          const orig = btn.textContent;
+          btn.textContent = "✓ Copied to clipboard";
+          btn.classList.add("done");
+          showToast("Prompt copied — paste it into your AI of choice");
+          setTimeout(() => { btn.textContent = orig; btn.classList.remove("done"); }, 1900);
+        } else { showToast("Couldn't copy — long-press to select"); }
+      });
+    });
+
+    // ---- Share ----
+    const shareUrl = location.href.split("#")[0];
+    const shareText = "10 mastery perks from “The Art of Crafting Prompts” — each paired with the best AI tool. Built on the D.N.A of every great prompt.";
+    document.getElementById("shareX").href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText) + "&url=" + encodeURIComponent(shareUrl);
+    document.getElementById("shareLinkedIn").href = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(shareUrl);
+    const nativeBtn = document.getElementById("shareNative");
+    if(navigator.share){
+      nativeBtn.addEventListener("click", () => navigator.share({title:"The Art of Crafting Prompts", text:shareText, url:shareUrl}).catch(()=>{}));
+    } else { nativeBtn.style.display = "none"; }
+    document.getElementById("shareCopy").addEventListener("click", async () => {
+      const ok = await copyText(shareUrl);
+      showToast(ok ? "Link copied ✓" : "Couldn't copy link");
+    });
+
+    // ---- Reveal perks on scroll ----
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((e, i) => {
-        if (e.isIntersecting) {
-          e.target.style.transitionDelay = (e.target.dataset.d || 0) + "ms";
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
+      entries.forEach((e) => {
+        if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
       });
     }, { threshold: 0.12 });
     document.querySelectorAll(".perk").forEach((el, i) => {
-      el.dataset.d = (i % 2) * 90;
+      el.style.transitionDelay = (i % 2) * 90 + "ms";
       io.observe(el);
     });
   </script>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>D.N.A Prompt Builder — The Art of Crafting Prompts</title>
+<meta name="description" content="Build a production-ready prompt live using the D.N.A framework: Define, Navigate, Adapt. By Kimi." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#05060c;--bg-2:#0a0d1a;
+    --panel:rgba(18,22,40,.55);--panel-solid:rgba(8,11,24,.6);
+    --panel-edge:rgba(120,160,255,.14);
+    --ink:#e9ecff;--ink-soft:#9aa3c7;--ink-faint:#5c648a;
+    --cyan:#41f1d6;--violet:#8b5cff;--pink:#ff5db1;
+    --glow:0 0 40px -8px rgba(65,241,214,.45);
+    --field-1:rgba(139,92,255,.22);--field-2:rgba(65,241,214,.18);--field-3:rgba(255,93,177,.16);
+    --grid-line:rgba(120,160,255,.06);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1fb;--bg-2:#e3e8f7;
+    --panel:rgba(255,255,255,.7);--panel-solid:rgba(255,255,255,.9);
+    --panel-edge:rgba(40,60,120,.16);
+    --ink:#10142a;--ink-soft:#4a5378;--ink-faint:#8089ad;
+    --cyan:#0bb39b;--violet:#6a37e0;--pink:#d83a8e;
+    --glow:0 0 36px -10px rgba(11,179,155,.4);
+    --field-1:rgba(106,55,224,.16);--field-2:rgba(11,179,155,.14);--field-3:rgba(216,58,142,.12);
+    --grid-line:rgba(40,60,120,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;color:var(--ink);font-family:"Sora",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .4s,color .4s}
+  .field{position:fixed;inset:0;z-index:-2;transition:background .4s;
+    background:
+      radial-gradient(60% 50% at 18% 12%, var(--field-1) 0%, transparent 60%),
+      radial-gradient(55% 45% at 85% 18%, var(--field-2) 0%, transparent 60%),
+      radial-gradient(70% 60% at 50% 110%, var(--field-3) 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);}
+  .grid{position:fixed;inset:-2px;z-index:-1;opacity:.35;
+    background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+    background-size:54px 54px;mask-image:radial-gradient(80% 60% at 50% 20%,#000 0%,transparent 85%)}
+  .wrap{max-width:1180px;margin:0 auto;padding:clamp(24px,5vw,56px) clamp(18px,5vw,48px) 90px}
+
+  nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:clamp(30px,6vw,56px)}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--ink)}
+  .brand .dot{width:11px;height:11px;border-radius:50%;background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--pink),var(--cyan));box-shadow:var(--glow);animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .nav-actions{display:flex;gap:10px}
+  .pill{font:700 11px/1 "Space Mono";letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);
+    text-decoration:none;padding:9px 14px;border:1px solid var(--panel-edge);border-radius:999px;background:var(--panel);
+    backdrop-filter:blur(8px);transition:.25s;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .pill:hover{color:var(--cyan);border-color:rgba(65,241,214,.4);box-shadow:var(--glow)}
+
+  .head{margin-bottom:clamp(26px,5vw,44px)}
+  .kicker{font:700 12px/1 "Space Mono";letter-spacing:.4em;text-transform:uppercase;color:var(--cyan);margin:0 0 16px}
+  h1{font-family:"Space Grotesk";font-weight:700;font-size:clamp(34px,6vw,64px);line-height:.98;letter-spacing:-.02em;margin:0;
+    background:linear-gradient(120deg,var(--ink),#c9d2ff 40%,var(--cyan) 72%,var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .head p{color:var(--ink-soft);max-width:64ch;margin:16px 0 0;line-height:1.55;font-size:clamp(15px,2vw,18px)}
+
+  .layout{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  .card{padding:clamp(20px,3vw,30px);border-radius:22px;border:1px solid var(--panel-edge);background:var(--panel);backdrop-filter:blur(14px)}
+  .strand{margin-bottom:26px}
+  .strand:last-child{margin-bottom:0}
+  .strand-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .strand-head .L{font-family:"Space Grotesk";font-weight:700;font-size:30px;line-height:1;width:42px;text-align:center;
+    background:linear-gradient(120deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .strand-head h2{font-family:"Space Grotesk";font-size:19px;margin:0}
+  .strand-head small{display:block;color:var(--ink-faint);font-weight:400;font-size:12px;margin-top:3px;font-family:"Sora"}
+  label{display:block;font:700 10px/1 "Space Mono";letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin:14px 0 7px}
+  input,textarea,select{width:100%;background:var(--panel-solid);border:1px solid var(--panel-edge);border-radius:12px;
+    color:var(--ink);font:400 14px/1.5 "Sora";padding:12px 14px;transition:.2s;resize:vertical}
+  input::placeholder,textarea::placeholder{color:var(--ink-faint)}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:rgba(65,241,214,.55);box-shadow:0 0 0 3px rgba(65,241,214,.12)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .checks{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .chk{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 "Space Mono";letter-spacing:.02em;
+    padding:9px 13px;border-radius:999px;border:1px solid var(--panel-edge);background:var(--panel-solid);cursor:pointer;transition:.2s;color:var(--ink-soft)}
+  .chk input{width:auto;accent-color:var(--cyan)}
+  .chk:hover{border-color:rgba(139,92,255,.5)}
+  .chk.on{color:var(--ink);border-color:var(--cyan);box-shadow:var(--glow)}
+
+  /* output */
+  .out-card{position:sticky;top:18px}
+  .out-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .out-head h2{font-family:"Space Grotesk";font-size:18px;margin:0}
+  .badge{font:700 10px/1 "Space Mono";letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);
+    padding:6px 10px;border:1px solid rgba(65,241,214,.4);border-radius:999px}
+  pre#out{margin:0;white-space:pre-wrap;word-break:break-word;font:400 13.5px/1.62 "Space Mono";
+    color:var(--ink);background:var(--panel-solid);border:1px solid var(--panel-edge);border-radius:14px;
+    padding:18px;min-height:260px;max-height:48vh;overflow:auto}
+  .out-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{font:700 12px/1 "Space Mono";letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--panel-edge);
+    border-radius:12px;padding:13px 16px;cursor:pointer;background:transparent;color:var(--ink);transition:.2s;flex:1;min-width:130px}
+  .btn.primary{background:linear-gradient(120deg,var(--cyan),#7af);color:#05060c;border-color:transparent}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+  .btn:hover{border-color:rgba(139,92,255,.5)}
+  .btn.done{border-color:var(--cyan);color:var(--cyan)}
+  .meter{margin-top:14px;font:600 12px/1.4 "Sora";color:var(--ink-soft)}
+  .bar{height:6px;border-radius:999px;background:var(--panel-solid);overflow:hidden;margin-top:8px;border:1px solid var(--panel-edge)}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--violet),var(--cyan));transition:width .4s}
+
+  footer{margin-top:46px;padding-top:24px;border-top:1px solid var(--panel-edge);color:var(--ink-soft);font-size:13.5px;line-height:1.6}
+  footer a{color:var(--cyan);text-decoration:none}
+
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--panel-solid);
+    border:1px solid var(--cyan);color:var(--ink);padding:12px 20px;border-radius:999px;font:600 13px/1 "Sora";
+    backdrop-filter:blur(10px);box-shadow:var(--glow);opacity:0;pointer-events:none;transition:.3s;z-index:50}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:860px){.layout{grid-template-columns:1fr}.out-card{position:static}.row{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+  <div class="field"></div>
+  <div class="grid"></div>
+
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="the-art-of-crafting-prompts.html"><span class="dot"></span> THE ART OF CRAFTING PROMPTS</a>
+      <div class="nav-actions">
+        <button class="pill" id="themeToggle" title="Toggle light / dark">🌙</button>
+        <a class="pill" href="the-art-of-crafting-prompts.html">← 10 Perks</a>
+      </div>
+    </nav>
+
+    <div class="head">
+      <p class="kicker">Interactive · Built on the D.N.A framework</p>
+      <h1>The D.N.A Prompt Builder</h1>
+      <p>Fill the strands — <b>Define</b>, <b>Navigate</b>, <b>Adapt</b> — and watch a production-ready prompt assemble itself live. Copy it straight into Claude, ChatGPT, Gemini, or any model.</p>
+    </div>
+
+    <div class="layout">
+      <!-- INPUTS -->
+      <section class="card">
+        <!-- DEFINE -->
+        <div class="strand">
+          <div class="strand-head"><div class="L">D</div><div><h2>Define</h2><small>Who the model is, what it's doing, for whom</small></div></div>
+          <label>Role / persona</label>
+          <input id="role" placeholder="e.g. senior conversion copywriter" />
+          <label>Goal / task</label>
+          <textarea id="goal" rows="2" placeholder="e.g. write a 5-email welcome sequence for a yard-makeover app"></textarea>
+          <label>Audience</label>
+          <input id="audience" placeholder="e.g. busy homeowners aged 35–55" />
+        </div>
+
+        <!-- NAVIGATE -->
+        <div class="strand">
+          <div class="strand-head"><div class="L">N</div><div><h2>Navigate</h2><small>The rails — format, tone, limits, no-go's</small></div></div>
+          <div class="row">
+            <div><label>Output format</label>
+              <select id="format">
+                <option value="">— none —</option>
+                <option>Plain prose</option>
+                <option>Markdown with headings</option>
+                <option>Bulleted list</option>
+                <option>Numbered steps</option>
+                <option>JSON</option>
+                <option>Table</option>
+              </select>
+            </div>
+            <div><label>Tone</label>
+              <select id="tone">
+                <option value="">— none —</option>
+                <option>Professional</option>
+                <option>Friendly &amp; warm</option>
+                <option>Punchy &amp; bold</option>
+                <option>Playful</option>
+                <option>Academic</option>
+                <option>Luxury / premium</option>
+              </select>
+            </div>
+          </div>
+          <label>Length / limit</label>
+          <input id="length" placeholder="e.g. under 150 words each" />
+          <label>Avoid (comma-separated)</label>
+          <input id="avoid" placeholder="e.g. jargon, hype, exclamation marks" />
+        </div>
+
+        <!-- ADAPT -->
+        <div class="strand">
+          <div class="strand-head"><div class="L">A</div><div><h2>Adapt</h2><small>Boosters that make it self-correct &amp; reusable</small></div></div>
+          <div class="checks">
+            <label class="chk"><input type="checkbox" id="reason"> Reason step by step</label>
+            <label class="chk"><input type="checkbox" id="critic"> Self-critique &amp; revise</label>
+            <label class="chk"><input type="checkbox" id="ask"> Ask before assuming</label>
+            <label class="chk"><input type="checkbox" id="template"> {{slot}} template form</label>
+          </div>
+          <label>Context to ground it on (optional)</label>
+          <textarea id="context" rows="2" placeholder="Paste any source text, data, or brand voice the answer must respect"></textarea>
+        </div>
+      </section>
+
+      <!-- OUTPUT -->
+      <section class="card out-card">
+        <div class="out-head"><h2>Your engineered prompt</h2><span class="badge" id="badge">D · N · A</span></div>
+        <pre id="out"></pre>
+        <div class="out-actions">
+          <button class="btn primary" id="copyBtn">⧉ Copy prompt</button>
+          <button class="btn" id="resetBtn">↺ Reset</button>
+        </div>
+        <div class="meter">Prompt strength: <span id="score">0%</span> — fill more strands to strengthen it
+          <div class="bar"><i id="barFill"></i></div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      Part of <b>“The Art of Crafting Prompts.”</b> Built by <b>Kimi</b> ·
+      <a href="https://dqhl26j56gqbg.kimi.page" target="_blank" rel="noopener">dqhl26j56gqbg.kimi.page</a>
+      &nbsp;·&nbsp; <a href="the-art-of-crafting-prompts.html">Back to the 10 perks →</a>
+    </footer>
+  </div>
+
+  <div id="toast">Copied ✓</div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const ids = ["role","goal","audience","format","tone","length","avoid","context"];
+    const checks = ["reason","critic","ask","template"];
+    const out = $("out");
+
+    const toast = $("toast"); let tt;
+    function showToast(m){ toast.textContent=m; toast.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>toast.classList.remove("show"),1700); }
+    async function copyText(t){ try{ await navigator.clipboard.writeText(t); return true; }
+      catch(e){ const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(_){}document.body.removeChild(a);return ok; } }
+
+    // theme
+    const root=document.documentElement, tg=$("themeToggle");
+    const sv=localStorage.getItem("aocp-theme"); if(sv) root.setAttribute("data-theme",sv);
+    const icon=()=>tg.textContent=root.getAttribute("data-theme")==="light"?"☀️":"🌙"; icon();
+    tg.onclick=()=>{const n=root.getAttribute("data-theme")==="light"?"dark":"light";root.setAttribute("data-theme",n);localStorage.setItem("aocp-theme",n);icon();};
+
+    function build(){
+      const v = {}; ids.forEach(i => v[i] = $(i).value.trim());
+      const c = {}; checks.forEach(i => c[i] = $(i).checked);
+      const tmpl = c.template;
+      const g = s => tmpl ? "{{"+s+"}}" : "";        // slot helper
+      const lines = [];
+
+      // DEFINE
+      const role = v.role || (tmpl ? g("role") : "a senior expert in the relevant field");
+      lines.push("Act as " + role + ".");
+      if(v.goal || tmpl) lines.push("Your task: " + (v.goal || g("goal")) + ".");
+      if(v.audience || tmpl) lines.push("Audience: " + (v.audience || g("audience")) + ".");
+
+      // NAVIGATE
+      const nav = [];
+      if(v.format) nav.push("Format the response as " + v.format.toLowerCase() + ".");
+      if(v.tone) nav.push("Tone: " + v.tone.toLowerCase() + ".");
+      if(v.length) nav.push("Length: " + v.length + ".");
+      if(v.avoid) nav.push("Avoid: " + v.avoid + ".");
+      if(tmpl && !nav.length){ nav.push("Format: {{format}}. Tone: {{tone}}. Length: {{length}}. Avoid: {{avoid}}."); }
+      if(nav.length){ lines.push(""); lines.push("Constraints:"); nav.forEach(n => lines.push("• " + n)); }
+
+      // ADAPT boosters
+      const boost = [];
+      if(c.reason) boost.push("Think step by step and show your reasoning before the final answer.");
+      if(c.ask) boost.push("If anything is ambiguous, ask me clarifying questions before answering.");
+      if(c.critic) boost.push("After your first draft, list its 3 biggest weaknesses, then deliver a REVISED version that fixes them.");
+      if(boost.length){ lines.push(""); boost.forEach(b => lines.push(b)); }
+
+      // CONTEXT grounding
+      if(v.context || (tmpl && false)){
+        lines.push("");
+        lines.push("Use ONLY the context below; if the answer isn't there, say so.");
+        lines.push('Context:\n"""\n' + (v.context || "") + '\n"""');
+      }
+
+      const text = lines.join("\n").replace(/\n{3,}/g,"\n\n").trim();
+      out.textContent = text;
+
+      // strength score
+      let filled = ids.filter(i => $(i).value.trim()).length + checks.filter(i=>$(i).checked).length;
+      const total = ids.length + checks.length;
+      const pct = Math.round(filled/total*100);
+      $("score").textContent = pct + "%";
+      $("barFill").style.width = pct + "%";
+      $("badge").textContent = [v.role&&"D", (v.format||v.tone||v.length||v.avoid)&&"N", (c.reason||c.critic||c.ask||v.context)&&"A"].filter(Boolean).join(" · ") || "D · N · A";
+      return text;
+    }
+
+    function bindChk(id){
+      const el=$(id), label=el.closest(".chk");
+      const sync=()=>label.classList.toggle("on", el.checked);
+      el.addEventListener("change", ()=>{sync();build();}); sync();
+    }
+    ids.forEach(i => $(i).addEventListener("input", build));
+    checks.forEach(bindChk);
+
+    $("copyBtn").addEventListener("click", async () => {
+      const ok = await copyText(out.textContent);
+      const b=$("copyBtn");
+      if(ok){ b.textContent="✓ Copied"; b.classList.add("done"); showToast("Prompt copied — paste it into your AI"); setTimeout(()=>{b.textContent="⧉ Copy prompt";b.classList.remove("done");},1700); }
+      else showToast("Couldn't copy");
+    });
+    $("resetBtn").addEventListener("click", () => {
+      ids.forEach(i => $(i).value="");
+      checks.forEach(i => { $(i).checked=false; $(i).closest(".chk").classList.remove("on"); });
+      build(); showToast("Cleared");
+    });
+
+    build();
+  </script>
+</body>
+</html>

@@ -31,6 +31,25 @@ def index() -> FileResponse:
     return FileResponse(os.path.join(WEB_DIR, "index.html"))
 
 
+# --- "The Art of Crafting Prompts" landing page + interactive D.N.A builder ---
+# Both are self-contained static pages at the repo root that link to each other
+# by filename, so we register the friendly path and the raw filename for each.
+PERKS_PAGE = os.path.join(BASE_DIR, "the-art-of-crafting-prompts.html")
+BUILDER_PAGE = os.path.join(BASE_DIR, "builder.html")
+
+
+@app.get("/perks")
+@app.get("/the-art-of-crafting-prompts.html")
+def perks() -> FileResponse:
+    return FileResponse(PERKS_PAGE)
+
+
+@app.get("/builder")
+@app.get("/builder.html")
+def builder() -> FileResponse:
+    return FileResponse(BUILDER_PAGE)
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
