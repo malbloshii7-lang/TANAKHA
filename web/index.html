@@ -9,11 +9,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
+  <script>
+    (function () {
+      var saved = localStorage.getItem("tanakha-theme");
+      if (saved) document.documentElement.setAttribute("data-theme", saved);
+    })();
+  </script>
 </head>
 <body>
   <nav class="nav">
     <div class="wrap">
       <div class="logo">TANAKHA<span>.</span></div>
+      <div class="theme-switch" id="themeSwitch" role="group" aria-label="Theme">
+        <button class="theme-dot" data-set="verdant" title="Verdant" aria-label="Verdant theme"></button>
+        <button class="theme-dot" data-set="noir-azure" title="Noir Azure" aria-label="Noir Azure theme"></button>
+        <button class="theme-dot" data-set="organic-warm" title="Organic Warm" aria-label="Organic Warm theme"></button>
+      </div>
       <a class="nav-cta" href="#studio">Try it free</a>
     </div>
   </nav>

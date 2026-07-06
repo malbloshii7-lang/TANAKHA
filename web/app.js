@@ -5,6 +5,21 @@
 
   const state = { file: null, style: null, result: null };
 
+  // ---- theme switcher ----
+  const THEME_KEY = "tanakha-theme";
+  const THEMES = ["verdant", "noir-azure", "organic-warm"];
+  const themeDots = document.querySelectorAll(".theme-dot");
+
+  function applyTheme(name) {
+    if (!THEMES.includes(name)) name = THEMES[0];
+    document.documentElement.setAttribute("data-theme", name);
+    localStorage.setItem(THEME_KEY, name);
+    themeDots.forEach((dot) => dot.classList.toggle("active", dot.dataset.set === name));
+  }
+
+  themeDots.forEach((dot) => dot.addEventListener("click", () => applyTheme(dot.dataset.set)));
+  applyTheme(localStorage.getItem(THEME_KEY) || THEMES[0]);
+
   // ---- upload ----
   const dropzone = $("dropzone");
   const fileInput = $("fileInput");
