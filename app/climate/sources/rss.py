@@ -1,4 +1,5 @@
 import datetime
+import email.utils
 import logging
 import re
 
@@ -71,14 +72,23 @@ def _parse_entries(xml_bytes: bytes) -> list[dict]:
 
 def _parse_timestamp(raw: str | None) -> str:
     if raw:
-        for fmt in ("%a, %d %b %Y %H:%M:%S %z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%SZ"):
-            try:
-                ts = datetime.datetime.strptime(raw, fmt)
-                if ts.tzinfo is None:
-                    ts = ts.replace(tzinfo=datetime.timezone.utc)
-                return ts.isoformat()
-            except ValueError:
-                continue
+        # Atom (updated/published) is ISO 8601.
+        try:
+            ts = datetime.datetime.fromisoformat(raw.strip().replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=datetime.timezone.utc)
+            return ts.isoformat()
+        except ValueError:
+            pass
+        # RSS 2.0 pubDate is RFC 2822 (e.g. "Wed, 09 Jul 2025 12:00:00 GMT") —
+        # email.utils handles the "GMT"/"UT" zone names strptime's %z rejects.
+        try:
+            ts = email.utils.parsedate_to_datetime(raw.strip())
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=datetime.timezone.utc)
+            return ts.isoformat()
+        except (TypeError, ValueError):
+            pass
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
