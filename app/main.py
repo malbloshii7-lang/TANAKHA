@@ -1,3 +1,4 @@
+import contextlib
 import io
 import os
 
@@ -8,11 +9,15 @@ from PIL import Image
 from pydantic import BaseModel
 
 from . import db, design, storage
+from .climate import db as climate_db
+from .climate import routes as climate_routes
+from .climate.ingestion import IngestionManager, build_event_sources, build_feed_sources
 from .providers import get_provider
 from .providers.mock import MockProvider
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB_DIR = os.path.join(BASE_DIR, "web")
+CLIMATE_WEB_DIR = os.path.join(WEB_DIR, "climate")
 
 ALLOWED_STYLES = {"modern", "lush garden", "desert xeriscape", "family yard"}
 MAX_UPLOAD_BYTES = 12 * 1024 * 1024
@@ -20,15 +25,38 @@ MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 # Initialize side-effects at import so the app (and tests) are ready immediately.
 db.init_db()
 storage.ensure_media_dir()
+climate_db.init_db()
 
-app = FastAPI(title="TANAKHA — AI Yard Makeover Visualizer")
+_ingestion_manager: IngestionManager | None = None
+
+
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _ingestion_manager
+    # Disabled in tests (see tests/test_climate_api.py) so no background
+    # polling/network happens during the test suite.
+    if os.getenv("CLIMATE_INGESTION_ENABLED", "1") == "1":
+        _ingestion_manager = IngestionManager(build_feed_sources(), build_event_sources())
+        await _ingestion_manager.start()
+    yield
+    if _ingestion_manager is not None:
+        await _ingestion_manager.stop()
+
+
+app = FastAPI(title="TANAKHA — AI Yard Makeover Visualizer", lifespan=lifespan)
 app.mount("/media", StaticFiles(directory=storage.ensure_media_dir()), name="media")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+app.include_router(climate_routes.router)
 
 
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(os.path.join(WEB_DIR, "index.html"))
+
+
+@app.get("/climate")
+def climate_page() -> FileResponse:
+    return FileResponse(os.path.join(CLIMATE_WEB_DIR, "index.html"))
 
 
 # --- "The Art of Crafting Prompts" landing page + interactive D.N.A builder ---

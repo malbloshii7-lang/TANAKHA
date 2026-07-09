@@ -47,6 +47,8 @@ photo ──▶ Claude vision ──▶ design brief ──▶ image provider �
 - **`app/db.py`** — SQLite `leads` table.
 - **`app/storage.py`** — saves before/after images to `media/`.
 - **`web/`** — premium single-page front-end (upload → style → reveal → lead form).
+- **`app/climate/`** — a second, independent feature: **Climate Pulse**, a live monitoring
+  feed. See below.
 
 ## API
 
@@ -56,6 +58,39 @@ photo ──▶ Claude vision ──▶ design brief ──▶ image provider �
 | POST | `/api/visualize` | multipart `image` + `style` → `{before_url, after_url, brief, style}` |
 | POST | `/api/leads` | JSON lead → `{id, status}` |
 | GET | `/api/leads` | List captured leads |
+
+## Climate Pulse — live monitoring feed
+
+`/climate` is an editorial-style live feed aggregating posts from WMO, national met
+services (NHMS), UN agencies, climate science bodies, and climate-finance institutions,
+plus a rolling calendar of climate-related events. It's a separate feature sharing this
+app's backend/DB conventions — see `app/climate/README.md` for the full design.
+
+```bash
+uvicorn app.main:app --reload
+# open http://localhost:8000/climate
+```
+
+Works with **zero API keys** by default: a server-side mock ingestion source produces a
+realistic, always-on feed (real timestamps, real dedup, real SSE push — just synthetic
+content instead of live social posts). Two real, pluggable sources are also included:
+
+- `rss` — polls free, keyless public feeds (NWS alerts, USGS earthquakes, ReliefWeb,
+  GDACS) on a 5-minute cadence.
+- `twitter` — polls the real X API v2 recent-search endpoint for the WMO/NHMS/UN seed
+  accounts, but only activates when `X_BEARER_TOKEN` is set (requires a paid X API tier).
+
+Enable them via `CLIMATE_SOURCES=mock,rss` (comma-separated) in your environment. LinkedIn/
+Facebook/Instagram ingestion is out of scope — those platforms don't offer public
+third-party read APIs.
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/climate` | Front-end |
+| GET | `/api/climate/feed` | Paginated feed reads — `?source=&search=&cursor=&limit=` |
+| GET | `/api/climate/feed/stream` | SSE stream — pushes new items/events as they're ingested |
+| GET | `/api/climate/events` | Upcoming calendar events |
+| GET | `/api/climate/stats` | Stat row: posts today, alerts, active sources, engagement |
 
 ## Configuration
 
@@ -70,6 +105,10 @@ Copy `.env.example` and set what you need:
 | `TANAKHA_DISABLE_CLAUDE` | — | set `1` to force templated briefs |
 | `MEDIA_DIR` | `media` | image storage dir |
 | `DATABASE_PATH` | `tanakha.db` | SQLite path |
+| `CLIMATE_SOURCES` | `mock` | comma list: `mock`, `rss`, `twitter` |
+| `CLIMATE_EVENT_SOURCES` | `mock` | comma list: `mock` |
+| `X_BEARER_TOKEN` | — | enables the real `twitter` source |
+| `CLIMATE_INGESTION_ENABLED` | `1` | set `0` to disable all background polling |
 
 ### Going live with real "after" images
 
@@ -84,7 +123,8 @@ Copy `.env.example` and set what you need:
 pytest -q
 ```
 
-Runs fully offline (mock provider + templated briefs).
+Runs fully offline (mock provider + templated briefs; Climate Pulse's background
+ingestion is disabled in tests via `CLIMATE_INGESTION_ENABLED=0`).
 
 ## Notes & roadmap
 
