@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>D.N.A Prompt Builder — The Art of Crafting Prompts</title>
 <meta name="description" content="Build a production-ready prompt live using the D.N.A framework: Define, Navigate, Adapt. By Kimi." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="D.N.A Prompt Builder — The Art of Crafting Prompts" />
+<meta property="og:description" content="Fill the three strands — Define, Navigate, Adapt — and watch a production-ready prompt assemble itself live." />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="D.N.A Prompt Builder" />
+<meta name="twitter:description" content="Build a production-ready prompt live with the D.N.A framework." />
+<meta name="theme-color" content="#05060c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2341f1d6'/%3E%3Cstop offset='.5' stop-color='%238b5cff'/%3E%3Cstop offset='1' stop-color='%23ff5db1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='13' fill='url(%23g)'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet" />
@@ -93,7 +101,8 @@
     padding:18px;min-height:260px;max-height:48vh;overflow:auto}
   .out-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
   .btn{font:700 12px/1 "Space Mono";letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--panel-edge);
-    border-radius:12px;padding:13px 16px;cursor:pointer;background:transparent;color:var(--ink);transition:.2s;flex:1;min-width:130px}
+    border-radius:12px;padding:13px 16px;cursor:pointer;background:transparent;color:var(--ink);transition:.2s;flex:1;min-width:110px;
+    text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
   .btn.primary{background:linear-gradient(120deg,var(--cyan),#7af);color:#05060c;border-color:transparent}
   .btn.primary:hover{transform:translateY(-1px);box-shadow:var(--glow)}
   .btn:hover{border-color:rgba(139,92,255,.5)}
@@ -136,6 +145,19 @@
     <div class="layout">
       <!-- INPUTS -->
       <section class="card">
+        <!-- PRESET -->
+        <div class="strand">
+          <label style="margin-top:0">Quick-start preset</label>
+          <select id="preset">
+            <option value="">— start from scratch —</option>
+            <option value="email">Welcome email sequence</option>
+            <option value="blog">SEO blog post</option>
+            <option value="code">Code review</option>
+            <option value="image">Image-generation prompt</option>
+            <option value="social">Social media post</option>
+          </select>
+        </div>
+
         <!-- DEFINE -->
         <div class="strand">
           <div class="strand-head"><div class="L">D</div><div><h2>Define</h2><small>Who the model is, what it's doing, for whom</small></div></div>
@@ -200,10 +222,14 @@
         <pre id="out"></pre>
         <div class="out-actions">
           <button class="btn primary" id="copyBtn">⧉ Copy prompt</button>
+          <a class="btn" id="openClaude" target="_blank" rel="noopener">↗ Claude</a>
+          <a class="btn" id="openChatGPT" target="_blank" rel="noopener">↗ ChatGPT</a>
+          <button class="btn" id="dlBtn">↓ .txt</button>
           <button class="btn" id="resetBtn">↺ Reset</button>
         </div>
         <div class="meter">Prompt strength: <span id="score">0%</span> — fill more strands to strengthen it
           <div class="bar"><i id="barFill"></i></div>
+          <div id="stats" style="margin-top:8px;color:var(--ink-faint)"></div>
         </div>
       </section>
     </div>
@@ -264,7 +290,7 @@
       if(boost.length){ lines.push(""); boost.forEach(b => lines.push(b)); }
 
       // CONTEXT grounding
-      if(v.context || (tmpl && false)){
+      if(v.context){
         lines.push("");
         lines.push("Use ONLY the context below; if the answer isn't there, say so.");
         lines.push('Context:\n"""\n' + (v.context || "") + '\n"""');
@@ -280,8 +306,52 @@
       $("score").textContent = pct + "%";
       $("barFill").style.width = pct + "%";
       $("badge").textContent = [v.role&&"D", (v.format||v.tone||v.length||v.avoid)&&"N", (c.reason||c.critic||c.ask||v.context)&&"A"].filter(Boolean).join(" · ") || "D · N · A";
+
+      // word / token estimate
+      const words = text ? text.split(/\s+/).length : 0;
+      $("stats").textContent = words + " words · ~" + Math.ceil(words * 1.35) + " tokens";
+
+      // one-click launch links, prompt prefilled
+      const enc = encodeURIComponent(text);
+      $("openClaude").href = "https://claude.ai/new?q=" + enc;
+      $("openChatGPT").href = "https://chatgpt.com/?q=" + enc;
+
+      save();
       return text;
     }
+
+    // ---- Autosave draft to localStorage ----
+    const STORE = "aocp-builder";
+    function save(){
+      const s = { v:{}, c:{} };
+      ids.forEach(i => s.v[i] = $(i).value);
+      checks.forEach(i => s.c[i] = $(i).checked);
+      try{ localStorage.setItem(STORE, JSON.stringify(s)); }catch(_){}
+    }
+    function restore(){
+      try{
+        const s = JSON.parse(localStorage.getItem(STORE));
+        if(!s) return;
+        ids.forEach(i => { if(s.v && s.v[i] != null) $(i).value = s.v[i]; });
+        checks.forEach(i => { $(i).checked = !!(s.c && s.c[i]); });
+      }catch(_){}
+    }
+
+    // ---- Quick-start presets ----
+    const PRESETS = {
+      email:{role:"senior email marketing strategist",goal:"write a 5-email welcome sequence that onboards new signups and drives the first purchase",audience:"new subscribers who just signed up",format:"Markdown with headings",tone:"Friendly & warm",length:"under 150 words per email",avoid:"spammy hype, ALL CAPS, excessive exclamation marks"},
+      blog:{role:"SEO content writer with 10 years of experience",goal:"write a long-form blog post on [topic] that can rank for [keyword]",audience:"beginners searching for practical guidance",format:"Markdown with headings",tone:"Professional",length:"1,200–1,500 words",avoid:"keyword stuffing, fluffy intros"},
+      code:{role:"staff software engineer performing a code review",goal:"review the code below for bugs, security issues, and readability problems, ordered by severity",audience:"the developer who wrote it",format:"Numbered steps",tone:"Professional",length:"be concise — only flag what matters",avoid:"nitpicks about personal style"},
+      image:{role:"art director crafting image-generation prompts",goal:"produce one detailed image prompt for [subject]: style, lighting, lens, mood, aspect ratio",audience:"a text-to-image model (Midjourney / DALL·E / Stable Diffusion)",format:"Plain prose",tone:"",length:"a single dense paragraph",avoid:"vague adjectives like 'nice' or 'beautiful'"},
+      social:{role:"social media growth strategist",goal:"write 3 hook-first post variants announcing [thing]",audience:"busy scrollers on X and LinkedIn",format:"Bulleted list",tone:"Punchy & bold",length:"under 40 words per variant",avoid:"hashtag spam, corporate buzzwords"}
+    };
+    $("preset").addEventListener("change", () => {
+      const p = PRESETS[$("preset").value];
+      if(!p) return;
+      ids.forEach(i => { if(i in p) $(i).value = p[i]; });
+      build();
+      showToast("Preset loaded — tweak the strands to fit");
+    });
 
     function bindChk(id){
       const el=$(id), label=el.closest(".chk");
@@ -297,12 +367,25 @@
       if(ok){ b.textContent="✓ Copied"; b.classList.add("done"); showToast("Prompt copied — paste it into your AI"); setTimeout(()=>{b.textContent="⧉ Copy prompt";b.classList.remove("done");},1700); }
       else showToast("Couldn't copy");
     });
+    $("dlBtn").addEventListener("click", () => {
+      const blob = new Blob([out.textContent], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "prompt.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast("Downloaded prompt.txt");
+    });
     $("resetBtn").addEventListener("click", () => {
       ids.forEach(i => $(i).value="");
       checks.forEach(i => { $(i).checked=false; $(i).closest(".chk").classList.remove("on"); });
+      $("preset").value = "";
+      try{ localStorage.removeItem(STORE); }catch(_){}
       build(); showToast("Cleared");
     });
 
+    restore();
+    checks.forEach(i => $(i).closest(".chk").classList.toggle("on", $(i).checked));
     build();
   </script>
 </body>
