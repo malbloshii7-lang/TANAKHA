@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<title>AI Product Explorer — Team Board</title>
+<style>
+:root{
+  --bg:#FAF8F5; --surface:#F2EFE9; --line:#D6CFC3; --ink:#1A1410;
+  --muted:#5C4F42; --faint:#8B7D6B; --accent:#C4986A; --chipbg:#EAE5DC;
+  --shadow:rgba(26,20,16,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#171310; --surface:#201B16; --line:#3A322A; --ink:#EDE6DC;
+    --muted:#BFB1A0; --faint:#8B7D6B; --accent:#D2A678; --chipbg:#2A241E;
+    --shadow:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#171310; --surface:#201B16; --line:#3A322A; --ink:#EDE6DC;
+  --muted:#BFB1A0; --faint:#8B7D6B; --accent:#D2A678; --chipbg:#2A241E;
+  --shadow:rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --bg:#FAF8F5; --surface:#F2EFE9; --line:#D6CFC3; --ink:#1A1410;
+  --muted:#5C4F42; --faint:#8B7D6B; --accent:#C4986A; --chipbg:#EAE5DC;
+  --shadow:rgba(26,20,16,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+::selection{background:rgba(196,152,106,.3)}
+.container{max-width:1150px;margin:0 auto;padding:0 24px}
+header{padding:44px 0 20px}
+h1{font-family:Georgia,'Iowan Old Style','Times New Roman',serif;font-size:clamp(30px,5vw,48px);letter-spacing:-.02em;margin-bottom:10px;text-wrap:balance}
+.subtitle{color:var(--muted);font-size:15px;line-height:1.6;max-width:60ch}
+.sticky-bar{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding:14px 0}
+.bar-inner{display:flex;flex-direction:column;gap:10px}
+.row1{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type="text"],select{padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--chipbg);color:var(--ink);font:inherit;font-size:14px;outline:none}
+input[type="text"]:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input[type="text"]{flex:1;min-width:180px;max-width:320px}
+input::placeholder{color:var(--faint)}
+.toolbar{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,.pill:focus-visible,.status-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.status-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+.status-chip .n{font-variant-numeric:tabular-nums;background:var(--chipbg);border-radius:999px;padding:1px 7px;font-size:11px}
+.status-chip.on{border-color:currentColor}
+.pills{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;border:none;font:inherit;transition:background .15s}
+.pill-all{background:var(--chipbg);color:var(--muted)}
+.pill-all.on{background:var(--accent);color:#fff}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.count{font-size:12px;color:var(--faint)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:24px 0}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;cursor:pointer;transition:box-shadow .2s;border-top:3px solid var(--line)}
+.card:hover{box-shadow:0 4px 16px var(--shadow)}
+.card-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.card h2{font-family:Georgia,'Iowan Old Style',serif;font-size:20px;margin-bottom:6px;font-weight:400}
+.card .for{font-size:12px;color:var(--faint);margin-bottom:10px}
+.card .problem{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.meta-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.badge{padding:4px 11px;border-radius:999px;font-size:11px;font-weight:600}
+.status-pill{padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700}
+.owner-tag{color:var(--faint)}
+.votes{margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.price{font-size:12px;color:var(--faint);white-space:nowrap}
+.expanded{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:none;cursor:default}
+.expanded.show{display:block}
+@media (prefers-reduced-motion: no-preference){.expanded.show{animation:fadeIn .25s ease}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.field{margin-bottom:13px}
+.field-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:4px;display:block}
+.field-text{font-size:13px;color:var(--muted);line-height:1.6}
+.ops{background:var(--chipbg);border-radius:10px;padding:14px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ops .full{grid-column:1/-1}
+.ops label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:4px}
+.ops select,.ops input,.ops textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;outline:none}
+.ops textarea{resize:vertical;min-height:56px;line-height:1.5}
+.vote-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.vote-btn:hover{border-color:var(--accent)}
+.empty{text-align:center;padding:60px 0;color:var(--faint);font-size:14px}
+footer{text-align:center;padding:24px 0;border-top:1px solid var(--line);margin-top:16px}
+footer p{font-size:12px;color:var(--faint)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s;z-index:60}
+.toast.show{opacity:1}
+</style>
+
+<header><div class="container">
+<h1>AI Product Explorer — Team Board</h1>
+<p class="subtitle">30 B2B SaaS ideas built on one insight: AI generates more content than humans can review, and AI makes subtle mistakes. Triage them as a team — set a status, claim an owner, vote, and leave notes. Everything saves in your browser; use Export / Import to sync with teammates.</p>
+</div></header>
+
+<div class="sticky-bar"><div class="container bar-inner">
+<div class="row1">
+  <input type="text" id="search" placeholder="Search ideas, owners, notes…">
+  <select id="sort" aria-label="Sort ideas">
+    <option value="default">Sort: Default</option>
+    <option value="votes">Sort: Most votes</option>
+    <option value="status">Sort: Status</option>
+  </select>
+  <div class="toolbar">
+    <button class="btn primary" id="exportBtn">Export JSON</button>
+    <button class="btn" id="importBtn">Import JSON</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <button class="btn" id="resetBtn">Reset board</button>
+  </div>
+</div>
+<div class="status-row" id="statusRow"></div>
+<div class="pills" id="pills"></div>
+<span class="count" id="count"></span>
+</div></div>
+
+<main class="container">
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty" style="display:none">No ideas match your filters.</div>
+</main>
+
+<footer><div class="container"><p>AI Product Explorer — team edition. State lives in this browser (localStorage); Export JSON is the team's source of truth.</p></div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const CAT={
+  'Engineering/Product':'#5B6E8B','Content/Marketing':'#7A6B5D','Legal':'#5D7A6B',
+  'Support/Service':'#7A5D6E','Academic/Research':'#6B6B7A','Trust/Safety':'#8B5E3C',
+  'Healthcare':'#6B7A5D','Finance':'#5D6E7A','Operations/Infrastructure':'#6B5D7A',
+  'Governance/Compliance':'#5D5D7A'
+};
+const DIFF={'Low':'#7A8B6E','Medium':'#C4953A','Medium-High':'#B8734A','High':'#A85D5D'};
+const RISK={'Low':'#7A8B6E','Medium':'#C4953A','High':'#A85D5D'};
+const CATS=Object.keys(CAT);
+const STATUSES=['Backlog','Evaluating','Building','Shipped','Dropped'];
+const SCOLOR={'Backlog':'#8B7D6B','Evaluating':'#C4953A','Building':'#5B6E8B','Shipped':'#7A8B6E','Dropped':'#A85D5D'};
+
+const ideas=[
+{id:1,name:'Code Bouncer',cat:'Engineering/Product',user:'Senior Engineering Manager',problem:'AI copilots generate 10x the pull-request volume, but human review throughput is flat. AI-generated code contains subtle hallucinations that static analyzers miss.',output:'Ranked PR review queue with hallucination risk scores, API-usage verification, and cognitive-load estimates per diff.',why:'Uses a secondary AI to pattern-match against known AI-generated code signatures, detect imaginary APIs, and estimate review complexity.',money:'Per-seat SaaS ($25-50/seat/month) integrated into GitHub/GitLab.',diff:'Medium',risk:'Medium',price:'$25-50/mo'},
+{id:2,name:'Content Triage',cat:'Content/Marketing',user:'Content Marketing Director',problem:'AI content mills produce volume human editors cannot keep up with, causing brand-voice drift and factual errors to slip into publication.',output:'Prioritized editing queue with brand-voice deviation scores, factual-accuracy flags, and emotional-resonance metrics.',why:'Uses AI to evaluate AI-generated copy against brand embeddings and fact corpora, surfacing what humans would miss at scale.',money:'Per-seat SaaS ($40-80/seat/month).',diff:'Medium',risk:'Medium',price:'$40-80/mo'},
+{id:3,name:'Draft Sentinel',cat:'Legal',user:'Senior Paralegal at mid-size law firm',problem:'Associates use AI to draft contracts faster, but AI-generated clauses contain hallucinated case citations, inconsistent defined terms, and non-existent statutory references.',output:'Annotated contract with hallucination flags, citation-verification links, and logical-consistency score.',why:'Uses AI to parse legal text and cross-reference against citation databases and statutory corpora in real time.',money:'Per-document ($15-50) or per-seat SaaS.',diff:'Medium-High',risk:'High',price:'$15-50/doc'},
+{id:4,name:'Ticket Bouncer',cat:'Support/Service',user:'Customer Support Operations Manager',problem:'AI chatbots resolve simple tickets but generate complex, emotionally escalated follow-ups that human agents must handle, creating unpredictable workload spikes.',output:'Escalation forecast with sentiment-decay curves, agent prep briefs, and predicted resolution time.',why:'Uses AI to analyze conversation transcripts for unresolved sub-intents and emotional-escalation patterns that precede human handoff.',money:'Per-seat SaaS ($30-60/seat/month).',diff:'Medium',risk:'Medium',price:'$30-60/mo'},
+{id:5,name:'Submission Screener',cat:'Academic/Research',user:'Managing Editor of mid-tier academic journal',problem:'AI writing tools have increased manuscript submission volume 3-5x while lowering average quality, burying genuine research under synthetic noise.',output:'Integrity score with AI-generation probability, citation-hallucination report, and methodological red flags.',why:'Uses AI to detect synthetic text patterns, verify citation existence, and flag methodological inconsistencies.',money:'Per-submission ($5-15) or annual journal license.',diff:'Medium-High',risk:'Medium',price:'$5-15/sub'},
+{id:6,name:'Reply Router',cat:'Support/Service',user:'SDR Team Lead',problem:'AI outbound tools generate reply volume that SDR teams cannot process, causing hot leads to cool while buried in auto-generated noise.',output:'Prioritized reply queue with intent classification, suggested response drafts, and meeting-booking probability.',why:'Uses AI to parse reply sentiment, detect buying signals, and draft context-aware follow-ups that preserve human tone.',money:'Per-seat SaaS ($40-80/seat/month).',diff:'Medium',risk:'Medium',price:'$40-80/mo'},
+{id:7,name:'Machine Legibility Auditor',cat:'Content/Marketing',user:'SEO Director at content publisher',problem:'AI-generated content floods the web, making sites stylistically indistinguishable to search algorithms, which triggers ranking suppression for "helpful content" violations.',output:'Differentiation score against SERP competitors, content humanization plan, and semantic uniqueness map.',why:'Uses AI to detect AI-generated text patterns and suggest angles that restore human distinctiveness.',money:'Per-site audit ($200-500) or monthly SaaS.',diff:'Medium',risk:'Medium',price:'$200-500/audit'},
+{id:8,name:'Report Differentiator',cat:'Finance',user:'Equity Research Analyst at hedge fund',problem:'AI drafting tools have made corporate earnings reports and SEC filings more formulaic, reducing the alpha available to investors who rely on linguistic nuance.',output:'Authenticity score highlighting boilerplate vs. original management commentary, with red-flagged sections and sentiment-inconsistency alerts.',why:'Uses AI to detect templated language and emotional dissonance between numbers and narrative.',money:'Per-seat SaaS ($200-500/seat/month) for buy-side firms.',diff:'Medium-High',risk:'Medium',price:'$200-500/mo'},
+{id:9,name:'Catalog Differentiator',cat:'Content/Marketing',user:'E-commerce Merchandising Manager',problem:'AI-written product descriptions across competitor catalogs converge on identical semantic embeddings, making price the only differentiator and eroding brand equity.',output:'Semantic similarity audit against competitor catalogs, differentiated rewrite suggestions, and brand-voice restoration plan.',why:'Uses AI to compute cross-catalog semantic overlap and generate unique selling angles.',money:'Per-catalog ($500-2,000) or monthly SaaS.',diff:'Medium',risk:'Low',price:'$500-2k/cat'},
+{id:10,name:'Brief Voice Checker',cat:'Legal',user:'Appellate Attorney at litigation boutique',problem:'AI drafting tools produce legally competent briefs that are stylistically uniform, causing judges to find them unpersuasive and lacking rhetorical distinctiveness.',output:'Voice originality score, rhetorical enhancement suggestions, and judge-specific style recommendations.',why:'Uses AI to detect stylistic patterns common in AI-generated legal text and suggest human stylistic differentiation.',money:'Per-document ($50-150) or per-seat.',diff:'Medium',risk:'Medium',price:'$50-150/doc'},
+{id:11,name:'Repo Fingerprint',cat:'Engineering/Product',user:'Staff Engineer at tech company',problem:'AI copilots generate code that ignores team-specific architectural patterns, creating technical debt and making repositories machine-illegible to internal tools.',output:'Conformance report against team patterns, custom style-guide enforcement, and AI-generated code segmentation.',why:'Uses AI to learn team-specific conventions and flag deviations introduced by AI copilots.',money:'Per-repo ($50-200/month) or per-seat.',diff:'Medium',risk:'Medium',price:'$50-200/mo'},
+{id:12,name:'Review Authenticator',cat:'Trust/Safety',user:'Head of Trust & Safety at marketplace',problem:'AI-generated fake reviews are becoming linguistically indistinguishable from authentic ones, eroding buyer trust and distorting seller rankings.',output:'Authenticity score per review, synthetic review removal queue, and seller manipulation risk index.',why:'Uses AI to detect synthetic text patterns and behavioral anomalies in review timing and language.',money:'Per-review ($0.01-0.05) or platform license.',diff:'High',risk:'High',price:'$0.01-0.05/rev'},
+{id:13,name:'Pixel Provenance',cat:'Trust/Safety',user:'Photo Editor at national newspaper',problem:'AI image generators and manipulators make photo verification harder, increasing the risk of publishing synthetic visuals as news.',output:'Provenance report with generation probability, manipulation detection map, and source-chain verification.',why:'Uses AI to detect synthetic image artifacts and metadata anomalies.',money:'Per-image ($5-20) or per-seat.',diff:'High',risk:'High',price:'$5-20/img'},
+{id:14,name:'Voice Vault',cat:'Trust/Safety',user:'Fraud Prevention Manager at retail bank',problem:'AI voice synthesis makes phone-based identity verification unreliable, exposing call centers to account-takeover fraud.',output:'Real-time caller authenticity score with synthetic-voice detection and escalation trigger.',why:'Uses AI to detect synthetic audio artifacts and liveness cues in real time.',money:'Per-call ($0.10-0.50) or per-seat.',diff:'High',risk:'High',price:'$0.10-0.50/call'},
+{id:15,name:'Chart Checker',cat:'Healthcare',user:'Chief Medical Information Officer at hospital system',problem:'AI scribes generate clinical notes that may contain fabricated symptoms, incorrect medications, or hallucinated patient histories, creating malpractice exposure.',output:'Discrepancy report cross-referencing notes against structured EHR data, with correction suggestions and severity scoring.',why:'Uses AI to parse unstructured clinical text and verify against structured records and medical ontologies.',money:'Per-seat ($100-300/seat/month) or per-hospital license.',diff:'High',risk:'High',price:'$100-300/mo'},
+{id:16,name:'Model Auditor',cat:'Finance',user:'FP&A Director at public company',problem:'AI copilots generate complex Excel models with subtle formula errors, circular references, and hallucinated assumptions, leading to bad capital-allocation decisions.',output:'Audit report with error flags, assumption traceability, and sensitivity analysis.',why:'Uses AI to parse formulas, detect logical inconsistencies, and trace assumption lineage.',money:'Per-model ($200-1,000) or per-seat.',diff:'High',risk:'Medium',price:'$200-1k/model'},
+{id:17,name:'Clause Validator',cat:'Legal',user:'Contract Manager at SaaS company',problem:'AI drafting tools invent clauses or misstate governing law, creating unenforceable contracts and compliance gaps.',output:'Validated contract with clause-existence verification against legal databases, citation links, and risk flags.',why:'Uses AI to match contract clauses against authoritative legal corpora and flag hallucinations.',money:'Per-document ($25-75) or per-seat.',diff:'Medium-High',risk:'Medium',price:'$25-75/doc'},
+{id:18,name:'Agent Switchboard',cat:'Operations/Infrastructure',user:'AI Operations Manager',problem:'Companies deploy multiple AI agents (sales, support, coding) that operate in silos, dropping context and duplicating actions across departments.',output:'Orchestration layer with context preservation, handoff logs, and conflict-resolution rules.',why:'Uses AI to translate between agent languages, preserve state, and mediate goal conflicts.',money:'Per-agent ($50-200/agent/month) or enterprise license.',diff:'High',risk:'High',price:'$50-200/agent/mo'},
+{id:19,name:'API Contract Guardian',cat:'Operations/Infrastructure',user:'Platform Engineering Lead',problem:'AI coding agents generate microservices that evolve without updating documentation, breaking downstream integrations and creating shadow APIs.',output:'Drift-detection report with auto-generated migration guides and deprecation timelines.',why:'Uses AI to parse code changes, infer API contracts, and detect backward-incompatible drift.',money:'Per-repo ($100-500/month) or per-seat.',diff:'Medium-High',risk:'Medium',price:'$100-500/mo'},
+{id:20,name:'Pipeline Reconciler',cat:'Operations/Infrastructure',user:'Data Engineering Manager',problem:'AI data tools generate ETL pipelines that overwrite or conflict with each other, causing data corruption and duplicate processing.',output:'Conflict map with resource-contention alerts, schema-collision detection, and resolution suggestions.',why:'Uses AI to parse pipeline logic and detect resource conflicts before runtime.',money:'Per-pipeline ($50-200/month) or per-seat.',diff:'High',risk:'Medium',price:'$50-200/mo'},
+{id:21,name:'Goal Aligner',cat:'Operations/Infrastructure',user:'Chief AI Officer',problem:'Different AI agents optimize for local metrics (e.g., sales AI promises unrealistic delivery dates, conflicting with ops AI capacity), causing systemic failures.',output:'Conflict alert with mediation suggestions, goal-hierarchy visualization, and systemic risk score.',why:'Uses AI to model agent goal hierarchies and detect cross-functional conflicts.',money:'Enterprise license ($50k-200k/year).',diff:'High',risk:'High',price:'$50k-200k/yr'},
+{id:22,name:'Model Version Reconciler',cat:'Operations/Infrastructure',user:'MLOps Lead',problem:'Teams use different versions of foundation models, causing inconsistent outputs, compliance drift, and reproducibility failures.',output:'Centralized model inventory with version reconciliation, output-consistency reports, and compliance-drift alerts.',why:'Uses AI to detect model version from output behavior and flag inconsistencies.',money:'Per-model ($100-500/month) or per-seat.',diff:'Medium',risk:'Medium',price:'$100-500/mo'},
+{id:23,name:'Prompt Manager',cat:'Governance/Compliance',user:'Operations Manager at logistics company',problem:'AI tools require prompt engineering that non-technical managers cannot perform, leaving them unable to extract value from AI investments.',output:'Curated prompt library with one-click execution, context-aware templates, and output quality scoring.',why:'Uses AI to generate and optimize prompts based on business context and user intent.',money:'Per-seat SaaS ($20-40/seat/month).',diff:'Low',risk:'Low',price:'$20-40/mo'},
+{id:24,name:'Board Translator',cat:'Governance/Compliance',user:'Board Chair at mid-market company',problem:'AI analytics tools produce complex, probabilistic outputs that non-technical board members cannot interpret, leading to decision paralysis or misinformed votes.',output:'Narrative summary with risk framing, decision options, and confidence intervals translated into business consequences.',why:'Uses AI to generate natural language explanations of complex AI outputs and model uncertainty.',money:'Per-board ($1,000-5,000/meeting) or annual retainer.',diff:'Medium',risk:'Medium',price:'$1k-5k/mtg'},
+{id:25,name:'Code Translator for PMs',cat:'Engineering/Product',user:'Product Manager at SaaS startup',problem:'AI copilots generate code that PMs need to understand for roadmap decisions, but they lack technical background to assess scope or risk.',output:'Business-impact summary of code changes, scope estimates, and risk framing in plain language.',why:'Uses AI to parse code diffs and map technical changes to business outcomes and user stories.',money:'Per-seat SaaS ($30-60/seat/month).',diff:'Medium',risk:'Medium',price:'$30-60/mo'},
+{id:26,name:'CFO Alert Triage',cat:'Finance',user:'CFO at growth-stage company',problem:'AI finance tools generate too many anomaly alerts, causing alert fatigue and obscuring genuine risks.',output:'Ranked anomaly list with business-impact scoring, recommended action, and false-positive probability.',why:'Uses AI to evaluate anomaly severity against business context and historical patterns.',money:'Per-seat SaaS ($100-300/seat/month).',diff:'Medium',risk:'Medium',price:'$100-300/mo'},
+{id:27,name:'Model Doc Generator',cat:'Governance/Compliance',user:'AI Governance Manager at bank',problem:'EU AI Act and emerging US regulations require extensive AI model documentation that does not exist in most organizations.',output:'Regulatory submission package with model cards, risk assessments, and governance narratives.',why:'Uses AI to analyze model architecture, training data, and behavior to generate compliance documentation.',money:'Per-model ($5k-20k) or enterprise license.',diff:'High',risk:'Medium',price:'$5k-20k/model'},
+{id:28,name:'PIA Auto-Generator',cat:'Governance/Compliance',user:'Data Protection Officer at multinational',problem:'AI systems process personal data in novel ways that require Privacy Impact Assessments, but the systems are opaque and change rapidly.',output:'PIA document with data-flow maps, risk register, and mitigation plan.',why:'Uses AI to map data flows through AI systems and identify privacy risks that static templates miss.',money:'Per-assessment ($2k-10k) or per-seat.',diff:'Medium-High',risk:'Medium',price:'$2k-10k/assmt'},
+{id:29,name:'Bias Audit Doc',cat:'Governance/Compliance',user:'Chief Diversity Officer at Fortune 500',problem:'NYC Local Law 144 and similar regulations require bias audits of AI hiring tools, but statistical audit expertise is scarce.',output:'Audit report with demographic disparity analysis, statistical significance testing, and remediation plan.',why:'Uses AI to analyze model outputs for demographic bias and generate regulator-ready statistical reports.',money:'Per-audit ($10k-50k) or annual retainer.',diff:'High',risk:'High',price:'$10k-50k/audit'},
+{id:30,name:'AI Supply Chain Mapper',cat:'Governance/Compliance',user:'Procurement Compliance Manager at manufacturer',problem:'EU AI Act requires knowing which vendors use AI and how, but supply chains are opaque and vendor disclosures are incomplete.',output:'AI supply chain map with risk classification, vendor AI usage inventory, and compliance gap analysis.',why:'Uses AI to parse vendor contracts, product descriptions, and support docs for AI usage indicators.',money:'Per-supplier ($500-2,000) or per-seat.',diff:'Medium',risk:'Medium',price:'$500-2k/supplier'}
+];
+
+// ---- team state ----
+const KEY='aipe-team-v1';
+let ops={};
+try{ops=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){ops={}}
+function op(id){return ops[id]||(ops[id]={status:'Backlog',owner:'',votes:0,notes:''})}
+function save(){localStorage.setItem(KEY,JSON.stringify(ops))}
+
+let activeCat=null,activeStatus=null,openId=null;
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function renderStatusRow(){
+  const counts={};STATUSES.forEach(s=>counts[s]=0);
+  ideas.forEach(i=>{counts[op(i.id).status]++});
+  const el=document.getElementById('statusRow');
+  el.innerHTML='<button class="status-chip'+(activeStatus?'':' on')+'" data-s="">All statuses <span class="n">'+ideas.length+'</span></button>'+
+    STATUSES.map(s=>'<button class="status-chip'+(activeStatus===s?' on':'')+'" data-s="'+s+'" style="color:'+SCOLOR[s]+'"><span class="dot" style="background:'+SCOLOR[s]+'"></span>'+s+' <span class="n">'+counts[s]+'</span></button>').join('');
+  el.querySelectorAll('.status-chip').forEach(btn=>{
+    btn.onclick=()=>{activeStatus=btn.dataset.s||null;renderStatusRow();renderGrid();};
+  });
+}
+
+function renderPills(){
+  const el=document.getElementById('pills');
+  el.innerHTML='<button class="pill pill-all'+(activeCat?'':' on')+'">All categories</button>'+
+    CATS.map(c=>'<button class="pill" style="background:'+(activeCat===c?CAT[c]:'var(--chipbg)')+';color:'+(activeCat===c?'#fff':CAT[c])+'"><span class="dot" style="background:'+(activeCat===c?'#fff':CAT[c])+'"></span>'+c+'</button>').join('');
+  el.querySelectorAll('.pill').forEach((btn,i)=>{
+    btn.onclick=()=>{activeCat=i===0?null:CATS[i-1];renderPills();renderGrid();};
+  });
+}
+
+function cardHTML(idea){
+  const o=op(idea.id),cc=CAT[idea.cat],dc=DIFF[idea.diff],rc=RISK[idea.risk],sc=SCOLOR[o.status];
+  return '<div class="card" data-id="'+idea.id+'" style="border-top-color:'+sc+'">'+
+    '<div class="card-head" style="color:'+cc+'"><span class="dot" style="background:'+cc+'"></span>'+idea.cat+'</div>'+
+    '<h2>'+idea.name+'</h2>'+
+    '<div class="for">For: '+idea.user+'</div>'+
+    '<div class="problem">'+idea.problem+'</div>'+
+    '<div class="meta-row">'+
+      '<span class="status-pill" style="background:'+sc+'22;color:'+sc+'">'+o.status+'</span>'+
+      (o.owner?'<span class="owner-tag">@'+esc(o.owner)+'</span>':'<span class="owner-tag">unclaimed</span>')+
+      '<span class="votes">▲ '+o.votes+'</span>'+
+    '</div>'+
+    '<div class="meta-row" style="margin-top:8px">'+
+      '<span class="badge" style="background:'+dc+'18;color:'+dc+'">'+idea.diff+'</span>'+
+      '<span class="badge" style="background:'+rc+'18;color:'+rc+'">Risk: '+idea.risk+'</span>'+
+      '<span class="price" style="margin-left:auto">'+idea.price+'</span>'+
+    '</div>'+
+    '<div class="expanded'+(openId===idea.id?' show':'')+'" id="exp-'+idea.id+'">'+
+      '<div class="ops" data-stop="1">'+
+        '<div><label for="st-'+idea.id+'">Status</label><select id="st-'+idea.id+'" data-act="status">'+STATUSES.map(s=>'<option'+(s===o.status?' selected':'')+'>'+s+'</option>').join('')+'</select></div>'+
+        '<div><label for="ow-'+idea.id+'">Owner</label><input id="ow-'+idea.id+'" data-act="owner" type="text" placeholder="who owns this?" value="'+esc(o.owner)+'"></div>'+
+        '<div class="full"><label for="nt-'+idea.id+'">Team notes</label><textarea id="nt-'+idea.id+'" data-act="notes" placeholder="decisions, blockers, next steps…">'+esc(o.notes)+'</textarea></div>'+
+        '<div class="full"><button class="vote-btn" data-act="vote">▲ Upvote — '+o.votes+'</button></div>'+
+      '</div>'+
+      '<div class="field"><span class="field-label">Output Produced</span><span class="field-text">'+idea.output+'</span></div>'+
+      '<div class="field"><span class="field-label">Why AI Matters</span><span class="field-text">'+idea.why+'</span></div>'+
+      '<div class="field"><span class="field-label">Monetization</span><span class="field-text">'+idea.money+'</span></div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderGrid(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const sort=document.getElementById('sort').value;
+  let filtered=ideas.filter(idea=>{
+    const o=op(idea.id);
+    const mc=!activeCat||idea.cat===activeCat;
+    const st=!activeStatus||o.status===activeStatus;
+    const ms=!q||[idea.name,idea.problem,idea.cat,idea.user,idea.output,o.owner,o.notes].join(' ').toLowerCase().includes(q);
+    return mc&&st&&ms;
+  });
+  if(sort==='votes')filtered=[...filtered].sort((a,b)=>op(b.id).votes-op(a.id).votes);
+  if(sort==='status')filtered=[...filtered].sort((a,b)=>STATUSES.indexOf(op(a.id).status)-STATUSES.indexOf(op(b.id).status));
+  document.getElementById('grid').innerHTML=filtered.map(cardHTML).join('');
+  document.getElementById('empty').style.display=filtered.length?'none':'block';
+  document.getElementById('count').textContent='Showing '+filtered.length+' of '+ideas.length;
+  bindCards();
+}
+
+function bindCards(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const id=+card.dataset.id;
+    card.addEventListener('click',e=>{
+      if(e.target.closest('[data-stop]'))return;
+      openId=openId===id?null:id;
+      renderGrid();
+    });
+    card.querySelector('[data-act="status"]').addEventListener('change',e=>{
+      op(id).status=e.target.value;save();renderStatusRow();renderGrid();
+    });
+    card.querySelector('[data-act="owner"]').addEventListener('input',e=>{op(id).owner=e.target.value;save();});
+    card.querySelector('[data-act="owner"]').addEventListener('change',()=>renderGrid());
+    card.querySelector('[data-act="notes"]').addEventListener('input',e=>{op(id).notes=e.target.value;save();});
+    card.querySelector('[data-act="vote"]').addEventListener('click',()=>{
+      op(id).votes++;save();renderGrid();
+    });
+  });
+}
+
+// ---- toolbar ----
+document.getElementById('exportBtn').onclick=()=>{
+  const payload={version:1,exported:new Date().toISOString(),board:ops};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='ai-product-board.json';a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Board exported — share the JSON with your team');
+};
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      const board=data.board||data;
+      if(typeof board!=='object')throw 0;
+      ops={...ops,...board};save();
+      renderStatusRow();renderGrid();
+      toast('Board imported — statuses, owners, votes and notes merged');
+    }catch(err){toast('Import failed: that file is not a valid board export')}
+  };
+  r.readAsText(f);e.target.value='';
+});
+document.getElementById('resetBtn').onclick=()=>{
+  if(!confirm('Reset the board? This clears all statuses, owners, votes and notes on this browser.'))return;
+  ops={};save();renderStatusRow();renderGrid();toast('Board reset');
+};
+document.getElementById('search').addEventListener('input',renderGrid);
+document.getElementById('sort').addEventListener('change',renderGrid);
+
+renderStatusRow();renderPills();renderGrid();
+</script>
+
+</body>
+</html>
