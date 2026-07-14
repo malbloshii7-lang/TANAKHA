@@ -52,6 +52,106 @@ body {
   text-transform: uppercase;
 }
 
+/* Glossary Review Console */
+.gate-banner {
+  padding: 1rem 1.25rem;
+  border-radius: 2px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.gate-banner.gate-closed {
+  background: #fdf3f2;
+  border-color: #d32f2f;
+  color: #b71c1c;
+}
+
+.gate-banner.gate-open {
+  background: #eef7ee;
+  border-color: #388e3c;
+  color: #1b5e20;
+}
+
+.reviewer-row {
+  max-width: 420px;
+}
+
+.entry-card {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 2px;
+  background: var(--paper);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.entry-card.entry-confirmed {
+  border-left-color: #388e3c;
+}
+
+.entry-card.entry-pending {
+  border-left-color: #d32f2f;
+}
+
+.entry-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.entry-id {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.entry-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.entry-confirmed .entry-badge { color: #388e3c; }
+.entry-pending .entry-badge { color: #d32f2f; }
+
+.entry-en {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.entry-context {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.entry-ar {
+  width: 100%;
+  min-height: 56px;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: "Traditional Arabic", "Segoe UI", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  resize: vertical;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.entry-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 /* Single body editor */
 .body-editor {
   min-height: 260px;

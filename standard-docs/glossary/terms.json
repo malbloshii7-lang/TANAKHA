@@ -1,7 +1,10 @@
 {
   "metadata": {
     "project": "STANDARD",
-    "language_pair": ["en", "ar"],
+    "language_pair": [
+      "en",
+      "ar"
+    ],
     "version": "1.0-pending-approval",
     "note": "All entries marked 'unconfirmed' until approved by human. No render() call proceeds without explicit human approval."
   },
