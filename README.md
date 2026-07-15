@@ -92,3 +92,68 @@ Runs fully offline (mock provider + templated briefs).
   outbound email/SMS, payments. Outreach should be **opt-in only** to stay clear of
   CAN-SPAM / TCPA — that's why the funnel captures consent at the lead form.
 - Previews are AI-generated *concepts*, not exact build plans.
+
+---
+
+## Climate Command Center & Campaign Team Portal
+
+This repo also hosts a second, unrelated static site: the **Climate Command Center**, a
+campaign site for climate coordination policy, plus a **Campaign Team Portal** that links
+it and the repo's other published landing pages.
+
+### Live URLs (after enabling GitHub Pages — see below)
+
+| Site | URL |
+|---|---|
+| Campaign Team Portal | `https://malbloshii7-lang.github.io/TANAKHA/portal/` |
+| Climate Command Center | `https://malbloshii7-lang.github.io/TANAKHA/climate/` |
+
+### One-time setup to go live
+
+GitHub Pages must be switched to **Actions**-based deploys once:
+
+1. Repo → **Settings** → **Pages**.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. Push to `main` (or run the **Deploy Pages** workflow manually from the **Actions** tab).
+
+The workflow (`.github/workflows/pages.yml`) builds `climate-command-center/` with Vite,
+then assembles the root static pages, `portal/`, and the built app into one deploy so
+everything ships from a single Pages site.
+
+### What's where
+
+- **`climate-command-center/`** — React + Vite + Tailwind site (5 pages: Home, Data
+  Intelligence, Strategic Framework, Partnerships, Governance). Uses `HashRouter` so deep
+  links work under the `/climate/` Pages subpath.
+- **`climate-command-center/src/content/`** — the campaign's editable source of truth:
+  - `smart-framework.ts` — SMART 2.0 pillars, initiatives, KPIs.
+  - `events.ts` — the governance calendar (shared by Home and Governance).
+  - `roadmap.ts` — implementation phases and milestones.
+  - `stats.ts` — headline indicators, regional risk data, and the data-vintage string.
+  - `partners.ts` — global partners & endorsements.
+
+  **To update the campaign** (new SMART version, new event dates, refreshed figures),
+  edit the relevant file here — every page that displays that content updates automatically,
+  and TypeScript will flag any shape mismatch.
+- **`climate-command-center/public/data/`** — the underlying World Bank Open Data CSVs
+  (CO2 per capita, renewable energy consumption, energy use per capita), served as-is and
+  linked from the Data Intelligence page's download cards and the portal's data section.
+- **`portal/index.html`** — the Campaign Team Portal: a single static page linking the
+  Climate Command Center, the repo's other published pages, and the raw CSVs.
+
+### Refreshing the World Bank data
+
+The bundled CSVs are a point-in-time pull (July 2026). To refresh:
+
+1. Re-pull the three indicators from [World Bank Open Data](https://data.worldbank.org)
+   (`EN.GHG.CO2.PC.CE.AR5`, `EG.FEC.RNEW.ZS`, `EG.USE.PCAP.KG.OE`).
+2. Replace the files in `climate-command-center/public/data/`.
+3. Update the headline figures in `climate-command-center/src/content/stats.ts` and bump
+   `DATA_VINTAGE` / `DATA_VINTAGE_SHORT`.
+
+### Design system
+
+The site uses a light, institutional "paper + navy ink + petrol teal" palette (see
+`climate-command-center/src/index.css`) instead of a dark/neon theme — chosen for a
+classy, practical, ministerial tone. A `.band-dark` class re-themes specific sections
+(navbar, hero, footer) to a deep-navy "gravitas" band using the same tokens.
