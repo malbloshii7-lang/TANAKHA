@@ -8,7 +8,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
 import {
-  Globe, AlertTriangle,
+  Globe, AlertTriangle, AlertCircle,
   Leaf, Network, Cpu, Users, RefreshCw,
   ChevronDown, ArrowRight,
 } from 'lucide-react'
