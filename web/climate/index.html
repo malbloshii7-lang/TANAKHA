@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Climate Pulse — Live Feed</title>
+  <meta name="description" content="Editorial-style live monitoring feed aggregating WMO, national met services, UN agencies, climate science bodies and climate finance institutions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/climate/style.css" />
+</head>
+<body data-theme="warm">
+  <div class="cp-app">
+    <aside class="cp-sidebar" id="sidebar">
+      <div class="cp-logo-block">
+        <div class="cp-logo">Climate<br />Pulse</div>
+        <div class="cp-logo-sub">Live Monitoring</div>
+      </div>
+
+      <div class="cp-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="cp-search-icon">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search..." autocomplete="off" />
+      </div>
+
+      <div class="cp-sources-label">Sources</div>
+      <nav class="cp-sources" id="sourceFilters"></nav>
+
+      <div class="cp-spacer"></div>
+      <div class="cp-rule"></div>
+
+      <div class="cp-calendar" id="calendar">
+        <h3 class="cp-calendar-title">Upcoming</h3>
+        <div class="cp-calendar-list" id="calendarList"></div>
+      </div>
+    </aside>
+
+    <main class="cp-main">
+      <header class="cp-header">
+        <button class="cp-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+
+        <div class="cp-header-titles">
+          <h1 id="headerTitle">All Sources</h1>
+          <p id="headerSub">
+            <span class="cp-pulse-dot"></span>
+            <span id="headerSubText">loading…</span>
+          </p>
+        </div>
+
+        <div class="cp-toggle-group" id="layoutToggle">
+          <button data-layout="card" class="active">Card</button>
+          <button data-layout="grid">Grid</button>
+          <button data-layout="list">List</button>
+        </div>
+
+        <div class="cp-toggle-group cp-theme-toggle" id="themeToggle">
+          <button data-theme="warm" class="active">Cashmere</button>
+          <button data-theme="ocean">Ember</button>
+          <button data-theme="earth">Moss</button>
+        </div>
+      </header>
+
+      <div class="cp-content">
+        <div class="cp-stats" id="stats"></div>
+
+        <div class="cp-alert-wrap" id="alertWrap" hidden>
+          <div class="cp-alert" id="alertBanner"></div>
+        </div>
+
+        <div class="cp-feed" id="feed" data-layout="card"></div>
+
+        <div class="cp-empty" id="emptyState" hidden>
+          <div class="cp-empty-title">Nothing here yet</div>
+          <div class="cp-empty-sub">Try adjusting your filters or search</div>
+        </div>
+
+        <button class="cp-load-more" id="loadMore" hidden>Load more</button>
+      </div>
+    </main>
+
+    <div class="cp-mobile-overlay" id="mobileOverlay" hidden></div>
+  </div>
+
+  <script src="/static/climate/app.js"></script>
+</body>
+</html>
