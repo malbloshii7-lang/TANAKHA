@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMPOWER — WMO Campaign Deck</title>
+<style>
+  /* ============ EMPOWER deck · STANDARD house style ============ */
+  :root{
+    --navy:#0A1F3C; --navy-deep:#050F1F; --gold:#BFA15A; --gold-bright:#E3C878;
+    --paper:#FBFAF7; --ink:#14181F;
+    --dur:12000ms;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#000;overflow:hidden;
+    font-family:"Segoe UI","Trebuchet MS",Tahoma,sans-serif;color:#fff}
+
+  #deck{position:fixed;inset:0}
+
+  /* ---- slides ---- */
+  .slide{position:absolute;inset:0;opacity:0;visibility:hidden;
+    transition:opacity .48s ease;/* 12-frame luminance dissolve @25fps */}
+  .slide.active{opacity:1;visibility:visible}
+
+  .scene{position:absolute;inset:0;overflow:hidden;transform:scale(1);}
+  .active .scene{animation:pushin var(--dur) linear forwards}
+  @keyframes pushin{from{transform:scale(1)}to{transform:scale(1.04)}}
+
+  /* ---- copy block ---- */
+  .copy{position:absolute;left:6vw;right:6vw;bottom:16vh;z-index:5;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:4vw}
+  .copy .en{max-width:46%;text-align:left}
+  .copy .ar{max-width:46%;text-align:right;direction:rtl;
+    font-family:"Traditional Arabic","Segoe UI",Tahoma,sans-serif}
+  .copy h2{font-size:2.6vw;font-weight:300;letter-spacing:.02em;line-height:1.35}
+  .copy .ar h2{font-size:2.9vw}
+  .kicker{display:block;font-size:1vw;letter-spacing:.35em;color:var(--gold);
+    text-transform:uppercase;margin-bottom:1vh;font-weight:600}
+  .ar .kicker{letter-spacing:.08em}
+  .active .copy>div{opacity:0;transform:translateY(1.6vh);
+    animation:rise .4s ease-out forwards}
+  .active .copy .en{animation-delay:.9s}
+  .active .copy .ar{animation-delay:1.15s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  .vo{position:absolute;left:0;right:0;bottom:8.5vh;text-align:center;z-index:5;
+    font-size:1.05vw;font-style:italic;color:rgba(255,255,255,.55);
+    opacity:0;transition:opacity .6s .8s}
+  .active .vo{opacity:1}
+
+  /* ---- big letter reveal ---- */
+  .bigletter{position:absolute;top:50%;left:50%;z-index:6;
+    transform:translate(-50%,-58%);font-size:26vw;font-weight:200;
+    color:transparent;-webkit-text-stroke:1.5px var(--gold);
+    text-shadow:0 0 8vw rgba(191,161,90,.25);opacity:0;pointer-events:none}
+  .active .bigletter{animation:letterin var(--dur) ease forwards}
+  @keyframes letterin{
+    0%{opacity:0;transform:translate(-50%,-58%) scale(1.25)}
+    8%{opacity:.9;transform:translate(-50%,-58%) scale(1)}
+    24%{opacity:.9}
+    34%{opacity:0;transform:translate(-50%,-30%) scale(.12)}
+    100%{opacity:0}}
+
+  /* ---- persistent letter rail ---- */
+  #rail{position:fixed;left:0;right:0;bottom:2.6vh;z-index:8;
+    display:flex;justify-content:center;gap:1.4vw;pointer-events:none;
+    transition:opacity .5s}
+  #rail span{font-size:2.2vw;font-weight:300;letter-spacing:.1em;
+    color:rgba(255,255,255,.14);-webkit-text-stroke:.5px rgba(191,161,90,.25);
+    transition:color .8s,text-shadow .8s,transform .8s}
+  #rail span.lit{color:var(--gold-bright);
+    text-shadow:0 0 1.2vw rgba(191,161,90,.6);transform:translateY(-.3vh)}
+  #rail.hidden{opacity:0}
+
+  /* ---- footage-slot tag (production aid, toggle with F) ---- */
+  .slot{position:absolute;top:3vh;right:3vw;z-index:7;font-size:.8vw;
+    letter-spacing:.2em;color:rgba(191,161,90,.5);border:1px solid rgba(191,161,90,.3);
+    padding:.5vh .8vw;text-transform:uppercase;display:none}
+  body.showslots .slot{display:block}
+
+  /* ---- HUD ---- */
+  #hud{position:fixed;top:2.4vh;left:3vw;z-index:9;font-size:.85vw;
+    letter-spacing:.3em;color:rgba(255,255,255,.4);text-transform:uppercase}
+  #progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:10;
+    background:var(--gold)}
+  #hint{position:fixed;top:2.4vh;right:3vw;z-index:9;font-size:.75vw;
+    color:rgba(255,255,255,.3);letter-spacing:.15em}
+
+  /* =================== SCENES =================== */
+
+  /* S1 · Earth pre-dawn */
+  .sc1{background:radial-gradient(120% 90% at 50% 118%,#1B3A63 0%,#0A1F3C 34%,#050F1F 62%,#000 100%)}
+  .sc1 .horizon{position:absolute;left:-10%;right:-10%;bottom:-42vh;height:70vh;
+    border-radius:50%;background:#02060C;
+    box-shadow:0 -1.2vh 6vh 1vh rgba(120,180,255,.55),0 -0.3vh 1.5vh 0 rgba(200,230,255,.9)}
+  .sc1 .sunrise{position:absolute;bottom:24vh;left:50%;width:2vw;height:2vw;border-radius:50%;
+    transform:translateX(-50%);background:#FFEBC2;filter:blur(1.2vw);opacity:.0;
+    animation:dawn var(--dur) ease-in forwards}
+  @keyframes dawn{30%{opacity:.25;box-shadow:0 0 6vw 3vw rgba(255,215,150,.35)}
+    100%{opacity:.95;box-shadow:0 0 14vw 8vw rgba(255,220,160,.5)}}
+  .sc1 .stars i{position:absolute;width:2px;height:2px;border-radius:50%;
+    background:#fff;opacity:.5;animation:tw 4s infinite alternate}
+  @keyframes tw{to{opacity:.1}}
+
+  /* S2 · stakes triptych */
+  .sc2{display:flex}
+  .sc2 .panel{flex:1;position:relative;opacity:0;animation:panelin .8s ease forwards}
+  .sc2 .p1{background:linear-gradient(180deg,#26343F 0%,#4A5A66 55%,#8C7B5E 100%);animation-delay:.1s}
+  .sc2 .p2{background:linear-gradient(180deg,#C79A55 0%,#A5763B 55%,#5E4322 100%);animation-delay:4.1s}
+  .sc2 .p3{background:linear-gradient(180deg,#25454C 0%,#3A6D74 60%,#1C3A40 100%);animation-delay:8.1s}
+  @keyframes panelin{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+  .sc2 .panel::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55) 100%)}
+  .sc2 .cloudmass{position:absolute;top:6%;left:8%;right:8%;height:38%;border-radius:48%;
+    background:rgba(255,255,255,.13);filter:blur(2.2vw)}
+  .sc2 .crack{position:absolute;bottom:14%;left:12%;right:12%;height:1px;
+    background:rgba(0,0,0,.5);box-shadow:0 6px 0 rgba(0,0,0,.3),0 14px 0 rgba(0,0,0,.2)}
+  .sc2 .waterline{position:absolute;bottom:0;left:0;right:0;height:26%;
+    background:linear-gradient(180deg,rgba(150,200,210,.28),rgba(20,60,70,.55));
+    animation:swell 3s ease-in-out infinite alternate}
+  @keyframes swell{to{height:31%}}
+
+  /* S3 · ops centre radar */
+  .sc3{background:radial-gradient(90% 90% at 50% 40%,#0E2A4E 0%,#081A33 55%,#03080F 100%)}
+  .sc3 .radar{position:absolute;top:50%;left:50%;width:56vh;height:56vh;
+    transform:translate(-50%,-56%);border-radius:50%;
+    border:1px solid rgba(120,180,255,.25);
+    box-shadow:inset 0 0 6vh rgba(80,140,220,.15)}
+  .sc3 .radar::before,.sc3 .radar::after{content:"";position:absolute;inset:18%;
+    border-radius:50%;border:1px solid rgba(120,180,255,.18)}
+  .sc3 .radar::after{inset:36%}
+  .sc3 .sweep{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg,rgba(110,190,255,.5) 0deg,rgba(110,190,255,.08) 40deg,transparent 70deg);
+    animation:sweep 4s linear infinite}
+  @keyframes sweep{to{transform:rotate(360deg)}}
+  .sc3 .blip{position:absolute;width:.7vh;height:.7vh;border-radius:50%;
+    background:#9FD4FF;box-shadow:0 0 1.2vh #9FD4FF;animation:tw 2.4s infinite alternate}
+
+  /* S4 · balloon dawn */
+  .sc4{background:linear-gradient(180deg,#2C3E63 0%,#7A5D7A 45%,#D89B6A 78%,#F2C48D 100%)}
+  .sc4 .balloon{position:absolute;left:52%;bottom:-6vh;width:3.4vh;height:4.2vh;
+    border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 35% 30%,#fff,#cfd6dd);
+    box-shadow:0 0 2vh rgba(255,255,255,.5);animation:rise4 var(--dur) ease-out forwards}
+  .sc4 .balloon::after{content:"";position:absolute;top:100%;left:50%;width:1px;height:7vh;
+    background:rgba(255,255,255,.55)}
+  @keyframes rise4{to{transform:translateY(-78vh) translateX(-4vw) scale(.55)}}
+  .sc4 .ground{position:absolute;bottom:0;left:0;right:0;height:12vh;
+    background:linear-gradient(180deg,transparent,#2A1E14 70%)}
+  .sc4 .grid{position:absolute;top:0;left:0;right:0;height:34%;opacity:0;
+    background:
+      repeating-linear-gradient(90deg,rgba(160,210,255,.12) 0 1px,transparent 1px 9vw),
+      repeating-linear-gradient(0deg,rgba(160,210,255,.12) 0 1px,transparent 1px 7vh);
+    animation:gridin var(--dur) linear forwards}
+  @keyframes gridin{0%,62%{opacity:0}86%{opacity:.7}100%{opacity:.6}}
+
+  /* S5 · aircraft & cloud canyon */
+  .sc5{background:linear-gradient(180deg,#5F83B8 0%,#8FB0D8 40%,#C9D9EC 100%)}
+  .sc5 .cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.85);
+    filter:blur(2.4vw)}
+  .sc5 .c1{width:44vw;height:22vh;left:-8vw;bottom:8vh}
+  .sc5 .c2{width:52vw;height:26vh;right:-12vw;bottom:-6vh;background:rgba(255,255,255,.75)}
+  .sc5 .c3{width:30vw;height:14vh;left:28vw;top:14vh;background:rgba(255,255,255,.5)}
+  .sc5 svg{position:absolute;top:38%;left:-16vw;width:15vw;
+    filter:drop-shadow(0 1vh 2vh rgba(20,40,70,.35));
+    animation:fly var(--dur) linear forwards}
+  @keyframes fly{to{transform:translateX(120vw) translateY(-6vh)}}
+
+  /* S6 · ridge to orbit */
+  .sc6{background:linear-gradient(180deg,#02040A 0%,#0A1F3C 46%,#27405F 74%,#42586F 100%)}
+  .sc6 .ridge{position:absolute;bottom:0;left:0;right:0;height:26vh;
+    clip-path:polygon(0 100%,0 62%,12% 38%,22% 58%,34% 22%,48% 55%,60% 30%,74% 62%,86% 40%,100% 66%,100% 100%);
+    background:#04070C}
+  .sc6 .station{position:absolute;bottom:24vh;left:33.4%;width:2px;height:5vh;background:#9FB6CE}
+  .sc6 .station::after{content:"";position:absolute;top:-1vh;left:-0.5vh;width:1.2vh;height:1.2vh;
+    border-radius:50%;background:#CFE4FF;box-shadow:0 0 1.6vh #9FD4FF;animation:tw 2s infinite alternate}
+  .sc6 .sat{position:absolute;top:14vh;left:-6vw;width:1.4vh;height:1.4vh;background:#EAD9A6;
+    box-shadow:0 0 1.6vh rgba(227,200,120,.9);animation:orbit var(--dur) linear forwards}
+  .sc6 .sat::before,.sc6 .sat::after{content:"";position:absolute;top:.2vh;width:2.6vh;height:1vh;
+    background:linear-gradient(#28437A,#152647)}
+  .sc6 .sat::before{right:130%}.sc6 .sat::after{left:130%}
+  @keyframes orbit{to{transform:translateX(112vw) translateY(4vh)}}
+
+  /* S7 · water */
+  .sc7{background:linear-gradient(105deg,#5E7A46 0%,#7C9A55 46%,#C1A05F 54%,#A5763B 100%)}
+  .sc7::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(80% 60% at 50% 42%,transparent 30%,rgba(4,10,18,.55) 100%)}
+  .sc7 .ripple{position:absolute;top:42%;left:50%;width:2vh;height:2vh;border-radius:50%;
+    border:2px solid rgba(255,255,255,.8);transform:translate(-50%,-50%);
+    animation:rip 3.4s ease-out infinite}
+  .sc7 .r2{animation-delay:1.1s}.sc7 .r3{animation-delay:2.2s}
+  @keyframes rip{from{width:1vh;height:1vh;opacity:.95}
+    to{width:46vh;height:46vh;opacity:0}}
+  .sc7 .arcs{position:absolute;bottom:6vh;left:8vw;width:30vw;height:16vh;opacity:.35;
+    border-top:2px dashed rgba(255,255,255,.8);border-radius:50%}
+
+  /* S8 · classroom light shafts */
+  .sc8{background:linear-gradient(180deg,#3A3226 0%,#57452D 55%,#2C2318 100%)}
+  .sc8 .shaft{position:absolute;top:-20vh;width:9vw;height:150vh;
+    background:linear-gradient(180deg,rgba(255,226,170,.42),transparent 76%);
+    transform:rotate(16deg);filter:blur(1vw);animation:shaft 6s ease-in-out infinite alternate}
+  .sc8 .s1{left:16vw}.sc8 .s2{left:36vw;animation-delay:1.4s}
+  .sc8 .s3{left:56vw;animation-delay:2.6s}
+  @keyframes shaft{to{opacity:.55;transform:rotate(15deg)}}
+  .sc8 .figure{position:absolute;bottom:0;left:50%;width:16vw;height:44vh;
+    transform:translateX(-50%);border-radius:8vw 8vw 0 0;
+    background:linear-gradient(180deg,rgba(10,8,5,.0),rgba(8,6,4,.8) 30%,#050403 100%)}
+
+  /* S9 · resilient aerial, sun rays */
+  .sc9{background:linear-gradient(180deg,#B7803C 0%,#D9A75B 34%,#8A6538 68%,#3A2C1B 100%)}
+  .sc9 .rays{position:absolute;top:-46vh;left:50%;width:180vw;height:120vh;
+    transform:translateX(-50%);
+    background:conic-gradient(from 176deg at 50% 0%,
+      transparent 0deg,rgba(255,235,190,.34) 5deg,transparent 11deg,
+      rgba(255,235,190,.22) 17deg,transparent 24deg,rgba(255,235,190,.3) 31deg,
+      transparent 38deg,rgba(255,235,190,.2) 45deg,transparent 52deg);
+    animation:raysin var(--dur) ease forwards}
+  @keyframes raysin{from{opacity:.25}to{opacity:.9}}
+  .sc9 .city{position:absolute;bottom:0;left:0;right:0;height:18vh;
+    clip-path:polygon(0 100%,0 55%,6% 55%,6% 30%,10% 30%,10% 62%,16% 62%,16% 20%,20% 20%,20% 55%,27% 55%,27% 38%,31% 38%,31% 66%,38% 66%,38% 12%,42% 12%,42% 55%,49% 55%,49% 30%,53% 30%,53% 60%,60% 60%,60% 24%,64% 24%,64% 55%,71% 55%,71% 40%,75% 40%,75% 64%,82% 64%,82% 18%,86% 18%,86% 55%,93% 55%,93% 34%,97% 34%,97% 100%);
+    background:#140F08}
+  .sc9 .turbine{position:absolute;bottom:17vh;width:2px;height:6vh;background:#140F08}
+  .sc9 .turbine::after{content:"";position:absolute;top:-1.4vh;left:-1.3vh;width:2.8vh;height:2.8vh;
+    background:
+      linear-gradient(0deg,transparent 46%,#140F08 46% 54%,transparent 54%),
+      linear-gradient(120deg,transparent 46%,#140F08 46% 54%,transparent 54%),
+      linear-gradient(240deg,transparent 46%,#140F08 46% 54%,transparent 54%);
+    animation:spin 5s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* S9 word lock */
+  .lockword{position:absolute;top:38%;left:0;right:0;text-align:center;z-index:6;
+    font-size:8.4vw;font-weight:200;letter-spacing:.28em;color:var(--gold-bright);
+    text-shadow:0 0 4vw rgba(191,161,90,.55);opacity:0}
+  .active .lockword{animation:lock var(--dur) ease forwards}
+  @keyframes lock{0%,28%{opacity:0;transform:scale(1.14)}
+    40%{opacity:1;transform:scale(1)}100%{opacity:1}}
+
+  /* S10 · candidacy card, dusk bokeh */
+  .sc10{background:radial-gradient(120% 100% at 50% 100%,#122A4C 0%,#0A1F3C 46%,#040B18 100%)}
+  .sc10 .bokeh i{position:absolute;border-radius:50%;background:rgba(227,200,120,.16);
+    filter:blur(1vw);animation:bob 9s ease-in-out infinite alternate}
+  @keyframes bob{to{transform:translateY(-3vh)}}
+  .card{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;
+    text-align:center;width:80vw}
+  .card .word{font-size:6.6vw;font-weight:200;letter-spacing:.3em;color:var(--gold-bright);
+    text-shadow:0 0 3vw rgba(191,161,90,.4)}
+  .card .rule{width:22vw;height:1px;background:var(--gold);margin:3.2vh auto}
+  .card .name{font-size:2.4vw;font-weight:300;letter-spacing:.06em}
+  .card .name-ar{font-size:2.7vw;direction:rtl;margin-top:1vh;
+    font-family:"Traditional Arabic","Segoe UI",Tahoma,sans-serif}
+  .card .line{margin-top:2.2vh;font-size:1.15vw;color:rgba(255,255,255,.65);letter-spacing:.2em;
+    text-transform:uppercase}
+  .card .pending{display:inline-block;margin-top:2.4vh;padding:.6vh 1.2vw;
+    border:1px solid rgba(191,161,90,.5);color:var(--gold);font-size:.8vw;
+    letter-spacing:.25em;text-transform:uppercase}
+  .active .card>*{opacity:0;animation:rise .7s ease-out forwards}
+  .active .card .word{animation-delay:.4s}
+  .active .card .rule{animation-delay:1s}
+  .active .card .name{animation-delay:1.5s}
+  .active .card .name-ar{animation-delay:1.8s}
+  .active .card .line{animation-delay:2.3s}
+  .active .card .pending{animation-delay:2.8s}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="hud">EMPOWER · WMO CAMPAIGN</div>
+<div id="hint">SPACE play/pause · ← → navigate · F footage slots</div>
+
+<div id="deck">
+
+  <!-- SLIDE 1 -->
+  <section class="slide" data-dur="12000">
+    <div class="scene sc1">
+      <div class="stars">
+        <i style="top:12%;left:18%"></i><i style="top:8%;left:64%;animation-delay:1s"></i>
+        <i style="top:22%;left:41%;animation-delay:2s"></i><i style="top:15%;left:82%;animation-delay:.5s"></i>
+        <i style="top:30%;left:8%;animation-delay:1.6s"></i><i style="top:5%;left:33%;animation-delay:2.4s"></i>
+      </div>
+      <div class="horizon"></div><div class="sunrise"></div>
+    </div>
+    <div class="slot">Footage slot · S1 Earth pre-dawn from altitude</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">Cold open</span><h2>One atmosphere. One&nbsp;responsibility.</h2></div>
+      <div class="ar"><span class="kicker">الافتتاح</span><h2>غلاف جوي واحد. مسؤولية واحدة.</h2></div>
+    </div>
+    <div class="vo">“The sky belongs to no nation — and to every nation.”</div>
+  </section>
+
+  <!-- SLIDE 2 -->
+  <section class="slide" data-dur="12000">
+    <div class="scene sc2">
+      <div class="panel p1"><div class="cloudmass"></div></div>
+      <div class="panel p2"><div class="crack"></div></div>
+      <div class="panel p3"><div class="waterline"></div></div>
+    </div>
+    <div class="slot">Footage slot · S2 storm / drought / flood triptych</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">The stakes</span><h2>Extreme weather — the #1 long-term global&nbsp;risk</h2></div>
+      <div class="ar"><span class="kicker">التحدي</span><h2>الطقس المتطرف — الخطر العالمي الأول على المدى البعيد</h2></div>
+    </div>
+    <div class="vo">“The question is no longer whether we act together — but how well.”</div>
+  </section>
+
+  <!-- SLIDE 3 · E -->
+  <section class="slide" data-letter="0" data-dur="12000">
+    <div class="scene sc3">
+      <div class="radar"><div class="sweep"></div>
+        <div class="blip" style="top:30%;left:62%"></div>
+        <div class="blip" style="top:58%;left:28%;animation-delay:.8s"></div>
+        <div class="blip" style="top:44%;left:74%;animation-delay:1.5s"></div>
+      </div>
+    </div>
+    <div class="bigletter">E</div>
+    <div class="slot">Footage slot · S3 forecasting ops centre, dolly-in</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">E · Pillar one</span><h2>Early Warnings for All — no one left unprotected</h2></div>
+      <div class="ar"><span class="kicker">الركيزة الأولى</span><h2>الإنذار المبكر للجميع</h2></div>
+    </div>
+    <div class="vo">“Empower begins with warning — early, accurate, reaching every last community.”</div>
+  </section>
+
+  <!-- SLIDE 4 · M -->
+  <section class="slide" data-letter="1" data-dur="12000">
+    <div class="scene sc4">
+      <div class="grid"></div><div class="balloon"></div><div class="ground"></div>
+    </div>
+    <div class="bigletter">M</div>
+    <div class="slot">Footage slot · S4 radiosonde balloon launch, tilt-up</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">M · Pillar two</span><h2>Shared data. Shared science. Shared&nbsp;futures.</h2></div>
+      <div class="ar"><span class="kicker">الركيزة الثانية</span><h2>بيانات مشتركة، وعلم مشترك، ومستقبل مشترك</h2></div>
+    </div>
+    <div class="vo">“Weather does not stop at borders. Neither can data, nor science, nor solidarity.”</div>
+  </section>
+
+  <!-- SLIDE 5 · P -->
+  <section class="slide" data-letter="2" data-dur="12000">
+    <div class="scene sc5">
+      <div class="cloud c3"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+      <svg viewBox="0 0 200 60" aria-hidden="true">
+        <path fill="#1E2E42" d="M8 34 L96 30 L128 12 L136 12 L120 30 L176 28 L192 33 L176 38 L120 36 L136 54 L128 54 L96 36 L8 40 Q2 37 8 34 Z"/>
+        <rect x="86" y="24" width="34" height="3" rx="1.5" fill="#16233A"/>
+      </svg>
+    </div>
+    <div class="bigletter">P</div>
+    <div class="slot">Footage slot · S5 cloud-seeding aircraft, air-to-air</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">P · Pillar three</span><h2>From agreements to action — partnerships that&nbsp;fly</h2></div>
+      <div class="ar"><span class="kicker">الركيزة الثالثة</span><h2>من الاتفاقيات إلى الأفعال</h2></div>
+    </div>
+    <div class="vo">“Real partnership is measured in delivery — in the air, on the ground, in people's lives.”</div>
+  </section>
+
+  <!-- SLIDE 6 · O -->
+  <section class="slide" data-letter="3" data-dur="12000">
+    <div class="scene sc6">
+      <div class="sat"></div><div class="ridge"></div><div class="station"></div>
+      <div class="stars">
+        <i style="top:6%;left:22%"></i><i style="top:12%;left:58%;animation-delay:1.2s"></i>
+        <i style="top:4%;left:78%;animation-delay:.6s"></i><i style="top:18%;left:38%;animation-delay:2s"></i>
+      </div>
+    </div>
+    <div class="bigletter">O</div>
+    <div class="slot">Footage slot · S6 mountain AWS → satellite match-cut</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">O · Pillar four</span><h2>From mountain ridge to orbit — the planet, observed</h2></div>
+      <div class="ar"><span class="kicker">الركيزة الرابعة</span><h2>من قمم الجبال إلى المدار</h2></div>
+    </div>
+    <div class="vo">“You cannot manage what you cannot measure. We will close the gaps — everywhere.”</div>
+  </section>
+
+  <!-- SLIDE 7 · W -->
+  <section class="slide" data-letter="4" data-dur="12000">
+    <div class="scene sc7">
+      <div class="ripple"></div><div class="ripple r2"></div><div class="ripple r3"></div>
+      <div class="arcs"></div>
+    </div>
+    <div class="bigletter">W</div>
+    <div class="slot">Footage slot · S7 macro water drop → irrigation aerial</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">W · Pillar five</span><h2>Every drop, foreseen. Water security is climate&nbsp;security.</h2></div>
+      <div class="ar"><span class="kicker">الركيزة الخامسة</span><h2>الأمن المائي هو الأمن المناخي</h2></div>
+    </div>
+    <div class="vo">“For half the world, climate change arrives as water — too little, too much, too late.”</div>
+  </section>
+
+  <!-- SLIDE 8 · E -->
+  <section class="slide" data-letter="5" data-dur="12000">
+    <div class="scene sc8">
+      <div class="shaft s1"></div><div class="shaft s2"></div><div class="shaft s3"></div>
+      <div class="figure"></div>
+    </div>
+    <div class="bigletter">E</div>
+    <div class="slot">Footage slot · S8 young forecaster teaching (real faces preferred)</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">E · Pillar six</span><h2>The next generation of forecasters — in every&nbsp;nation</h2></div>
+      <div class="ar"><span class="kicker">الركيزة السادسة</span><h2>الجيل القادم من خبراء الأرصاد في كل دولة</h2></div>
+    </div>
+    <div class="vo">“Empowerment is not aid. It is capability — built, owned, and led by every member state.”</div>
+  </section>
+
+  <!-- SLIDE 9 · R + lock -->
+  <section class="slide" data-letter="6" data-dur="12000">
+    <div class="scene sc9">
+      <div class="rays"></div><div class="city"></div>
+      <div class="turbine" style="left:22%"></div>
+      <div class="turbine" style="left:27%;transform:scale(.8)"></div>
+      <div class="turbine" style="left:31%;transform:scale(.65)"></div>
+    </div>
+    <div class="bigletter">R</div>
+    <div class="lockword">EMPOWER</div>
+    <div class="slot">Footage slot · S9 coastal city aerial, storm breaking</div>
+    <div class="copy">
+      <div class="en"><span class="kicker">R · Pillar seven</span><h2>A stronger WMO for a safer&nbsp;world</h2></div>
+      <div class="ar"><span class="kicker">الركيزة السابعة</span><h2>منظمة أرصاد عالمية أقوى لعالم أكثر أمانًا</h2></div>
+    </div>
+    <div class="vo">“Seven commitments. One word. Empower.”</div>
+  </section>
+
+  <!-- SLIDE 10 · card -->
+  <section class="slide" data-dur="14000" data-hiderail="1">
+    <div class="scene sc10">
+      <div class="bokeh">
+        <i style="top:70%;left:12%;width:5vh;height:5vh"></i>
+        <i style="top:78%;left:34%;width:3vh;height:3vh;animation-delay:2s"></i>
+        <i style="top:66%;left:58%;width:6vh;height:6vh;animation-delay:1s"></i>
+        <i style="top:80%;left:76%;width:4vh;height:4vh;animation-delay:3s"></i>
+        <i style="top:58%;left:88%;width:2.6vh;height:2.6vh;animation-delay:1.6s"></i>
+      </div>
+    </div>
+    <div class="slot">Footage slot · S10 WMO Geneva flags at dusk, soft focus</div>
+    <div class="card">
+      <div class="word">EMPOWER</div>
+      <div class="rule"></div>
+      <div class="name">H.E. Dr. Abdulla Al Mandoos</div>
+      <div class="name-ar">سعادة الدكتور عبدالله المندوس</div>
+      <div class="line">Candidacy line · election session · date — to be confirmed</div>
+      <div class="pending">Arabic name pending protocol.json approval</div>
+    </div>
+    <div class="vo">“Empower the science. Empower the members. Empower the mission. Together.”</div>
+  </section>
+
+</div>
+
+<div id="rail">
+  <span>E</span><span>M</span><span>P</span><span>O</span><span>W</span><span>E</span><span>R</span>
+</div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll(".slide")];
+  const rail=document.getElementById("rail");
+  const railLetters=[...rail.querySelectorAll("span")];
+  const progress=document.getElementById("progress");
+  let idx=-1,timer=null,playing=true,t0=0,raf=null;
+
+  function litUpTo(n){railLetters.forEach((s,i)=>s.classList.toggle("lit",i<=n));}
+  function litReset(){railLetters.forEach(s=>s.classList.remove("lit"));}
+
+  function show(n,fromNav){
+    if(n<0)n=0; if(n>=slides.length)n=slides.length-1;
+    if(n===idx)return;
+    if(idx>=0)slides[idx].classList.remove("active");
+    idx=n;
+    const s=slides[idx];
+    // force restart of CSS animations
+    s.classList.remove("active"); void s.offsetWidth; s.classList.add("active");
+    rail.classList.toggle("hidden",!!s.dataset.hiderail);
+    // rail state: letters lit = all letters up to this slide's letter (docked ~34% in)
+    const L=s.dataset.letter;
+    // compute letters already earned by earlier slides
+    let earned=-1;
+    for(let i=0;i<idx;i++){const l=slides[i].dataset.letter;if(l!==undefined)earned=Math.max(earned,+l);}
+    litReset(); litUpTo(earned);
+    if(L!==undefined){
+      const dockAt=(+s.dataset.dur||12000)*0.34;
+      setTimeout(()=>{ if(idx===n) litUpTo(+L); },fromNav?200:dockAt);
+    }
+    schedule();
+  }
+
+  function schedule(){
+    clearTimeout(timer);cancelAnimationFrame(raf);
+    const dur=+slides[idx].dataset.dur||12000;
+    t0=performance.now();
+    function tick(now){
+      const p=Math.min(1,(now-t0)/dur);
+      progress.style.width=(p*100)+"%";
+      if(p<1&&playing)raf=requestAnimationFrame(tick);
+    }
+    if(playing){
+      raf=requestAnimationFrame(tick);
+      timer=setTimeout(()=>{ if(idx<slides.length-1)show(idx+1); },dur);
+    }
+  }
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight")show(idx+1,true);
+    else if(e.key==="ArrowLeft")show(idx-1,true);
+    else if(e.key===" "){e.preventDefault();playing=!playing;
+      if(playing)schedule();else{clearTimeout(timer);cancelAnimationFrame(raf);}}
+    else if(e.key.toLowerCase()==="f")document.body.classList.toggle("showslots");
+  });
+  document.addEventListener("click",()=>show(idx+1,true));
+
+  function fromHash(){const h=location.hash.match(/slide=(\d+)/);return h?+h[1]-1:0;}
+  window.addEventListener("hashchange",()=>show(fromHash(),true));
+  show(fromHash(),true);
+})();
+</script>
+</body>
+</html>
