@@ -23,7 +23,6 @@
     --accent-amber: #96690D;       /* ochre */
     --accent-rose: #A03B3B;        /* oxblood */
     --accent-lime: #557A32;        /* olive */
-    --accent-gold: #B08D3E;        /* gold hairlines / band accent */
     --text-primary: #1A2B3C;       /* navy ink */
     --text-secondary: #45586B;
     --text-muted: #64748B;
@@ -73,15 +72,15 @@
     --bg-base: #142838;
     --bg-surface: #1A3042;
     --bg-surface-hover: #21394E;
-    --accent-primary: #C9A961;     /* champagne gold on navy */
-    --accent-secondary: #7FB5AC;   /* soft petrol on navy */
+    --accent-primary: #7FB5AC;     /* soft petrol on navy */
+    --accent-secondary: #5C9C93;   /* deeper petrol on navy */
     --text-primary: #F4EFE6;       /* warm ivory */
     --text-secondary: #BCC8D4;
     --text-muted: #8C9BAB;
     --border-subtle: rgba(244,239,230,0.14);
-    --border-active: rgba(201,169,97,0.45);
-    --accent-wash: rgba(201,169,97,0.1);
-    --accent-wash-strong: rgba(201,169,97,0.18);
+    --border-active: rgba(127,181,172,0.4);
+    --accent-wash: rgba(127,181,172,0.1);
+    --accent-wash-strong: rgba(127,181,172,0.18);
   }
 
   * {

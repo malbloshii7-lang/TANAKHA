@@ -476,7 +476,7 @@ export default function Partnerships() {
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto pt-16 pb-16">
           <motion.span
-            className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-8"
+            className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-8"
             {...fadeUp(0.3)}
             viewport={viewportOnce}
           >
@@ -513,7 +513,7 @@ export default function Partnerships() {
         <div className="max-w-[1280px] mx-auto px-6">
           {/* Section Header */}
           <motion.div className="mb-16" {...fadeUp()} viewport={viewportOnce}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-6">
+            <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-6">
               Endorsements
             </span>
             <h2 className="text-2xl lg:text-[2.5rem] font-display font-semibold text-text-primary leading-tight tracking-tight mb-3">
@@ -568,7 +568,7 @@ export default function Partnerships() {
         <div className="max-w-[1440px] mx-auto px-6">
           {/* Section Header */}
           <motion.div className="text-center mb-16" {...fadeUp()} viewport={viewportOnce}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-6">
+            <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-6">
               Flagship Partnership
             </span>
             <h2 className="text-2xl lg:text-[2.5rem] font-display font-semibold text-text-primary leading-tight tracking-tight mb-4">
@@ -663,7 +663,7 @@ export default function Partnerships() {
         <div className="max-w-[1280px] mx-auto px-6">
           {/* Section Header */}
           <motion.div className="mb-16" {...fadeUp()} viewport={viewportOnce}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-6">
+            <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-6">
               Stakeholder Map
             </span>
             <h2 className="text-2xl lg:text-[2.5rem] font-display font-semibold text-text-primary leading-tight tracking-tight mb-3">
@@ -685,7 +685,7 @@ export default function Partnerships() {
         <div className="max-w-[1280px] mx-auto px-6">
           {/* Section Header */}
           <motion.div className="text-center mb-16" {...fadeUp()} viewport={viewportOnce}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-6">
+            <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-6">
               Governance
             </span>
             <h2 className="text-2xl lg:text-[2.5rem] font-display font-semibold text-text-primary leading-tight tracking-tight mb-4">

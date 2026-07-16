@@ -7,348 +7,201 @@
 <meta name="description" content="Campaign team portal: Climate Command Center, published landing pages, and the underlying World Bank datasets." />
 <style>
   :root{
-    --bg-deep:#F7F4ED;
-    --bg-base:#F1EDE2;
-    --bg-surface:#FFFFFF;
-    --accent-primary:#0F6B66;
-    --accent-secondary:#14555E;
-    --accent-gold:#B08D3E;
-    --text-primary:#1A2B3C;
-    --text-secondary:#45586B;
-    --text-muted:#64748B;
-    --border-subtle:rgba(26,43,60,0.14);
-    --border-active:rgba(15,107,102,0.4);
-    --band-bg:#10202F;
-    --band-ink:#F4EFE6;
-    --band-secondary:#BCC8D4;
-    --band-accent:#C9A961;
-    --radius:0.5rem;
+    --paper:#F7F4ED;
+    --surface:#FFFFFF;
+    --ink:#1A2B3C;
+    --ink-soft:#45586B;
+    --ink-mute:#7A8699;
+    --accent:#0F6B66;
+    --rule:rgba(26,43,60,0.16);
+    --rule-heavy:rgba(26,43,60,0.4);
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#12212F; --surface:#182A3A; --ink:#EDE9E0; --ink-soft:#B7C2CE;
+      --ink-mute:#83909E; --accent:#6FB3AA; --rule:rgba(237,233,224,0.16); --rule-heavy:rgba(237,233,224,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#12212F; --surface:#182A3A; --ink:#EDE9E0; --ink-soft:#B7C2CE;
+    --ink-mute:#83909E; --accent:#6FB3AA; --rule:rgba(237,233,224,0.16); --rule-heavy:rgba(237,233,224,0.4);
+  }
+
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
     margin:0;
-    background:var(--bg-deep);
-    color:var(--text-primary);
-    font-family:Georgia,"Source Serif 4","Times New Roman",serif;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  body, input, button { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif; }
-  h1, h2, h3, .serif { font-family: Georgia, "Source Serif 4", "Times New Roman", serif; }
-  .tabular { font-variant-numeric: tabular-nums; }
+  h1,h2,h3{font-family:Georgia,"Source Serif 4","Times New Roman",serif; font-weight:600; margin:0;}
+  a{color:inherit; text-decoration:none}
+  .tabular{font-variant-numeric:tabular-nums}
 
-  a { color: inherit; text-decoration: none; }
+  .wrap{max-width:800px; margin:0 auto; padding:0 1.5rem;}
 
-  .band {
-    background: var(--band-bg);
-    color: var(--band-ink);
-    padding: 4rem 1.5rem 3.5rem;
+  header{padding:4.5rem 0 2.5rem; border-bottom:1px solid var(--rule-heavy);}
+  .kicker{
+    font-size:.75rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-mute); margin-bottom:.9rem;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; }
-  .eyebrow {
-    display:inline-flex; align-items:center; gap:.5rem;
-    font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;
-    padding:.35rem .85rem; border-radius:999px;
-    border:1px solid rgba(201,169,97,0.4); color: var(--band-accent);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  h1{font-size:clamp(1.9rem,4vw,2.5rem); line-height:1.2; letter-spacing:-0.01em;}
+  header p{
+    margin:1rem 0 0; max-width:560px; color:var(--ink-soft);
+    font-size:1.0625rem; line-height:1.65;
   }
-  .dot { width:6px; height:6px; border-radius:999px; background: var(--band-accent); display:inline-block; }
-  h1.title {
-    font-size: clamp(2rem, 4.5vw, 3.25rem);
-    line-height: 1.1;
-    margin: 1.25rem 0 .75rem;
-    letter-spacing: -0.01em;
-    font-weight: 600;
-  }
-  .band p.lede {
-    color: var(--band-secondary);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    max-width: 640px;
-    margin: 0;
+  header p em{
+    font-style:normal; color:var(--ink); border-bottom:1px solid var(--rule-heavy);
   }
 
-  main { padding: 3rem 1.5rem 5rem; }
+  section{padding:3rem 0; border-bottom:1px solid var(--rule);}
+  section:last-of-type{border-bottom:none}
+  .section-head{
+    display:flex; align-items:baseline; gap:.85rem; margin-bottom:.5rem;
+  }
+  .num{
+    font-family:Georgia,serif; font-size:.9rem; color:var(--ink-mute);
+    font-variant-numeric:tabular-nums;
+  }
+  h2{font-size:1.375rem;}
+  .section-note{color:var(--ink-soft); font-size:.9375rem; margin:.6rem 0 1.75rem; max-width:560px; line-height:1.6;}
 
-  .stat-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1px;
-    background: var(--border-subtle);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 3rem;
+  .entry-list{list-style:none; margin:0; padding:0;}
+  .entry{border-top:1px solid var(--rule);}
+  .entry:first-child{border-top:none}
+  .entry a, .entry .entry-row{
+    display:flex; align-items:baseline; justify-content:space-between; gap:1.5rem;
+    padding:1rem 0;
   }
-  .stat {
-    background: var(--bg-surface);
-    padding: 1.25rem 1.5rem;
-  }
-  .stat .value {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-    font-family: Georgia, serif;
-  }
-  .stat .label {
-    font-size: .75rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--text-muted);
-    margin-top: .35rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
+  .entry-main{min-width:0}
+  .entry-title{font-size:1.0625rem; font-weight:600; color:var(--ink);}
+  .entry a:hover .entry-title{color:var(--accent)}
+  .entry-desc{color:var(--ink-soft); font-size:.875rem; margin-top:.25rem; line-height:1.5;}
+  .entry-arrow{color:var(--ink-mute); font-size:.9rem; flex-shrink:0;}
+  .entry a:hover .entry-arrow{color:var(--accent)}
 
-  .section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0 0 .5rem;
-  }
-  .section-sub {
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    margin: 0 0 1.5rem;
-    font-size: .95rem;
-  }
+  .subnav{margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--rule);}
+  .subnav-label{font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:.6rem;}
+  .subnav ul{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:0 1.5rem;}
+  .subnav li{font-size:.9375rem; padding:.25rem 0;}
+  .subnav a{color:var(--ink-soft); border-bottom:1px solid transparent;}
+  .subnav a:hover{color:var(--accent); border-bottom-color:var(--accent);}
 
-  .flagship {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-left: 4px solid var(--accent-primary);
-    border-radius: var(--radius);
-    padding: 2rem;
-    margin-bottom: 3rem;
-  }
-  .flagship-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: .75rem;
-  }
-  .flagship h2 { font-size: 1.75rem; margin: 0; }
-  .flagship p {
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    line-height: 1.6;
-    max-width: 680px;
-    margin: 0 0 1.5rem;
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .6rem 1.15rem;
-    border-radius: .375rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: .875rem;
-    font-weight: 600;
-    background: var(--accent-primary);
-    color: #fff;
-    border: 1px solid var(--accent-primary);
-  }
-  .btn:hover { background: var(--accent-secondary); border-color: var(--accent-secondary); }
-  .btn.ghost {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border-subtle);
-  }
-  .btn.ghost:hover { border-color: var(--border-active); color: var(--accent-primary); }
+  .dl-link{font-size:.8125rem; color:var(--accent); border-bottom:1px solid var(--rule-heavy); white-space:nowrap;}
+  .dl-link:hover{border-bottom-color:var(--accent);}
 
-  .pill-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-  }
-  .pill-nav a {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: .8125rem;
-    padding: .4rem .85rem;
-    border-radius: 999px;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-secondary);
-  }
-  .pill-nav a:hover { border-color: var(--border-active); color: var(--accent-primary); }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 3rem;
-  }
-  .card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    transition: border-color .2s ease, transform .2s ease;
-  }
-  .card:hover { border-color: var(--border-active); transform: translateY(-2px); }
-  .card h3 {
-    font-size: 1.15rem;
-    margin: 0 0 .5rem;
-  }
-  .card p {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--text-secondary);
-    font-size: .9rem;
-    line-height: 1.55;
-    margin: 0 0 1rem;
-  }
-  .card a.link {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: .8125rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-  }
-  .card a.link:hover { text-decoration: underline; }
-
-  .data-list {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .data-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-subtle);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  .data-row:last-child { border-bottom: none; }
-  .data-row .name { font-weight: 600; font-size: .9rem; }
-  .data-row .meta { color: var(--text-muted); font-size: .8125rem; }
-  .data-row a.dl {
-    font-size: .8125rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-    border: 1px solid var(--border-active);
-    padding: .3rem .75rem;
-    border-radius: .375rem;
-    white-space: nowrap;
-  }
-  .data-row a.dl:hover { background: rgba(15,107,102,0.08); }
-
-  footer {
-    border-top: 1px solid var(--border-subtle);
-    padding: 2rem 1.5rem 3rem;
-    text-align: center;
-    color: var(--text-muted);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: .8125rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg-deep:#10202F; --bg-base:#142838; --bg-surface:#1A3042;
-      --text-primary:#F4EFE6; --text-secondary:#BCC8D4; --text-muted:#8C9BAB;
-      --border-subtle:rgba(244,239,230,0.14); --border-active:rgba(201,169,97,0.45);
-      --accent-primary:#C9A961; --accent-secondary:#7FB5AC;
-    }
-    :root:not([data-theme="light"]) .btn { color: #10202F; }
-  }
-  :root[data-theme="dark"] {
-    --bg-deep:#10202F; --bg-base:#142838; --bg-surface:#1A3042;
-    --text-primary:#F4EFE6; --text-secondary:#BCC8D4; --text-muted:#8C9BAB;
-    --border-subtle:rgba(244,239,230,0.14); --border-active:rgba(201,169,97,0.45);
-    --accent-primary:#C9A961; --accent-secondary:#7FB5AC;
-  }
-  :root[data-theme="dark"] .btn { color: #10202F; }
+  footer{padding:2.5rem 0 4rem;}
+  footer p{color:var(--ink-mute); font-size:.8125rem; margin:0; line-height:1.6;}
 </style>
 </head>
 <body>
 
-  <div class="band">
-    <div class="wrap">
-      <span class="eyebrow"><span class="dot"></span>Campaign Team Portal</span>
-      <h1 class="title">TANAKHA Campaign Hub</h1>
-      <p class="lede">One place for the campaign team to reach the Climate Command Center, the published landing pages, and the underlying World Bank datasets.</p>
-    </div>
+  <div class="wrap">
+    <header>
+      <div class="kicker">TANAKHA — Campaign Team</div>
+      <h1>Campaign Portal</h1>
+      <p>An index of the campaign's live sites and source data. Global CO2 stands at <em>4.69 t/capita</em>, a <em>19.5×</em> gap separates the highest- and lowest-emitting regions, and the leading region draws <em>75.8%</em> of its energy from renewables — figures current to <em>July 2026</em>.</p>
+    </header>
+
+    <section>
+      <div class="section-head"><span class="num">01</span><h2>Climate Command Center</h2></div>
+      <p class="section-note">The flagship campaign site: the SMART 2.0 strategic framework, World Bank climate indicators, the governance calendar, and global partnerships, for the 2027–2031 coordination cycle.</p>
+      <ul class="entry-list">
+        <li class="entry">
+          <a href="../climate/#/">
+            <span class="entry-main">
+              <span class="entry-title">Open the Command Center</span>
+            </span>
+            <span class="entry-arrow">→</span>
+          </a>
+        </li>
+      </ul>
+      <div class="subnav">
+        <div class="subnav-label">Sections</div>
+        <ul>
+          <li><a href="../climate/#/">Home</a></li>
+          <li><a href="../climate/#/data-intelligence">Data Intelligence</a></li>
+          <li><a href="../climate/#/strategic-framework">Strategic Framework</a></li>
+          <li><a href="../climate/#/partnerships">Partnerships</a></li>
+          <li><a href="../climate/#/governance">Governance</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><span class="num">02</span><h2>Other published pages</h2></div>
+      <p class="section-note">Landing pages already live from earlier campaign work.</p>
+      <ul class="entry-list">
+        <li class="entry">
+          <a href="../index.html">
+            <span class="entry-main">
+              <span class="entry-title">The Art of Crafting Prompts</span>
+              <div class="entry-desc">Ten prompt-crafting mastery perks, paired with the most powerful AI tools.</div>
+            </span>
+            <span class="entry-arrow">→</span>
+          </a>
+        </li>
+        <li class="entry">
+          <a href="../builder.html">
+            <span class="entry-main">
+              <span class="entry-title">D.N.A Prompt Builder</span>
+              <div class="entry-desc">Interactive builder for constructing prompts from the D.N.A framework.</div>
+            </span>
+            <span class="entry-arrow">→</span>
+          </a>
+        </li>
+        <li class="entry">
+          <a href="../lvmh-empire.html">
+            <span class="entry-main">
+              <span class="entry-title">Arnault&rsquo;s Luxury Empire</span>
+              <div class="entry-desc">A maison-by-maison archive of the LVMH brand portfolio.</div>
+            </span>
+            <span class="entry-arrow">→</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <div class="section-head"><span class="num">03</span><h2>Source data</h2></div>
+      <p class="section-note">World Bank Open Data, retrieved July 2026 — the same files powering the Command Center's Data Intelligence page.</p>
+      <ul class="entry-list">
+        <li class="entry">
+          <div class="entry-row">
+            <span class="entry-main">
+              <span class="entry-title">CO2 Emissions per Capita</span>
+              <div class="entry-desc">EN.GHG.CO2.PC.CE.AR5 · 250 rows</div>
+            </span>
+            <a class="dl-link" href="../climate/data/co2_per_capita.csv" download>Download CSV</a>
+          </div>
+        </li>
+        <li class="entry">
+          <div class="entry-row">
+            <span class="entry-main">
+              <span class="entry-title">Renewable Energy Consumption</span>
+              <div class="entry-desc">EG.FEC.RNEW.ZS · 752 rows</div>
+            </span>
+            <a class="dl-link" href="../climate/data/renewable_energy_consumption.csv" download>Download CSV</a>
+          </div>
+        </li>
+        <li class="entry">
+          <div class="entry-row">
+            <span class="entry-main">
+              <span class="entry-title">Energy Use per Capita</span>
+              <div class="entry-desc">EG.USE.PCAP.KG.OE · 51 rows</div>
+            </span>
+            <a class="dl-link" href="../climate/data/energy_use_per_capita.csv" download>Download CSV</a>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>TANAKHA Campaign Team Portal. Data sourced from World Bank Open Data.</p>
+    </footer>
   </div>
-
-  <main>
-    <div class="wrap">
-
-      <div class="stat-strip">
-        <div class="stat"><div class="value tabular">4.69t</div><div class="label">Global CO2 / capita</div></div>
-        <div class="stat"><div class="value tabular">19.5×</div><div class="label">Regional emissions gap</div></div>
-        <div class="stat"><div class="value tabular">75.8%</div><div class="label">Top renewable share</div></div>
-        <div class="stat"><div class="value tabular">Jul 2026</div><div class="label">Data vintage</div></div>
-      </div>
-
-      <div class="flagship">
-        <div class="flagship-head">
-          <h2>Climate Command Center</h2>
-          <div style="display:flex; gap:.6rem;">
-            <a class="btn" href="../climate/#/">Open Command Center →</a>
-          </div>
-        </div>
-        <p>The flagship campaign site — SMART 2.0 strategic framework, live World Bank climate indicators, governance calendar, and global partnerships, all in one evidence-based platform for the 2027–2031 coordination cycle.</p>
-        <nav class="pill-nav">
-          <a href="../climate/#/">Home</a>
-          <a href="../climate/#/data-intelligence">Data Intelligence</a>
-          <a href="../climate/#/strategic-framework">Strategic Framework</a>
-          <a href="../climate/#/partnerships">Partnerships</a>
-          <a href="../climate/#/governance">Governance</a>
-        </nav>
-      </div>
-
-      <h2 class="section-title">Other published pages</h2>
-      <p class="section-sub">Landing pages already live from earlier campaign work.</p>
-      <div class="card-grid">
-        <div class="card">
-          <h3>The Art of Crafting Prompts</h3>
-          <p>Ten prompt-crafting mastery perks, paired with the most powerful AI tools.</p>
-          <a class="link" href="../index.html">Open page →</a>
-        </div>
-        <div class="card">
-          <h3>D.N.A Prompt Builder</h3>
-          <p>Interactive builder for constructing prompts from the D.N.A framework.</p>
-          <a class="link" href="../builder.html">Open page →</a>
-        </div>
-        <div class="card">
-          <h3>Arnault&rsquo;s Luxury Empire</h3>
-          <p>A maison-by-maison archive of the LVMH brand portfolio.</p>
-          <a class="link" href="../lvmh-empire.html">Open page →</a>
-        </div>
-      </div>
-
-      <h2 class="section-title">Source data</h2>
-      <p class="section-sub">World Bank Open Data, retrieved July 2026 — same files powering the Command Center's Data Intelligence page.</p>
-      <div class="data-list">
-        <div class="data-row">
-          <div>
-            <div class="name">CO2 Emissions per Capita</div>
-            <div class="meta">EN.GHG.CO2.PC.CE.AR5 · 250 rows</div>
-          </div>
-          <a class="dl" href="../climate/data/co2_per_capita.csv" download>Download CSV</a>
-        </div>
-        <div class="data-row">
-          <div>
-            <div class="name">Renewable Energy Consumption</div>
-            <div class="meta">EG.FEC.RNEW.ZS · 752 rows</div>
-          </div>
-          <a class="dl" href="../climate/data/renewable_energy_consumption.csv" download>Download CSV</a>
-        </div>
-        <div class="data-row">
-          <div>
-            <div class="name">Energy Use per Capita</div>
-            <div class="meta">EG.USE.PCAP.KG.OE · 51 rows</div>
-          </div>
-          <a class="dl" href="../climate/data/energy_use_per_capita.csv" download>Download CSV</a>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <footer>
-    TANAKHA Campaign Team Portal · Data sourced from World Bank Open Data
-  </footer>
 
 </body>
 </html>

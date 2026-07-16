@@ -33,7 +33,7 @@ export default function Navbar() {
         className={
           'band-dark fixed top-0 left-0 right-0 z-50 h-[72px] md:h-[72px] flex items-center transition-all duration-300 ' +
           (scrolled
-            ? 'bg-[rgba(16,32,47,0.95)] shadow-[0_1px_0_rgba(201,169,97,0.25)]'
+            ? 'bg-[rgba(16,32,47,0.95)] border-b border-[var(--border-subtle)]'
             : 'bg-[rgba(16,32,47,0.92)] border-b border-[var(--border-subtle)]')
         }
       >
@@ -86,14 +86,13 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right: Live Dashboard Button */}
+          {/* Right: Data link */}
           <div className="flex items-center gap-4">
             <Link
               to="/data-intelligence"
-              className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full text-[0.875rem] font-medium text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] transition-all duration-200 hover:bg-[var(--accent-wash-strong)]"
+              className="hidden md:inline-flex items-center gap-2 text-[0.875rem] font-medium text-text-secondary border-b border-transparent hover:text-accent-cyan hover:border-accent-cyan transition-colors duration-200 pb-0.5"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse-live" />
-              Live Dashboard
+              Data Intelligence
             </Link>
 
             {/* Mobile Hamburger */}
@@ -123,10 +122,9 @@ export default function Navbar() {
           ))}
           <Link
             to="/data-intelligence"
-            className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded-full text-base font-medium text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)]"
+            className="mt-4 text-base font-medium text-accent-cyan border-b border-accent-cyan pb-0.5"
           >
-            <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse-live" />
-            Live Dashboard
+            Data Intelligence
           </Link>
         </div>
       )}

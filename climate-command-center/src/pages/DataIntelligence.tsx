@@ -146,10 +146,8 @@ function PillBadge({ children, variant = "cyan" }: { children: React.ReactNode; 
   const isRose = variant === "rose";
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-wider ${
-        isRose
-          ? "border-[rgba(160,59,59,0.25)] bg-[rgba(160,59,59,0.1)] text-[#A03B3B]"
-          : "border-[var(--border-active)] bg-[var(--accent-wash)] text-[var(--accent-primary)]"
+      className={`inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider ${
+        isRose ? "text-[#A03B3B]" : "text-[var(--accent-primary)]"
       }`}
       style={{ fontFamily: "'JetBrains Mono', monospace" }}
     >

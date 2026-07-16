@@ -102,7 +102,7 @@ function HeroSection() {
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-[800px] mx-auto">
         {/* Pill Badge */}
         <div className="hero-pill opacity-0 mb-6">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono">
             Climate Command Center 2027
           </span>
         </div>
@@ -244,7 +244,7 @@ function LiveDataDashboard() {
       <div className="max-w-[1280px] mx-auto px-6">
         {/* Section Header */}
         <div className="dashboard-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Live World Bank Data · {DATA_VINTAGE_SHORT}
           </span>
           <h2 className="font-display font-semibold text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] text-text-primary tracking-[-0.02em] leading-[1.1]">
@@ -337,7 +337,7 @@ function SMARTFramework() {
     <section ref={sectionRef} className="relative bg-bg-deep py-24 lg:py-32 overflow-hidden">
       <div className="relative z-10 max-w-[1280px] mx-auto px-6">
         <div className="smart-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Strategic Framework
           </span>
           <h2
@@ -419,7 +419,7 @@ function CampaignRiskIndex() {
     <section ref={sectionRef} className="bg-bg-base py-24 lg:py-32">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="cri-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Risk Assessment
           </span>
           <h2 className="font-display font-semibold text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] text-text-primary tracking-[-0.02em] leading-[1.1]">
@@ -511,7 +511,7 @@ function SAPMSection() {
     <section ref={sectionRef} className="relative bg-bg-deep py-24 lg:py-32 overflow-hidden">
       <div className="relative z-10 max-w-[1280px] mx-auto px-6">
         <div className="sapm-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Alignment Matrix
           </span>
           <h2 className="font-display font-semibold text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] text-text-primary tracking-[-0.02em] leading-[1.1]">
@@ -610,7 +610,7 @@ function GovernanceTimeline() {
     <section ref={sectionRef} className="bg-bg-base py-24 lg:py-32">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="timeline-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Governance Timeline
           </span>
           <h2 className="font-display font-semibold text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] text-text-primary tracking-[-0.02em] leading-[1.1]">
@@ -722,7 +722,7 @@ function StrategicGapAnalysis() {
     <section ref={sectionRef} className="relative bg-bg-deep py-24 lg:py-32 overflow-hidden">
       <div className="relative z-10 max-w-[1280px] mx-auto px-6">
         <div className="gap-header text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Strategic Analysis
           </span>
           <h2 className="font-display font-semibold text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] text-text-primary tracking-[-0.02em] leading-[1.1]">
@@ -807,7 +807,7 @@ function CTAFooterSection() {
     <section ref={sectionRef} className="relative bg-bg-deep py-24 lg:py-32 overflow-hidden">
       <div className="relative z-10 max-w-[800px] mx-auto px-6 text-center">
         <div className="cta-content flex flex-col items-center">
-          <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] font-mono mb-6">
+          <span className="text-[0.8125rem] font-medium tracking-[0.05em] uppercase text-accent-cyan font-mono mb-6">
             Take Action
           </span>
           <h2

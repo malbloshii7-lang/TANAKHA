@@ -66,20 +66,20 @@ function useAnimateInView(threshold = 0.15, once = true) {
 }
 
 /* ──────────────────────────────────────────────
-   Pill Badge
+   Label — plain typographic tag, no pill chrome
    ────────────────────────────────────────────── */
 
 function PillBadge({ children, variant = 'cyan', className = '' }: { children: React.ReactNode; variant?: 'cyan' | 'teal' | 'amber' | 'rose' | 'lime' | 'gradient'; className?: string }) {
   const variantClasses = {
-    cyan: 'bg-[var(--accent-wash)] border-[var(--border-active)] text-accent-cyan',
-    teal: 'bg-[rgba(0,184,169,0.1)] border-[rgba(0,184,169,0.25)] text-accent-teal',
-    amber: 'bg-[rgba(150,105,13,0.1)] border-[rgba(150,105,13,0.25)] text-accent-amber',
-    rose: 'bg-[rgba(160,59,59,0.1)] border-[rgba(160,59,59,0.25)] text-accent-rose',
-    lime: 'bg-[rgba(85,122,50,0.1)] border-[rgba(85,122,50,0.25)] text-accent-lime',
-    gradient: 'bg-gradient-to-r from-accent-teal/10 to-accent-cyan/10 border-[var(--border-active)] text-accent-cyan',
+    cyan: 'text-accent-cyan',
+    teal: 'text-accent-teal',
+    amber: 'text-accent-amber',
+    rose: 'text-accent-rose',
+    lime: 'text-accent-lime',
+    gradient: 'text-accent-cyan',
   }
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[0.8125rem] font-mono font-medium uppercase tracking-[0.05em] ${variantClasses[variant]} ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 text-[0.8125rem] font-mono font-medium uppercase tracking-[0.05em] ${variantClasses[variant]} ${className}`}>
       {children}
     </span>
   )
