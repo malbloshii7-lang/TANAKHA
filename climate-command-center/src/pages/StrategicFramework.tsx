@@ -239,7 +239,7 @@ function PillarSection({
               />
               {/* Badge */}
               <div className="absolute bottom-6 left-6">
-                <span className="inline-block px-3 py-1 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)]">
+                <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan">
                   {`PILLAR ${index + 1}`}
                 </span>
               </div>
@@ -382,7 +382,7 @@ export default function StrategicFramework() {
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto pt-16 pb-20">
           {/* Pill Badge */}
           <motion.span
-            className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-8"
+            className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-8"
             {...fadeUp()}
             viewport={viewportOnce}
           >
@@ -452,7 +452,7 @@ export default function StrategicFramework() {
         <div className="max-w-[1280px] mx-auto px-6">
           {/* Section Header */}
           <motion.div className="text-center mb-16" {...fadeUp()} viewport={viewportOnce}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan bg-[var(--accent-wash)] border border-[var(--border-active)] mb-6">
+            <span className="text-[0.8125rem] font-mono uppercase tracking-wider text-accent-cyan mb-6">
               Framework Overview
             </span>
             <h2 className="text-3xl lg:text-[3.5rem] font-display font-semibold text-text-primary leading-tight tracking-tight">
