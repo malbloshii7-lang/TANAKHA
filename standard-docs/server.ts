@@ -14,6 +14,7 @@ import path from "path";
 import renderRouter from "./routes/render";
 import prepareRouter from "./routes/prepare";
 import glossaryRouter from "./routes/glossary";
+import dnaRouter from "./routes/dna";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", renderRouter);
 app.use("/api", prepareRouter);
 app.use("/api", glossaryRouter);
+app.use("/api", dnaRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
