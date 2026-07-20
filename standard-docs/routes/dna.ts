@@ -15,6 +15,7 @@ import { Router, Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { measure, compare, generateInStyle, StyleFingerprint, Lang } from "../templates/speech/dna";
+import { fetchTranscript } from "../templates/speech/youtube";
 
 const ROOT = path.resolve(__dirname, "..");
 const DIR = path.join(ROOT, "dna-profiles");
@@ -41,6 +42,20 @@ function resolveFingerprint(body: any, res: Response): StyleFingerprint | null {
 }
 
 const router = Router();
+
+// The ONE online action in the suite: fetch a YouTube caption track
+// server-side. Everything downstream (fingerprint, generate, trace)
+// stays on-device.
+router.post("/dna/extract", async (req: Request, res: Response) => {
+  try {
+    const { url, lang } = req.body || {};
+    if (!url) return res.status(400).json({ error: "url is required" });
+    const out = await fetchTranscript(String(url), lang === "ar" ? "ar" : "en");
+    res.json(out);
+  } catch (e: any) {
+    res.status(502).json({ error: e.message || "Extraction failed — is this machine online?" });
+  }
+});
 
 router.post("/dna/analyze", (req: Request, res: Response) => {
   const { text, name, lang } = req.body || {};

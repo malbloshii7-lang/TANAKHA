@@ -41,7 +41,7 @@
   </style>
 </head>
 <body>
-  <div class="privacy">Offline · on-device measurement · no model · no network — nothing leaves this machine</div>
+  <div class="privacy">On-device measurement · no model · offline by default — the only online action is “Watch &amp; extract” (YouTube captions), and it is labeled</div>
   <header class="header">
     <div class="header-content">
       <h1>STANDARD</h1>
@@ -55,8 +55,13 @@
 
       <div class="dna-step" id="step1">
         <div class="stepno">Step 1 · Source</div>
-        <h3>Paste the transcript</h3>
-        <p class="hint">Paste a speech or transcript (40+ words). Everything is measured on-device.</p>
+        <h3>Paste a YouTube link — or the transcript</h3>
+        <p class="hint">Watch &amp; extract pulls the video's captions server-side — <strong>this one action goes online (YouTube only)</strong>; every other step is measured on-device. No captions? Paste the transcript below.</p>
+        <div class="langrow" style="margin-bottom:1rem">
+          <div class="form-group" style="flex:3"><label for="ytUrl">YouTube link <span style="color:var(--gold);font-size:.75rem;letter-spacing:.15em">· ONLINE STEP</span></label>
+            <input type="url" id="ytUrl" placeholder="https://www.youtube.com/watch?v=…"></div>
+          <div class="form-group" style="flex:0 0 auto"><button type="button" class="btn-secondary" id="btnExtract">Watch &amp; extract</button></div>
+        </div>
         <div class="langrow">
           <div class="form-group"><label for="srcName">Profile name</label>
             <input type="text" id="srcName" placeholder="e.g., kazakhstan-2025"></div>
@@ -80,7 +85,7 @@
       <div class="dna-step" id="step3" style="display:none">
         <div class="stepno">Step 3 · Synthesize</div>
         <h3>Create a speech in this style</h3>
-        <p class="hint">Offline template synthesis steered by the fingerprint. (A cloud provider layer is an optional, gated add-on — deliberately off the default path.)</p>
+        <p class="hint">Offline template synthesis steered by the fingerprint. (A cloud provider layer is an optional, gated add-on — deliberately off the default path.) The output is <strong>original text in a measured style</strong> — never present it as the source speaker's own words.</p>
         <div class="langrow">
           <div class="form-group"><label for="genTopic">Topic</label>
             <input type="text" id="genTopic" placeholder="e.g., regional water security"></div>

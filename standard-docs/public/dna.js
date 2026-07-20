@@ -12,7 +12,22 @@ const $ = (id) => document.getElementById(id);
 document.addEventListener("DOMContentLoaded", () => {
   $("btnAnalyze").addEventListener("click", analyze);
   $("btnGenerate").addEventListener("click", generate);
+  $("btnExtract").addEventListener("click", extract);
 });
+
+async function extract() {
+  try {
+    const url = $("ytUrl").value.trim();
+    if (!url) throw new Error("Paste a YouTube link first.");
+    setStatus("loading", "Watching & extracting captions from YouTube… (online step)");
+    const j = await post("/api/dna/extract", { url, lang: $("srcLang").value });
+    $("srcText").value = j.text;
+    if (!$("srcName").value.trim()) {
+      $("srcName").value = j.title.toLowerCase().replace(/[^\w؀-ۿ]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+    }
+    setStatus("success", `✓ Extracted ${j.words} words from “${j.title}” (captions: ${j.trackLang}). Review the text, then extract the fingerprint.`);
+  } catch (e) { setStatus("error", "✗ " + e.message); }
+}
 
 function setStatus(kind, msg) {
   const s = $("status");
