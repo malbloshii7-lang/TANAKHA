@@ -3,251 +3,144 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WMO Letter — Independence Day Greetings (Layout Replica)</title>
+<title>Watchlist</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  html, body { height: 100%; }
+
   body {
-    background: #e9ebee;
-    font-family: "Times New Roman", Times, serif;
-    color: #111;
-    padding: 24px 12px;
-  }
-
-  .sheet {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 56px 72px 40px;
-    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.15);
-  }
-
-  /* ---------- Letterhead ---------- */
-  .letterhead {
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
-    margin-bottom: 40px;
-  }
-
-  .emblem {
+    min-height: 100vh;
     display: flex;
     align-items: flex-start;
-    gap: 6px;
-    flex: none;
-  }
-
-  .emblem .vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 7px;
-    letter-spacing: 0.12em;
-    color: #2e6db4;
-    line-height: 1.4;
-  }
-
-  .emblem .globe {
-    width: 86px;
-    height: 86px;
-    border: 2px dashed #9db8d6;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    font-size: 9px;
-    color: #9db8d6;
-    letter-spacing: 0.06em;
+    padding: 60px 24px;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(120% 90% at 50% 0%, #0a0f18 0%, #05070d 55%, #03040a 100%);
+    color: #e8f0f5;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .org-block { padding-top: 2px; }
-
-  .org-block .wmo-omm {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #17458f;
-    margin-bottom: 10px;
+  .panel {
+    width: min(420px, 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(120, 150, 170, 0.14);
+    background: linear-gradient(180deg, rgba(18, 26, 38, 0.55) 0%, rgba(8, 12, 20, 0.4) 100%);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
   }
 
-  .org-block .org {
-    margin-bottom: 8px;
-  }
-
-  .org-block .org .name {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #2e6db4;
-    line-height: 1.25;
-  }
-
-  .org-block .org .office {
-    font-size: 11px;
-    color: #2e6db4;
-    line-height: 1.25;
-  }
-
-  .divider {
-    width: 1px;
-    background: #c8d4e4;
-    margin-top: 34px;
-  }
-
-  .org-right { padding-top: 34px; }
-
-  .org-right .org { margin-bottom: 10px; }
-  .org-right .org.ar { text-align: right; direction: rtl; }
-
-  /* ---------- Ref / date ---------- */
-  .refline { display: flex; margin-bottom: 4px; font-size: 17px; }
-  .refline .label { font-weight: 700; width: 130px; flex: none; }
-  .blue { color: #2e6db4; }
-  sup { font-size: 0.65em; }
-
-  .ref-block { margin-bottom: 34px; }
-
-  /* ---------- Addressee ---------- */
-  .addressee { font-size: 17px; line-height: 1.45; margin-bottom: 28px; }
-  .addressee .name { font-weight: 700; }
-  .addressee .sub { margin-top: 10px; }
-  .addressee .sub u { text-decoration: underline; }
-
-  .salutation { font-size: 17px; font-weight: 700; margin-bottom: 22px; }
-
-  /* ---------- Body ---------- */
-  .body p {
-    font-size: 17px;
-    line-height: 1.42;
-    text-align: justify;
-    margin-bottom: 20px;
-  }
-
-  .closing { font-size: 17px; margin: 8px 0 26px; }
-
-  .signature-space {
-    height: 90px;
+  .panel-header {
     display: flex;
     align-items: center;
-    color: #b9c2cc;
-    font-style: italic;
-    font-size: 14px;
+    justify-content: space-between;
+    padding: 22px 24px;
+    border-bottom: 1px solid rgba(120, 150, 170, 0.14);
   }
 
-  .signer .name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-  .signer .title { font-size: 17px; }
-
-  /* ---------- Footer ---------- */
-  .footer {
-    margin-top: 70px;
-    text-align: center;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
-    font-size: 9.5px;
-    color: #2e6db4;
-    line-height: 1.5;
+  .panel-header .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #f4f8fb;
   }
 
-  .footer .block { margin-bottom: 8px; }
-  .footer .block.dark { color: #17458f; }
-
-  @media print {
-    body { background: #fff; padding: 0; }
-    .sheet { box-shadow: none; padding: 40px 56px; }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d9b0;
+    box-shadow: 0 0 10px rgba(52, 217, 176, 0.7);
   }
+
+  .panel-header .count {
+    font-size: 13px;
+    color: #6b7686;
+  }
+
+  .rows { display: flex; flex-direction: column; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(120, 150, 170, 0.1);
+  }
+
+  .row:last-child { border-bottom: none; }
+
+  .row .symbol {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f4f8fb;
+  }
+
+  .row .price {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 16px;
+    color: #cdd6e0;
+  }
+
+  .row .change {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .row .change.up { color: #5fe6a2; }
+  .row .change.down { color: #ff6b60; }
+
+  .row .change .arrow { font-size: 0.75em; }
 </style>
 </head>
 <body>
-  <div class="sheet">
-
-    <div class="letterhead">
-      <div class="emblem">
-        <div class="vertical">WEATHER&nbsp;CLIMATE&nbsp;WATER&nbsp;&nbsp;TEMPS&nbsp;CLIMAT&nbsp;EAU</div>
-        <div class="globe">WMO<br />EMBLEM<br />(placeholder)</div>
-      </div>
-
-      <div class="org-block">
-        <div class="wmo-omm">WMO&nbsp;OMM</div>
-        <div class="org">
-          <div class="name">World Meteorological Organization</div>
-          <div class="office">Office of the President</div>
-        </div>
-        <div class="org">
-          <div class="name">Organisation m&eacute;t&eacute;orologique mondiale</div>
-          <div class="office">Bureau du President</div>
-        </div>
-        <div class="org">
-          <div class="name">Organizaci&oacute;n Meteorol&oacute;gica Mundial</div>
-          <div class="office">Oficina del Presidente</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="org-block org-right">
-        <div class="org">
-          <div class="name">&#1042;&#1089;&#1077;&#1084;&#1080;&#1088;&#1085;&#1072;&#1103; &#1084;&#1077;&#1090;&#1077;&#1086;&#1088;&#1086;&#1083;&#1086;&#1075;&#1080;&#1095;&#1077;&#1089;&#1082;&#1072;&#1103; &#1086;&#1088;&#1075;&#1072;&#1085;&#1080;&#1079;&#1072;&#1094;&#1080;&#1103;</div>
-          <div class="office">&#1041;&#1102;&#1088;&#1086; &#1055;&#1088;&#1077;&#1079;&#1080;&#1076;&#1077;&#1085;&#1090;&#1072;</div>
-        </div>
-        <div class="org ar">
-          <div class="name">&#1575;&#1604;&#1605;&#1606;&#1592;&#1605;&#1577; &#1575;&#1604;&#1593;&#1575;&#1604;&#1605;&#1610;&#1577; &#1604;&#1604;&#1571;&#1585;&#1589;&#1575;&#1583; &#1575;&#1604;&#1580;&#1608;&#1610;&#1577;</div>
-          <div class="office">&#1605;&#1603;&#1578;&#1576; &#1575;&#1604;&#1585;&#1574;&#1610;&#1587;</div>
-        </div>
-        <div class="org">
-          <div class="name">&#19990;&#30028;&#27668;&#35937;&#32452;&#32455;</div>
-          <div class="office">&#20027;&#24109;&#21150;&#20844;&#23460;</div>
-        </div>
-      </div>
+  <div class="panel">
+    <div class="panel-header">
+      <div class="title"><span class="dot"></span>WATCHLIST</div>
+      <div class="count" id="asset-count"></div>
     </div>
-
-    <div class="ref-block">
-      <div class="refline">
-        <span class="label">Our Ref:</span>
-        <span>NCM/2026/<span class="blue">033</span></span>
-      </div>
-      <div class="refline">
-        <span class="label">Date:</span>
-        <span><span class="blue">20<sup>th</sup></span> July 2026</span>
-      </div>
-    </div>
-
-    <div class="addressee">
-      <div class="name">Dr. Ghisliane Echeverry Priet</div>
-      <div>Permanent Representative of Colombia to the World Meteorological Organization</div>
-      <div class="sub"><u><strong>Sub:</strong> Independence Day Greetings from the President of WMO</u></div>
-    </div>
-
-    <div class="salutation">Dear Dr. Echeverry Priet,</div>
-
-    <div class="body">
-      <p>It is with immense pleasure that the World Meteorological Organization extends its warmest congratulations to the Republic of Colombia on the auspicious occasion of its Independence Day on July 20th. This significant day marks not only a pivotal moment in Colombia's rich history but also celebrates the nation's enduring spirit, resilience, and remarkable journey towards progress and prosperity.</p>
-
-      <p>Colombia's national meteorological service, IDEAM, has demonstrated commendable advancements in strengthening hydrometeorological monitoring, early warning systems, and climate services. A notable achievement includes the development and release of the 2018 Atlas of Climate, Radiation, and Wind of Colombia, which serves as a crucial tool for renewable energy development, risk management, and climate-smart decision-making, showcasing a significant technological transformation and providing valuable insights for climate adaptation and resilience. Furthermore, Colombia has been actively enhancing its water-monitoring systems and strengthening wildfire preparedness, particularly in response to the challenges posed by El Ni&ntilde;o events.</p>
-
-      <p>We also commend Colombia's proactive engagement in climate resilience initiatives, such as spearheading the First World Virtual High Mountain Summit in 2020, which brought together global stakeholders to discuss biodiversity, ecosystem services, and climate variability. The leadership of Ms. Gheidy Gallo Santos, with her extensive experience in public policy and international cooperation, has been instrumental in driving forward initiatives that contribute to national development and environmental sustainability.</p>
-
-      <p>The World Meteorological Organization deeply values its partnership with Colombia and remains steadfast in its shared commitment to addressing the pressing challenges of climate change. We extend our heartfelt wishes for Colombia's continued success, peace, and prosperity in the years to come.</p>
-    </div>
-
-    <div class="closing">Yours sincerely,</div>
-
-    <div class="signature-space">[signature space]</div>
-
-    <div class="signer">
-      <div class="name">Dr. Abdulla Ahmed Al Mandous</div>
-      <div class="title">President of the World Meteorological Organization (WMO)</div>
-    </div>
-
-    <div class="footer">
-      <div class="block">
-        WMO Secretariat &ndash; 7 bis, avenue de la Paix &ndash; Case postale 2300 &ndash; CH 1211 Gen&egrave;ve 2 &ndash; Suisse<br />
-        Tel.: +41 (0) 22 730 81 11 &ndash; Fax: +41 (0) 22 730 81 81 &ndash; aalmandous@wmo.int &ndash; public.wmo.int
-      </div>
-      <div class="block dark">
-        National Center of Meteorology (NCM), Ministry of Presidential Affairs, National Center of Meteorology, P.O. Box 4815, Abu Dhabi, United Arab Emirates<br />
-        Tel: +971 2 222 7777 &ndash; Fax: +971 2 666 1575 &ndash; Email: amandoos@ncms.ae
-      </div>
-    </div>
-
+    <div class="rows" id="rows"></div>
   </div>
+
+  <script>
+    var assets = [
+      { symbol: "BTC/USDT", price: 63263, change: 2.4 },
+      { symbol: "ETH/USDT", price: 3412, change: 1.1 },
+      { symbol: "SOL/USDT", price: 146.80, change: -3.2 },
+      { symbol: "GOLD",     price: 2385.50, change: 0.6 },
+      { symbol: "SP500",    price: 5487.30, change: -0.4 }
+    ];
+
+    function formatPrice(value) {
+      var parts = value.toFixed(value < 100 ? 2 : (value < 1000 ? 2 : 0)).toString().split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return parts.join(".");
+    }
+
+    var rowsEl = document.getElementById("rows");
+    var countEl = document.getElementById("asset-count");
+    countEl.textContent = assets.length + " assets";
+
+    assets.forEach(function (asset) {
+      var isUp = asset.change >= 0;
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<div class="symbol">' + asset.symbol + '</div>' +
+        '<div class="price">' + formatPrice(asset.price) + '</div>' +
+        '<div class="change ' + (isUp ? "up" : "down") + '">' +
+          '<span class="arrow">' + (isUp ? "&#9650;" : "&#9660;") + '</span>' +
+          '<span>' + Math.abs(asset.change).toFixed(1) + '%</span>' +
+        '</div>';
+      rowsEl.appendChild(row);
+    });
+  </script>
 </body>
 </html>
