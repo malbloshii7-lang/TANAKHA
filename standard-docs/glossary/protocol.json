@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "project": "STANDARD",
+    "category": "Royal and Ministerial Titles",
+    "note": "These entries are LOCKED SUBSTITUTIONS. The translation engine cannot alter them. They are copied verbatim from this table. Zero exceptions."
+  },
+  "entries": [
+    {
+      "id": "crown-prince",
+      "en": "His Highness Sheikh Khaled bin Mohamed bin Zayed Al Nahyan, Crown Prince of Abu Dhabi",
+      "ar": "سمو الشيخ خالد بن محمد بن زايد آل نهيان، ولي عهد أبوظبي",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null,
+      "note": "Exact from official sources. Verify before rendering."
+    },
+    {
+      "id": "dg-ncm",
+      "en": "H.E. Dr. Abdulla Al Mandoos",
+      "ar": "سعادة الدكتور عبدالله المندوس",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null,
+      "note": "NCM Director General. Verify spelling."
+    },
+    {
+      "id": "deputy-pm-kz",
+      "en": "Deputy Prime Minister Madiyev",
+      "ar": "نائب رئيس الوزراء مديييف",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null,
+      "note": "Kazakhstan government. Transliteration of name."
+    },
+    {
+      "id": "excellencies",
+      "en": "Excellencies, Colleagues, and Friends",
+      "ar": "سعادة الوزراء والزملاء الأعزاء",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null,
+      "note": "Standard opening salutation."
+    }
+  ]
+}

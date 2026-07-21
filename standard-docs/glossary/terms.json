@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "project": "STANDARD",
+    "language_pair": [
+      "en",
+      "ar"
+    ],
+    "version": "1.0-pending-approval",
+    "note": "All entries marked 'unconfirmed' until approved by human. No render() call proceeds without explicit human approval."
+  },
+  "entries": [
+    {
+      "id": "wmo-full",
+      "en": "World Meteorological Organization",
+      "ar": "المنظمة العالمية للأرصاد الجوية",
+      "context": "Full name of WMO, used in formal contexts",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "ncm",
+      "en": "National Centre of Meteorology",
+      "ar": "المركز الوطني للأرصاد",
+      "context": "UAE government institution",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "mou",
+      "en": "Memorandum of Understanding",
+      "ar": "مذكرة تفاهم",
+      "context": "Formal agreements, bilateral context",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "kazhydromet",
+      "en": "Kazhydromet",
+      "ar": "كازهيدرومت",
+      "context": "Kazakhstan hydrometeorological service (transliteration, proper noun)",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "climate-resilience",
+      "en": "climate resilience",
+      "ar": "الصمود المناخي",
+      "context": "EW4All, climate adaptation",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "cloud-seeding",
+      "en": "cloud seeding",
+      "ar": "زراعة السحب",
+      "context": "Weather technology initiative",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "deputy-pm",
+      "en": "Deputy Prime Minister",
+      "ar": "نائب رئيس الوزراء",
+      "context": "Government title",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    },
+    {
+      "id": "director-general",
+      "en": "Director General",
+      "ar": "المدير العام",
+      "context": "Leadership title",
+      "status": "unconfirmed",
+      "approved_by": null,
+      "approved_date": null
+    }
+  ]
+}

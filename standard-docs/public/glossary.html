@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STANDARD — Glossary Review Console</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <h1>STANDARD</h1>
+      <p>Glossary Review Console</p>
+      <p class="offline-note">Human approval gate · offline · nothing renders in Arabic until confirmed</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="form">
+      <div class="gate-banner" id="gateBanner">Loading glossaries…</div>
+
+      <div class="form-group reviewer-row">
+        <label for="reviewer">Reviewer name (recorded on every approval) *</label>
+        <input type="text" id="reviewer" placeholder="e.g., Mutnookh">
+      </div>
+
+      <fieldset class="fieldset">
+        <legend>Protocol Titles — LOCKED substitutions (highest risk)</legend>
+        <p class="field-hint">Titles are copied verbatim into documents. Verify every letter of the Arabic before approving.</p>
+        <div id="protocolList"></div>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend>Glossary Terms</legend>
+        <div id="termsList"></div>
+      </fieldset>
+
+      <div id="status" class="status"></div>
+      <p class="field-hint"><a href="index.html">← Back to H.E. Speech Builder</a></p>
+    </div>
+  </main>
+
+  <script src="glossary.js"></script>
+</body>
+</html>

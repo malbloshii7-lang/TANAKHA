@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STANDARD — Speech DNA Studio</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .dna-step{margin-bottom:2rem;border:1px solid var(--border);border-radius:2px;
+      background:#fff;padding:1.5rem;border-top:3px solid var(--gold)}
+    .dna-step h3{color:var(--navy);font-weight:600;margin-bottom:.35rem}
+    .dna-step .stepno{font-size:.75rem;letter-spacing:.3em;color:var(--gold);
+      text-transform:uppercase;font-weight:700}
+    .dna-step .hint{font-size:.85rem;color:var(--muted);margin-bottom:1rem}
+    .fp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+      gap:.8rem;margin-top:1rem}
+    .fp-card{background:var(--paper);border:1px solid var(--border);border-radius:2px;
+      padding:.8rem 1rem}
+    .fp-card .v{font-size:1.5rem;color:var(--navy);font-weight:600}
+    .fp-card .k{font-size:.75rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+    .sig-chips{margin-top:1rem}
+    .sig-chips span{display:inline-block;margin:.2rem .3rem .2rem 0;padding:.3rem .7rem;
+      border:1px solid var(--gold);color:var(--navy);font-size:.85rem;border-radius:2px}
+    .gen-out{white-space:pre-wrap;background:var(--paper);border:1px solid var(--border);
+      padding:1.25rem;font-family:Verdana,"Segoe UI",sans-serif;font-size:.95rem;
+      line-height:1.7;margin-top:1rem;max-height:420px;overflow:auto}
+    .gen-out[dir="rtl"]{text-align:right;font-family:"Traditional Arabic","Segoe UI",sans-serif;font-size:1.15rem}
+    .trace-row{display:flex;align-items:center;gap:1rem;margin:.55rem 0}
+    .trace-row .lbl{flex:0 0 300px;font-size:.85rem;color:var(--ink)}
+    .trace-row .bar{flex:1;height:10px;background:#EDEAE0;border-radius:5px;overflow:hidden}
+    .trace-row .fill{height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));
+      width:0;transition:width .8s ease}
+    .trace-row .pct{flex:0 0 56px;text-align:right;font-weight:600;color:var(--navy)}
+    .overall{margin-top:1.2rem;padding:1rem;text-align:center;font-size:1.25rem;
+      border:1px solid var(--gold);color:var(--navy)}
+    .overall b{font-size:2rem}
+    .privacy{background:var(--navy);color:#fff;font-size:.8rem;letter-spacing:.15em;
+      text-transform:uppercase;text-align:center;padding:.6rem;border-bottom:2px solid var(--gold)}
+    .langrow{display:flex;gap:1rem;align-items:end;flex-wrap:wrap}
+    .langrow .form-group{flex:1;min-width:200px;margin-bottom:0}
+  </style>
+</head>
+<body>
+  <div class="privacy">On-device measurement · no model · offline by default — the only online action is “Watch &amp; extract” (YouTube captions), and it is labeled</div>
+  <header class="header">
+    <div class="header-content">
+      <h1>STANDARD</h1>
+      <p>Speech DNA Studio</p>
+      <p class="offline-note"><a href="index.html" style="color:inherit;">← H.E. Speech Builder</a> · <a href="glossary.html" style="color:inherit;">Glossary Console</a></p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="form">
+
+      <div class="dna-step" id="step1">
+        <div class="stepno">Step 1 · Source</div>
+        <h3>Paste a YouTube link — or the transcript</h3>
+        <p class="hint">Watch &amp; extract pulls the video's captions server-side — <strong>this one action goes online (YouTube only)</strong>; every other step is measured on-device. No captions? Paste the transcript below.</p>
+        <div class="langrow" style="margin-bottom:1rem">
+          <div class="form-group" style="flex:3"><label for="ytUrl">YouTube link <span style="color:var(--gold);font-size:.75rem;letter-spacing:.15em">· ONLINE STEP</span></label>
+            <input type="url" id="ytUrl" placeholder="https://www.youtube.com/watch?v=…"></div>
+          <div class="form-group" style="flex:0 0 auto"><button type="button" class="btn-secondary" id="btnExtract">Watch &amp; extract</button></div>
+        </div>
+        <div class="langrow">
+          <div class="form-group"><label for="srcName">Profile name</label>
+            <input type="text" id="srcName" placeholder="e.g., kazakhstan-2025"></div>
+          <div class="form-group"><label for="srcLang">Language</label>
+            <select id="srcLang"><option value="en">English</option><option value="ar">العربية</option></select></div>
+        </div>
+        <div class="form-group" style="margin-top:1rem">
+          <textarea id="srcText" style="min-height:180px" placeholder="Paste the source speech here…"></textarea>
+        </div>
+        <button type="button" class="btn-primary" id="btnAnalyze">Extract DNA fingerprint</button>
+      </div>
+
+      <div class="dna-step" id="step2" style="display:none">
+        <div class="stepno">Step 2 · Fingerprint</div>
+        <h3>Measured style DNA</h3>
+        <p class="hint">A measured read — rhythm, vocabulary, formality, devices, signature phrases. Not a vibe.</p>
+        <div class="fp-grid" id="fpGrid"></div>
+        <div class="sig-chips" id="sigChips"></div>
+      </div>
+
+      <div class="dna-step" id="step3" style="display:none">
+        <div class="stepno">Step 3 · Synthesize</div>
+        <h3>Create a speech in this style</h3>
+        <p class="hint">Offline template synthesis steered by the fingerprint. (A cloud provider layer is an optional, gated add-on — deliberately off the default path.) The output is <strong>original text in a measured style</strong> — never present it as the source speaker's own words.</p>
+        <div class="langrow">
+          <div class="form-group"><label for="genTopic">Topic</label>
+            <input type="text" id="genTopic" placeholder="e.g., regional water security"></div>
+          <div class="form-group"><label for="genLang">Output language</label>
+            <select id="genLang"><option value="en">English</option><option value="ar">العربية</option></select></div>
+          <div class="form-group"><label for="genWords">Target words</label>
+            <input type="number" id="genWords" value="220" min="80" max="800"></div>
+        </div>
+        <div style="margin-top:1rem"><button type="button" class="btn-primary" id="btnGenerate">Create speech</button></div>
+        <div class="gen-out" id="genOut" style="display:none"></div>
+      </div>
+
+      <div class="dna-step" id="step4" style="display:none">
+        <div class="stepno">Step 4 · DNA Trace</div>
+        <h3>Does it match? Measured proof.</h3>
+        <p class="hint">The generated speech is re-measured and scored against the source fingerprint, dimension by dimension.</p>
+        <div id="traceRows"></div>
+        <div class="overall" id="overall"></div>
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+  </main>
+  <script src="dna.js"></script>
+</body>
+</html>
