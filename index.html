@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Watchlist</title>
+<title>Yas Marina Circuit — Lap Animation</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,135 +12,233 @@
   body {
     min-height: 100vh;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 60px 24px;
+    background: radial-gradient(120% 100% at 50% 0%, #101a3d 0%, #0a1130 45%, #060a1e 100%);
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: radial-gradient(120% 90% at 50% 0%, #0a0f18 0%, #05070d 55%, #03040a 100%);
-    color: #e8f0f5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .panel {
-    width: min(420px, 100%);
-    border-radius: 20px;
-    border: 1px solid rgba(120, 150, 170, 0.14);
-    background: linear-gradient(180deg, rgba(18, 26, 38, 0.55) 0%, rgba(8, 12, 20, 0.4) 100%);
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
     overflow: hidden;
   }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 22px 24px;
-    border-bottom: 1px solid rgba(120, 150, 170, 0.14);
+  svg.circuit {
+    width: min(98vw, 172vh);
+    height: auto;
+    display: block;
   }
 
-  .panel-header .title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: #f4f8fb;
+  /* Slight wobble layered on top of the path-following motion,
+     unsynced with the lap so it reads differently on every turn. */
+  .car-wobble {
+    animation: wobble 0.85s ease-in-out infinite alternate;
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #34d9b0;
-    box-shadow: 0 0 10px rgba(52, 217, 176, 0.7);
+  @keyframes wobble {
+    from { transform: rotate(-2.4deg); }
+    to   { transform: rotate(2.4deg); }
   }
 
-  .panel-header .count {
-    font-size: 13px;
-    color: #6b7686;
+  .glow {
+    animation: pulse 4.5s ease-in-out infinite;
   }
 
-  .rows { display: flex; flex-direction: column; }
-
-  .row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(120, 150, 170, 0.1);
+  @keyframes pulse {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.8; }
   }
 
-  .row:last-child { border-bottom: none; }
-
-  .row .symbol {
-    font-size: 16px;
-    font-weight: 700;
-    color: #f4f8fb;
-  }
-
-  .row .price {
-    font-family: "Consolas", "Courier New", monospace;
-    font-size: 16px;
-    color: #cdd6e0;
-  }
-
-  .row .change {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: "Consolas", "Courier New", monospace;
-    font-size: 15px;
-    font-weight: 700;
-  }
-
-  .row .change.up { color: #5fe6a2; }
-  .row .change.down { color: #ff6b60; }
-
-  .row .change .arrow { font-size: 0.75em; }
+  .title       { fill: #eef4fb; font-size: 58px; font-weight: 800; letter-spacing: 14px; }
+  .subtitle    { fill: #93a9c4; font-size: 20px; font-weight: 600; letter-spacing: 10px; }
+  .sector      { fill: #d7e7f4; font-size: 22px; font-weight: 700; letter-spacing: 4px; }
+  .startlabel  { fill: #eef4fb; font-size: 22px; font-weight: 700; letter-spacing: 3px; }
+  .legendtext  { fill: #cfe0ef; font-size: 19px; font-weight: 600; letter-spacing: 2px; }
 </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title"><span class="dot"></span>WATCHLIST</div>
-      <div class="count" id="asset-count"></div>
-    </div>
-    <div class="rows" id="rows"></div>
-  </div>
 
-  <script>
-    var assets = [
-      { symbol: "BTC/USDT", price: 63263, change: 2.4 },
-      { symbol: "ETH/USDT", price: 3412, change: 1.1 },
-      { symbol: "SOL/USDT", price: 146.80, change: -3.2 },
-      { symbol: "GOLD",     price: 2385.50, change: 0.6 },
-      { symbol: "SP500",    price: 5487.30, change: -0.4 }
+<svg class="circuit" viewBox="0 0 1400 1000" role="img"
+     aria-label="Stylized top-down map of the Yas Marina Circuit with a cartoon race car driving continuous laps">
+  <defs>
+    <filter id="blurBig" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="55" />
+    </filter>
+    <filter id="blurTurn" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+    <filter id="blurCar" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="10" />
+    </filter>
+    <pattern id="checker" width="14" height="14" patternUnits="userSpaceOnUse">
+      <rect width="14" height="14" fill="#f2f5f9" />
+      <rect width="7" height="7" fill="#10182c" />
+      <rect x="7" y="7" width="7" height="7" fill="#10182c" />
+    </pattern>
+    <!-- Invisible copy of the track geometry that the car's animateMotion follows -->
+    <path id="motionPath" fill="none" stroke="none" />
+  </defs>
+
+  <!-- ambient light pools -->
+  <g id="ambient">
+    <circle cx="820"  cy="240" r="120" fill="#f08a2e" opacity="0.30" filter="url(#blurBig)" />
+    <circle cx="1230" cy="330" r="110" fill="#39dfe8" opacity="0.30" filter="url(#blurBig)" />
+    <circle cx="470"  cy="640" r="100" fill="#39dfe8" opacity="0.26" filter="url(#blurBig)" />
+    <circle cx="770"  cy="930" r="110" fill="#f08a2e" opacity="0.28" filter="url(#blurBig)" />
+  </g>
+
+  <!-- track -->
+  <path id="trackBase"    fill="none" stroke="#0c1226" stroke-width="66" stroke-linejoin="round" opacity="0.9" />
+  <path id="trackAsphalt" fill="none" stroke="#454c60" stroke-width="46" stroke-linejoin="round" />
+
+  <!-- turn lighting / apex markers, generated one per corner -->
+  <g id="turnGlows"></g>
+
+  <path id="centerLine" fill="none" stroke="#dfe7f2" stroke-width="2.5"
+        stroke-dasharray="26 22" opacity="0.55" />
+
+  <!-- start / finish -->
+  <rect x="762" y="854" width="15" height="62" fill="url(#checker)" />
+  <text class="startlabel" x="770" y="828" text-anchor="middle">START / FINISH</text>
+
+  <!-- sector markers -->
+  <rect x="1216" y="428" width="8" height="40" rx="3" fill="#39dfe8" transform="rotate(32 1220 448)" />
+  <text class="sector" x="1252" y="486">SECTOR 1</text>
+  <rect x="1046" y="168" width="8" height="42" rx="3" fill="#f08a2e" transform="rotate(-24 1050 189)" />
+  <text class="sector" x="962" y="140">SECTOR 2</text>
+  <rect x="392" y="440" width="8" height="40" rx="3" fill="#39dfe8" transform="rotate(18 396 460)" />
+  <text class="sector" x="222" y="424">SECTOR 3</text>
+
+  <!-- titles -->
+  <text class="title" x="70" y="140">YAS MARINA CIRCUIT</text>
+  <text class="subtitle" x="74" y="186">ABU DHABI &#183; GRAND PRIX CIRCUIT</text>
+
+  <!-- legend -->
+  <g>
+    <circle cx="905" cy="954" r="9" fill="#39dfe8" />
+    <text class="legendtext" x="926" y="961">TURN LIGHTING</text>
+    <circle cx="1148" cy="954" r="9" fill="#f08a2e" />
+    <text class="legendtext" x="1169" y="961">APEX MARKERS</text>
+  </g>
+
+  <!-- original cartoon race car (drawn pointing +x; animateMotion added by script) -->
+  <g id="car">
+    <g class="car-wobble">
+      <ellipse cx="0" cy="0" rx="36" ry="24" fill="#39dfe8" opacity="0.35" filter="url(#blurCar)" />
+      <!-- wheels -->
+      <rect x="-21" y="-18" width="12" height="8" rx="3" fill="#0e1626" />
+      <rect x="-21" y="10"  width="12" height="8" rx="3" fill="#0e1626" />
+      <rect x="9"   y="-18" width="12" height="8" rx="3" fill="#0e1626" />
+      <rect x="9"   y="10"  width="12" height="8" rx="3" fill="#0e1626" />
+      <!-- wings -->
+      <rect x="-28" y="-13" width="7" height="26" rx="2.5" fill="#f08a2e" />
+      <rect x="21"  y="-13" width="7" height="26" rx="2.5" fill="#f08a2e" />
+      <!-- body -->
+      <rect x="-24" y="-11" width="48" height="22" rx="10" fill="#3ee2ea" />
+      <rect x="-24" y="-11" width="48" height="9"  rx="4.5" fill="#7deef3" opacity="0.55" />
+      <!-- cockpit -->
+      <circle cx="3" cy="0" r="6.5" fill="#0d2137" />
+    </g>
+  </g>
+
+  <script><![CDATA[
+  (function () {
+    var SVG_NS = "http://www.w3.org/2000/svg";
+    var XLINK_NS = "http://www.w3.org/1999/xlink";
+
+    // Stylized Yas Marina layout, anticlockwise from the pit straight.
+    // [x, y, cornerRadius]
+    var pts = [
+      [520, 885, 45],    // onto the main straight
+      [1080, 885, 70],   // T1 braking zone, up the right side
+      [1150, 760, 60],
+      [1060, 660, 55],
+      [1180, 560, 60],
+      [1090, 470, 50],
+      [1200, 400, 55],   // climb toward the hotel loop
+      [1300, 330, 70],
+      [1290, 200, 70],
+      [1150, 190, 60],
+      [1120, 300, 50],   // loop exit
+      [990, 330, 55],
+      [940, 220, 60],    // sweeping esses across the top
+      [790, 210, 60],
+      [760, 330, 55],
+      [620, 350, 55],
+      [580, 230, 60],
+      [440, 250, 60],
+      [400, 380, 55],    // down the left side
+      [500, 470, 55],
+      [420, 590, 55],
+      [510, 680, 50],
+      [430, 780, 55]     // final corner back onto the straight
     ];
 
-    function formatPrice(value) {
-      var parts = value.toFixed(value < 100 ? 2 : (value < 1000 ? 2 : 0)).toString().split(".");
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      return parts.join(".");
+    function sub(a, b) { return [a[0] - b[0], a[1] - b[1]]; }
+    function len(v) { return Math.hypot(v[0], v[1]); }
+    function scale(v, s) { return [v[0] * s, v[1] * s]; }
+    function add(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
+
+    // Closed path with every corner rounded by a quadratic curve, so the
+    // geometry is smooth (G1-continuous) for both the stroke and the motion.
+    function roundedLoopPath(points) {
+      var n = points.length;
+      var d = "";
+      var firstEntry = null;
+      for (var i = 0; i < n; i++) {
+        var prev = points[(i + n - 1) % n];
+        var cur = points[i];
+        var next = points[(i + 1) % n];
+        var inVec = sub(cur, prev);
+        var outVec = sub(next, cur);
+        var r = Math.min(cur[2], 0.42 * Math.min(len(inVec), len(outVec)));
+        var entry = add([cur[0], cur[1]], scale(inVec, -r / len(inVec)));
+        var exit = add([cur[0], cur[1]], scale(outVec, r / len(outVec)));
+        if (i === 0) {
+          firstEntry = entry;
+          d += "M " + entry[0].toFixed(1) + " " + entry[1].toFixed(1);
+        } else {
+          d += " L " + entry[0].toFixed(1) + " " + entry[1].toFixed(1);
+        }
+        d += " Q " + cur[0] + " " + cur[1] + " " + exit[0].toFixed(1) + " " + exit[1].toFixed(1);
+      }
+      d += " L " + firstEntry[0].toFixed(1) + " " + firstEntry[1].toFixed(1) + " Z";
+      return d;
     }
 
-    var rowsEl = document.getElementById("rows");
-    var countEl = document.getElementById("asset-count");
-    countEl.textContent = assets.length + " assets";
-
-    assets.forEach(function (asset) {
-      var isUp = asset.change >= 0;
-      var row = document.createElement("div");
-      row.className = "row";
-      row.innerHTML =
-        '<div class="symbol">' + asset.symbol + '</div>' +
-        '<div class="price">' + formatPrice(asset.price) + '</div>' +
-        '<div class="change ' + (isUp ? "up" : "down") + '">' +
-          '<span class="arrow">' + (isUp ? "&#9650;" : "&#9660;") + '</span>' +
-          '<span>' + Math.abs(asset.change).toFixed(1) + '%</span>' +
-        '</div>';
-      rowsEl.appendChild(row);
+    var d = roundedLoopPath(pts);
+    ["trackBase", "trackAsphalt", "centerLine", "motionPath"].forEach(function (id) {
+      document.getElementById(id).setAttribute("d", d);
     });
-  </script>
+
+    // One pulsing light per corner, alternating cyan (turn lighting)
+    // and orange (apex markers). The pit straight corner is skipped so
+    // the start/finish area stays clean.
+    var glowLayer = document.getElementById("turnGlows");
+    for (var i = 1; i < pts.length; i++) {
+      var c = document.createElementNS(SVG_NS, "circle");
+      c.setAttribute("cx", pts[i][0]);
+      c.setAttribute("cy", pts[i][1]);
+      c.setAttribute("r", 34 + (i % 3) * 7);
+      c.setAttribute("fill", i % 2 === 0 ? "#f08a2e" : "#39dfe8");
+      c.setAttribute("filter", "url(#blurTurn)");
+      c.setAttribute("class", "glow");
+      c.style.animationDelay = (-i * 0.7) + "s";
+      glowLayer.appendChild(c);
+    }
+
+    // Drive the car: SMIL animateMotion along the track path. calcMode
+    // defaults to "paced", giving constant speed around the whole lap.
+    var motion = document.createElementNS(SVG_NS, "animateMotion");
+    motion.setAttribute("dur", "16s");
+    motion.setAttribute("repeatCount", "indefinite");
+    motion.setAttribute("rotate", "auto");
+    var mpath = document.createElementNS(SVG_NS, "mpath");
+    mpath.setAttribute("href", "#motionPath");
+    mpath.setAttributeNS(XLINK_NS, "xlink:href", "#motionPath");
+    motion.appendChild(mpath);
+    document.getElementById("car").appendChild(motion);
+  })();
+  ]]></script>
+</svg>
+
 </body>
 </html>
