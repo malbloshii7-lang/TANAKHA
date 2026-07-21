@@ -7,96 +7,218 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    height: 100%;
+  :root {
+    /* Bullish accent set (default) */
+    --accent: #34d9b0;
+    --accent-soft: #5fe6a2;
+    --glow: rgba(52, 217, 176, 0.35);
+    --pill-border: rgba(52, 217, 176, 0.55);
+    --pill-text: #5fe6a2;
+    --pill-bg: rgba(30, 82, 66, 0.22);
   }
+
+  html, body { height: 100%; }
 
   body {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: 40px;
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background:
-      radial-gradient(120% 90% at 50% 20%, #0b1526 0%, #070c16 45%, #03060c 100%),
-      #03060c;
+    background: radial-gradient(120% 100% at 50% 10%, #0a0f18 0%, #05070d 55%, #030509 100%);
     color: #e8f0f5;
     -webkit-font-smoothing: antialiased;
   }
 
   .card {
     position: relative;
-    width: min(760px, 100%);
-    aspect-ratio: 4 / 3;
-    max-height: 88vh;
+    width: min(560px, 100%);
+    padding: 30px 34px 34px;
+    border-radius: 26px;
+    overflow: hidden;
+    border: 1px solid rgba(120, 150, 170, 0.16);
+    background:
+      radial-gradient(90% 70% at 85% 12%, var(--glow) 0%, rgba(0,0,0,0) 42%),
+      linear-gradient(160deg, rgba(20, 28, 40, 0.65) 0%, rgba(10, 15, 24, 0.55) 100%);
+    box-shadow: 0 40px 110px rgba(0, 0, 0, 0.6);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  /* ---- Header ---- */
+  .header {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 34px;
+  }
+
+  .logo {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 48px;
-    border-radius: 40px;
-    border: 1px solid rgba(84, 200, 214, 0.22);
-    background:
-      radial-gradient(140% 120% at 50% 0%, rgba(20, 38, 54, 0.55) 0%, rgba(8, 15, 26, 0.35) 55%, rgba(4, 8, 15, 0.2) 100%);
-    box-shadow:
-      0 0 0 1px rgba(84, 200, 214, 0.05),
-      0 40px 120px rgba(0, 0, 0, 0.55);
-  }
-
-  .symbol {
-    font-size: clamp(28px, 5vw, 46px);
+    border-radius: 14px;
+    border: 1px solid rgba(120, 150, 170, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    color: #6fd6e2;
-    margin-bottom: 18px;
+    color: var(--accent);
+    transition: color 0.3s ease;
   }
 
-  .price {
-    font-size: clamp(84px, 17vw, 180px);
-    font-weight: 800;
-    line-height: 0.95;
+  .titles .pair {
+    font-size: 26px;
+    font-weight: 700;
     letter-spacing: 0.01em;
     color: #f4f8fb;
-    text-shadow: 0 6px 40px rgba(0, 0, 0, 0.4);
   }
 
-  .change {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 26px;
-    font-size: clamp(26px, 4.5vw, 44px);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #5fe6a2;
+  .titles .sub {
+    margin-top: 2px;
+    font-size: 16px;
+    color: #7d8899;
   }
 
-  .change .arrow {
-    font-size: 0.72em;
+  /* ---- Toggle switch ---- */
+  .toggle {
+    margin-left: auto;
+    position: relative;
+    width: 70px;
+    height: 34px;
+    flex: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 999px;
+    background: #1a222e;
+    box-shadow: inset 0 0 0 1px rgba(120, 150, 170, 0.18);
+    transition: background 0.3s ease;
+  }
+
+  .knob {
+    position: absolute;
+    top: 4px;
+    left: 40px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 16px var(--glow);
+    transition: left 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* ---- Price ---- */
+  .price {
+    font-size: clamp(64px, 13vw, 92px);
+    font-weight: 800;
     line-height: 1;
+    letter-spacing: 0.01em;
+    color: #f4f8fb;
+  }
+
+  /* ---- Change row ---- */
+  .change {
+    margin-top: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .change .delta {
+    color: var(--accent-soft);
+    transition: color 0.3s ease;
+  }
+
+  .change .arrow { font-size: 0.78em; }
+
+  .change .window {
+    font-size: 17px;
+    font-weight: 600;
+    color: #6b7686;
+  }
+
+  /* ---- Pill ---- */
+  .pill-row {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .pill {
-    margin-top: 42px;
-    padding: 18px 56px;
+    padding: 11px 26px;
     border-radius: 999px;
-    border: 1px solid rgba(84, 200, 214, 0.55);
-    background: rgba(30, 70, 82, 0.28);
-    color: #7fdfe9;
-    font-size: clamp(18px, 2.6vw, 26px);
+    border: 1px solid var(--pill-border);
+    background: var(--pill-bg);
+    color: var(--pill-text);
+    font-size: 17px;
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.14em;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
   }
+
+  /* ---- Bearish state overrides ---- */
+  .card.bearish {
+    --accent: #f0584d;
+    --accent-soft: #ff6b60;
+    --glow: rgba(240, 88, 77, 0.32);
+    --pill-border: rgba(240, 88, 77, 0.55);
+    --pill-text: #ff6b60;
+    --pill-bg: rgba(82, 30, 28, 0.28);
+  }
+
+  .card.bearish .knob { left: 4px; }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="symbol">BTC/USDT</div>
+  <div class="card" id="card">
+    <div class="header">
+      <div class="logo">&#8383;</div>
+      <div class="titles">
+        <div class="pair">BTC/USDT</div>
+        <div class="sub">Perpetual</div>
+      </div>
+      <button class="toggle" id="toggle" role="switch" aria-checked="true" aria-label="Toggle market sentiment">
+        <span class="knob"></span>
+      </button>
+    </div>
+
     <div class="price">63,263</div>
-    <div class="change"><span class="arrow">&#9650;</span><span>+2.4%</span></div>
-    <div class="pill">BULLISH</div>
+
+    <div class="change">
+      <span class="delta"><span class="arrow" id="arrow">&#9650;</span> <span id="pct">+2.4%</span></span>
+      <span class="window">24h</span>
+    </div>
+
+    <div class="pill-row">
+      <span class="pill" id="pill">BULLISH</span>
+    </div>
   </div>
+
+  <script>
+    (function () {
+      var card = document.getElementById('card');
+      var toggle = document.getElementById('toggle');
+      var arrow = document.getElementById('arrow');
+      var pct = document.getElementById('pct');
+      var pill = document.getElementById('pill');
+
+      function render(bearish) {
+        card.classList.toggle('bearish', bearish);
+        toggle.setAttribute('aria-checked', String(!bearish));
+        arrow.innerHTML = bearish ? '&#9660;' : '&#9650;';
+        pct.textContent = bearish ? '−1.8%' : '+2.4%';
+        pill.textContent = bearish ? 'BEARISH' : 'BULLISH';
+      }
+
+      toggle.addEventListener('click', function () {
+        render(!card.classList.contains('bearish'));
+      });
+    })();
+  </script>
 </body>
 </html>
