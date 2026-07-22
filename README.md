@@ -5,6 +5,10 @@ photorealistic **"after"** image → a before/after slider creates the "wow" →
 details are captured as a **lead**. The lead is the monetizable asset (contractor SaaS,
 lead marketplace, or consumer hook — the same engine serves all three).
 
+> **Also in this repo:** a ministerial-grade official trip briefing system (Saudi MoFA / GCC tradition)
+> driven by Claude Code subagents — templates, a worked Tokyo case study, and a multi-agent pipeline
+> orchestrated by `ambassador-kai-voss`. See [`briefings/README.md`](./briefings/README.md).
+
 ## Quick start
 
 ```bash
