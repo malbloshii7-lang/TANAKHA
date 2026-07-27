@@ -1,0 +1,59 @@
+{
+  "case_id": "gc12_redsea_mixed_uae_effects",
+  "description": "Full Red Sea case: mixed UAE implications, three scenarios, contradictions handled.",
+  "knowledge_cutoff": "2026-07-01",
+  "strategic_question": "How does Red Sea disruption affect UAE positioning?",
+  "sources": [
+    {
+      "text": "أعلنت جماعة الحوثي أنها هاجمت سفينة حاويات في البحر الأحمر بالقرب من مضيق باب المندب يوم 2026-06-12.",
+      "publisher": "وكالة أنباء إقليمية",
+      "source_type": "news",
+      "publication_date": "2026-06-13",
+      "event_date": "2026-06-12",
+      "reliability": "medium"
+    },
+    {
+      "text": "Maersk suspended Red Sea transits and rerouted vessels around the Cape of Good Hope on 14 June 2026. Container volumes at Jebel Ali Port increased by 12 percent as carriers consolidated cargo in the Gulf.",
+      "publisher": "Reuters",
+      "source_type": "news",
+      "publication_date": "2026-06-14",
+      "reliability": "high"
+    },
+    {
+      "text": "AD Ports Group signed an agreement on 20 June 2026 to expand transshipment capacity at Khalifa Port in the UAE. The group expects throughput to grow over the next 6 months if Red Sea diversions persist.",
+      "publisher": "Gulf Business Desk",
+      "source_type": "press_release",
+      "publication_date": "2026-06-21",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_houthis",
+      "ent_redsea",
+      "ent_maersk",
+      "ent_jebelali",
+      "ent_adports",
+      "ent_uae"
+    ],
+    "claim_types_include": [
+      "observed",
+      "inferred",
+      "forecast"
+    ],
+    "min_observed_claims": 3,
+    "required_citations": true,
+    "contradiction_kinds_include": [],
+    "scenario_count": 3,
+    "implication_dimensions_include": [
+      "trade_logistics",
+      "security"
+    ],
+    "event_dates_include": [
+      "2026-06-12",
+      "2026-06-14",
+      "2026-06-20"
+    ]
+  },
+  "forbidden": {}
+}

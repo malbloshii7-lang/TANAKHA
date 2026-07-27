@@ -80,3 +80,4 @@ venv/
 media/
 *.db
 .env
+evaluation-reports/

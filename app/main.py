@@ -12,12 +12,16 @@ from . import db, design, storage
 from .climate import db as climate_db
 from .climate import routes as climate_routes
 from .climate.ingestion import IngestionManager, build_event_sources, build_feed_sources
+from .intelligence import db as intel_db
+from .intelligence import routes as intel_routes
+from .intelligence import seed as intel_seed
 from .providers import get_provider
 from .providers.mock import MockProvider
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB_DIR = os.path.join(BASE_DIR, "web")
 CLIMATE_WEB_DIR = os.path.join(WEB_DIR, "climate")
+SITROOM_WEB_DIR = os.path.join(WEB_DIR, "situation-room")
 
 ALLOWED_STYLES = {"modern", "lush garden", "desert xeriscape", "family yard"}
 MAX_UPLOAD_BYTES = 12 * 1024 * 1024
@@ -26,6 +30,8 @@ MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 db.init_db()
 storage.ensure_media_dir()
 climate_db.init_db()
+intel_db.init_db()
+intel_seed.seed()  # idempotent: content-hash dedup prevents duplicates
 
 _ingestion_manager: IngestionManager | None = None
 
@@ -47,6 +53,7 @@ app = FastAPI(title="TANAKHA — AI Yard Makeover Visualizer", lifespan=lifespan
 app.mount("/media", StaticFiles(directory=storage.ensure_media_dir()), name="media")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 app.include_router(climate_routes.router)
+app.include_router(intel_routes.router)
 
 
 @app.get("/")
@@ -57,6 +64,11 @@ def index() -> FileResponse:
 @app.get("/climate")
 def climate_page() -> FileResponse:
     return FileResponse(os.path.join(CLIMATE_WEB_DIR, "index.html"))
+
+
+@app.get("/situation-room")
+def situation_room_page() -> FileResponse:
+    return FileResponse(os.path.join(SITROOM_WEB_DIR, "index.html"))
 
 
 # --- "The Art of Crafting Prompts" landing page + interactive D.N.A builder ---

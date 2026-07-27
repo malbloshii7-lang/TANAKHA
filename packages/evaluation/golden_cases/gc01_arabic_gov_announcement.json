@@ -1,0 +1,30 @@
+{
+  "case_id": "gc01_arabic_gov_announcement",
+  "description": "Arabic government announcement produces cited observed claims.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "أعلنت وزارة الاقتصاد الإماراتية يوم 2026-06-10 أن دولة الإمارات وقعت اتفاقية شراكة اقتصادية شاملة مع الهند لتعزيز التجارة الثنائية. وقالت الوزارة إن حجم التبادل التجاري ارتفع بنسبة ١٥ في المئة خلال عام 2025.",
+      "title": "إعلان وزارة الاقتصاد",
+      "publisher": "وكالة أنباء الإمارات",
+      "source_type": "government_statement",
+      "publication_date": "2026-06-10",
+      "reliability": "high"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_uae",
+      "ent_india"
+    ],
+    "claim_types_include": [
+      "observed"
+    ],
+    "min_observed_claims": 1,
+    "required_citations": true,
+    "event_dates_include": [
+      "2026-06-10"
+    ]
+  },
+  "forbidden": {}
+}

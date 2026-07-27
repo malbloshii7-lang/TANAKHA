@@ -1,0 +1,31 @@
+{
+  "case_id": "gc05_conflicting_quantities",
+  "description": "Different transit counts for the Suez Canal raise conflicting_quantities.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "Suez Canal daily transits decreased to 52 ships this month, canal authorities reported on 2026-06-14.",
+      "publisher": "Canal Desk",
+      "source_type": "news",
+      "publication_date": "2026-06-14",
+      "reliability": "high"
+    },
+    {
+      "text": "أكدت مصادر ملاحية أن عدد السفن العابرة في قناة السويس انخفض إلى ٤٥ سفينة يومياً في يونيو 2026.",
+      "publisher": "وكالة أنباء إقليمية",
+      "source_type": "news",
+      "publication_date": "2026-06-15",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_scz"
+    ],
+    "contradiction_kinds_include": [
+      "conflicting_quantities"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {}
+}

@@ -1,0 +1,30 @@
+{
+  "case_id": "gc10_sanctions_name_falsepositive",
+  "description": "A company named 'أنصار' must not match the armed group 'أنصار الله'.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "وقعت شركة أنصار للتجارة العامة اتفاقية لتوريد القمح إلى ميناء عدن يوم 2026-06-18. وقالت الشركة إن الشحنات ستصل خلال 3 أشهر.",
+      "title": "اتفاقية توريد قمح",
+      "publisher": "نشرة تجارية",
+      "source_type": "press_release",
+      "publication_date": "2026-06-18",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_aden",
+      "ent_wheat"
+    ],
+    "claim_types_include": [
+      "observed"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {
+    "entity_ids_exclude": [
+      "ent_houthis"
+    ]
+  }
+}

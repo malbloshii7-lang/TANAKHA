@@ -1,0 +1,36 @@
+{
+  "case_id": "gc06_company_transliteration",
+  "description": "Arabic transliteration (دي بي ورلد) and English (DP World) resolve to one canonical company.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "DP World announced new feeder services from Jebel Ali Port on 20 June 2026.",
+      "publisher": "Gulf News",
+      "source_type": "news",
+      "publication_date": "2026-06-20",
+      "reliability": "medium"
+    },
+    {
+      "text": "أعلنت شركة دي بي ورلد عن خدمات ملاحية جديدة تربط ميناء جبل علي بموانئ شرق أفريقيا.",
+      "publisher": "صحيفة اقتصادية",
+      "source_type": "news",
+      "publication_date": "2026-06-21",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_dpworld",
+      "ent_jebelali"
+    ],
+    "shared_entity_sources": {
+      "entity_id": "ent_dpworld",
+      "min_sources": 2
+    },
+    "claim_types_include": [
+      "observed"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {}
+}

@@ -1,0 +1,26 @@
+{
+  "case_id": "gc08_forecast_no_horizon",
+  "description": "A forecast with no derivable horizon is blocked with a recorded warning.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "Maersk will resume normal Red Sea transits at some point, the company hinted, without giving any timeframe.",
+      "publisher": "Shipping Desk",
+      "source_type": "news",
+      "publication_date": "2026-06-20",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_maersk",
+      "ent_redsea"
+    ],
+    "validation_codes_include": [
+      "forecast_without_horizon"
+    ]
+  },
+  "forbidden": {
+    "no_forecast_claims": true
+  }
+}

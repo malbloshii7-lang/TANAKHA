@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PrimeAI Situation Room</title>
+<link rel="stylesheet" href="/static/situation-room/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="dot"></span> PrimeAI <strong>Situation Room</strong>
+  </div>
+  <div class="runmeta" id="run-meta">No analysis run yet</div>
+</header>
+
+<main class="layout">
+  <!-- ───────────── Left rail: evidence & controls ───────────── -->
+  <aside class="rail">
+    <section class="panel">
+      <h2>Brief</h2>
+      <select id="brief-select"></select>
+      <p class="hint" id="brief-question"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Add evidence</h2>
+      <textarea id="src-text" dir="auto"
+        placeholder="Paste Arabic or English source text…"></textarea>
+      <div class="grid2">
+        <input id="src-publisher" placeholder="Publisher" />
+        <input id="src-pubdate" placeholder="Pub date YYYY-MM-DD" />
+        <select id="src-type">
+          <option value="news">news</option>
+          <option value="government_statement">government statement</option>
+          <option value="press_release">press release</option>
+          <option value="report">report</option>
+          <option value="commentary">commentary</option>
+          <option value="social_media">social media</option>
+          <option value="other">other</option>
+        </select>
+        <select id="src-reliability">
+          <option value="high">high reliability</option>
+          <option value="medium" selected>medium reliability</option>
+          <option value="low">low reliability</option>
+          <option value="unverified">unverified</option>
+        </select>
+      </div>
+      <button id="src-add">Ingest pasted text</button>
+      <label class="filelabel">or upload TXT / MD / PDF / JSON
+        <input type="file" id="src-file" accept=".txt,.md,.pdf,.json" />
+      </label>
+      <p class="hint err" id="src-error"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Evidence <span class="count" id="src-count">0</span></h2>
+      <ul class="sources" id="src-list"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Run analysis</h2>
+      <input id="run-question" placeholder="Strategic question (optional)" />
+      <input id="run-cutoff" placeholder="Knowledge cutoff YYYY-MM-DD" />
+      <select id="run-provider">
+        <option value="deterministic" selected>deterministic (offline)</option>
+        <option value="huggingface">huggingface (requires HF_TOKEN)</option>
+      </select>
+      <button id="run-btn" class="primary">Run intelligence analysis</button>
+      <p class="hint err" id="run-error"></p>
+    </section>
+  </aside>
+
+  <!-- ───────────── Main: briefing output ───────────── -->
+  <section class="content" id="content">
+    <div class="empty" id="empty-state">
+      <h1>PrimeAI Situation Room</h1>
+      <p>Select the seeded Red Sea brief (or ingest your own Arabic/English
+      evidence) and run the intelligence analysis. Every analytical claim
+      stays linked to its source evidence — traceability over prose.</p>
+    </div>
+
+    <div id="briefing" class="hidden">
+      <div class="provider-strip" id="provider-strip"></div>
+      <div class="warnings" id="warnings"></div>
+
+      <article class="card">
+        <h2>What changed</h2>
+        <p id="what-changed" dir="auto"></p>
+      </article>
+
+      <article class="card">
+        <h2>Executive judgement</h2>
+        <p id="judgement"></p>
+        <div class="confbox" id="confbox"></div>
+      </article>
+
+      <article class="card">
+        <h2>Why it matters</h2>
+        <ul id="why-matters" class="linkedlist"></ul>
+      </article>
+
+      <article class="card">
+        <h2>UAE implications</h2>
+        <div id="implications"></div>
+      </article>
+
+      <article class="card">
+        <h2>Scenarios</h2>
+        <p class="hint" id="scenario-note"></p>
+        <div id="scenarios" class="scenario-row"></div>
+      </article>
+
+      <article class="card">
+        <h2>Indicators to watch</h2>
+        <ul id="indicators"></ul>
+      </article>
+
+      <article class="card takeaway">
+        <h2>Leadership takeaway</h2>
+        <p id="takeaway"></p>
+      </article>
+
+      <article class="card">
+        <h2>Contradictions &amp; review queue <span class="count" id="ctr-count"></span></h2>
+        <div id="contradictions"></div>
+      </article>
+
+      <article class="card">
+        <h2>Claims <span class="count" id="claim-count"></span></h2>
+        <p class="hint">Click a claim to see its cited sources. Observed =
+        directly evidenced; inferred = reasoned judgement; forecast = never a
+        fact.</p>
+        <div id="claims"></div>
+      </article>
+
+      <article class="card">
+        <h2>Extracted events</h2>
+        <div id="events"></div>
+      </article>
+
+      <article class="card">
+        <h2>Source appendix</h2>
+        <div id="appendix"></div>
+      </article>
+    </div>
+  </section>
+</main>
+<script src="/static/situation-room/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "case_id": "gc09_stale_as_current",
+  "description": "A 2025 source using 'currently' framing is flagged as stale.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "Currently the Suez Canal handles 75 ship transits per day, and traffic is now at record levels.",
+      "publisher": "Old Report",
+      "source_type": "report",
+      "publication_date": "2025-01-15",
+      "reliability": "medium"
+    },
+    {
+      "text": "Suez Canal transits decreased to 52 ships per day, authorities said on 2026-06-14.",
+      "publisher": "Canal Desk",
+      "source_type": "news",
+      "publication_date": "2026-06-14",
+      "reliability": "high"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_scz"
+    ],
+    "contradiction_kinds_include": [
+      "stale_presented_as_current"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {}
+}

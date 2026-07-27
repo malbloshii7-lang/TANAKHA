@@ -1,0 +1,32 @@
+{
+  "case_id": "gc04_conflicting_dates",
+  "description": "Two sources dating the same attack differently raise a conflicting_dates contradiction.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "The Houthi Movement attacked a container ship in the Red Sea on 2026-06-12, damaging its hull.",
+      "publisher": "Agency A",
+      "source_type": "news",
+      "publication_date": "2026-06-13",
+      "reliability": "medium"
+    },
+    {
+      "text": "هاجمت جماعة الحوثي سفينة حاويات في البحر الأحمر يوم 2026-06-15 وفق مصادر ملاحية.",
+      "publisher": "Agency B",
+      "source_type": "news",
+      "publication_date": "2026-06-16",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_houthis",
+      "ent_redsea"
+    ],
+    "contradiction_kinds_include": [
+      "conflicting_dates"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {}
+}

@@ -6,3 +6,5 @@ anthropic
 pytest
 httpx
 defusedxml
+pypdf
+huggingface_hub

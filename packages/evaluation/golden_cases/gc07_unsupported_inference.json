@@ -1,0 +1,32 @@
+{
+  "case_id": "gc07_unsupported_inference",
+  "description": "Interpretive geopolitical assessment must not persist as observed fact.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "The Houthi Movement attacked a tanker in the Red Sea on 2026-06-12. This attack suggests Iran is likely directing every operation in the region and probably controls all regional shipping decisions.",
+      "publisher": "Commentary Desk",
+      "source_type": "commentary",
+      "publication_date": "2026-06-13",
+      "reliability": "low"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_houthis",
+      "ent_iran"
+    ],
+    "claim_types_include": [
+      "observed",
+      "inferred"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {
+    "observed_text_must_not_contain": [
+      "suggests",
+      "probably",
+      "likely"
+    ]
+  }
+}

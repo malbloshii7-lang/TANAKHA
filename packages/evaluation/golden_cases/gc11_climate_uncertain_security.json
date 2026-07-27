@@ -1,0 +1,26 @@
+{
+  "case_id": "gc11_climate_uncertain_security",
+  "description": "Cyclone damage supports observed claims; security consequence stays inferred with counterevidence handling; no exact date invented for a month-only report.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "A severe cyclone struck the Port of Hodeidah in June 2026, damaging cranes and berths. Aid officials warned that humanitarian relief deliveries could be disrupted, though the port authority said operations may be restored quickly.",
+      "publisher": "Humanitarian Wire",
+      "source_type": "report",
+      "publication_date": "2026-06-25",
+      "reliability": "medium"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_hodeidah"
+    ],
+    "claim_types_include": [
+      "observed"
+    ],
+    "required_citations": true
+  },
+  "forbidden": {
+    "no_exact_event_date": true
+  }
+}

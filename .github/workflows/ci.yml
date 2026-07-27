@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Unit / integration / e2e tests
+        env:
+          CLIMATE_INGESTION_ENABLED: "0"
+          TANAKHA_DISABLE_CLAUDE: "1"
+          IMAGE_PROVIDER: mock
+        run: python -m pytest -q
+
+      # Golden analytical evaluation — the runner exits non-zero on any
+      # failed expectation or critical analytical violation (unsupported
+      # observed claims, missing source linkage, invalid claim types,
+      # forecasts without time horizons, broken Arabic handling, schema
+      # failures), which fails this job.
+      - name: Golden evaluation gate
+        run: python -m packages.evaluation.runner --report-dir evaluation-reports
+      - name: Upload evaluation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-reports
+          path: evaluation-reports/
+          if-no-files-found: ignore

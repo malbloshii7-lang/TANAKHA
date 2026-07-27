@@ -59,6 +59,95 @@ photo ──▶ Claude vision ──▶ design brief ──▶ image provider �
 | POST | `/api/leads` | JSON lead → `{id, status}` |
 | GET | `/api/leads` | List captured leads |
 
+## PrimeAI Situation Room — intelligence engine
+
+`/situation-room` turns Arabic and English evidence into a traceable
+executive briefing: structured sources → entities → events → claims
+(observed / inferred / forecast) → contradictions → UAE implications →
+three scenarios → indicators → leadership takeaway. Traceability beats
+prose: every material statement links to source evidence, unsupported
+observed claims are **blocked before persistence**, and material
+contradictions land in an analyst review queue.
+
+```bash
+uvicorn app.main:app --reload
+# open http://localhost:8000/situation-room
+```
+
+A Red Sea demonstration brief (`brf_redsea`, 1 Arabic + 2 English sources)
+is seeded automatically and idempotently on startup.
+
+### Architecture
+
+- **`services/intelligence/`** — provider-neutral analytical engine:
+  Arabic normalization (`arabic_normalizer.py`), language detection,
+  source processing with content-hash dedup and PDF text extraction
+  (`source_processor.py`), bilingual gazetteer entity extraction
+  (`entities.py`), event extraction with strict date discipline
+  (`events.py` — exact dates only when the text supports a specific day,
+  otherwise a period), claim validators (`claims.py`), contradiction
+  detection (`contradictions.py`), UAE implication framework
+  (`implications.py`), scenario engine (`scenarios.py`), length-disciplined
+  briefing composer (`briefing.py`), documented confidence blend
+  (`confidence.py`), citations (`citations.py`), and the orchestrating
+  `pipeline.py`.
+- **`services/intelligence/providers/`** — `deterministic` (rule-based,
+  offline, reproducible; used by tests/CI) and `huggingface` (official
+  `huggingface_hub` client with timeouts, bounded retry, JSON validation
+  and **no fallback that invents analysis**). Provider name + model ID are
+  recorded on every run; raw model output is stored separately from
+  approved analytical records.
+- **`app/intelligence/`** — FastAPI routes, SQLite persistence
+  (`intel_sources`, `intel_runs`, `intel_claims`, `intel_review_queue`,
+  `intel_briefs`) and the seeded Red Sea brief.
+- **`packages/evaluation/`** — 12 golden cases + metrics + runner
+  (`python -m packages.evaluation.runner`); CI fails on unsupported
+  observed claims, missing source linkage, invalid claim types,
+  horizonless forecasts, broken Arabic handling or schema failures.
+- **`web/situation-room/`** — the briefing interface (provider/model strip,
+  knowledge cutoff, evidence counts, warnings, contradictions, confidence
+  explanation, claim→source navigation, analyst review actions, scenario
+  indicators; RTL-aware rendering for Arabic).
+
+### Intelligence API
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/intel/sources` | ingest pasted Arabic/English text (JSON) |
+| POST | `/api/intel/sources/upload` | upload TXT / MD / PDF (text-based) / JSON |
+| GET | `/api/intel/sources` | list sources — `?brief_id=` |
+| GET | `/api/intel/briefs` | list briefs (incl. seeded `brf_redsea`) |
+| POST | `/api/analysis/run` | run analysis `{brief_id?, source_ids?, strategic_question?, knowledge_cutoff?, provider?}` |
+| GET | `/api/analysis/runs/{id}` | retrieve a persisted run (`?include_raw=true` for raw model output) |
+| POST | `/api/analysis/runs/{id}/rerun` | rerun with the same inputs |
+| GET | `/api/analysis/compare?run_a=&run_b=` | compare two runs |
+| POST | `/api/analysis/runs/{id}/claims/{cid}/review` | mark claim reviewed / approved / rejected |
+| GET | `/api/analysis/review-queue` | open contradiction review items |
+| POST | `/api/analysis/review-queue/{item_id}` | update a review item |
+
+### Configuring the Hugging Face provider
+
+```bash
+export INTELLIGENCE_PROVIDER=huggingface
+export HF_TOKEN=hf_...                       # never committed to code
+export HF_MODEL_ID=meta-llama/Llama-3.3-70B-Instruct   # any chat model
+export HF_TIMEOUT_SECONDS=60                 # optional, default 60
+uvicorn app.main:app --reload
+```
+
+Missing configuration fails the request with a clear 422 — the app never
+silently downgrades a requested `huggingface` run to the deterministic
+provider. Per-request `{"provider": "deterministic"}` overrides remain
+available regardless of the environment default.
+
+### Running the analytical evaluation
+
+```bash
+python -m pytest -q                          # unit + integration + e2e
+python -m packages.evaluation.runner         # 12 golden cases; writes
+                                             # evaluation-reports/*.json|md
+```
+
 ## Climate Pulse — live monitoring feed
 
 `/climate` is an editorial-style live feed aggregating posts from WMO, national met

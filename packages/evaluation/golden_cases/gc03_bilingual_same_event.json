@@ -1,0 +1,42 @@
+{
+  "case_id": "gc03_bilingual_same_event",
+  "description": "Arabic and English sources describing the same attack share entities and citations.",
+  "knowledge_cutoff": "2026-07-01",
+  "sources": [
+    {
+      "text": "هاجمت جماعة الحوثي سفينة تجارية في البحر الأحمر يوم 2026-06-12 بالقرب من مضيق باب المندب.",
+      "title": "هجوم في البحر الأحمر",
+      "publisher": "قناة إخبارية عربية",
+      "source_type": "news",
+      "publication_date": "2026-06-12",
+      "reliability": "medium"
+    },
+    {
+      "text": "The Houthi Movement attacked a commercial vessel in the Red Sea near the Bab el-Mandeb Strait on 2026-06-12, maritime officials said.",
+      "title": "Red Sea attack",
+      "publisher": "Reuters",
+      "source_type": "news",
+      "publication_date": "2026-06-12",
+      "reliability": "high"
+    }
+  ],
+  "expected": {
+    "entities_include": [
+      "ent_houthis",
+      "ent_redsea",
+      "ent_babelmandeb"
+    ],
+    "shared_entity_sources": {
+      "entity_id": "ent_houthis",
+      "min_sources": 2
+    },
+    "claim_types_include": [
+      "observed"
+    ],
+    "required_citations": true,
+    "event_dates_include": [
+      "2026-06-12"
+    ]
+  },
+  "forbidden": {}
+}
