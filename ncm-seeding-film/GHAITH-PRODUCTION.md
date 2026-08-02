@@ -78,6 +78,16 @@ Same approach as the earlier cuts: `filter_complex` concat normalising every inp
 `assemble.sh` in this directory is the local equivalent; the render CDN is blocked by the Claude
 Code session's egress policy, so the master gets cut in the Higgsfield sandbox instead.
 
+## SUPERSEDED — livery is wrong
+
+`REFERENCE-SPEC.md` (derived from supplied reference material) shows the NCM King Air is **white
+with a twin green pinstripe** and full Arabic/English titles — not the *"navy blue belly, red
+pinstripe, NCM roundel"* this skeleton specifies. **All thirteen shots of the master below carry
+the wrong aircraft** and need re-rendering with the hangar reference attached. Flare caps are
+green, not red, and the racks are far denser than rendered.
+
+Read `REFERENCE-SPEC.md` before spending any further credits on this pack.
+
 ## Finished master
 
 - **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/12103ddd-87d9-4f6d-95bc-1d07040a3004.mp4

@@ -14,6 +14,10 @@ Prepend to every shot so the fourteen renders read as one continuous film:
 > lines, soft volumetric lighting, calm institutional tone. Professional, accurate, restrained.
 > No exaggeration, no cartoon physics.
 
+> **Superseded in part.** `REFERENCE-SPEC.md` carries the observed aircraft and flare facts and
+> overrides the clause below on colour and density: caps are **green**, not red, and the racks hold
+> dense parallel rows. Read it before rendering.
+
 ## Flare clause (shots 7a–7c only)
 
 The seeding hardware is the part most likely to render wrong, so it gets its own fixed block —
