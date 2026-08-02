@@ -78,10 +78,16 @@ Same approach as the earlier cuts: `filter_complex` concat normalising every inp
 `assemble.sh` in this directory is the local equivalent; the render CDN is blocked by the Claude
 Code session's egress policy, so the master gets cut in the Higgsfield sandbox instead.
 
+## Finished master
+
+- **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/12103ddd-87d9-4f6d-95bc-1d07040a3004.mp4
+- 3840×2160, 24 fps, 32.0 s, H.264, silent, 76.4 MB. Thirteen shots, straight cuts.
+- Rendered with `kling3_0` `mode:4k`, 3 s per shot; the seven 2 s shots trimmed on the timeline.
+- **Flare variant B** was used throughout — small controlled burns, white-grey smoke, no large
+  flames. Re-rolling shots 10 and 11 to variant A costs 36 credits.
+- Per-shot source URLs and cut durations are in `ghaith-shots.tsv`.
+
 ## Status
 
-**Nothing rendered.** Account balance is 2 credits. The free-trial "unlim" path was tested against
-all three unlim-capable video models (`kling3_0`, `seedance_2_0_mini`, `gemini_omni`) and rejected
-on each — the allowance reports `available: false`. There is no zero-credit route to new footage.
-
-~68 credits produces the full thirteen-shot GHAITH film at 1080p.
+**Rendered and cut.** All thirteen shots rendered at 4K and assembled into the master linked
+above. 234 credits spent; ~268 remaining.
