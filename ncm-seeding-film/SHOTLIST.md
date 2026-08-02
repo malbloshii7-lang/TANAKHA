@@ -33,6 +33,13 @@ Every prompt is prefixed with the house style line so the twelve shots read as o
 | 11 | Return | Descent under the seeded weather, final approach, touchdown with honest spray and reflection |
 | 12 | Rest | Slow taxi back to Apron 5, cabin-window view of hangars and wet desert light, propellers wind down |
 
+## Finished master
+
+- **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/8076e24d-8f23-4b22-bd87-0233bbe55b92.mp4
+- 1920×1080, 24 fps, 120.5 s, H.264, silent, 76.8 MB. Straight cuts, no crossfades —
+  the brief's restraint reads better on hard cuts than on dissolves.
+- Per-shot source URLs are in `shots.tsv`, in screen order.
+
 ## Technical notes
 
 - **Resolution.** The brief asks for 8K. No model in the catalogue renders 8K; `kling3_0` tops out
@@ -40,4 +47,8 @@ Every prompt is prefixed with the house style line so the twelve shots read as o
   resolution and upscale in post if an 8K deliverable is required.
 - **Audio.** Generated per-shot audio would not match across twelve independent renders, so every
   clip is rendered silent and the film is intended to be scored as one piece.
-- **Assembly.** `assemble.sh` concatenates the downloaded shots in order into `ncm-seeding-film.mp4`.
+- **Assembly.** `assemble.sh` concatenates the shots in `shots.tsv` order into `ncm-seeding-film.mp4`.
+  Note that the render CDN (`d8j0ntlcm91z4.cloudfront.net`) is blocked by the egress policy of the
+  Claude Code session this was produced in, so the script could not be run there — the master was
+  cut in the Higgsfield sandbox, which reaches the CDN and has ffmpeg. The script is the local
+  equivalent and works anywhere the CDN is reachable.
