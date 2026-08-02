@@ -91,6 +91,22 @@ nose settling. Restrained camera, no shake theatrics.
 **08c — Return to rest.** The King Air taxis slowly back to Apron 5 under rain-washed light,
 turns onto the stand and stops. Propellers wind down. Quiet, still, calm final frame.
 
+## Test renders
+
+**Flare clause test** — shot 07c rendered against the corrected flare clause, Thunder look,
+`kling3_0_turbo` 1080p 5 s. This is the only v2 shot rendered so far:
+https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260802_114007_f1317295-6e96-4ea2-a024-d6066cb8c8c3.mp4
+
+**Unreal Engine look test** (superseded — the revised brief returns to the Thunder aesthetic, so
+these are reference only):
+
+| Shot | URL |
+|---|---|
+| HQ exterior | https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260802_113636_d30cd118-946b-4792-be96-0add196c3c17.mp4 |
+| Apron 5 taxi | https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260802_113640_4aa60c78-5483-47b0-bb3b-ba0e42f5ca6b.mp4 |
+| Flare racks | https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260802_113645_3c3893e0-bea4-49fa-b2c6-bca460fd5c9f.mp4 |
+| Approach & touchdown | https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260802_113648_8a154791-bd29-4081-81eb-6fef871a91ef.mp4 |
+
 ## Changes from v1
 
 - Sequence expanded from 12 to 14 shots: takeoff (05) and landing (08) now render as three
