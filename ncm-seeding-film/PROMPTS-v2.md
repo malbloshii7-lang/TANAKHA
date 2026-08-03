@@ -95,13 +95,18 @@ nose settling. Restrained camera, no shake theatrics.
 **08c — Return to rest.** The King Air taxis slowly back to Apron 5 under rain-washed light,
 turns onto the stand and stops. Propellers wind down. Quiet, still, calm final frame.
 
-## Complete 14-shot cut (current)
+## Final 14-shot cut (current)
+
+- **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/833be772-b485-4a9d-ac89-8ddbbb6ae1db.mp4
+- 1920×1080, 24 fps, 140.6 s, silent. All fourteen shots at `kling3_0` pro 10 s — no weak links.
+- Shot 07c re-rendered 3 Aug against the corrected flare clause from `REFERENCE-SPEC.md`
+  (green caps forward, dense rows, rearward burn only):
+  https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260803_115734_39bf63ea-fdcc-4b74-b077-9ff6803e353b.mp4
+
+## Earlier 14-shot cut (superseded — 07c was the 5 s turbo test)
 
 - **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/ba74def9-1c45-4693-9aed-41abb65d9202.mp4
-- 1920×1080, 24 fps, 135.6 s, silent. All fourteen shots present.
-- Shots 07a (under the cells) and 08b (cockpit touchdown) rendered 3 Aug, `kling3_0` pro 10 s.
-- **Known weak point:** shot 07c (flare racks) is still the 5 s 720p turbo test. Re-rendering at
-  pro 10 s to match the rest costs 17.5 credits.
+- 1920×1080, 24 fps, 135.6 s, silent.
 
 ## Earlier 12-shot cut (superseded)
 
