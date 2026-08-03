@@ -85,7 +85,12 @@ wrong. The UAE seeding fleet operates more than one livery, including the navy/r
 Presidential Affairs aircraft, so the navy/red aircraft in this master is legitimate and internally
 consistent across all thirteen shots. See `REFERENCE-SPEC.md` for the full livery table.
 
-## Finished master
+## Finished master (v2 — current)
+
+- **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/d890ea61-63f9-41c8-b8bc-87a7ad8897d4.mp4
+- 3840×2160, 24 fps, 32.0 s, silent. Shot 10 regenerated 3 Aug; all other shots unchanged.
+
+## Previous master (v1 — superseded)
 
 - **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/12103ddd-87d9-4f6d-95bc-1d07040a3004.mp4
 - 3840×2160, 24 fps, 32.0 s, H.264, silent, 76.4 MB. Thirteen shots, straight cuts.

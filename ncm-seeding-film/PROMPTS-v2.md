@@ -95,7 +95,15 @@ nose settling. Restrained camera, no shake theatrics.
 **08c — Return to rest.** The King Air taxis slowly back to Apron 5 under rain-washed light,
 turns onto the stand and stops. Propellers wind down. Quiet, still, calm final frame.
 
-## v2 cut (no new renders)
+## Complete 14-shot cut (current)
+
+- **Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/ba74def9-1c45-4693-9aed-41abb65d9202.mp4
+- 1920×1080, 24 fps, 135.6 s, silent. All fourteen shots present.
+- Shots 07a (under the cells) and 08b (cockpit touchdown) rendered 3 Aug, `kling3_0` pro 10 s.
+- **Known weak point:** shot 07c (flare racks) is still the 5 s 720p turbo test. Re-rendering at
+  pro 10 s to match the rest costs 17.5 credits.
+
+## Earlier 12-shot cut (superseded)
 
 Assembled entirely from footage already paid for — no credits spent. The v1 flare shot is
 replaced with the corrected Thunder-look flare render, and the order follows the revised brief.
