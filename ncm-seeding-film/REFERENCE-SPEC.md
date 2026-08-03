@@ -16,15 +16,28 @@ Beechcraft King Air C90, National Center of Meteorology.
 - Small Beechcraft King Air titles forward, near the cockpit windows.
 - Oval cabin windows, airstair door on the port side.
 
-### What was wrong before
+### Note on the GHAITH skeleton
 
-The GHAITH skeleton specifies *"white with navy blue belly, red pinstripe, NCM roundel on tail"*.
-That is **not this aircraft**. All thirteen shots of the delivered GHAITH 4K master carry that
-incorrect livery and need re-rendering against the reference.
+The skeleton specifies *"white with navy blue belly, red pinstripe, NCM roundel on tail"*. That
+matches the navy/red fleet aircraft, not the green one described above. Both exist — see
+*Known liveries* below.
 
-The navy-and-red striped King Air in `IMG_3647` is a **different airframe** — its titles read
-وزارة شؤون الرئاسة / *Ministry of Presidential Affairs*. Use that image for flare-rack geometry
-only; do not take livery from it.
+**Correction.** An earlier version of this file called the navy-and-red King Air in `IMG_3647`
+"a different airframe" and said not to take livery from it. That was wrong. Its titles read
+وزارة شؤون الرئاسة / *Ministry of Presidential Affairs*, and that aircraft is also part of the
+seeding operation. The fleet carries more than one livery.
+
+### Known liveries
+
+| Livery | Seen in | Titles |
+|---|---|---|
+| White + twin **green** pinstripe | hangar clip, `IMG_3730` (N6151A) | Arabic + English National Center of Meteorology |
+| White + **navy/red** pinstripe | landing clip, night-hero clip | NCM roundel on tail, "Cloud Seeding" |
+| White + **navy/red** pinstripe | `IMG_3647` (display model) | Ministry of Presidential Affairs |
+
+All three are legitimate. **The constraint is consistency within a single film, not choosing a
+single "correct" livery.** The delivered GHAITH 4K master uses navy/red and is therefore valid;
+it does not need re-rendering for livery. Pick one per film and hold it across every shot.
 
 ## The seeding flares
 
