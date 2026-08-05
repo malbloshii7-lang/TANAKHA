@@ -1,46 +1,66 @@
 # GHAITH — The Operation
 
-The delivered film. Eleven shots, 89 s, 1920×1080, silent.
+**Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/760ec58b-302f-4e00-a560-b930635113e1.mp4
 
-**Film:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/3f3a7bbe-2263-45ad-ac70-2a70aee3424b.mp4
+Fifteen shots, 83 s, 1920×1080, silent. Assembled 5 Aug from supplied operation clips.
 
-## Why this cut exists
+## Structure
 
-Earlier masters (`PROMPTS-v2.md`, `GHAITH-PRODUCTION.md`) were built from text prompts, so the
-aircraft was re-invented on every render and drifted shot to shot — the exact failure the brief
-warned against. This cut is assembled **only from green-livery material**: the supplied hero clips
-plus the renders that were reference-locked or spec-matched to them. One aircraft throughout.
+Not a chronology — a five-act arc with a payoff. The film ends on rain, because rain is what the
+mission is for.
 
-## Sequence
+### I — The decision (17 s)
+| # | Beat | Source |
+|---|---|---|
+| 01 | NCM headquarters, Abu Dhabi | `hq-exterior` |
+| 02 | Central Forecast Office — **SEEDING WINDOW CLOSES IN 02:14:58** | `cfo-abudhabi` |
+| 03 | The order goes out by radio | `cfo-lady` |
 
-| # | Beat | Source | In | Len |
-|---|---|---|---:|---:|
-| 01 | Forecast office — the order | hero `CFO_LADY` | 2 s | 7 s |
-| 02 | Ground service — loading the flares | hero `Ground_Service` | 0 s | 4 s |
-| 03 | Apron taxi | render, green-livery clause | 1 s | 9 s |
-| 04 | Climb-out, gear retracting | render, green-livery clause | 1 s | 9 s |
-| 05 | Cruise, low three-quarter | hero `Cruising` | 0 s | 6 s |
-| 06 | Cruise over the Hajar | hero `Mid_flight_cruise` | 0 s | 10 s |
-| 07 | Held cruise, mountains | render, green-livery clause | 1 s | 9 s |
-| 08 | Flare racks, loaded | hero `loaded_flares` | 0 s | 6 s |
-| 09 | Flares firing | render, green-livery clause | 1 s | 9 s |
-| 10 | Cruise, reference-locked | render, `seedance` image_references | 0 s | 5 s |
-| 11 | Extended cruise | render, `kling3_0` from hero start-frame | 0 s | 15 s |
+The countdown in 02 is the engine of the film: it establishes that this is time-critical before a
+single aircraft appears.
 
-## Known limits
+### II — Preparation (14 s)
+| 04 | Al Ain airport from the air | `aerial-airport` |
+| 05 | Ground crew load the flares | `ground-service` |
+| 06 | Runway 01/19, telemetry — IAS 000 | `hud-runway` |
 
-- **Silent.** No audio was ever generated. A single scored mix over the whole 89 s is the largest
-  remaining improvement.
-- **No landing.** The only approach and touchdown footage carries the old navy/red livery, so it
-  was cut rather than break aircraft continuity. The film ends in cruise. Closing the loop needs
-  two reference-locked shots — approach and at-rest — at ~10 credits each.
-- **Mixed rendering styles.** The hero clips are not one visual world: `CFO_LADY` is cel-shaded and
-  vertical (pillarboxed here), `Ground_Service` is photorealistic, the cruise clips are stylized 3D.
-  The livery is consistent; the render style is not.
-- Shot 11 was requested as a three-beat multi-shot generation, but the backend dropped
-  `multi_shots` when a `start_image` was supplied. It is one continuous 15 s take.
+### III — Departure (21 s)
+| 07 | **Hero takeoff** — NCM tail, green livery, loaded racks | `hero-takeoff` |
+| 08 | Cruise, low three-quarter | `cruising` |
+| 09 | Cruise over the Hajar | `mid-flight-cruise` |
 
-## Method
+### IV — The act (23 s)
+| 10 | **SEEDING ARMED** — flare counter 2 of 29, 9000 ft | `seeding-armed` |
+| 11 | The gloved hand presses **RELEASE** | `release-press` |
+| 12 | Cockpit — FLARE FIRE | `cockpit-flarefire` |
+| 13 | The racks | `loaded-flares` |
+| 14 | Seeding beneath the storm | `seeding-storm` |
 
-See `METHOD.md`. Fixed elements come from a reference image, variable elements from the prompt.
-Never describe a fixed element in the prompt.
+Five shots for one button press. The escalation — armed, pressed, confirmed, hardware, effect —
+is what gives the seeding weight rather than passing in a single cut.
+
+### V — The result (8 s)
+| 15 | **Landing under a rain shaft, wet runway** | `landing-rain` |
+
+## What changed from the 89 s cut
+
+- **It now has an ending.** The previous cut stopped in cruise because no correct-livery landing
+  existed. `landing-rain` closes the loop, and closes it on the rain itself.
+- **It has tension.** The CFO countdown and the armed-panel/flare-counter shots give stakes that
+  pure beauty shots could not.
+- **The hero takeoff replaces a rendered taxi.** Correct green livery, NCM tail, two-row racks with
+  red caps facing rearward — the spec, met.
+
+## Honest notes
+
+- **Silent.** Still the single largest remaining gap.
+- **The landing aircraft is not the King Air.** Shot 15 shows a different, jet-like airframe. It is
+  kept because the rain shaft is the film's payoff and no King Air landing footage exists. A viewer
+  who knows the fleet will notice.
+- **Mixed render styles** — cel-shaded (01, 07, 11), photorealistic (02, 05, 10, 15), stylized 3D
+  (08, 09). Consistent livery, inconsistent look.
+- Shot 10 is 736×400 upscaled; softer than the rest.
+
+## Credits spent on this cut
+
+**Zero.** Assembled entirely from supplied material and previously rendered shots.
