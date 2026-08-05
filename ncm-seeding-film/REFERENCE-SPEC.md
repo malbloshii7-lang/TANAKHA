@@ -31,29 +31,51 @@ seeding operation. The fleet carries more than one livery.
 
 | Livery | Seen in | Titles |
 |---|---|---|
-| White + twin **green** pinstripe | hangar clip, `IMG_3730` (N6151A) | Arabic + English National Center of Meteorology |
+| White + twin **green** pinstripe | hangar clip, `IMG_3730`, and all five 5 Aug clips (N6151A) | Arabic + English National Center of Meteorology, plus large **NCM** lettering on the rear fuselage |
 | White + **navy/red** pinstripe | landing clip, night-hero clip | NCM roundel on tail, "Cloud Seeding" |
 | White + **navy/red** pinstripe | `IMG_3647` (display model) | Ministry of Presidential Affairs |
 
-All three are legitimate. **The constraint is consistency within a single film, not choosing a
-single "correct" livery.** The delivered GHAITH 4K master uses navy/red and is therefore valid;
-it does not need re-rendering for livery. Pick one per film and hold it across every shot.
+**Resolved 5 Aug: the green livery is the target.** All five hero clips carry it, and the user's
+instruction with them was "must be like this". The navy/red aircraft remain real airframes, but
+they are not what these films should show. Every aircraft shot should carry:
 
-## The seeding flares
+> White fuselage, twin green pinstripe (dark green over light green) sweeping the length of the body
+> and up over the rear fuselage. Green tail cap and green engine nacelle tops. Large **NCM**
+> lettering on the rear fuselage. UAE coat of arms with المركز الوطني للأرصاد / National Center of
+> Meteorology titles forward of it. Registration N6151A.
 
-- Plain **white cylinders** with **GREEN end caps**, plus a narrow orange/red band partway along
-  the body. Body stencilling reads *Ghaith* (غيث).
-- Mounted in **multiple parallel rows** on rack rails beneath the wing — a dense block of flares,
-  not a sparse line.
-- Green caps face **forward**; the bodies extend rearward, and the burn and smoke go rearward.
+## The seeding flares — REVISED 5 Aug against the hero references
 
-### What was wrong before
+The five clips supplied 5 Aug (`Mid_flight_cruise`, `loaded_flares`, `Ground_Service`, `Cruising`,
+`CFO_LADY`) are the authority. They override everything written here before.
 
-- The skeleton's *"green-tipped salt flares"* was **correct**.
-- The earlier brief's *"red covers face the tail"* was applied as hardware colour and is wrong;
-  the red seen in the cel-shaded reference is the **ignited end**, not the cap. Green caps,
-  red glow only when burning.
-- Flare density was under-rendered throughout: the references show many tightly packed rows.
+### Rack geometry — the part that was most wrong
+
+- **Two parallel rows**, one above the other, on a single rack assembly slung under the wing
+  inboard of the engine nacelle.
+- Roughly **10–11 flares per row**, tightly packed shoulder to shoulder.
+- The rack terminates forward in a **flat end plate carrying a ring of circular bolt heads** —
+  a distinctive, immediately recognisable detail present in every in-flight reference.
+- Flare bodies are **metallic — brass, gunmetal, white** — banded with blue or green collars,
+  not plain white cylinders.
+- **The caps face REARWARD, toward the tail.** This confirms the original brief and reverses what
+  this file previously said.
+
+### Cap colour depends on state
+
+| State | Cap | Seen in |
+|---|---|---|
+| Loading on the ground, unfired | **Green** | `Ground_Service`, `IMG_3647` |
+| Mounted in flight, armed | **Red** | `loaded_flares`, `Mid_flight_cruise` |
+
+Green covers come off — or read as red — once the aircraft is airborne and armed. Use green for
+ground and loading shots, red for anything in flight.
+
+### Correction to this file
+
+An earlier revision stated *"green end caps facing **forward**"* and dismissed the original brief's
+*"red covers face the tail"* as a misreading. **Both halves of that were wrong.** The caps face
+rearward, and red is correct in flight. The original brief was right and this spec was wrong.
 
 ## The headquarters
 
