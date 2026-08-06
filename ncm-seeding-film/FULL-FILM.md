@@ -1,8 +1,13 @@
 # GHAITH — The Full Film
 
-**FILM:** https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/4f3788fa-9edd-48c3-916d-bd254a0208b0.mp4
+**4K MASTER (presentation):**
+https://d8j0ntlcm91z4.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/hf_20260806_085714_58f43e0e-7344-4149-b41b-e07d1c0dd3f4.mp4
+3840×2160 · Topaz prob-4 enhancement · ~1.3 GB
 
-**39 shots · 3 min 24 s · 1920×1080 · silent**
+**1080p MASTER (distribution):**
+https://d2ol7oe51mr4n9.cloudfront.net/user_3GDYTMzP23BD6MHwIHFhhk07Vl5/4f3788fa-9edd-48c3-916d-bd254a0208b0.mp4
+
+**39 shots · 3 min 24 s · silent**
 Fade in over 1.5 s, fade to black over the final 3 s.
 
 Every shot cel-shaded. Every aircraft shot either supplied hero footage or reference-locked to it.
@@ -79,5 +84,5 @@ is for, and it is the only image that says so without narration.
 - **Silent.** `generate_audio` is text-to-speech only and explicitly declines music and sound
   effects — a score is **not obtainable through this toolchain** and must come from outside.
   Narration in English or Arabic *is* possible here.
-- Reference-locked shots render at 720p inside a 1080p timeline. A Topaz 2160p pass on the master
-  would lift the whole film.
+- ~~Reference-locked shots render at 720p inside a 1080p timeline.~~ **Done:** the master has been
+  through a Topaz prob-4 pass to 3840×2160.
