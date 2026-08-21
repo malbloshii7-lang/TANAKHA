@@ -7,4 +7,6 @@
 
 ## Known mistakes
 
+- Don't dump huge presigned-URL curl commands into the terminal without first explaining in one plain sentence what they are and why they're needed — it alarms the user ("WTF is this"). Announce file-transfer steps briefly before running them.
+
 <!-- Append each entry as: `- YYYY-MM-DD — <what went wrong> → <what to do instead>` -->
