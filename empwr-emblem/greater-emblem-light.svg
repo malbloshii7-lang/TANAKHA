@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <!-- EMPWR · Greater Emblem — infused grand seal
+       Fuses: 3A hairline rings · 2A gold line · 2B wind stroke · 1B chrome gold wordmark
+              1C acrostic pillars (five stars) · 1D paper &amp; gold colophon -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8e6b0"/>
+      <stop offset="0.28" stop-color="#eccb85"/>
+      <stop offset="0.55" stop-color="#cf9f4d"/>
+      <stop offset="0.8" stop-color="#b68235"/>
+      <stop offset="1" stop-color="#8a5d1f"/>
+    </linearGradient>
+    <linearGradient id="goldStar" x1="0" y1="-17" x2="0" y2="17" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f8e6b0"/>
+      <stop offset="0.3" stop-color="#eccb85"/>
+      <stop offset="0.55" stop-color="#cf9f4d"/>
+      <stop offset="0.8" stop-color="#b68235"/>
+      <stop offset="1" stop-color="#8a5d1f"/>
+    </linearGradient>
+    <linearGradient id="wind" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cf9f4d" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#b68235" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#cf9f4d" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f8e6b0" stop-opacity="0.55"/>
+      <stop offset="0.7" stop-color="#f8e6b0" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#f8e6b0" stop-opacity="0"/>
+    </radialGradient>
+    <!-- source compass star: large upright + small 45°-rotated four-point stars -->
+    <g id="compassStar">
+      <path d="M 0 -8.2 L 2.2 -2.2 L 8.2 0 L 2.2 2.2 L 0 8.2 L -2.2 2.2 L -8.2 0 L -2.2 -2.2 Z"
+            transform="rotate(45)" fill="url(#goldStar)"/>
+      <path d="M 0 -16 L 2.6 -2.6 L 16 0 L 2.6 2.6 L 0 16 L -2.6 2.6 L -16 0 L -2.6 -2.6 Z"
+            fill="url(#goldStar)"/>
+      <circle r="1.8" fill="#f8e6b0"/>
+    </g>
+    <!-- text arcs -->
+    <path id="arcTop" d="M 96 500 A 404 404 0 0 1 904 500" fill="none"/>
+    <path id="arcBottom" d="M 116 500 A 384 384 0 0 0 884 500" fill="none"/>
+    <path id="arcMotto" d="M 196 500 A 304 304 0 0 1 804 500" fill="none"/>
+  </defs>
+
+  <rect width="1000" height="1000" fill="#faf6ec"/>
+
+  <!-- 3A · hairline seal rings -->
+  <circle cx="500" cy="500" r="478" fill="none" stroke="#b68235" stroke-width="1.6"/>
+  <circle cx="500" cy="500" r="470" fill="none" stroke="#b68235" stroke-width="0.8" opacity="0.75"/>
+  <circle cx="500" cy="500" r="452" fill="none" stroke="#b68235" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- circumscribed titles -->
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="7"
+        fill="#232323" text-anchor="middle">
+    <textPath href="#arcTop" startOffset="50%">DR. ABDULLA AL MANDOUS</textPath>
+  </text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing="4.5"
+        fill="#5a5245" text-anchor="middle">
+    <textPath href="#arcBottom" startOffset="50%">FOR WMO PRESIDENT · RE-ELECTION · 2027–2031</textPath>
+  </text>
+
+  <!-- side compass points on the text band -->
+  <use href="#compassStar" transform="translate(78,500) scale(1.15)"/>
+  <use href="#compassStar" transform="translate(922,500) scale(1.15)"/>
+
+  <!-- 2A · the gold line -->
+  <circle cx="500" cy="500" r="358" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <circle cx="500" cy="500" r="348" fill="none" stroke="#b68235" stroke-width="0.7" opacity="0.55"/>
+
+  <!-- 1C · acrostic pillars: five stars, one per value, pentagon studding the hairline rings -->
+  <g>
+    <circle cx="500" cy="35" r="13" fill="#faf6ec"/>
+    <circle cx="942.3" cy="356.3" r="13" fill="#faf6ec"/>
+    <circle cx="773.3" cy="876.2" r="13" fill="#faf6ec"/>
+    <circle cx="226.7" cy="876.2" r="13" fill="#faf6ec"/>
+    <circle cx="57.7" cy="356.3" r="13" fill="#faf6ec"/>
+    <use href="#compassStar" transform="translate(500,35) scale(0.72)"/>
+    <use href="#compassStar" transform="translate(942.3,356.3) scale(0.72)"/>
+    <use href="#compassStar" transform="translate(773.3,876.2) scale(0.72)"/>
+    <use href="#compassStar" transform="translate(226.7,876.2) scale(0.72)"/>
+    <use href="#compassStar" transform="translate(57.7,356.3) scale(0.72)"/>
+  </g>
+
+  <!-- 2B · wind strokes sweeping behind the central star -->
+  <g fill="none">
+    <path d="M 185 505 C 330 430, 500 468, 660 430 S 800 372, 815 360" stroke="url(#wind)" stroke-width="3.4"/>
+    <path d="M 195 535 C 350 470, 520 505, 672 466 S 796 414, 806 404" stroke="url(#wind)" stroke-width="1.8" opacity="0.75"/>
+    <path d="M 215 565 C 370 512, 540 542, 686 504 S 786 458, 792 450" stroke="url(#wind)" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- central compass star with halo -->
+  <circle cx="500" cy="424" r="188" fill="url(#glow)"/>
+  <use href="#compassStar" transform="translate(500,424) scale(8.6)"/>
+
+  <!-- 1B · chrome gold wordmark -->
+  <text x="503" y="712" font-family="Georgia, 'Times New Roman', serif" font-size="104" font-weight="bold"
+        letter-spacing="14" text-anchor="middle" fill="url(#gold)" stroke="#8a5d1f" stroke-width="1.1">EMPWR</text>
+
+  <!-- motto arcing over the star -->
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="3.4"
+        fill="#232323" text-anchor="middle">
+    <textPath href="#arcMotto" startOffset="50%">ELEVATE · MOBILIZE · PROTECT · WIN · REFORM</textPath>
+  </text>
+
+  <!-- colophon star below the wordmark -->
+  <use href="#compassStar" transform="translate(500,762) scale(1.05)"/>
+</svg>
