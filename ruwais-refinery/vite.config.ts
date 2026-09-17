@@ -35,6 +35,8 @@ function serveDataDir(): Plugin {
 }
 
 export default defineConfig({
+  // Relative base so the built app also works when hosted under a subpath.
+  base: './',
   plugins: [serveDataDir()],
   server: { port: 5173, strictPort: true },
 });

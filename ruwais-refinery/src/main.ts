@@ -15,10 +15,10 @@ async function boot(): Promise<void> {
   let appData: AppData;
   try {
     const [units, flows, scenarios, i18n] = await Promise.all([
-      loadJson<AppData['units']>('/data/units.json'),
-      loadJson<AppData['flows']>('/data/flows.json'),
-      loadJson<AppData['scenarios']>('/data/scenarios.json'),
-      loadJson<AppData['i18n']>('/data/i18n.json'),
+      loadJson<AppData['units']>('data/units.json'),
+      loadJson<AppData['flows']>('data/flows.json'),
+      loadJson<AppData['scenarios']>('data/scenarios.json'),
+      loadJson<AppData['i18n']>('data/i18n.json'),
     ]);
     appData = { units, flows, scenarios, i18n };
   } catch (e) {
