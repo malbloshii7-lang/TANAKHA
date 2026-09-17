@@ -83,7 +83,7 @@ html, body, #app { margin: 0; height: 100%; overflow: hidden; background: var(--
   padding: 14px; overflow-y: auto; z-index: 15;
   backdrop-filter: blur(4px);
 }
-#unit-panel { left: 12px; }
+#unit-panel { left: 12px; bottom: 270px; } /* ends above the legend */
 #scenario-panel { right: 12px; }
 [dir='rtl'] #unit-panel { left: auto; right: 12px; }
 [dir='rtl'] #scenario-panel { right: auto; left: 12px; }
@@ -180,7 +180,7 @@ html, body, #app { margin: 0; height: 100%; overflow: hidden; background: var(--
     width: auto; max-height: 44vh;
   }
   #unit-panel { z-index: 17; }
-  #legend { bottom: auto; top: 96px; max-width: 150px; font-size: 10px; padding: 6px 8px; }
+  #legend { bottom: auto; top: 170px; max-width: 150px; max-height: 34vh; overflow-y: auto; font-size: 10px; padding: 6px 8px; }
   #legend .cols { flex-direction: column; gap: 4px; }
   #tour-box, #trace-box { bottom: 8px; }
   #search { width: 110px; }
