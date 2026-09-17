@@ -1,0 +1,79 @@
+{
+  "$comment": "Volumes are representative kbpd (thousand barrels/day) per scenario A/B/C, derived from public assays + unit capacities. They illustrate relative magnitudes, not a rigorous mass balance. stream keys map to colors in the legend.",
+  "streams": {
+    "crude":    { "name_en": "Crude oil",          "name_ar": "نفط خام",          "color": "#3d2b1f" },
+    "gas":      { "name_en": "Gas / LPG",          "name_ar": "غاز / غاز مسال",   "color": "#e8e8e8" },
+    "naphtha":  { "name_en": "Naphtha / gasoline", "name_ar": "نافثا / بنزين",    "color": "#e8c832" },
+    "jet":      { "name_en": "Kerosene / jet",     "name_ar": "كيروسين / وقود طائرات", "color": "#7ec8e8" },
+    "diesel":   { "name_en": "Diesel / gasoil",    "name_ar": "ديزل",             "color": "#4caf50" },
+    "residue":  { "name_en": "Residue / fuel oil", "name_ar": "متبقيات / زيت وقود", "color": "#8a5a2b" },
+    "hydrogen": { "name_en": "Hydrogen",           "name_ar": "هيدروجين",         "color": "#b07ce8" },
+    "sulfur":   { "name_en": "Sulfur / H2S",       "name_ar": "كبريت",            "color": "#e89020" }
+  },
+  "flows": [
+    { "from": "habshan_inlet", "to": "crude_tanks", "stream": "crude",   "volume": { "A": 417, "B": 0,   "C": 0 } },
+    { "from": "habshan_inlet", "to": "ctx_east",    "stream": "crude",   "volume": { "A": 420, "B": 420, "C": 420 }, "context": true },
+    { "from": "crude_jetty",   "to": "crude_tanks", "stream": "crude",   "volume": { "A": 0,   "B": 420, "C": 420 } },
+    { "from": "crude_tanks",   "to": "cdu",         "stream": "crude",   "volume": { "A": 417, "B": 420, "C": 420 } },
+
+    { "from": "cdu", "to": "sgp",  "stream": "gas",     "volume": { "A": 12,  "B": 8,   "C": 8 } },
+    { "from": "cdu", "to": "nht",  "stream": "naphtha", "volume": { "A": 113, "B": 84,  "C": 67 } },
+    { "from": "cdu", "to": "kht",  "stream": "jet",     "volume": { "A": 63,  "B": 55,  "C": 46 } },
+    { "from": "cdu", "to": "dht",  "stream": "diesel",  "volume": { "A": 100, "B": 88,  "C": 80 } },
+    { "from": "cdu", "to": "ard",  "stream": "residue", "volume": { "A": 0,   "B": 185, "C": 177 } },
+    { "from": "cdu", "to": "rfcc", "stream": "residue", "volume": { "A": 89,  "B": 0,   "C": 0 } },
+    { "from": "cdu", "to": "vdu",  "stream": "residue", "volume": { "A": 40,  "B": 0,   "C": 42 } },
+
+    { "from": "ard", "to": "rfcc", "stream": "residue", "volume": { "A": 0, "B": 127, "C": 127 } },
+    { "from": "ard", "to": "vdu",  "stream": "residue", "volume": { "A": 0, "B": 48,  "C": 45 } },
+
+    { "from": "vdu", "to": "hcu",     "stream": "residue", "volume": { "A": 28, "B": 40, "C": 55 } },
+    { "from": "vdu", "to": "fo_tank", "stream": "residue", "volume": { "A": 12, "B": 16, "C": 32 } },
+
+    { "from": "rfcc", "to": "ght",     "stream": "naphtha", "volume": { "A": 44, "B": 63, "C": 62 } },
+    { "from": "rfcc", "to": "sgp",     "stream": "gas",     "volume": { "A": 16, "B": 23, "C": 22 } },
+    { "from": "rfcc", "to": "dht",     "stream": "diesel",  "volume": { "A": 18, "B": 25, "C": 25 } },
+    { "from": "rfcc", "to": "fo_tank", "stream": "residue", "volume": { "A": 8,  "B": 11, "C": 12 } },
+
+    { "from": "hcu", "to": "blend_header", "stream": "naphtha", "volume": { "A": 4,  "B": 6,  "C": 8 } },
+    { "from": "hcu", "to": "jet_tank",     "stream": "jet",     "volume": { "A": 10, "B": 14, "C": 18 } },
+    { "from": "hcu", "to": "diesel_tank",  "stream": "diesel",  "volume": { "A": 13, "B": 18, "C": 25 } },
+
+    { "from": "nht",  "to": "ccr",          "stream": "naphtha", "volume": { "A": 70, "B": 44, "C": 35 } },
+    { "from": "nht",  "to": "isom",         "stream": "naphtha", "volume": { "A": 20, "B": 14, "C": 12 } },
+    { "from": "nht",  "to": "blend_header", "stream": "naphtha", "volume": { "A": 23, "B": 26, "C": 20 } },
+    { "from": "ccr",  "to": "blend_header", "stream": "naphtha", "volume": { "A": 63, "B": 40, "C": 32 } },
+    { "from": "isom", "to": "blend_header", "stream": "naphtha", "volume": { "A": 19, "B": 13, "C": 11 } },
+    { "from": "ght",  "to": "blend_header", "stream": "naphtha", "volume": { "A": 42, "B": 60, "C": 59 } },
+    { "from": "blend_header", "to": "gasoline_tank", "stream": "naphtha", "volume": { "A": 130, "B": 127, "C": 117 } },
+
+    { "from": "kht", "to": "jet_tank",    "stream": "jet",    "volume": { "A": 63,  "B": 55,  "C": 46 } },
+    { "from": "dht", "to": "diesel_tank", "stream": "diesel", "volume": { "A": 118, "B": 113, "C": 105 } },
+
+    { "from": "sgp", "to": "lpg_sphere",              "stream": "gas", "volume": { "A": 14, "B": 15, "C": 14 } },
+    { "from": "sgp", "to": "propylene_sphere",        "stream": "gas", "volume": { "A": 8,  "B": 11, "C": 11 } },
+    { "from": "propylene_sphere", "to": "ctx_borouge","stream": "gas", "volume": { "A": 8,  "B": 11, "C": 11 }, "context": true },
+
+    { "from": "ccr", "to": "hmu", "stream": "hydrogen", "volume": { "A": 8,  "B": 5,  "C": 4 }, "note_en": "Reformer by-product H2 joins the header (shown into HMU as the H2 hub)" },
+    { "from": "hmu", "to": "ard", "stream": "hydrogen", "volume": { "A": 0,  "B": 40, "C": 50 } },
+    { "from": "hmu", "to": "hcu", "stream": "hydrogen", "volume": { "A": 10, "B": 14, "C": 19 } },
+    { "from": "hmu", "to": "dht", "stream": "hydrogen", "volume": { "A": 5,  "B": 9,  "C": 13 } },
+    { "from": "hmu", "to": "nht", "stream": "hydrogen", "volume": { "A": 3,  "B": 4,  "C": 5 } },
+
+    { "from": "ard", "to": "aru", "stream": "sulfur", "volume": { "A": 0, "B": 14, "C": 22 } },
+    { "from": "dht", "to": "aru", "stream": "sulfur", "volume": { "A": 3, "B": 6,  "C": 9 } },
+    { "from": "sws", "to": "sru", "stream": "sulfur", "volume": { "A": 2, "B": 5,  "C": 8 } },
+    { "from": "aru", "to": "sru", "stream": "sulfur", "volume": { "A": 5, "B": 18, "C": 28 } },
+    { "from": "sru", "to": "sulfur_pad", "stream": "sulfur", "volume": { "A": 4, "B": 10, "C": 18 }, "note_en": "≈400 / 1,000 / 1,800 t/d elemental sulfur — thickness scaled for visibility" },
+
+    { "from": "gasoline_tank", "to": "product_jetty", "stream": "naphtha", "volume": { "A": 95, "B": 92, "C": 85 } },
+    { "from": "gasoline_tank", "to": "truck_rack",    "stream": "naphtha", "volume": { "A": 35, "B": 35, "C": 32 } },
+    { "from": "jet_tank",      "to": "product_jetty", "stream": "jet",     "volume": { "A": 50, "B": 46, "C": 42 } },
+    { "from": "jet_tank",      "to": "truck_rack",    "stream": "jet",     "volume": { "A": 23, "B": 23, "C": 22 } },
+    { "from": "diesel_tank",   "to": "product_jetty", "stream": "diesel",  "volume": { "A": 90, "B": 90, "C": 88 } },
+    { "from": "diesel_tank",   "to": "truck_rack",    "stream": "diesel",  "volume": { "A": 41, "B": 41, "C": 42 } },
+    { "from": "fo_tank",       "to": "product_jetty", "stream": "residue", "volume": { "A": 20, "B": 27, "C": 44 } },
+    { "from": "lpg_sphere",    "to": "product_jetty", "stream": "gas",     "volume": { "A": 14, "B": 15, "C": 14 } },
+    { "from": "sulfur_pad",    "to": "product_jetty", "stream": "sulfur",  "volume": { "A": 4,  "B": 10, "C": 18 } }
+  ]
+}

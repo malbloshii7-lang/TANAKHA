@@ -1,0 +1,76 @@
+{
+  "$comment": "Crude specs are public/approx (cited in SOURCES.md). Yields and utilizations are REPRESENTATIVE estimates derived from public assays + unit capacities — ADNOC publishes no per-crude yields. Feed sulfur t/d = barrels x density(API) x sulfur wt%, formula shown in UI.",
+  "crudes": {
+    "murban":        { "name_en": "Murban",        "name_ar": "مربان",        "api": 40,   "sulfur_pct": 0.74, "tag": "public",  "color": "#c8a84b" },
+    "upper_zakum":   { "name_en": "Upper Zakum",   "name_ar": "زاكوم العليا", "api": 34,   "sulfur_pct": 1.75, "tag": "public",  "color": "#a06a3a" },
+    "basrah_medium": { "name_en": "Basrah Medium", "name_ar": "البصرة المتوسط", "api": 27.9, "sulfur_pct": 3.0,  "tag": "public",  "color": "#6f4425" },
+    "basrah_heavy":  { "name_en": "Basrah Heavy",  "name_ar": "البصرة الثقيل", "api": 24,   "sulfur_pct": 4.05, "tag": "public",  "color": "#4d2e18" }
+  },
+  "scenarios": {
+    "A": {
+      "name_en": "A · Murban diet (pre-CFP baseline)",
+      "name_ar": "أ · نظام خام مربان (قبل مشروع المرونة)",
+      "short_en": "Murban", "short_ar": "مربان",
+      "feed": [{ "crude": "murban", "kbpd": 417 }],
+      "tank_grades": ["murban", "murban", "murban", "murban", "murban", "murban"],
+      "cdu_cuts_pct": { "gas": 3, "naphtha": 27, "jet": 15, "diesel": 24, "residue": 31 },
+      "yields_pct": { "gasoline": 30, "diesel": 31, "jet": 17, "lpg": 4, "propylene": 2, "fuel_oil": 5, "sulfur": 0.7, "other": 10.3 },
+      "stats": {
+        "feed_sulfur_tpd": { "value": 400, "tag": "approx", "detail_en": "417 kb/d × ~131 kg/bbl × 0.74% S ≈ 400 t/d" },
+        "h2_demand_pct":   { "value": 35, "tag": "representative" },
+        "ard_util_pct":    { "value": 0,  "tag": "representative", "detail_en": "ARD did not exist pre-CFP" },
+        "rfcc_util_pct":   { "value": 70, "tag": "representative" },
+        "hcu_util_pct":    { "value": 50, "tag": "representative" },
+        "murban_freed_kbpd": { "value": 0, "tag": "public" }
+      },
+      "why_en": "The baseline: Ruwais West was built to run the UAE's own light, sweet Murban — easy to refine, little sulfur to handle. But every barrel burned at home is a premium export barrel not sold. Murban trades at a premium precisely because it is light and sweet, which makes feeding it to your own refinery the most expensive possible diet.",
+      "why_ar": "خط الأساس: بُنيت مصفاة الرويس الغربية لتكرير خام مربان الخفيف الحلو، لكن كل برميل يُكرر محليًا هو برميل تصدير ممتاز لا يُباع."
+    },
+    "B": {
+      "name_en": "B · Upper Zakum diet (post-CFP typical)",
+      "name_ar": "ب · نظام زاكوم العليا (بعد مشروع المرونة)",
+      "short_en": "Upper Zakum", "short_ar": "زاكوم العليا",
+      "feed": [{ "crude": "upper_zakum", "kbpd": 420 }],
+      "tank_grades": ["upper_zakum", "upper_zakum", "upper_zakum", "upper_zakum", "upper_zakum", "murban"],
+      "cdu_cuts_pct": { "gas": 2, "naphtha": 20, "jet": 13, "diesel": 21, "residue": 44 },
+      "yields_pct": { "gasoline": 30, "diesel": 31, "jet": 16, "lpg": 4, "propylene": 3, "fuel_oil": 6, "sulfur": 1.7, "other": 8.3 },
+      "stats": {
+        "feed_sulfur_tpd": { "value": 1000, "tag": "approx", "detail_en": "420 kb/d × ~136 kg/bbl × 1.75% S ≈ 1,000 t/d" },
+        "h2_demand_pct":   { "value": 70, "tag": "representative" },
+        "ard_util_pct":    { "value": 100, "tag": "representative", "detail_en": "185 kb/d residue vs 177 kbpsd capacity" },
+        "rfcc_util_pct":   { "value": 100, "tag": "representative" },
+        "hcu_util_pct":    { "value": 70, "tag": "representative" },
+        "murban_freed_kbpd": { "value": 420, "tag": "public", "detail_en": "MEES / S&P: Murban exports hit 8-year highs after CFP" }
+      },
+      "why_en": "The CFP arbitrage at work: Ruwais West now digests offshore Upper Zakum — heavier, 2.5× the sulfur — while the freed ~420,000 b/d of Murban sails away at a premium. The product slate barely changes; what changes is everything behind it: the ARD runs flat out, hydrogen demand doubles, and the sulfur plant handles 1,000 t/d instead of 400. Same products, cheaper feed — that difference is the project's payback.",
+      "why_ar": "مراجحة مشروع المرونة: تعالج المصفاة الآن خام زاكوم العليا الأثقل بينما يُصدَّر خام مربان المحرر بعلاوة سعرية. المنتجات لا تتغير تقريبًا، لكن استهلاك الهيدروجين يتضاعف وحمل الكبريت يرتفع."
+    },
+    "C": {
+      "name_en": "C · Basrah-led sour diet (opportunistic imports)",
+      "name_ar": "ج · نظام البصرة الحامض (استيراد انتهازي)",
+      "short_en": "Basrah blend", "short_ar": "مزيج البصرة",
+      "feed": [
+        { "crude": "basrah_medium", "kbpd": 280 },
+        { "crude": "basrah_heavy", "kbpd": 70 },
+        { "crude": "upper_zakum", "kbpd": 70 }
+      ],
+      "tank_grades": ["basrah_medium", "basrah_medium", "basrah_medium", "basrah_heavy", "upper_zakum", "murban"],
+      "cdu_cuts_pct": { "gas": 2, "naphtha": 16, "jet": 11, "diesel": 19, "residue": 52 },
+      "yields_pct": { "gasoline": 28, "diesel": 31, "jet": 15, "lpg": 3, "propylene": 3, "fuel_oil": 10, "sulfur": 3.0, "other": 7 },
+      "stats": {
+        "feed_sulfur_tpd": { "value": 1800, "tag": "approx", "detail_en": "blend ≈ 420 kb/d × ~140 kg/bbl × ~3% S ≈ 1,800 t/d (pure Basrah Heavy would be ~2,400)" },
+        "h2_demand_pct":   { "value": 90, "tag": "representative" },
+        "ard_util_pct":    { "value": 100, "tag": "representative" },
+        "rfcc_util_pct":   { "value": 100, "tag": "representative" },
+        "hcu_util_pct":    { "value": 95, "tag": "representative" },
+        "murban_freed_kbpd": { "value": 420, "tag": "approx", "detail_en": "plus the margin captured on discounted third-party barrels" }
+      },
+      "why_en": "The CFP logic extended to anyone's discounted barrels: when Basrah grades trade cheap enough, ADNOC buys them, refines them, and exports yet more Murban — MEES documented Basrah cargoes from April 2024 and even Kuwaiti crude in 2025. But this is opportunistic, not permanent: in mid-2025 Murban flowed back into Ruwais when the arbitrage closed. The limits are physical: fuel oil roughly doubles, and sulfur handling (~1,800 t/d, near the plant's ceiling) decides how sour the diet can get.",
+      "why_ar": "منطق المراجحة موسّعًا: عندما تكون خامات البصرة رخيصة بما يكفي، تشتريها أدنوك وتكررها وتصدّر مزيدًا من مربان. لكنه وضع انتهازي وليس دائمًا، وحدود معالجة الكبريت هي التي تقرر مدى حموضة النظام."
+    }
+  },
+  "notes": {
+    "yields_disclaimer_en": "Yields are representative estimates derived from public crude assays and unit capacities. ADNOC does not publish per-crude product yields for Ruwais.",
+    "yields_disclaimer_ar": "النسب تقديرات توضيحية مشتقة من تحاليل الخام العامة وسعات الوحدات، ولا تنشر أدنوك أرقامًا رسمية."
+  }
+}
