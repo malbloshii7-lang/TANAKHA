@@ -251,7 +251,7 @@ function back(text, x, y, align, p, size = 14, ls = 3) {
   if (p <= 0) return;
   ctx.save();
   setText(`600 ${size}px ${F_MONO}`, ls, 'ltr', 'left');
-  const w = ctx.measureText(text).width, x0 = align === 'right' ? x - w : x;
+  const w = ctx.measureText(text).width, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
   PAPER_PAT.setTransform(ctx.getTransform().inverse());
   ctx.globalAlpha = SA * p * 0.92; ctx.fillStyle = PAPER_PAT; ctx.fillRect(x0 - 7, y - size - 3, w + 12, size + 10);
   ctx.restore();
@@ -344,7 +344,7 @@ scene({
       this.cols.push(i < 10 ? OCHRE : i < 20 ? BLUE : i < 30 ? RED : SEPIA);
     }
     this.rings = [el(cx, cy, 256, 256, 0, TAU, 5), el(cx, cy, 248, 248, 0, TAU, 6), el(cx, cy, 180, 180, 0, TAU, 7), el(cx, cy, 124, 124, 0, TAU, 8), el(cx, cy, 382, 382, 0, TAU, 9, 1.1)];
-    const hy = cy + 36, hw = Math.sqrt(124 * 124 - 36 * 36);
+    const hy = cy + 36, hw = 130; // trimmed by the medallion's circle when drawn
     this.hy = hy;
     this.horizon = ln(cx - hw, hy, cx + hw, hy, 12, 0.4);
     this.dunes = [pl([[cx - 110, hy + 38], [cx - 60, hy + 22], [cx - 10, hy + 34], [cx + 40, hy + 18], [cx + 105, hy + 40]], false, 13, 0.5),
@@ -375,7 +375,8 @@ scene({
     this.stolen.forEach(([x, y], k) => { const q = easeOut(prog(lt, 5.6 + k * 0.12, 0.4)); disc(x, y, 5.5 * q, RED, 0.9); });
     stroke(this.spiral, easeInOut(prog(lt, 4.2, 4.6)), INK, 2, 0.8);
     ctx.restore();
-    // centre: horizon, dunes, Suhail rising (clipped above the horizon)
+    // centre: horizon, dunes, Suhail rising, all inside the medallion (which zooms with the wheel)
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, 122 * z, 0, TAU); ctx.clip();
     stroke(this.horizon, prog(lt, 2.0, 1.2), INK, 1.4, 0.8);
     this.dunes.forEach((d, i) => stroke(d, prog(lt, 2.4 + i * 0.3, 1.2), INK, 1.1, 0.6));
     const rise = easeInOut(prog(lt, 3.6, 3.2)), sy = this.hy + 30 - 96 * rise;
@@ -386,7 +387,7 @@ scene({
       const a = (i / 16) * TAU, r1 = i % 2 ? 44 : 56, q = prog(lt, 6.2 + i * 0.03, 0.5);
       stroke(ln(cx + 32 * Math.cos(a), sy + 32 * Math.sin(a), cx + r1 * Math.cos(a), sy + r1 * Math.sin(a), 60 + i, 0.15), q, INK, 1, 0.5);
     }
-    ctx.restore();
+    ctx.restore(); ctx.restore();
   },
 });
 
@@ -430,7 +431,7 @@ scene({
     this.awning = [ln(-146, -54, -147, -84, 51, 0.1), ln(-112, -44, -112, -76, 52, 0.1), new P(wob(quad([-152, -84], [-130, -91], [-106, -76], 8), 53, 0.3))];
     this.mast = ln(18, -22, 50, -262, 43, 0.3);
     this.yard = ln(138, -200, -166, -290, 44, 0.4);
-    const Th = [132, -194], Pk = [-160, -283], Cl = [-140, -80], Tk = [132, -52];
+    const Th = [132, -202], Pk = [-160, -288], Cl = [-140, -80], Tk = [132, -52]; // the head is laced to the yard
     this.sail = new P(wob([Th, Pk].concat(quad(Pk, [-174, -180], Cl, 16).slice(1), quad(Cl, [0, -54], Tk, 18).slice(1)), 45, 0.5), true);
     this.sailMat = []; // woven palm matting: two families of lines
     for (let i = -14; i < 16; i++) { const y0 = -180 + i * 12; this.sailMat.push(new P([[-200, y0 - 0.296 * 340], [140, y0]])); }
@@ -446,11 +447,11 @@ scene({
       this.waves.push(new P(wob(pts, 50 + row, 0.4)));
     }
     this.sea = ln(990, 826, 1880, 826, 55, 0.5);
-    // the monsoon: low over the water, filling the sail from behind
+    // the monsoon: filling the sail from behind and skimming the water; the sail and the hull hide the stretches behind them
     this.winds = [
-      new P(wob(cubic([990, 772], [1300, 730], [1600, 792], [1866, 744]), 60, 1)),
-      new P(wob(cubic([990, 700], [1320, 660], [1620, 722], [1866, 672]), 61, 1)),
-      new P(wob(cubic([1060, 628], [1340, 594], [1620, 650], [1860, 610]), 62, 1)),
+      new P(wob(cubic([990, 810], [1280, 782], [1560, 818], [1812, 790]), 60, 1)),
+      new P(wob(cubic([990, 700], [1300, 660], [1580, 722], [1812, 676]), 61, 1)),
+      new P(wob(cubic([1060, 628], [1320, 594], [1580, 650], [1808, 614]), 62, 1)),
     ];
     this.scale = ln(1846, 826, 1846, 576, 70, 0.3);
   },
@@ -490,9 +491,11 @@ scene({
     fill(starP(1846, 552, 15 * sq, 6 * sq, 8), OCHRE, 0.95); stroke(starP(1846, 552, 15 * sq, 6 * sq, 8), sq, INK, 1, 0.8);
     // the ship, riding the swell in front of the wind; everything below the waterline is hidden by the sea
     const dx = 1170 + 10 * lt, dy = 798 + 5 * Math.sin(lt * 1.4);
+    const world = ctx.getTransform();
     ctx.save(); ctx.translate(dx, dy); ctx.rotate(0.02 * Math.sin(lt * 1.1));
     const hp = easeInOut(prog(lt, 1.0, 1.6)), sp = easeInOut(prog(lt, 2.2, 1.6));
-    ctx.save(); ctx.beginPath(); ctx.rect(-270, -420, 540, 448); ctx.clip();
+    // clip at the sea line itself (y 826 on the plate), so the hull always meets the water as she pitches and heaves
+    ctx.save(); const local = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 100, 900, 726); ctx.clip(); ctx.setTransform(local);
     if (sp > 0) mask(this.sail);
     const fq = easeOut(prog(lt, 3.4, 0.6)); // crew: the helmsman aft, two hands forward; the hull hides their legs
     if (fq > 0) this.crew.forEach(([x, y]) => { disc(x, y - 23, 3.8 * fq, INK, 0.85); stroke(new P([[x - 4.5, y - 16], [x, y - 18.5], [x + 4.5, y - 16]]), fq, INK, 2.2, 0.85); stroke(new P([[x, y - 18], [x, y - 7]]), fq, INK, 3, 0.85); });
@@ -572,12 +575,9 @@ scene({
     // the main yard lowered and the sail spread over it as an awning against the sun
     this.awnYard = ln(-104, -58, 74, -50, 149, 0.3);
     this.awning = new P(wob([[-104, -58], [74, -50]].concat(quad([74, -50], [-14, -30], [-104, -46], 18).slice(1)), 156, 0.6), true);
-    this.oars = [-80, -44, -8, 28, 64, 100].map((x, i) => { const y = yOn(sheer, x); return { p: ln(x - 18, y + 2, x + 46, y + 10, 170 + i, 0.2), blade: new P([[x + 38, y + 8], [x + 50, y + 11]]), tip: [x + 46, y + 10] }; });
-    // the working diver's lifeline from his hauler's hands; the stone rope, its stone being hauled up; the resting divers' ropes
-    this.yada = new P(wob([[58, yOn(sheer, 58) + 2], [74, 100], [89, 211]], 143, 0.5));
-    this.zubail = x => new P(wob([[20, yOn(sheer, 20) + 2], [22, x]], 142, 0.3));
-    this.qalta = [0, 1].map(i => { const o = this.oars[i]; return new P([o.tip, [o.tip[0] + 4, -1]]); });
-    this.anchorLine = new P(wob([[122, -26], [200, 90], [282, 210]], 157, 0.8));
+    // oars run out over the gunwale toward us, so they read as short strokes down to the water
+    this.oars = [-80, -44, -8, 28, 64, 100].map((x, i) => { const y = yOn(sheer, x); return { p: ln(x, y + 1, x + 7, -5, 170 + i, 0.1), blade: new P([[x + 6, -8], [x + 8, -1]]), tip: [x + 7, -5] }; });
+    this.bedPts = [[990, 1034], [1150, 1028], [1330, 1038], [1520, 1030], [1690, 1022], [1880, 1016]];
     this.bCrew = [-118, -60, 20, 56].map(x => [x, yOn(sheer, x) + 11]);
     this.bed = pl([[990, 1034], [1150, 1028], [1330, 1038], [1520, 1030], [1690, 1022], [1880, 1016]], false, 143, 0.6);
     // a pearl-oyster bed; the diver reaches for the open one
@@ -608,8 +608,13 @@ scene({
     stroke(this.surface, prog(lt, 0.6, 1.4), INK, 1.3, 0.65);
     this.waves.forEach((w, i) => stroke(w, prog(lt, 0.8 + i * 0.22, 2.2), BLUE, 1.2, 0.5));
     const bp = easeInOut(prog(lt, 1.6, 1.2));
-    ctx.save(); ctx.translate(1300 + 3 * Math.sin(lt * 0.9), 812 + 3 * Math.sin(lt * 1.3)); ctx.rotate(0.015 * Math.sin(lt * 1.1));
-    ctx.save(); ctx.beginPath(); ctx.rect(-220, -300, 460, 300); ctx.clip(); // above the waterline
+    // the boat heaves and pitches; B maps a point on the boat to the plate
+    const bx = 1300 + 3 * Math.sin(lt * 0.9), by = 812 + 3 * Math.sin(lt * 1.3), br = 0.015 * Math.sin(lt * 1.1), cr = Math.cos(br), sr = Math.sin(br);
+    const B = ([x, y]) => [bx + x * cr - y * sr, by + x * sr + y * cr], sheer = this.sheer, bed = x => yOn(this.bedPts, x);
+    const world = ctx.getTransform();
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(br);
+    // clip at the sea line itself (y 812 on the plate), so the hull always meets the water
+    ctx.save(); const local = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 100, 900, 712); ctx.clip(); ctx.setTransform(local);
     const cq = easeOut(prog(lt, 3.2, 0.6)); // the nakhoda aft, the haulers at the rail; the bulwark hides their legs
     if (cq > 0) this.bCrew.forEach(([x, y]) => { disc(x, y - 22, 3.6 * cq, INK, 0.85); stroke(new P([[x - 4.5, y - 15], [x, y - 17.5], [x + 4.5, y - 15]]), cq, INK, 2.2, 0.85); stroke(new P([[x, y - 17], [x, y - 6]]), cq, INK, 2.8, 0.85); });
     mask(this.boat); hatch(this.boat, [-130, -60, 135, 20], 0.3, 6, bp, INK, 1, 0.4, 146); stroke(this.boat, bp, INK, 2);
@@ -617,30 +622,37 @@ scene({
     stroke(this.bRail, bp, INK, 1.3, 0.8); stroke(this.stemHead, bp, INK, 2.2);
     this.poop.forEach(q => stroke(q, prog(lt, 2.4, 0.6), INK, 1.2, 0.8));
     ctx.restore();
+    // below the waterline the sea is drawn in section, so the submerged hull (~1.2 m draft) shows through the water, paler
+    ctx.save(); const local2 = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 812, 900, 60); ctx.clip(); ctx.setTransform(local2);
+    mask(this.boat); fill(this.boat, BLUE, 0.1 * bp); stroke(this.boat, bp, INK, 1.4, 0.45);
+    ctx.restore();
     stroke(this.boatMast, prog(lt, 2.4, 0.7), INK, 2.2); stroke(this.mizzen, prog(lt, 2.5, 0.6), INK, 1.8);
     const aq = easeOut(prog(lt, 2.8, 0.7)); // the sail spread as an awning
     fill(this.awning, OCHRE, 0.3 * aq); stroke(this.awning, aq, INK, 1.1, 0.8); stroke(this.awnYard, aq, INK, 2.2);
-    this.oars.forEach((o, i) => { const q = easeOut(prog(lt, 3.0 + i * 0.1, 0.5)); stroke(o.p, q, INK, 1.8, 0.85); stroke(o.blade, q, INK, 3.4, 0.85); });
-    stroke(this.anchorLine, easeInOut(prog(lt, 3.2, 1.6)), INK, 1, 0.55);
-    // the working diver on the bed, on his lifeline, reaching for an open oyster
-    stroke(this.yada, easeInOut(prog(lt, 3.6, 1.4)), INK, 1.1, 0.8);
-    const dq = easeOut(prog(lt, 4.6, 0.8));
+    this.oars.forEach((o, i) => { const q = easeOut(prog(lt, 3.0 + i * 0.1, 0.5)); stroke(o.p, q, INK, 1.8, 0.85); stroke(o.blade, q, INK, 3, 0.85); });
+    ctx.restore();
+    // everything in the water is drawn on the plate: it does not heave with the boat
+    // the anchor cable runs down and forward to a grapnel on the bed
+    const ax = 1582, ay = bed(1582) - 3, aq2 = easeInOut(prog(lt, 3.2, 1.6));
+    stroke(new P(quad(B([122, -26]), [1478, 900], [ax, ay], 20)), aq2, INK, 1, 0.55);
+    if (aq2 >= 1) [[[ax - 6, ay + 1], [ax + 7, ay + 2]], [[ax + 7, ay + 2], [ax + 11, ay - 3]], [[ax - 6, ay + 1], [ax - 9, ay - 4]]].forEach(sg => stroke(new P(sg), 1, INK, 1.4, 0.85));
+    // the working diver, feet on the bed, on his lifeline, reaching for an open oyster
+    const fx = 1392, fy = bed(1392) - 1, dq = easeOut(prog(lt, 4.6, 0.8)), sw = 0.8 * Math.sin(lt * 1.7);
+    stroke(new P(quad(B([58, yOn(sheer, 58) + 2]), [1372, 900], [fx - 1, fy - 12 + sw], 18)), easeInOut(prog(lt, 3.6, 1.4)), INK, 1.1, 0.8);
     if (dq > 0) {
-      const bob = 1.2 * Math.sin(lt * 1.7);
-      disc(90, 201 + bob, 2.8 * dq, INK, 0.85);
-      stroke(new P([[90, 204 + bob], [92, 213 + bob]]), dq, INK, 2.4, 0.85);
-      stroke(new P([[90, 206 + bob], [87, 199 + bob]]), dq, INK, 1.4, 0.85);
-      stroke(new P([[91, 206 + bob], [97, 211 + bob], [103, 214]]), dq, INK, 1.4, 0.85);
-      stroke(new P([[92, 213 + bob], [88, 221]]), dq, INK, 1.6, 0.85); stroke(new P([[92, 213 + bob], [97, 221]]), dq, INK, 1.6, 0.85);
-      disc(94, 210 + bob, 2 * dq, SEPIA, 0.7); // the net bag at his neck
+      disc(fx - 2, fy - 20 + sw, 2.8 * dq, INK, 0.85);
+      stroke(new P([[fx - 2, fy - 17 + sw], [fx, fy - 8]]), dq, INK, 2.4, 0.85);
+      stroke(new P([[fx - 2, fy - 15 + sw], [fx - 5, fy - 22 + sw]]), dq, INK, 1.4, 0.85);
+      stroke(new P([[fx - 1, fy - 15 + sw], [fx + 5, fy - 10], [fx + 11, fy - 4]]), dq, INK, 1.4, 0.85);
+      stroke(new P([[fx, fy - 8], [fx - 4, fy]]), dq, INK, 1.6, 0.85); stroke(new P([[fx, fy - 8], [fx + 5, fy]]), dq, INK, 1.6, 0.85);
+      disc(fx + 1, fy - 13 + sw, 2 * dq, SEPIA, 0.7); // the net bag at his neck
     }
     // the stone weight, hauled back up now that he is down
-    const sy = lerp(214, 36, easeInOut(prog(lt, 4.6, 4.2))), sq = easeOut(prog(lt, 3.6, 0.6));
-    if (sq > 0) { stroke(this.zubail(sy), sq, INK, 1, 0.75); fill(new P([[18, sy], [26, sy], [28, sy + 6], [16, sy + 6]], true), SEPIA, 0.85 * sq); }
+    const sx = 1322, sy = lerp(bed(1322) - 7, 846, easeInOut(prog(lt, 4.6, 4.2))), sq = easeOut(prog(lt, 3.6, 0.6));
+    if (sq > 0) { stroke(new P([B([20, yOn(sheer, 20) + 2]), [sx + 1, sy]]), sq, INK, 1, 0.75); fill(new P([[sx - 4, sy], [sx + 4, sy], [sx + 6, sy + 6], [sx - 6, sy + 6]], true), SEPIA, 0.85 * sq); }
     // two resting divers at the surface, each holding the rope tied to his oar
     const rq = easeOut(prog(lt, 3.4, 0.6));
-    if (rq > 0) this.qalta.forEach((q, i) => { stroke(q, rq, INK, 0.9, 0.7); const [x] = q.pts[1], hy = -2.6 + 0.8 * Math.sin(lt * 2 + i); disc(x + 1, hy, 2.8 * rq, INK, 0.85); stroke(new P([[x + 2, hy + 3], [x + 7, hy + 4]]), rq, INK, 1.4, 0.7); });
-    ctx.restore();
+    if (rq > 0) [0, 1].forEach(i => { const t = B(this.oars[i].tip), hx = t[0] + 5, hy = 809.4 + 0.8 * Math.sin(lt * 2 + i); stroke(new P([t, [hx + 1, hy + 2]]), rq, INK, 0.9, 0.7); disc(hx, hy, 2.8 * rq, INK, 0.85); });
     stroke(this.bed, prog(lt, 2.2, 1.6), INK, 1.2, 0.6);
     this.oysters.forEach((o, i) => {
       const q = easeOut(prog(lt, 4.4 + i * 0.08, 0.6));
@@ -674,7 +686,7 @@ scene({
     this.hajarFill = new P(hj, true);
     // Jebel Hafeet on the south horizon, as seen from Hili: steep east end, a broad knobbly crest a third of the way in,
     // a long even fall to the northern foothills (profile from the Copernicus 30 m elevation model, heights ×3)
-    const hp = [[0, 0.18], [0.06, 0.58], [0.12, 0.81], [0.19, 0.86], [0.25, 0.94], [0.31, 0.96], [0.34, 1], [0.38, 0.95], [0.44, 0.98], [0.5, 0.92], [0.56, 0.85], [0.62, 0.75], [0.69, 0.62], [0.75, 0.44], [0.81, 0.32], [0.88, 0.24], [0.94, 0.21], [1, 0.02]];
+    const hp = [[0, 0], [0.06, 0.58], [0.12, 0.81], [0.19, 0.86], [0.25, 0.94], [0.31, 0.96], [0.34, 1], [0.38, 0.95], [0.44, 0.98], [0.5, 0.92], [0.56, 0.85], [0.62, 0.75], [0.69, 0.62], [0.75, 0.44], [0.81, 0.32], [0.88, 0.24], [0.94, 0.21], [1, 0.02]];
     const hf = hp.map(([u, v]) => [1440 + 440 * u, HZ - 118 * v]);
     this.hafeet = new P(wob(hf, 242, 0.6));
     this.hafeetFill = new P(hf.concat([[1880, HZ], [1440, HZ]]), true);
@@ -685,12 +697,13 @@ scene({
     this.ys = x => yOn(S, x);
     this.surface = pl(S, false, 150, 0.6);
     this.ground = new P(S.concat([[1885, 900], [985, 900]]), true);
-    // the water table in the alluvium, and the saturated ground below it
-    const wt = [[985, 660], [1120, 668], [1400, 700], [1640, 730], [1885, 760]];
+    // the water table in the alluvium, and the saturated ground below it: it falls faster than the gallery, which lies below it
+    // upstream (the stretch that gathers water) and above it downstream (the stretch that only carries it), so the fields stay dry
+    const wt = [[985, 660], [1120, 668], [1380, 706], [1535, 730], [1650, 745], [1885, 772]];
     this.watertable = new P(wob(wt, 244, 0.4));
     this.wet = new P(wt.concat([[1885, 900], [985, 900]]), true);
     // the channel floor falls more gently than the ground, so the water surfaces at the oasis
-    const yg = x => 680 + 0.08 * (x - 1120);
+    const yg = x => 680 + 0.1 * (x - 1120); // gentler than the ground, and the slabs stay buried to the open channel
     this.yg = yg;
     this.galFloor = ln(1120, yg(1120), 1535, yg(1535), 245, 0.2);
     this.galRoof = ln(1120, yg(1120) - 9, 1420, yg(1420) - 9, 246, 0.2);
@@ -705,7 +718,7 @@ scene({
     const oc = []; for (let x = 1535; x <= 1650; x += 5) oc.push([x, Math.max(yg(1535), this.ys(x) + 5)]);
     this.open = new P(oc);
     this.openCut = new P(oc.concat(oc.slice().reverse().map(([x, y]) => [x, this.ys(x) - 1])), true);
-    this.openSides = []; for (let x = 1540; x < 1650; x += 9) this.openSides.push(ln(x, this.ys(x) - 1, x, this.ys(x) + 5, 270 + x, 0));
+    this.openSides = []; for (let x = 1540; x < 1650; x += 9) this.openSides.push(ln(x, this.ys(x) - 1, x, Math.max(yg(1535), this.ys(x) + 5), 270 + x, 0));
     // the distributor: a paved junction with a slab sluice gate, and field channels beyond
     const dy = this.ys(1656);
     this.dist = new P([[1650, dy - 2], [1672, dy - 2], [1672, dy + 7], [1650, dy + 7]], true);
@@ -748,7 +761,7 @@ scene({
     hatch(this.ground, [985, 580, 1885, 900], 0.9, 16, prog(lt, 1.0, 2.2), INK, 0.9, 0.16, 197);
     stroke(this.surface, p0, INK, 2);
     stroke(this.watertable, easeInOut(prog(lt, 1.6, 1.4)), BLUE, 1.4, 0.6, [10, 7], 0);
-    small('WATER TABLE', 992, 686, prog(lt, 2.6, 0.6), { size: 11, ls: 3, a: 0.55, col: BLUE });
+    back('WATER TABLE', 992, 686, 'left', prog(lt, 2.6, 0.6), 11, 3); small('WATER TABLE', 992, 686, prog(lt, 2.6, 0.6), { size: 11, ls: 3, a: 0.55, col: BLUE });
     // the gallery and its shafts
     const gq = easeInOut(prog(lt, 2.0, 1.6));
     mask(this.galCut); stroke(this.galFloor, gq, INK, 1.4, 0.85); stroke(this.galRoof, gq, INK, 1.4, 0.85); stroke(this.galEnd, gq, INK, 1.2, 0.8);
@@ -773,7 +786,7 @@ scene({
     this.sideCh.forEach(q => stroke(q, easeOut(prog(lt, 5.8, 0.6)), BLUE, 1.6, 0.7));
     this.cereal.forEach((q, i) => stroke(q, easeOut(prog(lt, 6.0 + (i % 6) * 0.05, 0.5)), OCHRE, 1.2, 0.8));
     const lq = easeOut(prog(lt, 4.4, 0.8));
-    [['GALLERY', 1236, 728], ['CUT-AND-COVER', 1420, 742], ['OPEN CHANNEL', 1560, 756]].forEach(([t, x, y]) => { back(t, x, y, 'left', lq, 11, 3); small(t, x, y, lq, { size: 11, ls: 3, a: 0.65 }); });
+    [['GALLERY', 1236, 728], ['CUT-AND-COVER', 1420, 752], ['OPEN CHANNEL', 1560, 776]].forEach(([t, x, y]) => { back(t, x, y, 'left', lq, 11, 3); small(t, x, y, lq, { size: 11, ls: 3, a: 0.65 }); });
     this.palms.forEach((p, i) => {
       const q = easeOut(prog(lt, 5.8 + i * 0.3, 1.0));
       stroke(p.trunk, q, INK, 3 * p.s, 0.9);
@@ -868,7 +881,7 @@ scene({
   },
 });
 
-// VI · Al Matarat — Zayed International from runway 31L: fog lifts off Terminal A, the crescent tower stands by, a departure climbs away
+// VI · Al Matarat — Zayed International from runway 31L: fog lifts off Terminal A, the crescent tower stands by, an arrival lands
 scene({
   start: 46, dur: 8, num: 'VI', name: 'AL MATARAT', ar: 'المطارات', readout: 'AVIATION + TOURISM · 18.2% OF UAE GDP · 2023',
   kicker: '24-HOUR WEATHER WATCH · 10 UAE AIRPORTS',
@@ -889,41 +902,48 @@ scene({
     }
     this.lights = [];
     for (let z = 0; z < 24; z++) for (const side of [-1, 1]) this.lights.push({ z, x: VX + side * HW(z) * 1.05, y: Y(z), r: 6 / (1 + K * z) });
-    // departing aircraft, seen from behind, drawn around (0, 0)
+    // an arriving widebody seen from behind, drawn around its fuselage centre at 9.23 px to the metre: 65 m span, 6.5 m
+    // fuselage, engines ~9.7 m out, gear down with the main wheels 6 m below the fuselage centre and the nacelles clear of the ground
     this.plane = {
       fus: el(0, 0, 30, 30, 0, TAU, 510, 0.2),
-      fin: new P([[-7, -26], [-4, -124], [7, -124], [10, -26]], true),
-      wings: [new P([[-27, 2], [-300, -24], [-300, -15], [-27, 13]], true), new P([[27, 2], [300, -24], [300, -15], [27, 13]], true)],
-      stabs: [new P([[-6, -108], [-72, -102], [-72, -95], [-6, -98]], true), new P([[6, -108], [72, -102], [72, -95], [6, -98]], true)],
-      engs: [el(-112, 32, 26, 26, 0, TAU, 511, 0.2), el(112, 32, 26, 26, 0, TAU, 512, 0.2)],
+      fin: new P([[-7, -29], [-4, -112], [7, -112], [10, -29]], true),
+      wings: [new P([[-29, 2], [-300, -24], [-300, -15], [-29, 12]], true), new P([[29, 2], [300, -24], [300, -15], [29, 12]], true)],
+      stabs: [new P([[-26, -14], [-88, -26], [-88, -20], [-26, -7]], true), new P([[26, -14], [88, -26], [88, -20], [26, -7]], true)],
+      engs: [el(-92, 26, 22, 22, 0, TAU, 511, 0.2), el(92, 26, 22, 22, 0, TAU, 512, 0.2)],
+      gear: [ln(-50, 10, -50, 44, 514, 0), ln(50, 10, 50, 44, 515, 0), ln(0, 29, 0, 45, 516, 0)],
+      tyres: [-57, -50, 43, 50, -7, 0].map((x, i) => new P([[x, i > 3 ? 46 : 43], [x + 7, i > 3 ? 46 : 43], [x + 7, 55], [x, 55]], true)),
     };
-    // the AUH control tower: a crescent (said to recall a dhow's sail) on a five-storey base, 1 km right of 31L
-    this.towerBase = new P([[1732, 1000], [1732, 944], [1880, 944], [1880, 1000]], true);
-    this.baseFloors = [956, 968, 980, 990].map((y, i) => ln(1738, y, 1874, y, 525 + i, 0.2));
-    const outer = quad([1874, 944], [1882, 560], [1784, 312], 28), inner = quad([1804, 944], [1836, 600], [1784, 312], 28);
-    this.crescent = new P(wob(outer.concat(inner.slice(0, -1).reverse()), 522, 0.3), true);
-    this.cab = new P([[1752, 458], [1806, 458], [1806, 414], [1742, 414]], true);
-    this.cabMull = [1752, 1762, 1772, 1782, 1792].map((x, i) => ln(x + 1, 456, x - 1, 416, 530 + i, 0));
-    this.cabRoof = ln(1736, 410, 1812, 410, 523, 0.2);
-    this.cabFloor = ln(1748, 463, 1808, 463, 524, 0.2);
-    this.cabStrut = ln(1756, 464, 1808, 526, 529, 0.2);
-    // Terminal A on the horizon: one roof over the central hall swelling into a shallow dune, piers of rolling arches
-    const bays = (x0, n, w) => { let pts = []; for (let i = 0; i < n; i++) pts = pts.concat(quad([x0 + i * w, 492], [x0 + i * w + w / 2, 485], [x0 + (i + 1) * w, 492], 6).slice(i ? 1 : 0)); return pts; };
-    this.pierL = new P(bays(1466, 5, 18)); this.pierR = new P(bays(1676, 5, 18));
-    this.hallRoof = new P(cubic([1556, 491], [1578, 468], [1640, 458], [1676, 491], 30));
-    this.hallSeams = [5, 10].map(d => new P(cubic([1566, 491 - d * 0.3], [1584, 468 + d], [1636, 458 + d], [1668, 491 - d * 0.3], 24)));
-    this.termFace = new P([[1466, 500], [1466, 492]].concat(bays(1466, 5, 18), cubic([1556, 491], [1578, 468], [1640, 458], [1676, 491], 30).slice(1), bays(1676, 5, 18).slice(1), [[1766, 500]]), true);
-    this.termMull = []; for (let x = 1470; x < 1766; x += 7) this.termMull.push(new P([[x, 499], [x, x > 1556 && x < 1676 ? 486 : 493]]));
-    // windsock (left)
-    this.pole = ln(1060, 800, 1060, 600, 530, 0.3);
+    // In this view the control tower stands ~1 km right of 31L and 2.3 km on, Terminal A's high point 1.9 km beyond it;
+    // at their true size here they are small on the horizon. Positions and sizes follow the runway's own perspective:
+    // the 60 m runway's drawn width puts the eye ~62 m up, so the 109 m tower crosses the horizon and the 52 m terminal stays just under it.
+    this.farTower = new P(quad([1812, 516], [1815, 500], [1800, 482], 8).concat(quad([1800, 482], [1805, 502], [1801, 516], 8).slice(1)), true);
+    this.farBase = new P([[1795, 522], [1795, 516], [1818, 516], [1818, 522]], true);
+    this.farCab = new P([[1792, 494], [1802, 494], [1802, 489], [1791, 489]], true);
+    const fb = (x0, n, w) => { let pts = []; for (let i = 0; i < n; i++) pts = pts.concat(quad([x0 + i * w, 508], [x0 + i * w + w / 2, 505.5], [x0 + (i + 1) * w, 508], 4).slice(i ? 1 : 0)); return pts; };
+    this.farTerm = new P([[1560, 512], [1560, 508]].concat(fb(1560, 5, 10), cubic([1610, 508], [1622, 501], [1654, 499.5], [1676, 508], 16).slice(1), fb(1676, 5, 10).slice(1), [[1726, 512]]), true);
+    this.farRoof = new P(cubic([1610, 508], [1622, 501], [1654, 499.5], [1676, 508], 16));
+    // figure inset: the crescent tower on its five-storey base, 109 m, drawn to one scale (3.3 px to the metre, shown at 0.92)
+    this.box = [new P([[1722, 584], [1880, 584], [1880, 1040], [1722, 1040]], true), new P([[1728, 590], [1874, 590], [1874, 1034], [1728, 1034]], true)];
+    this.towerBase = new P([[1762, 1000], [1762, 934], [1840, 934], [1840, 1000]], true);
+    this.baseFloors = [947, 960, 973, 986].map((y, i) => ln(1766, y, 1836, y, 525 + i, 0.2));
+    const outer = quad([1836, 934], [1842, 732], [1790, 640], 28), inner = quad([1800, 934], [1818, 750], [1790, 640], 28);
+    this.crescent = new P(wob(outer.concat(inner.slice(0, -1).reverse()), 522, 0.25), true);
+    this.cab = new P([[1774, 712], [1806, 712], [1806, 690], [1768, 690]], true);
+    this.cabMull = [1776, 1784, 1792, 1800].map((x, i) => ln(x + 1, 711, x - 1, 691, 530 + i, 0));
+    this.cabRoof = ln(1764, 687, 1810, 687, 523, 0.1);
+    this.cabFloor = ln(1772, 715, 1808, 715, 524, 0.1);
+    this.cabStrut = ln(1776, 716, 1806, 748, 529, 0.1);
+    this.scaleBar = [ln(1860, 1000, 1860, 640, 540, 0), ln(1855, 1000, 1865, 1000, 541, 0), ln(1855, 640, 1865, 640, 542, 0)];
+    // windsock, to scale: a ~9 m pole about 60 m left of the centre line
+    this.pole = ln(1104, 849, 1104, 799, 530, 0.1);
   },
   draw(lt) {
     chrome(this, lt); textBlock(this, lt);
     note('Zayed International · about 24 fog days a year, 1983–2018', 1862, 170, 4.4, lt, { a: 0.36 });
-    note('ضباب', 1000, 1052, 4.8, lt, { ar: true, size: 34, align: 'left', a: 0.3 });
+    note('ضباب', 1000, 444, 4.8, lt, { ar: true, size: 34, align: 'left', a: 0.3 });
     const lq = easeOut(prog(lt, 4.6, 0.8));
-    back('ZAYED INTERNATIONAL', 1616, 450, 'center', lq, 12, 3); small('ZAYED INTERNATIONAL', 1616, 450, lq, { size: 12, ls: 3, align: 'center', a: 0.75 });
-    small('RUNWAY 31L', 1720, 1036, prog(lt, 1.6, 0.6), { size: 12, ls: 3, a: 0.6 });
+    back('ZAYED INTERNATIONAL', 1643, 480, 'center', lq, 12, 3); small('ZAYED INTERNATIONAL', 1643, 480, lq, { size: 12, ls: 3, align: 'center', a: 0.75 });
+    small('RUNWAY 31L', 1162, 1034, prog(lt, 1.6, 0.6), { size: 12, ls: 3, a: 0.6, align: 'right' });
     const { VX, HY, Y, HW, K } = this;
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
     this.edges.forEach((e, i) => stroke(e, easeOut(prog(lt, 0.3 + i * 0.1, 1.1)), INK, 2.2));
@@ -935,11 +955,10 @@ scene({
       const on = easeOut(prog(lt, 1.1 + l.z * 0.035, 0.3)), hot = Math.abs(race - l.z / 24) < 0.035;
       disc(l.x, l.y, l.r * on * (hot ? 1.5 : 1), hot ? RED : OCHRE, 0.95);
     });
-    // Terminal A, low on the horizon beyond the tower
+    // Terminal A and the crescent tower, true size, on the horizon
     const tq = easeOut(prog(lt, 0.6, 1.4));
-    mask(this.termFace); fill(this.termFace, BLUE, 0.18 * tq);
-    this.termMull.forEach(m => stroke(m, tq, INK, 0.6, 0.45));
-    [this.pierL, this.pierR].forEach(q => stroke(q, tq, INK, 1.2, 0.85)); stroke(this.hallRoof, tq, INK, 1.6); this.hallSeams.forEach(q => stroke(q, tq, INK, 0.7, 0.5));
+    mask([this.farTerm, this.farTower, this.farBase]); fill(this.farTerm, BLUE, 0.2 * tq); stroke(this.farTerm, tq, INK, 1, 0.85); stroke(this.farRoof, tq, INK, 1.3);
+    fill(this.farTower, INK, 0.12 * tq); stroke(this.farTower, tq, INK, 1.1); stroke(this.farBase, tq, INK, 1); fill(this.farCab, BLUE, 0.5 * tq); stroke(this.farCab, tq, INK, 0.9);
     // fog banks over the far runway, burning off
     const fog = 1 - easeInOut(prog(lt, 2.4, 2.2));
     if (fog > 0.01) for (let k = 0; k < 5; k++) {
@@ -953,33 +972,50 @@ scene({
       for (let x = 985 + dx; x < 1885; x += 38) { ctx.moveTo(x, y + h / 2 + 4 * Math.sin(x * 0.02)); ctx.lineTo(x + 24, y + h / 2 + 4 * Math.sin((x + 24) * 0.02)); }
       ctx.stroke(); ctx.restore();
     }
-    // the crescent tower on its base, clad in quilted cushions, the glazed cab on its inner curve
-    const tp = easeInOut(prog(lt, 0.8, 1.2));
-    mask([this.towerBase, this.crescent]);
-    hatch(this.crescent, [1780, 300, 1885, 946], 0.9, 10, tp, INK, 0.9, 0.3, 526); hatch(this.crescent, [1780, 300, 1885, 946], -0.9, 10, tp, INK, 0.9, 0.3, 527);
-    stroke(this.crescent, tp, INK, 1.9); stroke(this.towerBase, tp, INK, 1.8); this.baseFloors.forEach(f => stroke(f, tp, INK, 1, 0.6));
-    const cp = easeOut(prog(lt, 1.6, 0.8));
-    mask(this.cab); fill(this.cab, BLUE, 0.45 * cp); stroke(this.cab, cp, INK, 1.6); this.cabMull.forEach(m => stroke(m, cp, INK, 0.9, 0.7));
-    stroke(this.cabRoof, cp, INK, 2.4); stroke(this.cabFloor, cp, INK, 2); stroke(this.cabStrut, cp, INK, 1.4, 0.8);
+    // figure inset: the crescent tower on its base, clad in quilted cushions, the glazed cab on its inner curve
+    const bq = easeInOut(prog(lt, 0.8, 1.0)), tp = easeInOut(prog(lt, 1.2, 1.2));
+    if (bq > 0) {
+      ctx.save(); ctx.translate(1801, 584); ctx.scale(0.92, 0.92); ctx.translate(-1801, -584);
+      mask(this.box[0]); stroke(this.box[0], bq, INK, 1.6); stroke(this.box[1], bq, INK, 0.8, 0.6);
+      hatch(this.crescent, [1786, 636, 1846, 936], 0.9, 8, tp, INK, 0.8, 0.3, 526); hatch(this.crescent, [1786, 636, 1846, 936], -0.9, 8, tp, INK, 0.8, 0.3, 527);
+      stroke(this.crescent, tp, INK, 1.7); mask(this.towerBase); stroke(this.towerBase, tp, INK, 1.6); this.baseFloors.forEach(f => stroke(f, tp, INK, 0.9, 0.6));
+      const cp = easeOut(prog(lt, 1.8, 0.8));
+      mask(this.cab); fill(this.cab, BLUE, 0.45 * cp); stroke(this.cab, cp, INK, 1.4); this.cabMull.forEach(m => stroke(m, cp, INK, 0.8, 0.7));
+      stroke(this.cabRoof, cp, INK, 2); stroke(this.cabFloor, cp, INK, 1.6); stroke(this.cabStrut, cp, INK, 1.2, 0.8);
+      this.scaleBar.forEach(l => stroke(l, prog(lt, 2.2, 0.6), INK, 0.9, 0.6));
+      const fq = easeOut(prog(lt, 2.4, 0.6));
+      ctx.save(); ctx.translate(1860, 820); ctx.rotate(-Math.PI / 2);
+      back('109 M', 0, 4, 'center', fq, 10, 2); small('109 M', 0, 4, fq, { size: 10, ls: 2, a: 0.75, align: 'center' });
+      ctx.restore();
+      small('CONTROL TOWER', 1801, 1022, fq, { size: 10, ls: 2, a: 0.75, align: 'center' });
+      ctx.restore();
+    }
     // windsock streaming in the breeze
-    stroke(this.pole, easeOut(prog(lt, 0.9, 0.8)), INK, 2);
+    stroke(this.pole, easeOut(prog(lt, 0.9, 0.8)), INK, 1.4);
     const wq = easeOut(prog(lt, 1.4, 0.8));
     if (wq > 0) for (let k = 0; k < 5; k++) {
-      const x0 = 1062 + k * 24 * wq, x1 = x0 + 24 * wq, fl = Math.sin(lt * 7 + k * 0.9) * 3 * k / 4;
-      const r0 = 14 - k * 2, r1 = 12 - k * 2;
-      fill(new P([[x0, 606 - r0 + fl], [x1, 606 - r1 + fl * 1.3], [x1, 606 + r1 + fl * 1.3], [x0, 606 + r0 + fl]], true), k % 2 ? '#EFE3CC' : RED, k % 2 ? 0.9 : 0.85);
+      const x0 = 1105 + k * 4.4 * wq, x1 = x0 + 4.4 * wq, fl = Math.sin(lt * 7 + k * 0.9) * 0.6 * k / 4;
+      const r0 = 3 - k * 0.4, r1 = 2.6 - k * 0.4;
+      fill(new P([[x0, 802 - r0 + fl], [x1, 802 - r1 + fl * 1.3], [x1, 802 + r1 + fl * 1.3], [x0, 802 + r0 + fl]], true), k % 2 ? '#EFE3CC' : RED, k % 2 ? 0.9 : 0.85);
     }
-    // the departure: climbing away over the runway
-    const u = easeInOut(prog(lt, 3.3, 4.5));
-    if (lt > 3.1 && u < 1) {
-      const sc = lerp(1.0, 0.13, u), y = lerp(905, 432, u), lw = 1.9 / Math.max(sc, 0.35);
-      const pl_ = this.plane, parts = [pl_.fus, pl_.fin, ...pl_.wings, ...pl_.stabs, ...pl_.engs];
-      ctx.save(); ctx.translate(VX, y); ctx.scale(sc, sc); ctx.rotate(0.03 * Math.sin(lt * 1.3));
+    // the arrival, as the fog lifts: seen ~100 m past the threshold (crossed at 15 m, a 50 ft crossing), a flare onto the touchdown zone ~400 m on,
+    // then the roll-out along the centre line. Placed by the runway's own perspective: eye ~62 m up, 8.73 px/m at the threshold,
+    // each unit of z another 0.35 of the threshold distance (~33 m)
+    if (lt > 3.1) {
+      // time runs ~2× fast: 4.3 z/s on the approach (after a 0.5 s ease-in as it fades in), braking to 0.4 z/s by the cut
+      const t = lt - 3.1, v = 4.3, td = 0.5 + (12 - 3 - v * 0.25) / v, D = 8 - 3.1 - td;
+      const z = t < 0.5 ? 3 + v * t * t : t < td ? 3 + v * (t - 0.25) : 12 + v * (t - td) - (v - 0.4) * (t - td) ** 2 / (2 * D);
+      const hw = z < 12 ? 15 * (1 - z / 12) ** 2 : 0, k = 1 + K * z;
+      const sc = 0.946 / k, y = HY + 8.73 * (62.3 - hw - 6) / k, lw = 1.9 / Math.max(sc, 0.35);
+      const pl_ = this.plane, parts = [pl_.fus, pl_.fin, ...pl_.wings, ...pl_.stabs, ...pl_.engs, ...pl_.tyres];
+      ctx.save(); ctx.translate(VX, y); ctx.scale(sc, sc); ctx.rotate(0.03 * Math.sin(lt * 1.3) * Math.min(1, hw / 4)); // wings level once down
       const a = easeOut(prog(lt, 3.1, 0.4));
       mask(parts);
-      hatch([pl_.fus, ...pl_.engs], [-140, -30, 140, 60], 0.9, 6, a, INK, 1, 0.45, 513);
+      hatch([pl_.fus, ...pl_.engs], [-120, -30, 120, 50], 0.9, 6, a, INK, 1, 0.45, 513);
+      pl_.gear.forEach(g => stroke(g, a, INK, lw * 1.3));
       parts.forEach(q => stroke(q, a, INK, lw));
-      pl_.engs.forEach((e, i) => disc(i ? 112 : -112, 32, 11, INK, 0.8 * a));
+      pl_.tyres.forEach(q => fill(q, INK, 0.85 * a));
+      pl_.engs.forEach((e, i) => disc(i ? 92 : -92, 26, 9, INK, 0.8 * a));
       ctx.restore();
     }
   },
@@ -996,7 +1032,7 @@ scene({
     this.quayTop = ln(985, 786, 1062, 786, 540, 0.3);
     this.quayFace = new P([[985, 786], [1062, 786], [1062, 812], [985, 812]], true);
     this.bollard = el(1040, 783, 6, 5, Math.PI, TAU, 541, 0);
-    this.yard = [[988, 744, 4], [1016, 752, 3], [1044, 760, 2]].map(([x, y, n], i) => ({ x, y, n, i }));
+    this.yard = [[988, 4], [1016, 3], [1044, 2]].map(([x, n], i) => ({ x, y: 787 - 11 * n, n, i })); // stacks stand on the quay deck
     // cranes stand on the quay behind the ship; from the water we see them end-on: legs, portal, boom end, A-frame, machinery house
     this.cranes = [1270, 1480, 1700].map((cx, i) => {
       const q = { cx, i, raised: i === 2 };
@@ -1060,7 +1096,7 @@ scene({
     const qp = easeInOut(prog(lt, 0.2, 1.0));
     hatch(this.quayFace, [985, 786, 1062, 812], 0.8, 6, qp, INK, 1, 0.35, 542); stroke(this.quayTop, qp, INK, 2);
     stroke(this.bollard, prog(lt, 1.0, 0.4), INK, 1.6);
-    this.yard.forEach(y => { for (let k = 0; k < y.n; k++) { const b = new P([[y.x, y.y + 11 * k], [y.x + 40, y.y + 11 * k], [y.x + 40, y.y + 11 * k + 10], [y.x, y.y + 11 * k + 10]], true), q = easeOut(prog(lt, 0.6 + y.i * 0.1 + k * 0.05, 0.4)); fill(b, [OCHRE, BLUE, RED, SEPIA][(y.i + k) % 4], 0.6 * q); stroke(b, q, INK, 0.9, 0.7); } });
+    this.yard.forEach(y => { for (let k = 0; k < y.n; k++) { const b = new P([[y.x, y.y + 11 * k], [y.x + 40, y.y + 11 * k], [y.x + 40, y.y + 11 * k + 10], [y.x, y.y + 11 * k + 10]], true), q = easeOut(prog(lt, 0.6 + y.i * 0.1 + k * 0.05, 0.4)); if (q > 0) mask(b); fill(b, [OCHRE, BLUE, RED, SEPIA][(y.i + k) % 4], 0.6 * q); stroke(b, q, INK, 0.9, 0.7); } });
     // the cranes, behind the ship
     this.cranes.forEach(c => {
       const q = easeOut(prog(lt, 0.3 + c.i * 0.2, 1.0)), hq = easeOut(prog(lt, 0.9 + c.i * 0.2, 0.6));
@@ -1117,8 +1153,8 @@ scene({
     }
     const by = 912 + 7 * Math.sin(lt * 2.2), bq = easeOut(prog(lt, 2.2, 0.6));
     if (bq > 0) {
-      ctx.save(); ctx.translate(1812, by); ctx.rotate(0.1 * Math.sin(lt * 1.9));
-      fill(this.buoy, RED, 0.85 * bq); stroke(this.buoy, bq, INK, 1.4); stroke(this.buoyMast, bq, INK, 1.4);
+      ctx.save(); ctx.translate(1812, by); ctx.rotate(0.1 * Math.sin(lt * 1.9)); ctx.scale(0.45, 0.45); // a 3 m buoy at this scale
+      mask(this.buoy); fill(this.buoy, RED, 0.85 * bq); stroke(this.buoy, bq, INK, 1.4); stroke(this.buoyMast, bq, INK, 1.4);
       disc(0, -66, 5, Math.floor(lt * 2) % 2 ? OCHRE : RED, bq, 'source-over');
       ctx.restore();
     }
@@ -1127,12 +1163,12 @@ scene({
     stroke(new P([[1004, 836], [1040, 836]]), wh, INK, 0.9, 0.6);
     stroke(new P([[1014, 824], [1014, 836]]), wh, INK, 1.2, 0.8);
     arrowHead(1014, 824, -Math.PI / 2, 5, INK, 0.8 * wh, 1.2); arrowHead(1014, 836, Math.PI / 2, 5, INK, 0.8 * wh, 1.2);
-    back('WAVE HEIGHT', 1030, 824, 'left', wh, 12, 3);
-    small('WAVE HEIGHT', 1030, 824, wh, { size: 12, ls: 3, a: 0.7 });
+    back('WAVE HEIGHT', 1030, 830, 'left', wh, 12, 3);
+    small('WAVE HEIGHT', 1030, 830, wh, { size: 12, ls: 3, a: 0.7 });
   },
 });
 
-// VIII · Al Taqa — Shams 1: parabolic troughs turn to follow the sun; a wind farm on the far horizon
+// VIII · Al Taqa — Shams 1: parabolic troughs turn to follow the sun; a pyranometer and an anemometer measure sun and wind
 scene({
   start: 62, dur: 8, num: 'VIII', name: 'AL TAQA', ar: 'الطاقة', readout: 'UAE RENEWABLES · 6 GW · 2024',
   kicker: 'FORECASTS FOR SOLAR PLANTS AND WIND FARMS',
@@ -1148,7 +1184,7 @@ scene({
     // Shams 1 is a parabolic-trough plant: rows run north–south and turn east to west with the sun.
     // We look south along four rows (one-point perspective to (VX, HY)); every point scales toward the vanishing point.
     Object.assign(this, { VX: 1430, K: 0.3, YG: 1000, W0: 92, H0: 56, Z0: 0.15, Z1: 26 });
-    this.offs = [-370, -104, 162, 428]; // about three trough-widths apart, centre to centre
+    this.offs = [-370, -115, 140, 395]; // about three trough-widths apart, centre to centre
     // the trough cross-section in its own frame (axis up, torque tube at the origin): parabola, focus, rims
     const W = this.W0, f = 0.3 * W, v = -0.1 * W;
     this.sec = []; for (let i = 0; i <= 16; i++) { const u = -W / 2 + (W * i) / 16; this.sec.push([u, v - (u * u) / (4 * f)]); }
@@ -1163,10 +1199,10 @@ scene({
     this.accRibs = [1660, 1672, 1684, 1696, 1708, 1720].map((x, i) => ln(x, 513, x, 531, 660 + i, 0));
     this.accLegs = [1654, 1672, 1690, 1708, 1724].map((x, i) => ln(x, 532, x, HY, 640 + i, 0));
     this.fans = [1663, 1681, 1699, 1717].map((x, i) => el(x, 536, 7, 2, 0, TAU, 650 + i, 0)); // fans underneath
-    // a wind farm on the horizon, receding
-    this.turbines = [[1086, 84, 34, 0], [1140, 72, 29, 1.3], [1188, 62, 25, 2.1]].map(([x, h, r, ph], i) => ({
-      x, hy: HY - h, r, ph, tower: new P([[x - 3.2, HY], [x - 1.4, HY - h], [x + 1.4, HY - h], [x + 3.2, HY]], true), i,
-    }));
+    // the wind: an anemometer mast in the field, cups and vane at the top (no wind farm stands at Shams 1)
+    this.anemMast = ln(1196, 1000, 1196, 846, 635, 0.1);
+    this.anemArm = ln(1182, 848, 1212, 848, 636, 0);
+    this.anemStays = [ln(1196, 900, 1170, 1000, 637, 0.1), ln(1196, 900, 1222, 1000, 638, 0.1)];
     // pyranometer: the instrument that measures sunlight
     this.tripod = [ln(990, 1000, 1004, 944, 630, 0.2), ln(1018, 1000, 1004, 944, 631, 0.2), ln(1004, 1004, 1004, 944, 632, 0.2)];
     this.plate = ln(988, 944, 1020, 944, 633, 0.1);
@@ -1174,8 +1210,10 @@ scene({
   },
   draw(lt) {
     chrome(this, lt); textBlock(this, lt);
-    note('WMO–IRENA clean-energy workshop · hosted by NCM · Abu Dhabi, 2024', 1862, 1052, 4.4, lt, { a: 0.36 });
+    note('WMO–IRENA clean-energy workshop', 1862, 1016, 4.4, lt, { a: 0.36 }); // two lines, clear of the instrument labels
+    note('hosted by NCM · Abu Dhabi, 2024', 1862, 1052, 4.6, lt, { a: 0.36 });
     small('PYRANOMETER', 988, 1030, prog(lt, 3.4, 0.6), { size: 12, ls: 3, a: 0.65 });
+    small('ANEMOMETER', 1196, 1030, prog(lt, 3.6, 0.6), { size: 12, ls: 3, a: 0.65, align: 'center' });
     small('SHAMS 1 · MADINAT ZAYED', 1660, 500, prog(lt, 3.0, 0.6), { size: 12, ls: 3, a: 0.7, align: 'center' });
     const HY = this.HY;
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
@@ -1227,22 +1265,20 @@ scene({
       stroke(new P([at(zNear, off, [0, -0.1 * this.W0]), fN]), 1, INK, 1, 0.7);
       disc(fN[0], fN[1], 4.2, INK, 0.9); disc(fN[0], fN[1], 2.2, RED, 0.9 * sq, 'source-over');
       if (sq > 0) this.rays.forEach(p => {
-        const hit = at(zNear, off, p), from = at(zNear, off, [p[0], p[1] - 0.55 * this.W0]);
+        const hit = at(zNear, off, p), from = at(zNear, off, [p[0], p[1] - 0.4 * this.W0]);
         stroke(new P([from, hit, fN]), 1, OCHRE, 1.2, 0.8 * sq, [5, 4], -lt * 30);
       });
     });
-    // the turbines rise, then their blades turn in the wind
-    this.turbines.forEach(tb => {
-      const q = easeOut(prog(lt, 1.6 + tb.i * 0.15, 0.6)), bq = easeOut(prog(lt, 2.1 + tb.i * 0.15, 0.5));
-      mask(tb.tower); stroke(tb.tower, q, INK, 1.2);
-      if (bq <= 0) return;
-      const spin = tb.ph + Math.max(0, lt - 2.1) * (2.4 - tb.i * 0.25);
-      for (let k = 0; k < 3; k++) {
-        const a = spin + (k * TAU) / 3, c = Math.cos(a), sn = Math.sin(a), L = tb.r * bq, w = 3.2 * tb.r / 40;
-        fill(new P([[tb.x - sn * w, tb.hy + c * w], [tb.x + c * L, tb.hy + sn * L], [tb.x + sn * w, tb.hy - c * w]], true), INK, 0.8);
-      }
-      disc(tb.x, tb.hy, 3.4 * tb.r / 40 + 1, INK, 0.9);
-    });
+    // the anemometer: its cups spin, its vane swings
+    const mq = easeOut(prog(lt, 2.4, 0.7));
+    stroke(this.anemMast, mq, INK, 1.8); this.anemStays.forEach(l => stroke(l, mq, INK, 0.8, 0.6)); stroke(this.anemArm, mq, INK, 1.4);
+    if (mq >= 1) {
+      const spin = lt * 5;
+      for (let k = 0; k < 3; k++) { const a = spin + (k * TAU) / 3, ex = 1182 + 9 * Math.cos(a), ey = 840 + 3 * Math.sin(a); stroke(new P([[1182, 840], [ex, ey]]), 1, INK, 1, 0.8); disc(ex, ey, 2.6, INK, 0.85); }
+      stroke(new P([[1182, 848], [1182, 840]]), 1, INK, 1.2);
+      const vane = 0.25 * Math.sin(lt * 0.9);
+      stroke(new P([[1212, 848], [1212, 838]]), 1, INK, 1.2); stroke(new P([[1212 - 12 * Math.cos(vane), 836], [1212 + 8 * Math.cos(vane), 836]]), 1, INK, 1.4); fill(new P([[1212 - 12 * Math.cos(vane), 831], [1212 - 12 * Math.cos(vane), 841], [1212 - 6 * Math.cos(vane), 836]], true), RED, 0.85);
+    }
     this.tripod.forEach(l => stroke(l, easeOut(prog(lt, 2.6, 0.6)), INK, 1.4));
     const dq = easeOut(prog(lt, 3.0, 0.5));
     stroke(this.plate, dq, INK, 2); stroke(this.dome, dq, INK, 1.4); fill(this.dome, BLUE, 0.25 * dq);
@@ -1284,10 +1320,11 @@ scene({
     const sail = (x0, w, h, seed) => { const top = m(h), pts = [[x0, base], [x0 + 1, top]].concat(quad([x0 + 1, top], [x0 + w * 0.7, top - 3], [x0 + w, top + h * 0.09], 8).slice(1), quad([x0 + w, top + h * 0.09], [x0 + w * 1.18, m(h * 0.5)], [x0 + w - 2, base], 14).slice(1)); return new P(wob(pts, seed, 0.25), true); };
     [[1716, 34, 260], [1684, 36, 278], [1744, 32, 218], [1628, 32, 234], [1652, 38, 305]].forEach(([x0, w, h], i) => add({ body: sail(x0, w, h, 720 + i), glass: [0.3, 0.6].map(f => new P(quad([x0 + w * f, base], [x0 + w * f + w * 0.12, m(h * 0.5)], [x0 + w * f, m(h) + 6], 10))) }));
     // Emirates Palace: a long low front, a great central dome over the tallest block, small domes on the wings
-    add({ body: new P([[1786, base], [1786, m(18)], [1812, m(18)], [1812, m(34)], [1860, m(34)], [1860, m(18)], [1882, m(18)], [1882, base]], true), palace: true });
+    add({ body: new P([[1782, base], [1782, m(18)], [1812, m(18)], [1812, m(34)], [1860, m(34)], [1860, m(18)], [1885, m(18)], [1885, base]], true), palace: true, // about 1 km long: its wing runs on past the plate
+      outline: new P([[1885, m(18)], [1860, m(18)], [1860, m(34)], [1812, m(34)], [1812, m(18)], [1782, m(18)], [1782, base]]) });
     this.palaceDome = el(1836, m(34), 24, 26, Math.PI, TAU, 730, 0.2);
     this.palaceFinial = ln(1836, m(34) - 26, 1836, m(34) - 36, 731, 0);
-    this.palaceDomes = [1794, 1804, 1868, 1876].map((x, i) => el(x, m(18), 4.5, 5, Math.PI, TAU, 732 + i, 0));
+    this.palaceDomes = [1790, 1802, 1870, 1882].map((x, i) => el(x, m(18), 4.5, 5, Math.PI, TAU, 732 + i, 0));
     // the sea between the Corniche and the homes on this shore
     this.water = [806, 818, 832, 848].map((y, i) => new P(wob([[985 + i * 14, y], [1885 - i * 10, y]], 740 + i, 0.6)));
     // villas and a mosque in the foreground
@@ -1326,7 +1363,7 @@ scene({
         ctx.stroke(); ctx.restore(); return;
       }
       if (b.adnoc) { fill(b.glassFace, BLUE, 0.3 * q); b.glass.forEach(g => stroke(g, q, INK, 0.7, 0.45)); stroke(b.body, q, INK, 1.6); b.walls.forEach(w => stroke(w, q, INK, 1.2, 0.85)); return; }
-      if (b.palace) { fill(b.body, OCHRE, 0.25 * q); stroke(b.body, q, INK, 1.3); return; }
+      if (b.palace) { fill(b.body, OCHRE, 0.25 * q); stroke(b.outline, q, INK, 1.3); return; }
       fill(b.body, BLUE, 0.16 * q);
       (b.glass || []).forEach(g => stroke(g, q, INK, 0.7, 0.4)); (b.lantern || []).forEach(g => stroke(g, q, INK, 0.5, 0.35));
       if (b.ring) stroke(b.ring, q, INK, 1.1, 0.7); if (b.band) stroke(b.band, q, INK, 1.1, 0.7);
@@ -1336,7 +1373,7 @@ scene({
     fill(this.palaceDome, OCHRE, 0.35 * pq0); stroke(this.palaceDome, pq0, INK, 1.3); stroke(this.palaceFinial, pq0, INK, 1.1);
     this.palaceDomes.forEach(d => { fill(d, OCHRE, 0.35 * pq0); stroke(d, pq0, INK, 1); });
     this.water.forEach((w, i) => stroke(w, prog(lt, 0.5 + i * 0.1, 1.2), BLUE, 1, 0.45, [18 - i * 2, 10 + i * 3], i * 7));
-    small('ABU DHABI · THE CORNICHE', 1218, 578, prog(lt, 2.0, 0.8), { size: 12, ls: 3, a: 0.7 });
+    small('ABU DHABI · THE CORNICHE', 1319, 578, prog(lt, 2.0, 0.8), { size: 12, ls: 2, a: 0.7, align: 'center' });
     stroke(this.ground, prog(lt, 0.5, 1.0), INK, 1.6, 0.8);
     const fq = easeOut(prog(lt, 1.2, 0.8));
     mask([this.drum, this.minaret, this.minTop]); fill(this.dome, OCHRE, 0.45 * fq);
