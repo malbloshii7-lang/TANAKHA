@@ -424,7 +424,7 @@ t = tt(5.0)
 w = t / 5.0
 jet = (1 - w) * sosfilt(sos("band", [300, 1800]), noise(len(t))) + w * sosfilt(sos("band", [900, 4200]), noise(len(t)))
 fx.add(jet * np.sin(np.pi * w) ** 1.5, 49.2, 0.07)
-# IX · a soft alert tone as each warning ring leaves the mast
+# IX · a soft alert tone as each warning ring leaves the storm forecast
 for k in range(6):
     t = tt(0.25)
     fx.add(np.sin(2 * np.pi * 1760 * t) * np.exp(-t * 14) * np.minimum(1, t / 0.004), 72.2 + 0.5 * k, 0.05, 0.1)
