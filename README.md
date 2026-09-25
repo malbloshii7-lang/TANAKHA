@@ -197,3 +197,35 @@ The site uses a light, institutional "paper + navy ink + petrol teal" palette (s
 `climate-command-center/src/index.css`) instead of a dark/neon theme — chosen for a
 classy, practical, ministerial tone. A `.band-dark` class re-themes specific sections
 (navbar, hero, footer) to a deep-navy "gravitas" band using the same tokens.
+
+---
+
+## NCM at Twenty — 20th anniversary story
+
+`ncm-20/index.html` is a bilingual (English / Arabic, true RTL) commemorative story for the
+20th anniversary of the UAE National Center of Meteorology, marked in March 2027. It is a
+single self-contained page with no build step, deployed with the rest of the Pages site at
+`https://malbloshii7-lang.github.io/TANAKHA/ncm-20/` (append `#ar` to open it in Arabic). The
+portal lists it under "Other published pages".
+
+- **Story:** a night-sky masthead with falling rain and a rain gauge graduated 2007–2027, then
+  six chapters: heritage (Durour calendar, Ibn Majid, pearling, aflaj) → the institution →
+  the national ambition → rain enhancement at home, in the lab (UAEREP) and for the world →
+  milestones → the next twenty years. A colophon lists every source.
+- **Editing:** each chapter exists twice, in a `data-lang="en"` and a `data-lang="ar"` block;
+  change both. Figures carry numbered footnotes (`a.fn` → `#src-N`) that point at the
+  shared sources list, so keep numbers and sources in step.
+- **Anniversary date:** the gauge fills from 2007 to March 2027 and shows
+  "20th anniversary · March 2027". Set `ANNIVERSARY_DAY` in the page script once the exact
+  day is confirmed and the caption becomes a day countdown. Note that the public record
+  dates Federal Decree-Law No. 6 of 2007 to 13 November 2007; an earlier ministerial
+  resolution (No. 16 of 2007) first created the Center, and its date is not public.
+- **Facts:** drawn from public NCM, WAM, UAEREP, WMO, UNESCO and government sources, current to
+  September 2026. Counts that change over time (stations, radars) carry the year reported;
+  seeding effectiveness is attributed to NCM, not stated as fact.
+- **Design:** the Diplomatic Ledger palette (paper, navy ink, one petrol "rain" accent, no
+  gold); Source Serif 4 and Noto Naskh Arabic for headings, the IBM Plex Sans / Plex Sans
+  Arabic superfamily for matched body text. Light/dark and reduced motion are respected.
+- **Before publishing officially:** the page is marked as a draft for review in its colophon.
+  Give the Arabic a native editorial pass, confirm leaders' current titles with protocol,
+  then remove the draft line.

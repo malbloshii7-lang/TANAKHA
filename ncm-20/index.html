@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NCM at Twenty</title>
+<meta name="description" content="A bilingual commemorative story for the 20th anniversary of the UAE National Center of Meteorology (2007–2027): heritage, national service, and global leadership in rain enhancement." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Naskh+Arabic:wght@600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+<style>
+  /* ------------------------------------------------------------------
+     Diplomatic Ledger palette (shared with the Climate Command Center
+     and the portal): paper, navy ink, one petrol "rain" accent. Ochre
+     marks dryness in data only. The night band carries the masthead
+     and the closing chapter.
+     ------------------------------------------------------------------ */
+  :root{
+    color-scheme:light;
+    --paper:#F7F4ED;
+    --paper-2:#F1EDE2;
+    --surface:#FFFFFF;
+    --ink:#1A2B3C;
+    --ink-soft:#45586B;
+    --ink-mute:#5B6A7B;
+    --accent:#0F6B66;
+    --accent-wash:rgba(15,107,102,.08);
+    --dry:#96690D;
+    --rule:rgba(26,43,60,.14);
+    --rule-heavy:rgba(26,43,60,.38);
+
+    --band:#10202F;
+    --band-ink:#F4EFE6;
+    --band-soft:#BCC8D4;
+    --band-mute:#8C9BAB;
+    --band-accent:#7FB5AC;
+    --band-rule:rgba(244,239,230,.16);
+    --rain-rgb:127,181,172;
+    --sand-rgb:201,164,104;
+
+    --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ar-display:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;
+    --ar-body:"IBM Plex Sans Arabic","Dubai","Segoe UI",Tahoma,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --paper:#12212F; --paper-2:#152736; --surface:#182A3A;
+      --ink:#EDE9E0; --ink-soft:#B7C2CE; --ink-mute:#8D9AA8;
+      --accent:#6FB3AA; --accent-wash:rgba(111,179,170,.10);
+      --dry:#D1A24A;
+      --rule:rgba(237,233,224,.14); --rule-heavy:rgba(237,233,224,.36);
+      --band:#0A1520;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --paper:#12212F; --paper-2:#152736; --surface:#182A3A;
+    --ink:#EDE9E0; --ink-soft:#B7C2CE; --ink-mute:#8D9AA8;
+    --accent:#6FB3AA; --accent-wash:rgba(111,179,170,.10);
+    --dry:#D1A24A;
+    --rule:rgba(237,233,224,.14); --rule-heavy:rgba(237,233,224,.36);
+    --band:#0A1520;
+  }
+
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font:400 1.0625rem/1.7 var(--sans);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  :lang(ar){font-family:var(--ar-body)}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;text-wrap:balance}
+  h1:lang(ar),h2:lang(ar),h3:lang(ar){font-family:var(--ar-display);font-weight:700;letter-spacing:0}
+  p{margin:0}
+  a{color:inherit}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+  .wrap{max-width:1160px;margin-inline:auto;padding-inline:clamp(16px,5vw,56px)}
+  .num{font-variant-numeric:lining-nums tabular-nums}
+
+  .label{font:500 .75rem/1.5 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute)}
+  .label:lang(ar){font:500 .9375rem/1.6 var(--ar-body);letter-spacing:0;text-transform:none}
+
+  .prose{max-width:66ch}
+  .prose p + p{margin-top:1em}
+  .prose a,.entry a,.map-row a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+  .prose:lang(ar),.entry:lang(ar),.map-row:lang(ar){line-height:1.95}
+  a.fn{font:500 .68em/0 var(--mono);color:var(--accent);text-decoration:none;vertical-align:super;padding-inline:.15em}
+  a.fn:hover{text-decoration:underline}
+  .closing a.fn{color:var(--band-accent)}
+
+  /* ---------- Masthead: night band, rain canvas, gauge ---------- */
+  .mast{position:relative;isolation:isolate;overflow:hidden;background:var(--band);color:var(--band-ink)}
+  .mast canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
+  .mast .label{color:var(--band-mute)}
+  .mast a:focus-visible,.mast button:focus-visible{outline-color:var(--band-accent)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:22px}
+  .lockup{display:flex;align-items:baseline;gap:.7em;font:600 .8125rem/1 var(--mono);letter-spacing:.16em;color:var(--band-ink)}
+  .lockup span{color:var(--band-mute);font-weight:500}
+  .lang-toggle{
+    font:500 1rem/1 var(--ar-body);color:var(--band-ink);background:transparent;cursor:pointer;
+    border:1px solid var(--band-rule);border-radius:4px;padding:.6em 1em;
+    transition:border-color .2s ease,background-color .2s ease;
+  }
+  .lang-toggle:lang(en){font:500 .875rem/1 var(--sans);letter-spacing:.02em}
+  .lang-toggle:hover{border-color:var(--band-accent);background:rgba(var(--rain-rgb),.08)}
+
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(32px,6vw,96px);align-items:end;padding-block:clamp(36px,7vw,92px) clamp(40px,6vw,72px)}
+  .hero h1{font-size:clamp(2.6rem,6.4vw,5.25rem);line-height:1.02;letter-spacing:-.015em;margin-block:18px 24px;max-width:13ch}
+  .hero h1:lang(ar){font-size:clamp(2.4rem,5.6vw,4.5rem);line-height:1.4;max-width:15ch}
+  .hero .lede{font-size:clamp(1.125rem,1.8vw,1.3125rem);line-height:1.6;color:var(--band-soft);max-width:54ch}
+  .hero .lede:lang(ar){line-height:1.9}
+  .toc{margin-top:44px}
+  .toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 28px;border-top:1px solid var(--band-rule)}
+  .toc li{border-bottom:1px solid var(--band-rule)}
+  .toc a{display:flex;gap:12px;align-items:baseline;padding-block:12px;text-decoration:none;color:var(--band-soft);font-size:.9375rem;line-height:1.4}
+  .toc a:hover{color:var(--band-ink)}
+  .toc .n{font:500 .75rem/1 var(--mono);color:var(--band-accent)}
+
+  .gauge{margin:0;display:grid;justify-items:center;gap:14px;width:190px}
+  .gauge svg{display:block;width:150px;height:auto;overflow:visible}
+  .gauge .glass{fill:none;stroke:rgba(var(--rain-rgb),.55);stroke-width:1.25}
+  .gauge .tick{stroke:rgba(var(--rain-rgb),.55);stroke-width:1}
+  .gauge .tick.major{stroke:var(--band-soft)}
+  .gauge .yr{font:500 11px var(--mono);fill:var(--band-mute)}
+  .gauge .yr.last{fill:var(--band-ink)}
+  .gauge .water{fill:rgba(var(--rain-rgb),.30);transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--fill,.97));transition:transform 2.2s cubic-bezier(.2,.7,.2,1)}
+  .gauge .meniscus{stroke:var(--band-accent);stroke-width:1.5;transition:transform 2.2s cubic-bezier(.2,.7,.2,1)}
+  .gauge figcaption{font-size:.8125rem;line-height:1.5;color:var(--band-mute);text-align:center}
+  .gauge figcaption strong{display:block;margin-bottom:4px;font:600 .875rem/1.5 var(--sans);color:var(--band-ink)}
+  .gauge figcaption strong:lang(ar){font-family:var(--ar-body)}
+
+  /* ---------- Chapters ---------- */
+  .chapter{padding-block:clamp(64px,9vw,120px);border-top:1px solid var(--rule)}
+  .chapter.alt{background:var(--paper-2)}
+  .chapter-grid{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:clamp(24px,5vw,72px)}
+  .rail{align-self:start;position:sticky;top:calc(env(safe-area-inset-top,0px) + 28px);display:grid;gap:10px}
+  .rail .n{font:600 clamp(2.5rem,5vw,3.5rem)/1 var(--serif);color:var(--accent)}
+  .chapter h2{font-size:clamp(1.875rem,3.8vw,2.875rem);line-height:1.1;letter-spacing:-.01em;max-width:22ch}
+  .chapter h2:lang(ar){line-height:1.5}
+  .chapter .intro{font-size:clamp(1.125rem,1.6vw,1.25rem);line-height:1.65;color:var(--ink-soft);max-width:62ch;margin-top:20px}
+  .chapter .intro:lang(ar){line-height:1.95}
+  .chapter .prose{margin-top:28px}
+
+  .entries{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,4vw,56px);margin-top:48px}
+  .entry{border-top:1px solid var(--rule-heavy);padding-block:22px 30px;display:grid;gap:10px;align-content:start}
+  .entry h3{font-size:1.375rem;line-height:1.25}
+  .entry h3:lang(ar){line-height:1.6}
+  .entry p{color:var(--ink-soft);font-size:1rem}
+
+  .figures{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 28px;margin:48px 0 0;padding:0}
+  .fig{border-top:1px solid var(--rule-heavy);padding-block:18px 10px;display:flex;flex-direction:column;gap:8px}
+  .fig dd{margin:0;order:-1;font:600 clamp(2.25rem,4vw,3rem)/1 var(--serif);color:var(--ink)}
+  .fig dt{font-size:.9375rem;line-height:1.45;color:var(--ink-soft)}
+  .fig dt:lang(ar){line-height:1.7}
+  .note{margin-top:16px;font-size:.8125rem;color:var(--ink-mute);max-width:66ch}
+
+  .decree{margin-top:40px;max-width:62ch;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:24px 28px;display:grid;gap:8px}
+  .decree .no{font:500 .8125rem/1.5 var(--mono);color:var(--accent);letter-spacing:.04em}
+  .decree .no:lang(ar){font-family:var(--ar-body);letter-spacing:0;font-size:.9375rem}
+  .decree p{color:var(--ink-soft)}
+
+  .map{margin-top:44px;border-bottom:1px solid var(--rule)}
+  .map-row{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr);gap:10px 40px;border-top:1px solid var(--rule);padding-block:24px}
+  .map-row h3{font-size:1.25rem;line-height:1.3}
+  .map-row h3:lang(ar){line-height:1.6}
+  .map-row .label{display:block;margin-top:8px}
+  .map-row p{color:var(--ink-soft)}
+
+  .sub{margin-top:64px}
+  .sub > h3{font-size:clamp(1.375rem,2.4vw,1.75rem);line-height:1.2;margin-bottom:14px}
+  .sub > h3:lang(ar){line-height:1.6}
+  .sub > .label{display:block;margin-bottom:10px;color:var(--accent)}
+
+  .panel{margin-top:36px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:clamp(22px,3vw,36px)}
+  .panel .figures{margin-top:20px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .panel .fig dd{font-size:clamp(1.75rem,3.2vw,2.75rem)}
+
+  .quote{margin:56px 0 0;padding-inline-start:24px;border-inline-start:2px solid var(--accent);max-width:54ch}
+  .quote p{font:italic 400 clamp(1.25rem,2.2vw,1.625rem)/1.45 var(--serif);color:var(--ink)}
+  .quote p:lang(ar){font:700 clamp(1.25rem,2.2vw,1.5rem)/1.9 var(--ar-display)}
+  .quote footer{margin-top:14px;font-size:.9375rem;color:var(--ink-mute)}
+
+  .timeline{list-style:none;margin:44px 0 0;padding:0;border-bottom:1px solid var(--rule)}
+  .timeline li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;border-top:1px solid var(--rule);padding-block:20px}
+  .timeline time{font:500 .9375rem/1.7 var(--mono);color:var(--accent)}
+  .timeline h3{font:600 1.0625rem/1.5 var(--sans);text-wrap:pretty}
+  .timeline h3:lang(ar){font:600 1.125rem/1.8 var(--ar-body)}
+  .timeline p{color:var(--ink-soft);font-size:.9375rem;margin-top:4px}
+  .timeline p:lang(ar){line-height:1.9}
+  .timeline li.anniv{background:var(--accent-wash);padding-inline:16px;margin-inline:-16px;border-top-color:var(--accent)}
+
+  /* ---------- Closing band ---------- */
+  .closing{background:var(--band);color:var(--band-ink);border-top:0}
+  .closing .rail .n{color:var(--band-accent)}
+  .closing .label{color:var(--band-mute)}
+  .closing .intro{color:var(--band-soft)}
+  .closing a:focus-visible{outline-color:var(--band-accent)}
+  .aims{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;margin-top:44px}
+  .aim{border-top:1px solid var(--band-rule);padding-block:22px 30px;display:grid;gap:8px;align-content:start}
+  .aim h3{font-size:1.3125rem;line-height:1.3}
+  .aim h3:lang(ar){line-height:1.6}
+  .aim p{color:var(--band-soft)}
+  .aim p:lang(ar){line-height:1.9}
+  .dedication{margin-top:64px;padding-top:32px;border-top:1px solid var(--band-rule);font:italic 400 clamp(1.25rem,2.4vw,1.75rem)/1.5 var(--serif);max-width:46ch;color:var(--band-ink)}
+  .dedication:lang(ar){font:700 clamp(1.25rem,2.4vw,1.625rem)/1.9 var(--ar-display)}
+
+  /* ---------- Colophon & sources ---------- */
+  .colophon{padding-block:56px 72px}
+  .colophon h2{font-size:1.375rem}
+  .colophon .about{margin-top:12px;max-width:72ch;color:var(--ink-soft);font-size:.9375rem}
+  .colophon .about:lang(ar){line-height:1.9}
+  .colophon .sources-h{margin-top:32px}
+  .sources{margin:28px 0 0;padding-inline-start:1.6em;columns:2 340px;column-gap:48px;font-size:.84375rem;line-height:1.5;color:var(--ink-soft)}
+  .sources li{break-inside:avoid;margin-bottom:10px;scroll-margin-top:24px}
+  .sources li::marker{font:500 .8em var(--mono);color:var(--ink-mute)}
+  .sources li:target{color:var(--ink)}
+  .sources a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;overflow-wrap:anywhere}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    .figures,.panel .figures{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:880px){
+    .hero{grid-template-columns:1fr}
+    .gauge{grid-template-columns:auto 1fr;justify-items:start;align-items:center;width:auto;gap:18px}
+    .gauge svg{width:104px}
+    .gauge figcaption{text-align:start}
+    .chapter-grid{grid-template-columns:1fr}
+    .rail{position:static;grid-auto-flow:column;justify-content:start;align-items:baseline;gap:16px}
+    .toc ol{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:640px){
+    .entries,.aims{grid-template-columns:1fr}
+    .map-row{grid-template-columns:1fr}
+    .timeline li{grid-template-columns:1fr;gap:4px}
+    .toc ol{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .gauge .water,.gauge .meniscus{transition:none}
+  }
+  @media print{
+    .mast canvas,.lang-toggle,.toc{display:none}
+    .mast,.closing{background:none;color:var(--ink)}
+    .rail{position:static}
+  }
+</style>
+</head>
+<body>
+
+<header class="mast" id="top">
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="lockup" dir="ltr">NCM <span>2007–2027</span></span>
+      <button class="lang-toggle" id="lang-toggle" type="button" lang="ar" aria-label="اقرأ الصفحة بالعربية">العربية</button>
+    </div>
+
+    <div class="hero">
+      <div data-lang="en" lang="en">
+        <p class="label">National Center of Meteorology · United Arab Emirates</p>
+        <h1>Twenty years of reading the sky</h1>
+        <p class="lede">For two decades, the National Center of Meteorology has watched over the weather, seas and ground of the United Arab Emirates. In a country where rain is scarce, it has also made the UAE a global pioneer in the science of rain enhancement.</p>
+        <nav class="toc" aria-label="Chapters">
+          <ol>
+            <li><a href="#en-heritage"><span class="n">1</span>Before the instruments</a></li>
+            <li><a href="#en-nation"><span class="n">2</span>Built for the nation</a></li>
+            <li><a href="#en-ambition"><span class="n">3</span>Part of the national ambition</a></li>
+            <li><a href="#en-rain"><span class="n">4</span>More rain for a thirsty world</a></li>
+            <li><a href="#en-milestones"><span class="n">5</span>Milestones, 2007–2027</a></li>
+            <li><a href="#en-next"><span class="n">6</span>The next twenty</a></li>
+          </ol>
+        </nav>
+      </div>
+
+      <div data-lang="ar" lang="ar" dir="rtl" hidden>
+        <p class="label">المركز الوطني للأرصاد · الإمارات العربية المتحدة</p>
+        <h1>عشرون عاماً في قراءة السماء</h1>
+        <p class="lede">على مدى عقدين، يرصد المركز الوطني للأرصاد طقس دولة الإمارات العربية المتحدة وبحارها وباطن أرضها. وفي بلدٍ شحيح الأمطار، جعل من الإمارات رائدةً عالمياً في علوم الاستمطار.</p>
+        <nav class="toc" aria-label="الفصول">
+          <ol>
+            <li><a href="#ar-heritage"><span class="n">1</span>قبل الأجهزة</a></li>
+            <li><a href="#ar-nation"><span class="n">2</span>مؤسسة في خدمة الوطن</a></li>
+            <li><a href="#ar-ambition"><span class="n">3</span>ركيزة في الطموح الوطني</a></li>
+            <li><a href="#ar-rain"><span class="n">4</span>مطرٌ أوفر لعالمٍ عطشان</a></li>
+            <li><a href="#ar-milestones"><span class="n">5</span>محطات العقدين</a></li>
+            <li><a href="#ar-next"><span class="n">6</span>العشرون المقبلة</a></li>
+          </ol>
+        </nav>
+      </div>
+
+      <figure class="gauge" id="gauge">
+        <svg viewBox="0 0 150 440" aria-hidden="true">
+          <line class="glass" x1="16" y1="6" x2="108" y2="6" />
+          <line class="glass" x1="16" y1="6" x2="44" y2="34" />
+          <line class="glass" x1="108" y1="6" x2="80" y2="34" />
+          <rect class="glass" x="40" y="34" width="44" height="394" rx="4" />
+          <g class="water">
+            <rect x="41.5" y="38" width="41" height="388" fill="rgba(127,181,172,.30)" />
+            <line class="meniscus" x1="41.5" y1="38" x2="82.5" y2="38" vector-effect="non-scaling-stroke" />
+          </g>
+          <g>
+            <line class="tick major" x1="84" y1="426.0" x2="97" y2="426.0" />
+            <text class="yr" x="103" y="430.0">2007</text>
+            <line class="tick" x1="84" y1="406.6" x2="90" y2="406.6" />
+            <line class="tick" x1="84" y1="387.2" x2="90" y2="387.2" />
+            <line class="tick" x1="84" y1="367.8" x2="90" y2="367.8" />
+            <line class="tick" x1="84" y1="348.4" x2="90" y2="348.4" />
+            <line class="tick major" x1="84" y1="329.0" x2="97" y2="329.0" />
+            <text class="yr" x="103" y="333.0">2012</text>
+            <line class="tick" x1="84" y1="309.6" x2="90" y2="309.6" />
+            <line class="tick" x1="84" y1="290.2" x2="90" y2="290.2" />
+            <line class="tick" x1="84" y1="270.8" x2="90" y2="270.8" />
+            <line class="tick" x1="84" y1="251.4" x2="90" y2="251.4" />
+            <line class="tick major" x1="84" y1="232.0" x2="97" y2="232.0" />
+            <text class="yr" x="103" y="236.0">2017</text>
+            <line class="tick" x1="84" y1="212.6" x2="90" y2="212.6" />
+            <line class="tick" x1="84" y1="193.2" x2="90" y2="193.2" />
+            <line class="tick" x1="84" y1="173.8" x2="90" y2="173.8" />
+            <line class="tick" x1="84" y1="154.4" x2="90" y2="154.4" />
+            <line class="tick major" x1="84" y1="135.0" x2="97" y2="135.0" />
+            <text class="yr" x="103" y="139.0">2022</text>
+            <line class="tick" x1="84" y1="115.6" x2="90" y2="115.6" />
+            <line class="tick" x1="84" y1="96.2" x2="90" y2="96.2" />
+            <line class="tick" x1="84" y1="76.8" x2="90" y2="76.8" />
+            <line class="tick" x1="84" y1="57.4" x2="90" y2="57.4" />
+            <line class="tick major" x1="84" y1="38.0" x2="97" y2="38.0" />
+            <text class="yr last" x="103" y="42.0">2027</text>
+          </g>
+        </svg>
+        <figcaption>
+          <strong data-lang="en" lang="en" id="gauge-status-en">20th anniversary · March 2027</strong>
+          <strong data-lang="ar" lang="ar" id="gauge-status-ar" hidden>الذكرى العشرون · مارس 2027</strong>
+          <span data-lang="en" lang="en">A rain gauge graduated in years. The level marks the time since the Center was founded.</span>
+          <span data-lang="ar" lang="ar" hidden>مقياس مطر مُدرَّج بالسنوات، يدلّ منسوبه على الزمن المنقضي منذ تأسيس المركز.</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ============================ ENGLISH ============================ -->
+
+<section class="chapter" id="en-heritage" data-lang="en" lang="en" aria-labelledby="en-heritage-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">1</span><span class="label">Heritage</span></div>
+    <div>
+      <h2 id="en-heritage-h">Before the instruments</h2>
+      <p class="intro">Long before radar and satellites, the people of this land read the sky to live. They timed harvests, voyages and pearling seasons by the stars and the winds, and shared out scarce water through channels that are now World Heritage.</p>
+      <div class="entries">
+        <article class="entry">
+          <span class="label">Counted from Suhail</span>
+          <h3>The Durour calendar</h3>
+          <p>The traditional Durour calendar divides the year into 36 periods of ten days, counted from the rising of Suhail (Canopus), with five extra days to make 365.<a class="fn" href="#src-1" aria-label="Source 1">1</a> Each period told families when to plant and harvest, when the sea would turn, when to expect wind and rain, and when to fish.<a class="fn" href="#src-2" aria-label="Source 2">2</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">Julfar · 15th century</span>
+          <h3>Ibn Majid’s monsoons</h3>
+          <p>Ahmad ibn Majid, born in Julfar in present-day Ras Al Khaimah,<a class="fn" href="#src-3" aria-label="Source 3">3</a> was one of the great navigators of the Indian Ocean. His manual, the <i>Kitab al-Fawa’id</i>, assembled around 1490,<a class="fn" href="#src-4" aria-label="Source 4">4</a> timed voyages on the monsoon (the word comes from the Arabic <i>mawsim</i>, season)<a class="fn" href="#src-5" aria-label="Source 5">5</a> by counting the days of the solar year, and fixed positions by measuring the height of stars in “fingers”.<a class="fn" href="#src-6" aria-label="Source 6">6</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">June to September</span>
+          <h3>The pearling seasons</h3>
+          <p>The great dive, <i>al-ghous al-kabir</i>, ran from June to September, with shorter dives in cooler months on either side.<a class="fn" href="#src-7" aria-label="Source 7">7</a> Sailors knew the local winds by name: the Shamal from the north-west, the Kaus from the south-east, the Suhaili from the south.<a class="fn" href="#src-8" aria-label="Source 8">8</a> Pearling faded from the 1930s and had nearly ended by the 1950s.<a class="fn" href="#src-9" aria-label="Source 9">9</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">Al Ain · Iron Age</span>
+          <h3>The aflaj</h3>
+          <p>UNESCO notes that Hili, in Al Ain, has “one of the oldest examples of the sophisticated aflaj irrigation system which dates back to the Iron Age”. In 2011 the Cultural Sites of Al Ain became the UAE’s first World Heritage Site.<a class="fn" href="#src-10" aria-label="Source 10">10</a><a class="fn" href="#src-11" aria-label="Source 11">11</a> As the Ruler’s Representative in Al Ain, Sheikh Zayed had the aflaj restored and water rights shared out more fairly.<a class="fn" href="#src-12" aria-label="Source 12">12</a></p>
+        </article>
+      </div>
+      <blockquote class="quote">
+        <p>“We cherish our environment because it is an integral part of our country, our history and our heritage.”</p>
+        <footer>The late Sheikh Zayed bin Sultan Al Nahyan, first UAE Environment Day, 1998<a class="fn" href="#src-13" aria-label="Source 13">13</a></footer>
+      </blockquote>
+      <div class="prose">
+        <p>NCM inherits that relationship with the sky and gives it the precision of modern science. It also helps keep the old knowledge alive: the Center is a partner in the Sheikh Zayed Grand Mosque Centre’s annual Emirati calendar, which records the Durour and the risings of the stars.<a class="fn" href="#src-14" aria-label="Source 14">14</a> In August 2026, NCM’s Dr Mohamed Al Ebri described Suhail as “a well-known astronomical indicator and part of the region’s traditional climate heritage”.<a class="fn" href="#src-15" aria-label="Source 15">15</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter alt" id="en-nation" data-lang="en" lang="en" aria-labelledby="en-nation-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">2</span><span class="label">Since 2007</span></div>
+    <div>
+      <h2 id="en-nation-h">Built for the nation</h2>
+      <p class="intro">In 2007 the UAE brought its weather service and its atmospheric research together in one national institution, with a task written into federal law: to unify the country’s weather and seismic information and to serve every sector with it.</p>
+      <div class="prose">
+        <p>Weather has been recorded here for nearly a century. At Al Mahatta in Sharjah, the airfield that opened in 1932 as a stop for Imperial Airways, weather data were collected from 1934, and it became the first weather forecasting centre in what is now the UAE and Oman.<a class="fn" href="#src-16" aria-label="Source 16">16</a> The UAE acceded to the convention of the World Meteorological Organization in December 1986.<a class="fn" href="#src-17" aria-label="Source 17">17</a></p>
+        <p>For years the work was divided. The federal Meteorological Department handled forecasting, while the Department of Atmospheric Studies at the Ministry of Presidential Affairs led research on rain enhancement. In 2007 the two came together as the National Center of Meteorology and Seismology.<a class="fn" href="#src-18" aria-label="Source 18">18</a><a class="fn" href="#src-19" aria-label="Source 19">19</a> A resolution of the Minister of Presidential Affairs first created the Center. On 13 November 2007, Federal Decree-Law No. 6, issued by the late Sheikh Khalifa bin Zayed Al Nahyan, established it in federal law, with its headquarters in Abu Dhabi.<a class="fn" href="#src-20" aria-label="Source 20">20</a><a class="fn" href="#src-21" aria-label="Source 21">21</a> In 2017 it took its present name, the National Center of Meteorology.<a class="fn" href="#src-22" aria-label="Source 22">22</a> H.E. Dr Abdulla Ahmed Al Mandous has led it since 2008.<a class="fn" href="#src-23" aria-label="Source 23">23</a></p>
+      </div>
+      <div class="decree">
+        <span class="no">Federal Decree-Law No. 6 of 2007 · Article 3</span>
+        <p lang="ar" dir="rtl">«يهدف المركز إلى توحيد مصدر معلومات الأرصاد والزلزالية ومراقبة التغيرات التي تحدث في الغلاف الجوي، وتقديم خدمات الأرصاد والهندسة الزلزالية إلى كافة القطاعات…»</p>
+        <p>“The Center aims to unify the source of meteorological and seismic information, to monitor changes in the atmosphere, and to provide meteorological and seismic-engineering services to all sectors…” (unofficial translation)<a class="fn" href="#src-20" aria-label="Source 20">20</a></p>
+      </div>
+      <dl class="figures">
+        <div class="fig"><dt>weather stations across the country (2021)<a class="fn" href="#src-24" aria-label="Source 24">24</a></dt><dd><bdi>100+</bdi></dd></div>
+        <div class="fig"><dt>weather radars (2021)<a class="fn" href="#src-24" aria-label="Source 24">24</a></dt><dd><bdi>9</bdi></dd></div>
+        <div class="fig"><dt>seismic stations in the national network (2023)<a class="fn" href="#src-25" aria-label="Source 25">25</a></dt><dd><bdi>23</bdi></dd></div>
+        <div class="fig"><dt>petaflops of peak computing in the Atmosphere supercomputer (2021)<a class="fn" href="#src-26" aria-label="Source 26">26</a></dt><dd><bdi>2.8</bdi></dd></div>
+      </dl>
+      <p class="note">Network counts are the latest published figures and carry the year they were reported.</p>
+      <div class="prose">
+        <p>NCM is the only official body authorised to provide meteorological services nationwide.<a class="fn" href="#src-27" aria-label="Source 27">27</a> Its seismic network, set up in 2008, watches the ground, and the Center acts as the UAE’s national tsunami warning centre.<a class="fn" href="#src-25" aria-label="Source 25">25</a> In 2021 it commissioned Atmosphere, a supercomputer built to run its weather models faster and in finer detail.<a class="fn" href="#src-26" aria-label="Source 26">26</a></p>
+        <p>The work is most visible when the weather turns dangerous. On 16 April 2024 the UAE recorded its heaviest rainfall since data collection began in 1949, and Khatm Al Shakla in Al Ain measured 254.8 mm in less than 24 hours, more than twice the country’s usual rainfall for a whole year.<a class="fn" href="#src-28" aria-label="Source 28">28</a><a class="fn" href="#src-29" aria-label="Source 29">29</a> NCM had warned two days earlier of growing instability and flowing wadis, and on the day it issued a red alert: “Hazardous weather events of exceptional severity are forecast.”<a class="fn" href="#src-30" aria-label="Source 30">30</a><a class="fn" href="#src-31" aria-label="Source 31">31</a></p>
+        <p>The country’s extremes run from 51.8°C, measured at Sweihan in August 2025, to −5.7°C on Jebel Jais in February 2017.<a class="fn" href="#src-32" aria-label="Source 32">32</a><a class="fn" href="#src-33" aria-label="Source 33">33</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="en-ambition" data-lang="en" lang="en" aria-labelledby="en-ambition-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">3</span><span class="label">National priorities</span></div>
+    <div>
+      <h2 id="en-ambition-h">Part of the national ambition</h2>
+      <p class="intro">In 2011 His Highness Sheikh Mohamed bin Zayed Al Nahyan, now President of the UAE, said that water is more important than oil for the country.<a class="fn" href="#src-34" aria-label="Source 34">34</a> The nation’s goals depend on the weather in plain ways: water, safe roads, seas and skies, and a climate it can plan around. NCM’s work runs through each of them.</p>
+      <div class="map">
+        <div class="map-row">
+          <div><h3>Water security</h3><span class="label">UAE Water Security Strategy 2036</span></div>
+          <p>Launched in 2017, the strategy aims to cut total water demand by 21% and to reuse 95% of treated water.<a class="fn" href="#src-35" aria-label="Source 35">35</a> Groundwater still supplies about 46% of the country’s water,<a class="fn" href="#src-36" aria-label="Source 36">36</a> and the UAE receives less than 100 mm of rain a year.<a class="fn" href="#src-29" aria-label="Source 29">29</a> NCM’s International Rain Enhancement Forum is convened “in the context of the UAE Water Security Strategy 2036 and the UAE Science Strategy”.<a class="fn" href="#src-37" aria-label="Source 37">37</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>Safety of people</h3><span class="label">Early warning</span></div>
+          <p>When storms, fog or dust arrive, NCM’s forecasts and warnings are the official reference for the whole country.<a class="fn" href="#src-27" aria-label="Source 27">27</a> Since 2024 an Early Warning System for All, built with the Ministry of Foreign Affairs, has also alerted UAE citizens abroad to disasters by text message.<a class="fn" href="#src-38" aria-label="Source 38">38</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>Science and innovation</h3><span class="label">National Innovation Strategy</span></div>
+          <p>The UAE Research Program for Rain Enhancement Science is aligned with the UAE’s innovation strategy and has drawn researchers from nine countries.<a class="fn" href="#src-39" aria-label="Source 39">39</a><a class="fn" href="#src-40" aria-label="Source 40">40</a> Since 2024 NCM has also been a WMO Regional Training Centre, part of the organization’s network for training meteorologists.<a class="fn" href="#src-41" aria-label="Source 41">41</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>Climate action</h3><span class="label">COP28 · 2023</span></div>
+          <p>When the UAE hosted COP28, NCM co-hosted the Science for Climate Action Pavilion with the WMO, the IPCC and the MERI Foundation, and presented the UAE’s early warning system there.<a class="fn" href="#src-42" aria-label="Source 42">42</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>A voice in the world</h3><span class="label">WMO President · 2023–2027</span></div>
+          <p>In June 2023 NCM’s Director General, Dr Abdulla Ahmed Al Mandous, was elected President of the World Meteorological Organization, the first meteorologist from the Gulf Cooperation Council to hold the post.<a class="fn" href="#src-43" aria-label="Source 43">43</a> From 2017 to 2023 he had presided over the WMO’s Regional Association for Asia.<a class="fn" href="#src-23" aria-label="Source 23">23</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter alt" id="en-rain" data-lang="en" lang="en" aria-labelledby="en-rain-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">4</span><span class="label">Rain enhancement</span></div>
+    <div>
+      <h2 id="en-rain-h">More rain for a thirsty world</h2>
+      <p class="intro">The UAE receives less than 100 mm of rain in a typical year.<a class="fn" href="#src-29" aria-label="Source 29">29</a> Rather than accept that limit, the country set out to coax more rain from the clouds it has, and then to advance the science for every country facing drought.</p>
+
+      <div class="sub">
+        <span class="label">At home</span>
+        <h3>Four decades of cloud seeding</h3>
+        <div class="prose">
+          <p>The UAE’s first cloud-seeding trial flew in February 1982,<a class="fn" href="#src-44" aria-label="Source 44">44</a> and seeding operations took shape in the 1990s.<a class="fn" href="#src-45" aria-label="Source 45">45</a> From 2001 to 2005 the country ran a scientific assessment of rain enhancement with the US National Center for Atmospheric Research (NCAR), the University of the Witwatersrand and other partners.<a class="fn" href="#src-46" aria-label="Source 46">46</a> The operational programme began in 2002 over the Hajar Mountains, and since 2010 it has covered the whole country, all year round.<a class="fn" href="#src-47" aria-label="Source 47">47</a></p>
+          <p>In 2022 NCM flew 311 seeding missions, close to 1,000 flying hours.<a class="fn" href="#src-48" aria-label="Source 48">48</a> Its aircraft release flares of natural salts at the base of suitable clouds to help droplets grow into raindrops, and NCM does not seed during extreme weather.<a class="fn" href="#src-47" aria-label="Source 47">47</a><a class="fn" href="#src-49" aria-label="Source 49">49</a> The flares are made at home, in NCM’s Emirates Weather Enhancement Factory, the first in the Middle East and North Africa to produce high-quality cloud-seeding materials and flares.<a class="fn" href="#src-50" aria-label="Source 50">50</a></p>
+          <p>NCM estimates that seeding suitable clouds can raise rainfall by 10 to 25 percent,<a class="fn" href="#src-51" aria-label="Source 51">51</a> at a cost its researchers put at 1 to 4 US cents per cubic metre of water, far below the cost of desalination.<a class="fn" href="#src-52" aria-label="Source 52">52</a> Its scientists are also candid about how hard the effect is to measure. In 2023 they wrote: “There are still too many multiscale and region-specific unknowns to report a specific percentage.”<a class="fn" href="#src-52" aria-label="Source 52">52</a> Closing that gap is why the UAE chose to invest in the science itself.</p>
+        </div>
+      </div>
+
+      <div class="sub">
+        <span class="label">In the laboratory</span>
+        <h3>A research programme for the world</h3>
+        <div class="prose">
+          <p>In January 2015, under the patronage of His Highness Sheikh Mansour bin Zayed Al Nahyan, the UAE launched the UAE Research Program for Rain Enhancement Science (UAEREP), an international grant programme run by NCM.<a class="fn" href="#src-53" aria-label="Source 53">53</a> It offers grants of up to US$1.5 million per project over three years.<a class="fn" href="#src-54" aria-label="Source 54">54</a> Six award cycles later it has funded 17 projects,<a class="fn" href="#src-40" aria-label="Source 40">40</a><a class="fn" href="#src-54" aria-label="Source 54">54</a> and its research has produced eight patents.<a class="fn" href="#src-55" aria-label="Source 55">55</a> One is a seeding nanomaterial, a salt core coated in titanium dioxide, developed at Khalifa University and patented with NCM.<a class="fn" href="#src-56" aria-label="Source 56">56</a></p>
+          <p>The projects range from nanomaterials and drones that release electric charge into clouds to lasers, land-cover experiments and artificial intelligence.<a class="fn" href="#src-57" aria-label="Source 57">57</a><a class="fn" href="#src-58" aria-label="Source 58">58</a><a class="fn" href="#src-54" aria-label="Source 54">54</a> The programme’s International Rain Enhancement Forum brings the field together in Abu Dhabi. Its seventh edition, in January 2025, marked the programme’s tenth anniversary.<a class="fn" href="#src-45" aria-label="Source 45">45</a></p>
+        </div>
+        <div class="panel">
+          <span class="label">UAEREP in figures</span>
+          <dl class="figures">
+            <div class="fig"><dt>research projects funded in six cycles, 2016–2026<a class="fn" href="#src-40" aria-label="Source 40">40</a><a class="fn" href="#src-54" aria-label="Source 54">54</a></dt><dd><bdi>17</bdi></dd></div>
+            <div class="fig"><dt>awarded in the first five cycles<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>US$22.5m</bdi></dd></div>
+            <div class="fig"><dt>researchers<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>208</bdi></dd></div>
+            <div class="fig"><dt>research institutions<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>45</bdi></dd></div>
+            <div class="fig"><dt>countries<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>9</bdi></dd></div>
+            <div class="fig"><dt>patents<a class="fn" href="#src-55" aria-label="Source 55">55</a></dt><dd><bdi>8</bdi></dd></div>
+          </dl>
+          <p class="note">Researchers, institutions and countries cover the first five cycles, to 2024.</p>
+        </div>
+        <blockquote class="quote">
+          <p>“Today, the programme has become a global platform that brings minds together and produces distinctive solutions that strengthen water security and pave the way for a more sustainable future.”</p>
+          <footer>His Highness Sheikh Mansour bin Zayed Al Nahyan, Vice President, Deputy Prime Minister and Chairman of the Presidential Court, May 2026. Translated from the Arabic.<a class="fn" href="#src-59" aria-label="Source 59">59</a></footer>
+        </blockquote>
+      </div>
+
+      <div class="sub">
+        <span class="label">For the world</span>
+        <h3>Sharing the science</h3>
+        <div class="prose">
+          <p>The UAE shares what it learns. NCM supported the WMO expert team’s international review of precipitation-enhancement research, published in 2019.<a class="fn" href="#src-60" aria-label="Source 60">60</a> In October 2025 NCM signed a memorandum with Kazakhstan’s weather service, and in May 2026 a UAE team and aircraft began a rain-enhancement pilot in the Turkistan region, training Kazakh pilots, meteorologists and engineers.<a class="fn" href="#src-61" aria-label="Source 61">61</a><a class="fn" href="#src-62" aria-label="Source 62">62</a> In December 2025 NCM and Morocco’s meteorological directorate agreed on joint research that includes cloud seeding.<a class="fn" href="#src-63" aria-label="Source 63">63</a> And in December 2023 UAE aircraft seeded clouds over Lahore to ease severe smog, a mission Punjab’s caretaker chief minister called “a gift from the UAE”.<a class="fn" href="#src-64" aria-label="Source 64">64</a></p>
+          <p>The UAE and Senegal co-host the UN 2026 Water Conference in Abu Dhabi, from 8 to 10 December 2026.<a class="fn" href="#src-65" aria-label="Source 65">65</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="en-milestones" data-lang="en" lang="en" aria-labelledby="en-milestones-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">5</span><span class="label">Milestones</span></div>
+    <div>
+      <h2 id="en-milestones-h">Milestones, 2007–2027</h2>
+      <p class="intro">From the founding decree to the presidency of the World Meteorological Organization, the moments that shaped the Center’s first twenty years.</p>
+      <ol class="timeline">
+        <li><time datetime="2007">2007</time><div><h3>The Center is founded</h3><p>Federal Decree-Law No. 6 of 2007 establishes the National Center of Meteorology and Seismology in Abu Dhabi.<a class="fn" href="#src-20" aria-label="Source 20">20</a></p></div></li>
+        <li><time datetime="2008">2008</time><div><h3>A national seismic network</h3><p>The national seismic network is set up. Dr Abdulla Ahmed Al Mandous takes the helm and becomes the UAE’s Permanent Representative with the WMO.<a class="fn" href="#src-25" aria-label="Source 25">25</a><a class="fn" href="#src-23" aria-label="Source 23">23</a></p></div></li>
+        <li><time datetime="2010">2010</time><div><h3>Seeding goes nationwide</h3><p>The operational cloud-seeding programme expands to the whole country, all year round.<a class="fn" href="#src-47" aria-label="Source 47">47</a></p></div></li>
+        <li><time datetime="2015">2015</time><div><h3>UAEREP is launched</h3><p>An international research grant programme for rain-enhancement science begins, under the patronage of Sheikh Mansour bin Zayed Al Nahyan.<a class="fn" href="#src-53" aria-label="Source 53">53</a></p></div></li>
+        <li><time datetime="2017">2017</time><div><h3>A new name and a regional role</h3><p>Federal Law No. 13 of 2017 renames the Center the National Center of Meteorology. Dr Al Mandous becomes President of the WMO Regional Association for Asia.<a class="fn" href="#src-22" aria-label="Source 22">22</a><a class="fn" href="#src-23" aria-label="Source 23">23</a></p></div></li>
+        <li><time datetime="2021">2021</time><div><h3>Atmosphere, and drones in the clouds</h3><p>NCM commissions a 2.8-petaflop supercomputer, and charge-emitting research drones fly in UAE skies.<a class="fn" href="#src-26" aria-label="Source 26">26</a><a class="fn" href="#src-57" aria-label="Source 57">57</a></p></div></li>
+        <li><time datetime="2023">2023</time><div><h3>Presidency of the WMO</h3><p>Dr Al Mandous is elected President of the World Meteorological Organization. At COP28, NCM co-hosts the Science for Climate Action Pavilion.<a class="fn" href="#src-43" aria-label="Source 43">43</a><a class="fn" href="#src-42" aria-label="Source 42">42</a></p></div></li>
+        <li><time datetime="2024">2024</time><div><h3>The heaviest rain on record</h3><p>On 16 April the UAE records its heaviest rainfall since 1949. NCM becomes a WMO Regional Training Centre and launches an early-warning platform for citizens abroad.<a class="fn" href="#src-28" aria-label="Source 28">28</a><a class="fn" href="#src-41" aria-label="Source 41">41</a><a class="fn" href="#src-38" aria-label="Source 38">38</a></p></div></li>
+        <li><time datetime="2025">2025</time><div><h3>A decade of UAEREP</h3><p>The seventh International Rain Enhancement Forum marks ten years of the programme, and NCM signs a memorandum with Kazakhstan.<a class="fn" href="#src-45" aria-label="Source 45">45</a><a class="fn" href="#src-61" aria-label="Source 61">61</a></p></div></li>
+        <li><time datetime="2026">2026</time><div><h3>Across borders, and into AI</h3><p>A UAE team begins a rain-enhancement pilot in Kazakhstan, and NCM launches two AI assistants for weather services, Al-Rasid and Forecaster Assistant.<a class="fn" href="#src-62" aria-label="Source 62">62</a><a class="fn" href="#src-66" aria-label="Source 66">66</a></p></div></li>
+        <li class="anniv"><time datetime="2027-03">2027</time><div><h3>Twenty years</h3><p>NCM marks its 20th anniversary in March, in the year by which the UN’s Early Warnings for All initiative aims to protect everyone on Earth.<a class="fn" href="#src-67" aria-label="Source 67">67</a></p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="chapter closing" id="en-next" data-lang="en" lang="en" aria-labelledby="en-next-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">6</span><span class="label">2027–2047</span></div>
+    <div>
+      <h2 id="en-next-h">The next twenty</h2>
+      <p class="intro">The next two decades will test everything NCM has built: a warming climate, rising demand for water, and a world that needs early warnings and every extra drop of rain.</p>
+      <div class="aims">
+        <div class="aim">
+          <h3>Every drop counted</h3>
+          <p>Carry rain enhancement from promising results to proven, measurable gains, with UAEREP’s researchers and the Water Security Strategy 2036 as the frame.<a class="fn" href="#src-54" aria-label="Source 54">54</a><a class="fn" href="#src-35" aria-label="Source 35">35</a></p>
+        </div>
+        <div class="aim">
+          <h3>Warnings that reach everyone</h3>
+          <p>The UN’s Early Warnings for All initiative, co-led by the WMO, aims to protect everyone on Earth by the end of 2027, the year NCM turns twenty.<a class="fn" href="#src-67" aria-label="Source 67">67</a></p>
+        </div>
+        <div class="aim">
+          <h3>Forecasts at the speed of AI</h3>
+          <p>NCM’s AI assistants, launched in 2026, and its Atmosphere supercomputer point to forecasts that are faster, finer and more local.<a class="fn" href="#src-66" aria-label="Source 66">66</a><a class="fn" href="#src-26" aria-label="Source 26">26</a></p>
+        </div>
+        <div class="aim">
+          <h3>A partner to a drier world</h3>
+          <p>From Kazakhstan to Morocco, and through its WMO Regional Training Centre, NCM’s expertise already crosses borders. The next twenty years ask it to go further.<a class="fn" href="#src-62" aria-label="Source 62">62</a><a class="fn" href="#src-63" aria-label="Source 63">63</a><a class="fn" href="#src-41" aria-label="Source 41">41</a></p>
+        </div>
+      </div>
+      <p class="dedication">To the forecasters, observers, pilots, engineers and scientists of the National Center of Meteorology: twenty years of watching the sky, so the nation can plan for tomorrow.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ARABIC ============================ -->
+
+<section class="chapter" id="ar-heritage" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-heritage-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">1</span><span class="label">الإرث</span></div>
+    <div>
+      <h2 id="ar-heritage-h">قبل الأجهزة</h2>
+      <p class="intro">قبل الرادارات والأقمار الاصطناعية بزمن طويل، قرأ أهل هذه الأرض السماء ليعيشوا؛ فوقّتوا الحصاد والأسفار ومواسم الغوص بالنجوم والرياح، وتقاسموا الماء الشحيح عبر أفلاجٍ صارت اليوم تراثاً عالمياً.</p>
+      <div class="entries">
+        <article class="entry">
+          <span class="label">من طلوع سهيل</span>
+          <h3>حساب الدرور</h3>
+          <p>يقسّم حساب الدرور التقليدي السنة إلى 36 دَرّاً، مدة كلٍّ منها عشرة أيام، تُعَدّ من طلوع نجم سهيل، وتُضاف إليها خمسة أيام تُعرف بـ«الخمس المساريق» لتكتمل السنة 365 يوماً.<a class="fn" href="#src-1" aria-label="Source 1">1</a> وكان كل دَرٍّ يدلّ الناس على مواسم الزراعة والحصاد، وأحوال البحر، ومواعيد الرياح والأمطار، ومواسم الصيد.<a class="fn" href="#src-2" aria-label="Source 2">2</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">جلفار · القرن الخامس عشر</span>
+          <h3>ابن ماجد ورياح الموسم</h3>
+          <p>وُلد أحمد بن ماجد في جلفار، في رأس الخيمة اليوم،<a class="fn" href="#src-3" aria-label="Source 3">3</a> وكان من أعظم ملاحي المحيط الهندي. وفي كتابه «الفوائد في أصول علم البحر والقواعد»، الذي جُمع نحو عام 1490،<a class="fn" href="#src-4" aria-label="Source 4">4</a> وقّت رحلات الموسم بعدّ أيام السنة الشمسية، وحدّد المواقع بقياس ارتفاع النجوم بـ«الأصابع».<a class="fn" href="#src-6" aria-label="Source 6">6</a> ومن كلمة «الموسم» العربية اشتُقّ اسم الرياح الموسمية في لغات أوروبية عدة.<a class="fn" href="#src-5" aria-label="Source 5">5</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">من يونيو إلى سبتمبر</span>
+          <h3>مواسم الغوص</h3>
+          <p>امتد «الغوص الكبير» من يونيو إلى سبتمبر، وسبقته ولحقته مواسم أقصر في الأشهر الأبرد.<a class="fn" href="#src-7" aria-label="Source 7">7</a> وعرف البحّارة رياحهم بأسمائها: الشمال من الشمال الغربي، والكوس من الجنوب الشرقي، والسهيلي من الجنوب.<a class="fn" href="#src-8" aria-label="Source 8">8</a> ثم أخذ الغوص يتراجع منذ ثلاثينيات القرن العشرين حتى كاد يتوقف في خمسينياته.<a class="fn" href="#src-9" aria-label="Source 9">9</a></p>
+        </article>
+        <article class="entry">
+          <span class="label">العين · العصر الحديدي</span>
+          <h3>الأفلاج</h3>
+          <p>يضم موقع هيلي في العين، بحسب اليونسكو، واحداً من أقدم نماذج نظام الري بالأفلاج، ويعود إلى العصر الحديدي. وفي عام 2011 أصبحت «مواقع العين الثقافية» أول موقع في الدولة يُدرج على قائمة التراث العالمي.<a class="fn" href="#src-10" aria-label="Source 10">10</a><a class="fn" href="#src-11" aria-label="Source 11">11</a> وحين كان المغفور له الشيخ زايد بن سلطان آل نهيان ممثلاً للحاكم في العين، أعاد إحياء الأفلاج ووزّع حقوق المياه توزيعاً أكثر عدلاً.<a class="fn" href="#src-12" aria-label="Source 12">12</a></p>
+        </article>
+      </div>
+      <blockquote class="quote">
+        <p>«إننا نولي بيئتنا جل اهتمامنا لأنها جزء عضوي من بلادنا وتاريخنا وتراثنا»</p>
+        <footer>المغفور له الشيخ زايد بن سلطان آل نهيان، طيب الله ثراه<a class="fn" href="#src-68" aria-label="Source 68">68</a></footer>
+      </blockquote>
+      <div class="prose">
+        <p>ويرث المركز الوطني للأرصاد هذه العلاقة بالسماء ويمنحها دقة العلم الحديث، ويسهم في صون المعرفة القديمة؛ فهو شريك في التقويم الإماراتي الذي يصدره مركز جامع الشيخ زايد الكبير سنوياً، ويوثّق الدرور وطوالع النجوم.<a class="fn" href="#src-14" aria-label="Source 14">14</a> وفي أغسطس 2026 وصف الدكتور محمد العبري من المركز نجم سهيل بأنه مؤشر فلكي معروف وجزء من الإرث المناخي التقليدي في المنطقة.<a class="fn" href="#src-15" aria-label="Source 15">15</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter alt" id="ar-nation" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-nation-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">2</span><span class="label">منذ 2007</span></div>
+    <div>
+      <h2 id="ar-nation-h">مؤسسة في خدمة الوطن</h2>
+      <p class="intro">في عام 2007 جمعت دولة الإمارات خدمات الأرصاد الجوية وأبحاث الغلاف الجوي في مؤسسة وطنية واحدة، أوكل إليها القانون الاتحادي توحيد مصدر معلومات الأرصاد والزلازل في الدولة، وتقديم خدماتها إلى جميع القطاعات.</p>
+      <div class="prose">
+        <p>يُرصد الطقس على هذه الأرض منذ قرابة قرن؛ ففي «المحطة» بالشارقة، المطار الذي افتُتح عام 1932 محطةً لرحلات الخطوط الجوية الإمبراطورية، بدأ جمع بيانات الطقس عام 1934، لتصبح أول مركز للتنبؤ بالطقس في ما يُعرف اليوم بالإمارات وعُمان.<a class="fn" href="#src-16" aria-label="Source 16">16</a> وانضمت الدولة إلى اتفاقية المنظمة العالمية للأرصاد الجوية في ديسمبر 1986.<a class="fn" href="#src-17" aria-label="Source 17">17</a></p>
+        <p>وظل العمل موزعاً سنوات؛ إذ تولّت إدارة الأرصاد الجوية الاتحادية التنبؤات، فيما قادت إدارة الدراسات الجوية في وزارة شؤون الرئاسة أبحاث الاستمطار. وفي عام 2007 اجتمعتا في «المركز الوطني للأرصاد الجوية والزلازل».<a class="fn" href="#src-18" aria-label="Source 18">18</a><a class="fn" href="#src-19" aria-label="Source 19">19</a> وقد أُنشئ المركز أولاً بقرار من وزير شؤون الرئاسة، ثم صدر في 13 نوفمبر 2007 المرسوم بقانون اتحادي رقم (6) لسنة 2007 عن المغفور له الشيخ خليفة بن زايد آل نهيان، ليؤسسه بقانون اتحادي ويجعل مقره الرئيسي في أبوظبي.<a class="fn" href="#src-20" aria-label="Source 20">20</a><a class="fn" href="#src-21" aria-label="Source 21">21</a> وفي عام 2017 حمل اسمه الحالي: المركز الوطني للأرصاد.<a class="fn" href="#src-22" aria-label="Source 22">22</a> ويقوده معالي الدكتور عبدالله أحمد المندوس منذ عام 2008.<a class="fn" href="#src-23" aria-label="Source 23">23</a></p>
+      </div>
+      <div class="decree">
+        <span class="no">المرسوم بقانون اتحادي رقم (6) لسنة 2007 · المادة (3)</span>
+        <p>«يهدف المركز إلى توحيد مصدر معلومات الأرصاد والزلزالية ومراقبة التغيرات التي تحدث في الغلاف الجوي، وتقديم خدمات الأرصاد والهندسة الزلزالية إلى كافة القطاعات…»<a class="fn" href="#src-20" aria-label="Source 20">20</a></p>
+      </div>
+      <dl class="figures">
+        <div class="fig"><dt>محطة أرصاد جوية في أنحاء الدولة (2021)<a class="fn" href="#src-24" aria-label="Source 24">24</a></dt><dd><bdi>100+</bdi></dd></div>
+        <div class="fig"><dt>رادارات طقس (2021)<a class="fn" href="#src-24" aria-label="Source 24">24</a></dt><dd><bdi>9</bdi></dd></div>
+        <div class="fig"><dt>محطة في الشبكة الوطنية لرصد الزلازل (2023)<a class="fn" href="#src-25" aria-label="Source 25">25</a></dt><dd><bdi>23</bdi></dd></div>
+        <div class="fig"><dt>بيتافلوب: القدرة الحسابية القصوى للحاسوب الفائق «أتموسفير» (2021)<a class="fn" href="#src-26" aria-label="Source 26">26</a></dt><dd><bdi>2.8</bdi></dd></div>
+      </dl>
+      <p class="note">أعداد الشبكات هي أحدث الأرقام المنشورة، مع سنة نشرها.</p>
+      <div class="prose">
+        <p>والمركز هو الجهة الرسمية الوحيدة المخولة بتقديم خدمات الأرصاد الجوية على مستوى الدولة.<a class="fn" href="#src-27" aria-label="Source 27">27</a> وتراقب شبكته الزلزالية، التي أُنشئت عام 2008، باطن الأرض، ويعمل مركزاً وطنياً للإنذار من أمواج تسونامي.<a class="fn" href="#src-25" aria-label="Source 25">25</a> وفي عام 2021 أدخل الحاسوب الفائق «أتموسفير» لتشغيل نماذج التنبؤ بالطقس بسرعة ودقة أعلى.<a class="fn" href="#src-26" aria-label="Source 26">26</a></p>
+        <p>ويبلغ عمل المركز ذروة حضوره حين تشتد الأحوال الجوية. ففي 16 أبريل 2024 شهدت الدولة أغزر هطول للأمطار منذ بدء جمع البيانات عام 1949، وسجّلت منطقة خطم الشكلة في العين 254.8 ملم في أقل من 24 ساعة، أي أكثر من ضعفي ما تتلقاه الدولة عادةً من أمطار في عام كامل.<a class="fn" href="#src-28" aria-label="Source 28">28</a><a class="fn" href="#src-29" aria-label="Source 29">29</a> وكان المركز قد نبّه قبل يومين إلى تزايد حالة عدم الاستقرار الجوي واحتمال جريان الأودية، ثم أصدر في يوم العاصفة إنذاراً أحمر من ظواهر جوية خطرة ذات شدة استثنائية.<a class="fn" href="#src-30" aria-label="Source 30">30</a><a class="fn" href="#src-31" aria-label="Source 31">31</a></p>
+        <p>وتمتد أطراف مناخ الدولة من 51.8 درجة مئوية سُجّلت في سويحان في أغسطس 2025، إلى 5.7 درجة مئوية تحت الصفر على قمة جبل جيس في فبراير 2017.<a class="fn" href="#src-32" aria-label="Source 32">32</a><a class="fn" href="#src-33" aria-label="Source 33">33</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="ar-ambition" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-ambition-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">3</span><span class="label">الأولويات الوطنية</span></div>
+    <div>
+      <h2 id="ar-ambition-h">ركيزة في الطموح الوطني</h2>
+      <p class="intro">في عام 2011 قال صاحب السمو الشيخ محمد بن زايد آل نهيان، رئيس الدولة حفظه الله، حين كان ولياً لعهد أبوظبي، إن الماء أهم من النفط بالنسبة إلى دولة الإمارات.<a class="fn" href="#src-34" aria-label="Source 34">34</a> وتعتمد أهداف الوطن على الطقس في أمور واضحة: الماء، وسلامة الطرق والبحار والأجواء، ومناخ يمكن التخطيط للمستقبل في ضوئه. ويمتد عمل المركز عبر كل واحد منها.</p>
+      <div class="map">
+        <div class="map-row">
+          <div><h3>الأمن المائي</h3><span class="label">استراتيجية الأمن المائي لدولة الإمارات 2036</span></div>
+          <p>تهدف الاستراتيجية، التي أُطلقت عام 2017، إلى خفض إجمالي الطلب على المياه بنسبة 21% وإعادة استخدام 95% من المياه المعالجة.<a class="fn" href="#src-35" aria-label="Source 35">35</a> ولا تزال المياه الجوفية توفر نحو 46% من مياه الدولة،<a class="fn" href="#src-36" aria-label="Source 36">36</a> فيما يقل معدل الأمطار السنوي عن 100 ملم.<a class="fn" href="#src-29" aria-label="Source 29">29</a> ويُعقد الملتقى الدولي للاستمطار في إطار استراتيجية الأمن المائي لدولة الإمارات 2036 واستراتيجية الدولة للعلوم.<a class="fn" href="#src-37" aria-label="Source 37">37</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>سلامة الناس</h3><span class="label">الإنذار المبكر</span></div>
+          <p>حين تهب العواصف أو يحلّ الضباب أو الغبار، تكون تنبؤات المركز وتحذيراته المرجع الرسمي للدولة كلها.<a class="fn" href="#src-27" aria-label="Source 27">27</a> ومنذ عام 2024 يتيح «نظام الإنذار المبكر للجميع»، الذي أطلقه المركز مع وزارة الخارجية، تنبيه المواطنين في الخارج إلى الكوارث عبر الرسائل النصية.<a class="fn" href="#src-38" aria-label="Source 38">38</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>العلوم والابتكار</h3><span class="label">الاستراتيجية الوطنية للابتكار</span></div>
+          <p>يتماشى برنامج الإمارات لبحوث علوم الاستمطار مع استراتيجية الدولة للابتكار، واستقطب باحثين من تسع دول.<a class="fn" href="#src-39" aria-label="Source 39">39</a><a class="fn" href="#src-40" aria-label="Source 40">40</a> ومنذ عام 2024 أصبح المركز مركزاً إقليمياً للتدريب ضمن شبكة المنظمة العالمية للأرصاد الجوية لتأهيل خبراء الأرصاد.<a class="fn" href="#src-41" aria-label="Source 41">41</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>العمل المناخي</h3><span class="label"><bdi dir="ltr">COP28 · 2023</bdi></span></div>
+          <p>حين استضافت الدولة مؤتمر الأطراف <bdi dir="ltr">COP28</bdi>، شارك المركز في استضافة جناح «العلوم من أجل العمل المناخي» مع المنظمة العالمية للأرصاد الجوية والهيئة الحكومية الدولية المعنية بتغير المناخ ومؤسسة ميري، وعرض فيه نظام الإنذار المبكر في الدولة.<a class="fn" href="#src-42" aria-label="Source 42">42</a></p>
+        </div>
+        <div class="map-row">
+          <div><h3>صوتٌ في العالم</h3><span class="label">رئاسة المنظمة العالمية للأرصاد الجوية · <bdi dir="ltr">2023–2027</bdi></span></div>
+          <p>في يونيو 2023 انتُخب الدكتور عبدالله أحمد المندوس، مدير عام المركز آنذاك، رئيساً للمنظمة العالمية للأرصاد الجوية، ليكون أول خبير أرصاد من دول مجلس التعاون الخليجي يتولى هذا المنصب.<a class="fn" href="#src-43" aria-label="Source 43">43</a> وكان قد ترأس الاتحاد الإقليمي لآسيا في المنظمة من عام 2017 إلى عام 2023.<a class="fn" href="#src-23" aria-label="Source 23">23</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter alt" id="ar-rain" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-rain-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">4</span><span class="label">الاستمطار</span></div>
+    <div>
+      <h2 id="ar-rain-h">مطرٌ أوفر لعالمٍ عطشان</h2>
+      <p class="intro">يقل ما تتلقاه الإمارات من أمطار في العام المعتاد عن 100 ملم.<a class="fn" href="#src-29" aria-label="Source 29">29</a> وبدلاً من التسليم بهذا الحد، سعت الدولة إلى أن تستدرّ من سحبها مطراً أوفر، ثم إلى أن تدفع هذا العلم إلى الأمام من أجل كل بلد يواجه الجفاف.</p>
+
+      <div class="sub">
+        <span class="label">في الداخل</span>
+        <h3>أربعة عقود من تلقيح السحب</h3>
+        <div class="prose">
+          <p>حلّقت أول تجربة لتلقيح السحب في الدولة في فبراير 1982،<a class="fn" href="#src-44" aria-label="Source 44">44</a> وترسّخت العمليات في تسعينيات القرن العشرين.<a class="fn" href="#src-45" aria-label="Source 45">45</a> وبين عامي 2001 و2005 نفّذت الدولة تقييماً علمياً للاستمطار مع المركز الوطني لأبحاث الغلاف الجوي في الولايات المتحدة <bdi dir="ltr">(NCAR)</bdi> وجامعة ويتواترسراند وشركاء آخرين.<a class="fn" href="#src-46" aria-label="Source 46">46</a> وانطلق البرنامج التشغيلي عام 2002 فوق جبال الحجر، وهو يغطي الدولة كلها على مدار العام منذ 2010.<a class="fn" href="#src-47" aria-label="Source 47">47</a></p>
+          <p>في عام 2022 نفّذ المركز 311 طلعة جوية لتلقيح السحب، بما يقارب 1000 ساعة طيران.<a class="fn" href="#src-48" aria-label="Source 48">48</a> وتطلق طائراته شعلات من الأملاح الطبيعية عند قواعد السحب المناسبة لتساعد القطيرات على النمو حتى تصير قطرات مطر، ولا يُجري المركز عمليات التلقيح في أثناء الظواهر الجوية المتطرفة.<a class="fn" href="#src-47" aria-label="Source 47">47</a><a class="fn" href="#src-49" aria-label="Source 49">49</a> وتُصنع هذه الشعلات محلياً في «مصنع الإمارات لتحسين الطقس» التابع للمركز، وهو أول مصنع في منطقة الشرق الأوسط وشمال أفريقيا لإنتاج مواد وشعلات تلقيح السحب عالية الجودة.<a class="fn" href="#src-50" aria-label="Source 50">50</a></p>
+          <p>ويقدّر المركز أن تلقيح السحب المناسبة يمكن أن يزيد الهطول بنسبة تتراوح بين 10% و25%،<a class="fn" href="#src-51" aria-label="Source 51">51</a> بكلفة يقدّرها باحثوه بما بين سنت واحد وأربعة سنتات أمريكية للمتر المكعب من المياه، وهي أقل بكثير من كلفة التحلية.<a class="fn" href="#src-52" aria-label="Source 52">52</a> ويقرّ علماؤه بصراحة بصعوبة قياس هذا الأثر؛ فقد كتبوا عام 2023 أن المجهول في هذه العمليات لا يزال أكبر من أن يسمح بتحديد نسبة بعينها.<a class="fn" href="#src-52" aria-label="Source 52">52</a> ولسدّ هذه الفجوة اختارت الدولة أن تستثمر في العلم نفسه.</p>
+        </div>
+      </div>
+
+      <div class="sub">
+        <span class="label">في المختبر</span>
+        <h3>برنامج بحثي للعالم</h3>
+        <div class="prose">
+          <p>في يناير 2015، وتحت رعاية سمو الشيخ منصور بن زايد آل نهيان، أطلقت الدولة «برنامج الإمارات لبحوث علوم الاستمطار»، وهو برنامج منح بحثية دولي ينظمه المركز الوطني للأرصاد.<a class="fn" href="#src-53" aria-label="Source 53">53</a> ويقدّم منحاً تصل إلى 1.5 مليون دولار أمريكي للمشروع الواحد على مدى ثلاث سنوات.<a class="fn" href="#src-54" aria-label="Source 54">54</a> وبعد ست دورات، موّل البرنامج 17 مشروعاً،<a class="fn" href="#src-40" aria-label="Source 40">40</a><a class="fn" href="#src-54" aria-label="Source 54">54</a> وأثمرت بحوثه ثماني براءات اختراع،<a class="fn" href="#src-55" aria-label="Source 55">55</a> منها مادة نانوية لتلقيح السحب قوامها نواة من الملح مغلّفة بثاني أكسيد التيتانيوم، طُوّرت في جامعة خليفة وسُجّلت براءتها بالشراكة مع المركز.<a class="fn" href="#src-56" aria-label="Source 56">56</a></p>
+          <p>وتمتد مشروعاته من المواد النانوية والطائرات المسيّرة التي تطلق شحنات كهربائية في السحب، إلى الليزر وتجارب الغطاء الأرضي والذكاء الاصطناعي.<a class="fn" href="#src-57" aria-label="Source 57">57</a><a class="fn" href="#src-58" aria-label="Source 58">58</a><a class="fn" href="#src-54" aria-label="Source 54">54</a> ويجمع «الملتقى الدولي للاستمطار» أهل هذا العلم في أبوظبي، وقد احتفت دورته السابعة في يناير 2025 بمرور عشر سنوات على إطلاق البرنامج.<a class="fn" href="#src-45" aria-label="Source 45">45</a></p>
+        </div>
+        <div class="panel">
+          <span class="label">البرنامج بالأرقام</span>
+          <dl class="figures">
+            <div class="fig"><dt>مشروعاً بحثياً في ست دورات، <bdi dir="ltr">2016–2026</bdi><a class="fn" href="#src-40" aria-label="Source 40">40</a><a class="fn" href="#src-54" aria-label="Source 54">54</a></dt><dd><bdi>17</bdi></dd></div>
+            <div class="fig"><dt>مليون دولار أمريكي مُنحت في الدورات الخمس الأولى<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>22.5</bdi></dd></div>
+            <div class="fig"><dt>باحثاً<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>208</bdi></dd></div>
+            <div class="fig"><dt>مؤسسةً بحثية<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>45</bdi></dd></div>
+            <div class="fig"><dt>دول<a class="fn" href="#src-40" aria-label="Source 40">40</a></dt><dd><bdi>9</bdi></dd></div>
+            <div class="fig"><dt>براءات اختراع<a class="fn" href="#src-55" aria-label="Source 55">55</a></dt><dd><bdi>8</bdi></dd></div>
+          </dl>
+          <p class="note">تشمل أرقام الباحثين والمؤسسات والدول الدورات الخمس الأولى حتى عام 2024.</p>
+        </div>
+        <blockquote class="quote">
+          <p>«اليوم، أصبح البرنامج منصة عالمية تجمع العقول، وتنتج حلولاً نوعية تعزز الأمن المائي، وتمهّد لمستقبل أكثر استدامة»</p>
+          <footer>سمو الشيخ منصور بن زايد آل نهيان، نائب رئيس الدولة، نائب رئيس مجلس الوزراء، رئيس ديوان الرئاسة، مايو 2026<a class="fn" href="#src-59" aria-label="Source 59">59</a></footer>
+        </blockquote>
+      </div>
+
+      <div class="sub">
+        <span class="label">للعالم</span>
+        <h3>علمٌ يُتشارَك</h3>
+        <div class="prose">
+          <p>وتشارك الدولة ما تتعلمه؛ فقد دعم المركز مراجعة دولية لبحوث تعزيز الهطول أجراها فريق خبراء المنظمة العالمية للأرصاد الجوية ونُشرت عام 2019.<a class="fn" href="#src-60" aria-label="Source 60">60</a> وفي أكتوبر 2025 وقّع المركز مذكرة تفاهم مع هيئة الأرصاد في كازاخستان، وفي مايو 2026 بدأ فريق إماراتي بطائراته مشروعاً تجريبياً للاستمطار في إقليم تركستان، مع تدريب طيارين وخبراء أرصاد ومهندسين من كازاخستان.<a class="fn" href="#src-61" aria-label="Source 61">61</a><a class="fn" href="#src-62" aria-label="Source 62">62</a> وفي ديسمبر 2025 اتفق المركز مع المديرية العامة للأرصاد الجوية في المغرب على بحوث مشتركة تشمل تلقيح السحب.<a class="fn" href="#src-63" aria-label="Source 63">63</a> وفي ديسمبر 2023 لقّحت طائرات إماراتية السحب فوق لاهور للتخفيف من الضباب الدخاني الكثيف، ووصف رئيس وزراء إقليم البنجاب المؤقت المبادرة بأنها «هدية من الإمارات».<a class="fn" href="#src-64" aria-label="Source 64">64</a></p>
+          <p>وتستضيف الدولة مع السنغال مؤتمر الأمم المتحدة للمياه 2026 في أبوظبي، من 8 إلى 10 ديسمبر 2026.<a class="fn" href="#src-65" aria-label="Source 65">65</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="ar-milestones" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-milestones-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">5</span><span class="label">محطات</span></div>
+    <div>
+      <h2 id="ar-milestones-h">محطات العقدين</h2>
+      <p class="intro">من مرسوم التأسيس إلى رئاسة المنظمة العالمية للأرصاد الجوية، هذه أبرز اللحظات التي صنعت أعوام المركز العشرين الأولى.</p>
+      <ol class="timeline">
+        <li><time datetime="2007">2007</time><div><h3>تأسيس المركز</h3><p>المرسوم بقانون اتحادي رقم (6) لسنة 2007 يؤسس المركز الوطني للأرصاد الجوية والزلازل في أبوظبي.<a class="fn" href="#src-20" aria-label="Source 20">20</a></p></div></li>
+        <li><time datetime="2008">2008</time><div><h3>شبكة وطنية لرصد الزلازل</h3><p>إنشاء الشبكة الوطنية لرصد الزلازل، وتولّي الدكتور عبدالله أحمد المندوس قيادة المركز وتمثيل الدولة لدى المنظمة العالمية للأرصاد الجوية.<a class="fn" href="#src-25" aria-label="Source 25">25</a><a class="fn" href="#src-23" aria-label="Source 23">23</a></p></div></li>
+        <li><time datetime="2010">2010</time><div><h3>الاستمطار يعمّ الدولة</h3><p>توسّع برنامج تلقيح السحب التشغيلي ليغطي الدولة كلها على مدار العام.<a class="fn" href="#src-47" aria-label="Source 47">47</a></p></div></li>
+        <li><time datetime="2015">2015</time><div><h3>إطلاق برنامج الإمارات لبحوث علوم الاستمطار</h3><p>برنامج منح بحثية دولي في علوم الاستمطار، تحت رعاية سمو الشيخ منصور بن زايد آل نهيان.<a class="fn" href="#src-53" aria-label="Source 53">53</a></p></div></li>
+        <li><time datetime="2017">2017</time><div><h3>اسم جديد ودور إقليمي</h3><p>القانون الاتحادي رقم (13) لسنة 2017 يعدّل الاسم إلى «المركز الوطني للأرصاد»، والدكتور عبدالله المندوس يتولى رئاسة الاتحاد الإقليمي لآسيا في المنظمة.<a class="fn" href="#src-22" aria-label="Source 22">22</a><a class="fn" href="#src-23" aria-label="Source 23">23</a></p></div></li>
+        <li><time datetime="2021">2021</time><div><h3>«أتموسفير»، وطائرات مسيّرة في السحب</h3><p>المركز يُدخل حاسوباً فائقاً بقدرة 2.8 بيتافلوب، وطائرات بحثية مسيّرة تطلق شحنات كهربائية في سماء الدولة.<a class="fn" href="#src-26" aria-label="Source 26">26</a><a class="fn" href="#src-57" aria-label="Source 57">57</a></p></div></li>
+        <li><time datetime="2023">2023</time><div><h3>رئاسة المنظمة العالمية للأرصاد الجوية</h3><p>انتخاب الدكتور عبدالله المندوس رئيساً للمنظمة، والمركز يشارك في استضافة جناح «العلوم من أجل العمل المناخي» في <bdi dir="ltr">COP28</bdi>.<a class="fn" href="#src-43" aria-label="Source 43">43</a><a class="fn" href="#src-42" aria-label="Source 42">42</a></p></div></li>
+        <li><time datetime="2024">2024</time><div><h3>أغزر أمطار منذ بدء التسجيل</h3><p>في 16 أبريل تشهد الدولة أغزر أمطار منذ عام 1949، والمركز يصبح مركزاً إقليمياً للتدريب تابعاً للمنظمة، ويطلق منصة للإنذار المبكر للمواطنين في الخارج.<a class="fn" href="#src-28" aria-label="Source 28">28</a><a class="fn" href="#src-41" aria-label="Source 41">41</a><a class="fn" href="#src-38" aria-label="Source 38">38</a></p></div></li>
+        <li><time datetime="2025">2025</time><div><h3>عقدٌ على برنامج الاستمطار</h3><p>الدورة السابعة للملتقى الدولي للاستمطار تحتفي بعشر سنوات على البرنامج، والمركز يوقّع مذكرة تفاهم مع كازاخستان.<a class="fn" href="#src-45" aria-label="Source 45">45</a><a class="fn" href="#src-61" aria-label="Source 61">61</a></p></div></li>
+        <li><time datetime="2026">2026</time><div><h3>عبر الحدود، وبالذكاء الاصطناعي</h3><p>فريق إماراتي يبدأ مشروعاً تجريبياً للاستمطار في كازاخستان، والمركز يطلق المساعدَين الذكيين «الراصد» و«مساعد المتنبئ» لخدمات الطقس.<a class="fn" href="#src-62" aria-label="Source 62">62</a><a class="fn" href="#src-66" aria-label="Source 66">66</a></p></div></li>
+        <li class="anniv"><time datetime="2027-03">2027</time><div><h3>عشرون عاماً</h3><p>المركز يحتفي بذكراه العشرين في مارس، في العام الذي حددته مبادرة الأمم المتحدة «الإنذار المبكر للجميع» لحماية كل إنسان على الأرض.<a class="fn" href="#src-67" aria-label="Source 67">67</a></p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="chapter closing" id="ar-next" data-lang="ar" lang="ar" dir="rtl" hidden aria-labelledby="ar-next-h">
+  <div class="wrap chapter-grid">
+    <div class="rail"><span class="n">6</span><span class="label"><bdi dir="ltr">2027–2047</bdi></span></div>
+    <div>
+      <h2 id="ar-next-h">العشرون المقبلة</h2>
+      <p class="intro">ستختبر العشرون عاماً المقبلة كل ما بناه المركز: مناخٌ يزداد حرارة، وطلبٌ متزايد على المياه، وعالمٌ يحتاج إلى الإنذار المبكر وإلى كل قطرة مطر إضافية.</p>
+      <div class="aims">
+        <div class="aim">
+          <h3>كل قطرة محسوبة</h3>
+          <p>أن ينتقل علم الاستمطار من نتائج واعدة إلى مكاسب مثبتة يمكن قياسها، ببحوث البرنامج وفي إطار استراتيجية الأمن المائي 2036.<a class="fn" href="#src-54" aria-label="Source 54">54</a><a class="fn" href="#src-35" aria-label="Source 35">35</a></p>
+        </div>
+        <div class="aim">
+          <h3>إنذارٌ يصل إلى الجميع</h3>
+          <p>تهدف مبادرة الأمم المتحدة «الإنذار المبكر للجميع»، التي تشارك المنظمة العالمية للأرصاد الجوية في قيادتها، إلى حماية كل إنسان على الأرض بحلول نهاية 2027، العام الذي يُتمّ فيه المركز عامه العشرين.<a class="fn" href="#src-67" aria-label="Source 67">67</a></p>
+        </div>
+        <div class="aim">
+          <h3>تنبؤات بسرعة الذكاء الاصطناعي</h3>
+          <p>يشير المساعدان الذكيان اللذان أطلقهما المركز عام 2026، وحاسوبه الفائق «أتموسفير»، إلى تنبؤات أسرع وأدق وأقرب إلى كل مدينة وحيّ.<a class="fn" href="#src-66" aria-label="Source 66">66</a><a class="fn" href="#src-26" aria-label="Source 26">26</a></p>
+        </div>
+        <div class="aim">
+          <h3>شريكٌ لعالمٍ أشدّ جفافاً</h3>
+          <p>من كازاخستان إلى المغرب، وعبر مركزه الإقليمي للتدريب، باتت خبرة المركز تعبر الحدود، والعشرون المقبلة تدعوها إلى مدى أبعد.<a class="fn" href="#src-62" aria-label="Source 62">62</a><a class="fn" href="#src-63" aria-label="Source 63">63</a><a class="fn" href="#src-41" aria-label="Source 41">41</a></p>
+        </div>
+      </div>
+      <p class="dedication">إلى المتنبئين والراصدين والطيارين والمهندسين والعلماء في المركز الوطني للأرصاد: عشرون عاماً من رصد السماء، ليخطط الوطن لغده بثقة.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <div data-lang="en" lang="en">
+      <h2>About this page</h2>
+      <p class="about">A commemorative story for the 20th anniversary of the National Center of Meteorology, marked in March 2027. It was prepared in September 2026 as a draft for review and is not an official NCM publication. Every figure comes from the public sources below; network counts carry the year they were reported. Each source is described in English, and several are in Arabic.</p>
+      <p class="label sources-h">Sources</p>
+    </div>
+    <div data-lang="ar" lang="ar" dir="rtl" hidden>
+      <h2>عن هذه الصفحة</h2>
+      <p class="about">قصة تذكارية بمناسبة الذكرى العشرين لتأسيس المركز الوطني للأرصاد، التي تحلّ في مارس 2027. أُعدّت في سبتمبر 2026 مسودةً للمراجعة، وليست إصداراً رسمياً للمركز. جميع الأرقام مأخوذة من المصادر العامة أدناه، وتحمل أعداد الشبكات سنة نشرها. وُصف كل مصدر بالإنجليزية، وبعض المصادر منشور بالعربية.</p>
+      <p class="label sources-h">المصادر</p>
+    </div>
+    <ol class="sources" lang="en" dir="ltr">
+      <li id="src-1">Al Droor wa Al Tawali: the Durour calendar and star risings. Sheikh Zayed Grand Mosque Centre. <a href="https://szgmc.gov.ae/en/publications/al-droor-wa-al-tawali" rel="noopener">szgmc.gov.ae</a></li>
+      <li id="src-2">Al Durour, the ancient Gulf calendar used to predict weather and grow crops. The National, 30 Sep 2021. <a href="https://www.thenationalnews.com/uae/2021/09/30/al-durour-the-ancient-gulf-calendar-used-to-predict-wild-weather-and-grow-crops/" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-3">Ahmed bin Majid. Ras Al Khaimah Department of Antiquities and Museums. <a href="https://rakheritage.rak.ae/ahmed-bin-majid/" rel="noopener">rakheritage.rak.ae</a></li>
+      <li id="src-4">Kitab al-Fawa’id fi usul ’ilm al-bahr wa al-qawa’id, assembled in 1490. Library of Congress. <a href="https://www.loc.gov/item/2008401696/" rel="noopener">loc.gov</a></li>
+      <li id="src-5">Monsoon: etymology. Merriam-Webster. <a href="https://www.merriam-webster.com/dictionary/monsoon" rel="noopener">merriam-webster.com</a></li>
+      <li id="src-6">P. Beaujard, The Worlds of the Indian Ocean (on Ibn Majid’s sailing seasons and star altitudes). Cambridge University Press, 2019. <a href="https://doi.org/10.1017/9781108341004.002" rel="noopener">doi.org</a></li>
+      <li id="src-7">Pearl diving: heritage register. Abu Dhabi Department of Culture and Tourism. <a href="https://abudhabiculture.ae/en/cultural-heritage/intangible/heritage-register/traditional-handicraft/pearl-diving" rel="noopener">abudhabiculture.ae</a></li>
+      <li id="src-8">Almehrezi, doctoral thesis on the maritime heritage of the UAE (local wind names). University of Plymouth, 2017. <a href="https://doi.org/10.24382/1078" rel="noopener">doi.org</a></li>
+      <li id="src-9">June once signalled the start of the big dive for UAE pearl divers. The National, 9 Jun 2023. <a href="https://www.thenationalnews.com/weekend/2023/06/09/timeframe-june-once-signalled-the-start-of-the-big-dive-for-uae-pearl-divers/" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-10">Cultural Sites of Al Ain (Hafit, Hili, Bidaa Bint Saud and Oases Areas). UNESCO World Heritage Centre. <a href="https://whc.unesco.org/en/list/1343/" rel="noopener">whc.unesco.org</a></li>
+      <li id="src-11">Al Ain wins World Heritage listing. The National, 27 Jun 2011. <a href="https://www.thenationalnews.com/uae/al-ain-wins-world-heritage-list-honours-1.414587" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-12">Sheikh Zayed bin Sultan Al Nahyan: biography. Embassy of the UAE, Washington DC. <a href="https://www.uae-embassy.org/sheikh-zayed-bin-sultan-al-nahyan" rel="noopener">uae-embassy.org</a></li>
+      <li id="src-13">Sheikh Zayed’s message for the first UAE Environment Day, 1998. UAE Ministry of Foreign Affairs. <a href="https://www.mofa.gov.ae/en/MediaHub/News/2019/2014/5/3/030514-abo-dhabi" rel="noopener">mofa.gov.ae</a></li>
+      <li id="src-14">Sheikh Zayed Grand Mosque Centre launches the Hijri calendar for 1447 AH, with partners including NCM. Sheikh Zayed Grand Mosque Centre, 26 Jun 2025. <a href="https://www.szgmc.gov.ae/en/news-detail/sheikh-zayed-grand-mosque-centre-launches-hijri-calendar-for-1447-ah" rel="noopener">szgmc.gov.ae</a></li>
+      <li id="src-15">Suhail star 2026 and UAE weather: NCM explains. Emirates 24|7, 20 Aug 2026. <a href="https://www.emirates247.com/uae/suhail-star-2026-and-uae-weather-will-temperatures-in-dubai-abu-dhabi-start-to-fall-ncm-explains/4728" rel="noopener">emirates247.com</a></li>
+      <li id="src-16">Sharjah’s winged history (Al Mahatta and the first weather forecasting centre). Gulf News, 4 Oct 2012. <a href="https://gulfnews.com/uae/sharjahs-winged-history-1.1085522" rel="noopener">gulfnews.com</a></li>
+      <li id="src-17">Convention of the World Meteorological Organization: status of parties (UAE accession 17 Dec 1986). US Department of State, treaty depositary. <a href="https://2009-2017.state.gov/documents/organization/201721.pdf" rel="noopener">2009-2017.state.gov</a></li>
+      <li id="src-18">UAE weather: raising the isobar on forecasts (the 2007 merger that formed NCMS). The National, 19 Nov 2012. <a href="https://www.thenationalnews.com/uae/environment/uae-weather-raising-the-isobar-on-forecasts-1.453531" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-19">Cloud seeding experiment has thundering success. Gulf News, 7 May 2008. <a href="https://gulfnews.com/uae/environment/cloud-seeding-experiment-has-thundering-success-1.104086" rel="noopener">gulfnews.com</a></li>
+      <li id="src-20">Federal Decree-Law No. 6 of 2007 establishing and organising the National Center of Meteorology, issued 13 Nov 2007 (Arabic). UAE Legislation portal. <a href="https://uaelegislation.gov.ae/ar/legislations/1921" rel="noopener">uaelegislation.gov.ae</a></li>
+      <li id="src-21">National Center of Meteorology. Abu Dhabi Media Office. <a href="https://www.mediaoffice.abudhabi/en/topic/national-center-of-meteorology/" rel="noopener">mediaoffice.abudhabi</a></li>
+      <li id="src-22">Khalifa issues decree amending the name of NCMS. UAE Cabinet, 18 Oct 2017. <a href="https://uaecabinet.ae/en/news/khalifa-issues-decree-amending-the-name-of-ncms" rel="noopener">uaecabinet.ae</a></li>
+      <li id="src-23">Abdulla Al Mandous, President of WMO. World Meteorological Organization. <a href="https://wmo.int/profile/abdulla-al-mandous" rel="noopener">wmo.int</a></li>
+      <li id="src-24">Ministry of Education and the National Center of Meteorology (network figures). UAE Ministry of Education, 2021. <a href="https://www.moe.gov.ae/En/MediaCenter/News/Pages/MOE-NCM.aspx" rel="noopener">moe.gov.ae</a></li>
+      <li id="src-25">NCM seismologists on the UAE national seismic network, established August 2008 (conference abstract). IUGG General Assembly, 2023. <a href="https://doi.org/10.57757/iugg23-3012" rel="noopener">doi.org</a></li>
+      <li id="src-26">UAE’s National Center for Meteorology advances weather forecasting with new supercomputer built by HPE. HPCwire, Oct 2021. <a href="https://www.hpcwire.com/off-the-wire/uaes-ncm-advances-weather-forecasting-with-new-supercomputer-built-by-hpe/" rel="noopener">hpcwire.com</a></li>
+      <li id="src-27">Partnership between NCM and Ras Al Khaimah International Airport (Arabic). WAM, 26 Nov 2024. <a href="https://www.wam.ae/ar/article/b6e20kj-%D8%B4%D8%B1%D8%A7%D9%83%D8%A9-%D8%A8%D9%8A%D9%86-%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A-%D9%84%D9%84%D8%A3%D8%B1%D8%B5%D8%A7%D8%AF-%D9%88%D9%85%D8%B7%D8%A7%D8%B1-%D8%B1%D8%A3%D8%B3-%D8%A7%D9%84%D8%AE%D9%8A%D9%85%D8%A9-%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A" rel="noopener">wam.ae</a></li>
+      <li id="src-28">UAE witnesses its heaviest rainfall since data collection began in 1949. WAM, 16 Apr 2024. <a href="https://www.wam.ae/en/article/13vbuq9-uae-witnesses-largest-rainfall-over-past-years" rel="noopener">wam.ae</a></li>
+      <li id="src-29">Frequently asked questions (UAE annual rainfall below 100 mm). UAE Research Program for Rain Enhancement Science. <a href="https://www.uaerep.ae/section/outreach/resources/faq?locale=en&amp;nID=2035" rel="noopener">uaerep.ae</a></li>
+      <li id="src-30">NCM: atmospheric instability to increase from Monday afternoon until Wednesday morning (Arabic). WAM, 14 Apr 2024. <a href="https://www.wam.ae/ar/article/b2ni20j-%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A-%D9%84%D9%84%D8%A3%D8%B1%D8%B5%D8%A7%D8%AF-%D8%AD%D8%A7%D9%84%D8%A9-%D8%B9%D8%AF%D9%85-%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%82%D8%B1%D8%A7%D8%B1-%D8%A7%D9%84%D8%AC%D9%88%D9%8A-%D8%AA%D8%B2%D8%AF%D8%A7%D8%AF" rel="noopener">wam.ae</a></li>
+      <li id="src-31">Red alert issued by Met Office as more rain clouds form over the UAE. Gulf News, 16 Apr 2024. <a href="https://gulfnews.com/uae/weather/red-alert-issued-by-met-office-as-more-rain-clouds-form-over-the-uae-1.1713281623276" rel="noopener">gulfnews.com</a></li>
+      <li id="src-32">UAE summer temperatures surge near record highs after hottest-ever spring. Reuters, 4 Aug 2025. <a href="https://www.reuters.com/sustainability/climate-energy/uae-summer-temperatures-surge-near-record-highs-after-hottest-ever-spring-2025-08-04/" rel="noopener">reuters.com</a></li>
+      <li id="src-33">-5.7°C: when the UAE recorded its lowest temperature, at Jebel Jais. Gulf News, 13 Jan 2026. <a href="https://gulfnews.com/uae/weather/57c-when-uae-recorded-its-lowest-temperature-at-jebel-jais-1.500407285" rel="noopener">gulfnews.com</a></li>
+      <li id="src-34">Water is more important than oil for UAE: Mohammed bin Zayed. Emirates 24|7, 13 Dec 2011. <a href="https://www.emirates247.com/news/government/water-is-more-important-than-oil-for-uae-mohammed-bin-zayed-2011-12-13-1.432657" rel="noopener">emirates247.com</a></li>
+      <li id="src-35">The UAE Water Security Strategy 2036. UAE Government portal. <a href="https://u.ae/en/about-the-uae/strategies-initiatives-and-awards/strategies-plans-and-visions/environment-and-energy/the-uae-water-security-strategy-2036" rel="noopener">u.ae</a></li>
+      <li id="src-36">Water: supply, demand and groundwater. UAE Government portal. <a href="https://u.ae/en/information-and-services/environment-and-energy/Natural-resources/water-" rel="noopener">u.ae</a></li>
+      <li id="src-37">About the International Rain Enhancement Forum. IREF. <a href="https://iref.ae/about/" rel="noopener">iref.ae</a></li>
+      <li id="src-38">MoFA and NCM launch the Early Warning System for All digital platform. UAE Ministry of Foreign Affairs, 30 Aug 2024. <a href="https://www.mofa.gov.ae/en/mediahub/news/2024/8/30/30-8-2024-uae-mofa" rel="noopener">mofa.gov.ae</a></li>
+      <li id="src-39">About the program. UAE Research Program for Rain Enhancement Science. <a href="https://www.uaerep.ae/section/the-program/about-the-program?nID=2094&amp;locale=en" rel="noopener">uaerep.ae</a></li>
+      <li id="src-40">A. Al Mazrouei, Cloud seeding in the United Arab Emirates (programme figures to cycle 5). Asian Weather Modification Conference, 2024. <a href="https://awmc.royalrain.go.th/awmc2024/img/UAE_Cloud%20Seeding%20in%20the%20United%20Arab%20Emirates.pdf" rel="noopener">awmc.royalrain.go.th</a></li>
+      <li id="src-41">New WMO Regional Training Centre in the United Arab Emirates. WMO MeteoWorld, Nov 2024. <a href="https://wmo.int/resources/meteoworld/meteoworld-november-2024/new-wmo-regional-training-centre-united-arab-emirates" rel="noopener">wmo.int</a></li>
+      <li id="src-42">Science for Climate Action Pavilion programme: WMO, IPCC, MERI Foundation and NCM. World Meteorological Organization, Dec 2023. <a href="https://wmo.int/files/wmo-ipcc-meri-ncm-science-climate-action-pavilion-programme" rel="noopener">wmo.int</a></li>
+      <li id="src-43">UAE wins presidency of the World Meteorological Organization. UAE Ministry of Foreign Affairs, 2 Jun 2023. <a href="https://www.mofa.gov.ae/en/mediahub/news/2023/6/2/2-6-2023-uae-wins" rel="noopener">mofa.gov.ae</a></li>
+      <li id="src-44">Seeds in the clouds: a timeline of the UAE’s rain enhancement journey since 1982. Zawya, 18 Jan 2018. <a href="https://www.zawya.com/en/business/seeds-in-the-clouds-a-timeline-of-uaes-rain-enhancement-journey-since-1982-432923" rel="noopener">zawya.com</a></li>
+      <li id="src-45">International Rain Enhancement Forum kicks off in Abu Dhabi. Abu Dhabi Media Office, 28 Jan 2025. <a href="https://www.mediaoffice.abudhabi/en/environment/international-rain-enhancement-forum-kicks-off-in-abu-dhabi/" rel="noopener">mediaoffice.abudhabi</a></li>
+      <li id="src-46">UAE Rainfall Enhancement Assessment Program, final report. National Center for Atmospheric Research (NCAR), Jul 2005. <a href="https://opensky.ucar.edu/system/files/2024-09/reports_76.pdf" rel="noopener">opensky.ucar.edu</a></li>
+      <li id="src-47">T. Al Hosari et al., The UAE cloud seeding program: a statistical and physical evaluation, Atmosphere 12, 1013. MDPI, Aug 2021. <a href="https://doi.org/10.3390/atmos12081013" rel="noopener">doi.org</a></li>
+      <li id="src-48">UAE doubles number of cloud-seeding flights in six years in bid to boost rainfall. The National, 24 Jan 2023. <a href="https://www.thenationalnews.com/uae/2023/01/24/uae-doubles-number-of-cloud-seeding-flights-in-six-years-in-bid-to-boost-rainfall/" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-49">NCM: no cloud seeding during the April 2024 storm; no seeding during extreme weather. The National, 17 Apr 2024. <a href="https://www.thenationalnews.com/news/uae/2024/04/17/cloud-seeding-uae-rain-weather/" rel="noopener">thenationalnews.com</a></li>
+      <li id="src-50">Rains in UAE: inside the factory that makes salt flares for cloud-seeding. Khaleej Times. <a href="https://www.khaleejtimes.com/uae/weather/rains-in-uae-inside-the-factory-that-makes-salt-flares-for-cloud-seeding" rel="noopener">khaleejtimes.com</a></li>
+      <li id="src-51">UAE conducts 172 cloud-seeding flights in 2025 so far. Gulf News, 10 Aug 2025. <a href="https://gulfnews.com/uae/weather/uae-conducts-172-cloud-seeding-flights-in-2025-so-far-1.500228558" rel="noopener">gulfnews.com</a></li>
+      <li id="src-52">NCM and UAEREP scientists on rain enhancement in the UAE, npj Climate and Atmospheric Science. Nature Portfolio, 26 Oct 2023. <a href="https://www.nature.com/articles/s41612-023-00503-2" rel="noopener">nature.com</a></li>
+      <li id="src-53">US$5 million international research grant launched (UAEREP). World Meteorological Organization, 2015. <a href="https://wmo.int/media/magazine-article/us5-million-international-research-grant-launched" rel="noopener">wmo.int</a></li>
+      <li id="src-54">UAE Research Program for Rain Enhancement Science announces its sixth-cycle awardees. WAM, 21 Jan 2026. <a href="https://www.wam.ae/en/article/byc8t48-uae-research-programme-for-rain-enhancement" rel="noopener">wam.ae</a></li>
+      <li id="src-55">Outcomes and impact (patents). UAE Research Program for Rain Enhancement Science. <a href="https://www.uaerep.ae/section/innovation/outcomes-and-impact?locale=en&amp;nID=2062" rel="noopener">uaerep.ae</a></li>
+      <li id="src-56">Patent family WO2018069388A1: core-shell seeding nanomaterial (Khalifa University and NCM). Google Patents. <a href="https://patents.google.com/patent/WO2018069388A1/en" rel="noopener">patents.google.com</a></li>
+      <li id="src-57">Scientists are zapping clouds with electricity to make it rain. CNN, 27 May 2021. <a href="https://www.cnn.com/2021/05/27/middleeast/clouds-electricity-rain-spc-intl" rel="noopener">cnn.com</a></li>
+      <li id="src-58">Three research projects win the programme’s fifth-cycle grants (Arabic). UAE Research Program for Rain Enhancement Science, Jan 2024. <a href="https://www.uaerep.ae/ar/media-press/734/20" rel="noopener">uaerep.ae</a></li>
+      <li id="src-59">Mansour bin Zayed: the rain enhancement research programme is a global platform for water security (Arabic). Al Khaleej, 13 May 2026. <a href="https://www.alkhaleej.ae/2026-05-13/%D8%A7%D9%84%D8%A5%D9%85%D8%A7%D8%B1%D8%A7%D8%AA/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%A7%D9%84%D8%AF%D8%A7%D8%B1/%D9%85%D9%86%D8%B5%D9%88%D8%B1-%D8%A8%D9%86-%D8%B2%D8%A7%D9%8A%D8%AF-%D8%A7%D9%84%D8%A5%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D8%A8%D8%AD%D9%88%D8%AB-%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%85%D8%B7%D8%A7%D8%B1-%D9%85%D9%86%D8%B5%D8%A9-%D8%B9%D8%A7%D9%84%D9%85%D9%8A%D8%A9-%D9%84%D8%AA%D8%B9%D8%B2%D9%8A%D8%B2-%D8%A7%D9%84%D8%A3%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D8%A6%D9%8A" rel="noopener">alkhaleej.ae</a></li>
+      <li id="src-60">A. Flossmann et al., Review of advances in precipitation enhancement research, Bulletin of the American Meteorological Society. American Meteorological Society, 2019. <a href="https://doi.org/10.1175/BAMS-D-18-0160.1" rel="noopener">doi.org</a></li>
+      <li id="src-61">Memorandum between Kazhydromet, Kazaeronavigatsia and the UAE National Center of Meteorology. Kazhydromet, Oct 2025. <a href="https://www.kazhydromet.kz/en/post/3090" rel="noopener">kazhydromet.kz</a></li>
+      <li id="src-62">President of Kazakhstan meets WMO President; UAE rain-enhancement pilot in Turkistan region. WAM, 15 May 2026. <a href="https://www.wam.ae/en/article/c084839-president-kazakhstan-meets-with-wmo-president" rel="noopener">wam.ae</a></li>
+      <li id="src-63">Morocco, UAE to boost forecasting and cloud-seeding innovation cooperation. Barlaman Today, 4 Dec 2025. <a href="https://barlamantoday.com/2025/12/04/morocco-uae-to-boost-forecasting-and-cloud-seeding-innovation-cooperation/" rel="noopener">barlamantoday.com</a></li>
+      <li id="src-64">Artificial rain over Lahore with UAE aircraft (AFP). Dawn, Dec 2023. <a href="https://www.dawn.com/news/1798419" rel="noopener">dawn.com</a></li>
+      <li id="src-65">2026 UN Water Conference: revised dates, 8 to 10 December 2026, Abu Dhabi. UN-Water, 25 May 2026. <a href="https://www.unwater.org/news/2026-un-water-conference-revised-dates" rel="noopener">unwater.org</a></li>
+      <li id="src-66">NCM launches agentic AI assistants for weather services. WAM, 29 Jun 2026. <a href="https://www.wam.ae/en/article/c0ywq23-ncm-launches-countrys-first-agentic-assistants-for" rel="noopener">wam.ae</a></li>
+      <li id="src-67">Early Warnings for All. World Meteorological Organization. <a href="https://wmo.int/all-activities/build-resilience/early-warnings-all" rel="noopener">wmo.int</a></li>
+      <li id="src-68">Sheikh Zayed, a model of care for the environment (Arabic). Aletihad, 2012. <a href="https://www.aletihad.ae/article/76781/2012/%D8%A7%D9%84%D8%B4%D9%8A%D8%AE-%D8%B2%D8%A7%D9%8A%D8%AF-%D9%86%D9%85%D9%88%D8%B0%D8%AC-%D9%85%D8%AA%D9%85%D9%8A%D8%B2-%D9%81%D9%8A-%D8%A7%D9%84%D8%A7%D9%87%D8%AA%D9%85%D8%A7%D9%85-%D8%A8%D8%A7%D9%84%D8%A8%D9%8A%D8%A6%D8%A9-%D9%88%D8%A7%D9%84%D8%AB%D8%B1%D9%88%D8%A7%D8%AA-%D8%A7%D9%84%D8%B7%D8%A8%D9%8A%D8%B9%D9%8A%D8%A9" rel="noopener">aletihad.ae</a></li>
+    </ol>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+
+    /* ---------- Language: English / Arabic ---------- */
+    var KEY = 'ncm20-lang';
+    var TITLES = { en: 'NCM at Twenty', ar: 'المركز الوطني للأرصاد في عامه العشرين' };
+    var toggle = document.getElementById('lang-toggle');
+
+    function setLang(lang, remember) {
+      var nodes = document.querySelectorAll('[data-lang]');
+      for (var i = 0; i < nodes.length; i++) nodes[i].hidden = nodes[i].getAttribute('data-lang') !== lang;
+      root.lang = lang;
+      root.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.title = TITLES[lang];
+      var other = lang === 'ar' ? 'en' : 'ar';
+      toggle.lang = other;
+      toggle.textContent = other === 'ar' ? 'العربية' : 'English';
+      toggle.setAttribute('aria-label', other === 'ar' ? 'اقرأ الصفحة بالعربية' : 'Read this page in English');
+      if (remember) { try { localStorage.setItem(KEY, lang); } catch (e) {} }
+    }
+
+    var initial = location.hash === '#ar' ? 'ar' : location.hash === '#en' ? 'en' : null;
+    if (!initial) { try { initial = localStorage.getItem(KEY); } catch (e) {} }
+    setLang(initial === 'ar' ? 'ar' : 'en', false);
+    toggle.addEventListener('click', function () { setLang(root.lang === 'ar' ? 'en' : 'ar', true); });
+
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Gauge: 2007–2027, filled to today ---------- */
+    // The Center dates from 2007 (Federal Decree-Law No. 6 of 2007) and marks
+    // its 20th anniversary in March 2027. Set ANNIVERSARY_DAY to the day of the
+    // month once it is confirmed; the caption then counts down in days.
+    var ANNIVERSARY_DAY = null;
+    var FROM = Date.UTC(2007, 2, ANNIVERSARY_DAY || 1);
+    var TO = Date.UTC(2027, 2, ANNIVERSARY_DAY || 1);
+    var gauge = document.getElementById('gauge');
+    var level = Math.max(0, Math.min(1, (Date.now() - FROM) / (TO - FROM))).toFixed(4);
+    if (still) {
+      gauge.style.setProperty('--fill', level);
+    } else {
+      gauge.style.setProperty('--fill', '0');
+      gauge.getBoundingClientRect();
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { gauge.style.setProperty('--fill', level); });
+      });
+    }
+    var statusEn = document.getElementById('gauge-status-en');
+    var statusAr = document.getElementById('gauge-status-ar');
+    var daysLeft = Math.ceil((TO - Date.now()) / 864e5);
+    if (Date.now() >= (ANNIVERSARY_DAY ? TO : Date.UTC(2027, 3, 1))) {
+      statusEn.textContent = 'Twenty years complete';
+      statusAr.textContent = 'اكتملت عشرون عاماً';
+    } else if (ANNIVERSARY_DAY) {
+      statusEn.textContent = daysLeft + (daysLeft === 1 ? ' day' : ' days') + ' to the 20th anniversary';
+      statusAr.textContent = 'الأيام المتبقية على الذكرى العشرين: ' + daysLeft;
+    }
+
+    /* ---------- Rain over the dunes ---------- */
+    var canvas = document.getElementById('rain');
+    var ctx = canvas.getContext && canvas.getContext('2d');
+    if (!ctx) return;
+    var SLANT = 0.16;
+    var drops = [], splashes = [];
+    var w = 0, h = 0, rain = '127,181,172', sand = '201,164,104';
+    var running = false, onScreen = true, t0 = 0, last = 0;
+
+    var cs = getComputedStyle(root);
+    rain = cs.getPropertyValue('--rain-rgb').trim() || rain;
+    sand = cs.getPropertyValue('--sand-rgb').trim() || sand;
+
+    function ground(x) { return h - 22 - Math.sin(x / 150) * 7 - Math.sin(x / 61 + 1.3) * 3; }
+    function drop(anywhere) {
+      return {
+        x: Math.random() * (w + h * SLANT) - h * SLANT,
+        y: anywhere ? Math.random() * h : -20 - Math.random() * 80,
+        len: 10 + Math.random() * 18,
+        v: 420 + Math.random() * 380,
+        a: 0.12 + Math.random() * 0.4
+      };
+    }
+    function size() {
+      var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = r.width; h = r.height;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var n = Math.round(Math.min(240, (w * h) / 4800));
+      while (drops.length < n) drops.push(drop(true));
+      drops.length = n;
+    }
+    function paint(density) {
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var x = 0; x <= w + 8; x += 8) {
+        if (x) ctx.lineTo(x, ground(x)); else ctx.moveTo(x, ground(x));
+      }
+      ctx.strokeStyle = 'rgba(' + sand + ',.5)';
+      ctx.stroke();
+      var n = Math.round(drops.length * density);
+      for (var i = 0; i < n; i++) {
+        var d = drops[i];
+        ctx.strokeStyle = 'rgba(' + rain + ',' + d.a.toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - d.len * SLANT, d.y - d.len);
+        ctx.stroke();
+      }
+      for (var j = 0; j < splashes.length; j++) {
+        var s = splashes[j];
+        ctx.strokeStyle = 'rgba(' + rain + ',' + (0.5 * (1 - s.t)).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y, 1 + s.t * 8, 0.5 + s.t * 2, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    function frame(ts) {
+      if (!running) return;
+      if (!t0) t0 = ts;
+      var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0;
+      last = ts;
+      // Light at first, then steady: the seeding metaphor, once, on load.
+      var density = Math.min(1, 0.1 + (ts - t0) / 3500);
+      var n = Math.round(drops.length * density);
+      for (var i = 0; i < n; i++) {
+        var d = drops[i];
+        d.y += d.v * dt;
+        d.x += d.v * dt * SLANT;
+        if (d.y >= ground(d.x)) {
+          if (splashes.length < 60 && Math.random() < 0.5) splashes.push({ x: d.x, y: ground(d.x), t: 0 });
+          drops[i] = drop(false);
+        }
+      }
+      for (var j = splashes.length - 1; j >= 0; j--) {
+        splashes[j].t += dt * 2.4;
+        if (splashes[j].t >= 1) splashes.splice(j, 1);
+      }
+      paint(density);
+      requestAnimationFrame(frame);
+    }
+    function play() {
+      if (running || still || !onScreen || document.hidden) return;
+      running = true; last = 0;
+      requestAnimationFrame(frame);
+    }
+
+    size();
+    if (still) paint(1); else play();
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () { size(); if (!running) paint(1); }).observe(canvas);
+    }
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (entries) {
+        onScreen = entries[0].isIntersecting;
+        if (onScreen) play(); else running = false;
+      }).observe(canvas);
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) running = false; else play();
+    });
+  })();
+</script>
+</body>
+</html>

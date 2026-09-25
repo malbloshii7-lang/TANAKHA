@@ -41,6 +41,7 @@ jobs:
           mkdir -p _site
           cp index.html builder.html lvmh-empire.html the-art-of-crafting-prompts.html _site/ 2>/dev/null || true
           cp -r portal _site/portal
+          cp -r ncm-20 _site/ncm-20
           mkdir -p _site/climate
           cp -r climate-command-center/dist/. _site/climate/
 
