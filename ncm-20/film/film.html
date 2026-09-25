@@ -30,6 +30,7 @@ const INK = '#1D1813', RED = '#B3391D', BLUE = '#28478C', OCHRE = '#C9973B', SEP
 const cv = document.getElementById('film');
 const ctx = cv.getContext('2d');
 let SA = 1; // alpha of the scene being drawn (crossfades)
+let REAL_LT = 0; // unscaled local time of the scene being drawn (labels switch on real cuts)
 
 /* ---------- maths & motion ---------- */
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
@@ -182,7 +183,7 @@ let HEAD_SIZE = 96;
 function setText(font, ls = 0, dir = 'ltr', align = 'left') {
   ctx.font = font; ctx.letterSpacing = ls + 'px'; ctx.direction = dir; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
 }
-function typeLine(text, x, y, t0, lt, { size = 20, ls = 7, a = 0.85, weight = 500, align = 'left', cps = 42, col = INK } = {}) {
+function typeLine(text, x, y, t0, lt, { size = 20, ls = 7, a = 0.85, weight = 500, align = 'left', cps = 58, col = INK } = {}) {
   const n = Math.floor(clamp((lt - t0) * cps, 0, text.length));
   if (n <= 0) return;
   ctx.save();
@@ -204,7 +205,7 @@ function blurIn(draw, p, maxBlur = 14, dx = 26) {
   ctx.restore();
 }
 // Big inscriptional headline, revealed word by word (blur to sharp).
-function headline(lines, accent, x, top, t0, lt, { size = HEAD_SIZE, align = 'left', step = 0.2 } = {}) {
+function headline(lines, accent, x, top, t0, lt, { size = HEAD_SIZE, align = 'left', step = 0.14 } = {}) {
   setText(`900 ${size}px ${F_HEAD}`, 1);
   let wi = 0, y = top + size * 0.88;
   for (const line of lines) {
@@ -267,7 +268,7 @@ function smallAr(text, x, y, p, { size = 22, a = 0.8, align = 'left', weight = 5
 /* ---------- chapter chrome: label (top left), readout (top right) ---------- */
 function chrome(s, lt) {
   // Labels switch at the cut: the old one is gone just before the new one appears.
-  const vis = clamp(lt / 0.3) * clamp((s.dur - lt) / 0.3);
+  const rl = REAL_LT, vis = clamp(rl / 0.2) * clamp((s.dur - rl) / 0.2);
   const p = easeOut(prog(lt, 0, 0.8)) * vis;
   const name = (s.num ? s.num + ' · ' : '') + s.name;
   small(name, 78, 72, p, { size: 18, ls: 7, a: 0.82 });
@@ -280,7 +281,7 @@ function textBlock(s, lt) {
   const x = 110, ky = 338;
   typeLine(s.kicker, x, ky, 0.25, lt, { size: 18, ls: 6, a: 0.8 });
   const hb = headline(s.head, s.accent, x, ky + 30, 0.55, lt);
-  arabic(s.arHead, x, hb.bottom + 92, 0.55 + hb.words * 0.2 + 0.1, lt, { size: 56 });
+  arabic(s.arHead, x, hb.bottom + 92, 0.55 + hb.words * 0.14 + 0.1, lt, { size: 56 });
 }
 
 /* ---------- scenes ---------- */
@@ -289,7 +290,7 @@ const scene = s => SCENES.push(s);
 
 // Prologue
 scene({
-  start: 0, dur: 5, num: '', name: 'PROLOGUE', ar: 'المقدمة', readout: '2007 — 2027',
+  start: 0, dur: 6, num: '', name: 'PROLOGUE', ar: 'المقدمة', readout: '2007 — 2027',
   init() {
     this.horizon = ln(620, 380, 1300, 380, 11, 0.8);
   },
@@ -316,7 +317,7 @@ scene({
 
 // I · Al Durour — the 36-petal calendar wheel and the rising of Suhail
 scene({
-  start: 5, dur: 11, num: 'I', name: 'AL DUROUR', ar: 'الدرور', readout: 'SUHAIL · α CARINAE',
+  start: 6, dur: 8, speed: 11 / 8, num: 'I', name: 'AL DUROUR', ar: 'الدرور', readout: 'SUHAIL · α CARINAE',
   kicker: 'THE DUROUR CALENDAR · 36 × 10 DAYS + 5',
   head: ['WE COUNTED', 'THE YEAR', 'BY A STAR.'], accent: { 'STAR.': RED },
   arHead: 'عددنا أيام السنة بطلوع سهيل',
@@ -383,7 +384,7 @@ scene({
 
 // II · Al Mawsim — Ibn Majid, the dhow and the monsoon
 scene({
-  start: 16, dur: 11, num: 'II', name: 'AL MAWSIM', ar: 'الموسم', readout: 'KITAB AL-FAWAʾID · 895 AH',
+  start: 14, dur: 8, speed: 11 / 8, num: 'II', name: 'AL MAWSIM', ar: 'الموسم', readout: 'KITAB AL-FAWAʾID · 895 AH',
   kicker: 'AHMAD IBN MAJID · JULFAR · c. 1490',
   head: ['WE SAILED', 'BY THE', 'MONSOON.'], accent: { 'MONSOON.': BLUE },
   arHead: 'وأبحرنا مع رياح الموسم',
@@ -473,7 +474,7 @@ scene({
 
 // III · Al Ghous — the named winds over the pearling sea
 scene({
-  start: 27, dur: 11, num: 'III', name: 'AL GHOUS', ar: 'الغوص', readout: 'SHAMAL · NORTH-WEST',
+  start: 22, dur: 8, speed: 11 / 8, num: 'III', name: 'AL GHOUS', ar: 'الغوص', readout: 'SHAMAL · NORTH-WEST',
   kicker: 'AL-GHOUS AL-KABIR · JUNE — SEPTEMBER',
   head: ['WE KNEW', 'EVERY WIND', 'BY NAME.'], accent: { 'WIND': RED },
   arHead: 'وعرفنا الرياح بأسمائها',
@@ -550,7 +551,7 @@ scene({
 
 // IV · Al Aflaj — carrying water through the desert
 scene({
-  start: 38, dur: 11, num: 'IV', name: 'AL AFLAJ', ar: 'الأفلاج', readout: 'UNESCO WORLD HERITAGE · 2011',
+  start: 30, dur: 8, speed: 11 / 8, num: 'IV', name: 'AL AFLAJ', ar: 'الأفلاج', readout: 'UNESCO WORLD HERITAGE · 2011',
   kicker: 'HILI · AL AIN · IRON AGE',
   head: ['WE CARRIED', 'WATER THROUGH', 'THE DESERT.'], accent: { 'WATER': BLUE },
   arHead: 'وأجرينا الماء في الأفلاج عبر الصحراء',
@@ -623,7 +624,7 @@ scene({
 
 // V · Al Markaz — a centre to read the sky: radar, anemometer, the logbook
 scene({
-  start: 49, dur: 11, num: 'V', name: 'AL MARKAZ', ar: 'المركز', readout: '24.45°N · 54.38°E',
+  start: 38, dur: 8, speed: 11 / 8, num: 'V', name: 'AL MARKAZ', ar: 'المركز', readout: '24.45°N · 54.38°E',
   kicker: 'FEDERAL DECREE-LAW NO. 6 · 2007 · ABU DHABI',
   head: ['THEN WE BUILT', 'A CENTER TO', 'READ THE SKY.'], accent: { 'SKY.': BLUE },
   arHead: 'ثم أسسنا مركزاً يرصد السماء',
@@ -705,9 +706,349 @@ scene({
   },
 });
 
+// VI · Al Matarat — fog lifts over a runway and a departure climbs away
+scene({
+  start: 46, dur: 8, num: 'VI', name: 'AL MATARAT', ar: 'المطارات', readout: 'TODO_READOUT_AIR',
+  kicker: 'TODO_KICKER_AIR',
+  head: ['WE KEEP', 'THE SKIES', 'OPEN.'], accent: { 'OPEN.': BLUE },
+  arHead: 'ونُبقي الأجواء مفتوحة',
+  init() {
+    const VX = 1440, HY = 500, NEAR = 1044, K = 0.35;
+    const Y = z => HY + (NEAR - HY) / (1 + K * z), HW = z => 262 / (1 + K * z);
+    Object.assign(this, { VX, HY, Y, HW, K });
+    this.horizon = ln(985, HY, 1885, HY, 500, 0.6);
+    this.edges = [ln(VX - HW(0), Y(0), VX - HW(60), Y(60), 501, 0.4), ln(VX + HW(0), Y(0), VX + HW(60), Y(60), 502, 0.4)];
+    this.dashes = [];
+    for (let z = 1.3; z < 26; z += 1.15) this.dashes.push({ z, p: new P([[VX, Y(z)], [VX, Y(z + 0.55)]]) });
+    this.keys = [];
+    for (const side of [-1, 1]) for (let k = 0; k < 6; k++) {
+      const u0 = 0.18 + k * 0.125, u1 = u0 + 0.075, q = (u, z) => [VX + side * u * HW(z), Y(z)];
+      this.keys.push(new P([q(u0, 0.12), q(u1, 0.12), q(u1, 0.7), q(u0, 0.7)], true));
+    }
+    this.lights = [];
+    for (let z = 0; z < 24; z++) for (const side of [-1, 1]) this.lights.push({ z, x: VX + side * HW(z) * 1.05, y: Y(z), r: 6 / (1 + K * z) });
+    // departing aircraft, seen from behind, drawn around (0, 0)
+    this.plane = {
+      fus: el(0, 0, 30, 30, 0, TAU, 510, 0.2),
+      fin: new P([[-7, -26], [-4, -124], [7, -124], [10, -26]], true),
+      wings: [new P([[-27, 2], [-300, -24], [-300, -15], [-27, 13]], true), new P([[27, 2], [300, -24], [300, -15], [27, 13]], true)],
+      stabs: [new P([[-6, -108], [-72, -102], [-72, -95], [-6, -98]], true), new P([[6, -108], [72, -102], [72, -95], [6, -98]], true)],
+      engs: [el(-112, 32, 26, 26, 0, TAU, 511, 0.2), el(112, 32, 26, 26, 0, TAU, 512, 0.2)],
+    };
+    // control tower (foreground, right)
+    this.towerBody = new P([[1790, 1000], [1800, 440], [1838, 440], [1848, 1000]], true);
+    this.cab = new P(wob([[1760, 440], [1878, 440], [1867, 382], [1771, 382], [1760, 440]], 522, 0.4).slice(0, -1), true);
+    this.cabWin = new P([[1775, 426], [1863, 426], [1859, 396], [1779, 396]], true);
+    this.roof = ln(1768, 377, 1870, 377, 523, 0.3);
+    this.aerial = ln(1819, 377, 1819, 320, 524, 0.2);
+    // windsock (left)
+    this.pole = ln(1060, 800, 1060, 600, 530, 0.3);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('TODO_NOTE_AIR', 1862, 1052, 4.4, lt, { a: 0.36 });
+    note('ضباب', 1000, 1052, 4.8, lt, { ar: true, size: 34, align: 'left', a: 0.3 });
+    const { VX, HY, Y, HW, K } = this;
+    stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
+    this.edges.forEach((e, i) => stroke(e, easeOut(prog(lt, 0.3 + i * 0.1, 1.1)), INK, 2.2));
+    this.dashes.forEach((d, i) => stroke(d.p, prog(lt, 0.6 + i * 0.045, 0.25), INK, 3.4 / (1 + K * d.z) + 0.5, 0.85));
+    this.keys.forEach((k, i) => fill(k, INK, 0.78 * easeOut(prog(lt, 1.0 + (i % 6) * 0.05, 0.4))));
+    // edge lights, with a strobe racing toward the far end
+    const race = (lt * 1.8) % 1;
+    this.lights.forEach(l => {
+      const on = easeOut(prog(lt, 1.1 + l.z * 0.035, 0.3)), hot = Math.abs(race - l.z / 24) < 0.035;
+      disc(l.x, l.y, l.r * on * (hot ? 1.5 : 1), hot ? RED : OCHRE, 0.95);
+    });
+    // fog banks over the far runway, thinning as the forecast clears
+    const fog = 1 - easeInOut(prog(lt, 2.4, 2.2));
+    if (fog > 0.01) for (let k = 0; k < 5; k++) {
+      const y = HY - 44 + k * 30, h = 26, dx = ((lt * 22 + k * 173) % 300) - 150;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(985, y, 900, h); ctx.clip();
+      PAPER_PAT.setTransform(ctx.getTransform().inverse());
+      ctx.globalAlpha = SA * fog * (0.72 - k * 0.08); ctx.fillStyle = PAPER_PAT; ctx.fillRect(985, y, 900, h);
+      ctx.globalAlpha = SA * fog * 0.3; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = SEPIA; ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 985 + dx; x < 1885; x += 38) { ctx.moveTo(x, y + h / 2 + 4 * Math.sin(x * 0.02)); ctx.lineTo(x + 24, y + h / 2 + 4 * Math.sin((x + 24) * 0.02)); }
+      ctx.stroke(); ctx.restore();
+    }
+    // control tower
+    const tp = easeInOut(prog(lt, 0.8, 1.2));
+    mask(this.towerBody); hatch(this.towerBody, [1788, 440, 1850, 1000], 1.2, 7, tp, INK, 1, 0.4, 525); stroke(this.towerBody, tp, INK, 1.8);
+    const cp = easeOut(prog(lt, 1.6, 0.8));
+    mask(this.cab); fill(this.cabWin, BLUE, 0.5 * cp); stroke(this.cab, cp, INK, 1.8); stroke(this.cabWin, cp, INK, 1, 0.7);
+    stroke(this.roof, cp, INK, 2.4); stroke(this.aerial, prog(lt, 2.0, 0.5), INK, 1.4);
+    // windsock streaming in the breeze
+    stroke(this.pole, easeOut(prog(lt, 0.9, 0.8)), INK, 2);
+    const wq = easeOut(prog(lt, 1.4, 0.8));
+    if (wq > 0) for (let k = 0; k < 5; k++) {
+      const x0 = 1062 + k * 24 * wq, x1 = x0 + 24 * wq, fl = Math.sin(lt * 7 + k * 0.9) * 3 * k / 4;
+      const r0 = 14 - k * 2, r1 = 12 - k * 2;
+      fill(new P([[x0, 606 - r0 + fl], [x1, 606 - r1 + fl * 1.3], [x1, 606 + r1 + fl * 1.3], [x0, 606 + r0 + fl]], true), k % 2 ? '#EFE3CC' : RED, k % 2 ? 0.9 : 0.85);
+    }
+    // the departure: climbing away over the runway
+    const u = easeInOut(prog(lt, 3.3, 4.5));
+    if (lt > 3.1 && u < 1) {
+      const sc = lerp(1.0, 0.13, u), y = lerp(905, 432, u), lw = 1.9 / Math.max(sc, 0.35);
+      const pl_ = this.plane, parts = [pl_.fus, pl_.fin, ...pl_.wings, ...pl_.stabs, ...pl_.engs];
+      ctx.save(); ctx.translate(VX, y); ctx.scale(sc, sc); ctx.rotate(0.03 * Math.sin(lt * 1.3));
+      const a = easeOut(prog(lt, 3.1, 0.4));
+      mask(parts);
+      hatch([pl_.fus, ...pl_.engs], [-140, -30, 140, 60], 0.9, 6, a, INK, 1, 0.45, 513);
+      parts.forEach(q => stroke(q, a, INK, lw));
+      pl_.engs.forEach((e, i) => disc(i ? 112 : -112, 32, 11, INK, 0.8 * a));
+      ctx.restore();
+    }
+  },
+});
+
+// VII · Al Mawani — a crane loads a ship; a buoy marks the swell
+scene({
+  start: 54, dur: 8, num: 'VII', name: 'AL MAWANI', ar: 'الموانئ', readout: 'TODO_READOUT_SEA',
+  kicker: 'TODO_KICKER_SEA',
+  head: ['WE GUIDE', 'THE SHIPS', 'HOME.'], accent: { 'HOME.': RED },
+  arHead: 'ونرشد السفن إلى مرافئها',
+  init() {
+    this.quayTop = ln(985, 690, 1252, 690, 540, 0.4);
+    this.quay = new P([[985, 690], [1252, 690], [1252, 800], [985, 800]], true);
+    this.bollards = [1020, 1110, 1200].map((x, i) => el(x, 684, 7, 6, Math.PI, TAU, 541 + i, 0));
+    // ship at berth
+    const hull = [[1258, 652], [1874, 652], [1860, 700], [1832, 772], [1296, 776], [1266, 740]];
+    this.hull = new P(wob(hull.concat([hull[0]]), 545, 0.5).slice(0, -1), true);
+    this.boot = new P([[1266, 742], [1846, 742], [1832, 772], [1296, 776]], true);
+    this.bridge = new P([[1272, 652], [1272, 560], [1336, 560], [1336, 652]], true);
+    this.bridgeWin = [0, 1, 2].map(k => ln(1280, 580 + k * 22, 1328, 580 + k * 22, 546 + k, 0.2));
+    this.stack = new P([[1300, 560], [1300, 530], [1318, 530], [1318, 560]], true);
+    const r = rng(47), cols = [RED, BLUE, OCHRE, SEPIA, BLUE, RED, INK];
+    this.boxes = [];
+    for (let c = 0; c < 11; c++) {
+      const tiers = 2 + Math.floor(r() * 3);
+      for (let k = 0; k < tiers; k++) {
+        const x = 1346 + c * 46, y = 652 - (k + 1) * 25;
+        this.boxes.push({ c, p: new P([[x, y], [x + 43, y], [x + 43, y + 23], [x, y + 23]], true), col: cols[Math.floor(r() * cols.length)], k });
+      }
+    }
+    // ship-to-shore crane on the quay, boom out over the ship
+    this.crane = [ln(1086, 690, 1104, 372, 550, 0.3), ln(1226, 690, 1208, 372, 551, 0.3), ln(1090, 620, 1222, 452, 552, 0.2), ln(1222, 620, 1090, 452, 553, 0.2),
+      ln(1060, 372, 1250, 372, 554, 0.2), ln(992, 350, 1800, 350, 555, 0.3), ln(992, 366, 1800, 366, 556, 0.3),
+      ln(1110, 350, 1156, 232, 557, 0.2), ln(1200, 350, 1156, 232, 558, 0.2), ln(1156, 232, 1800, 352, 559, 0.3), ln(1156, 232, 992, 352, 560, 0.3)];
+    this.house = new P([[1112, 350], [1112, 326], [1196, 326], [1196, 350]], true);
+    this.sea = ln(1252, 772, 1885, 772, 561, 0.4);
+    this.waves = [];
+    for (let row = 0; row < 6; row++) {
+      const y = 822 + row * 30, off = row % 2 ? 24 : 0, pts = [];
+      for (let x = 990 + off; x < 1870; x += 48) pts.push(...quad([x, y], [x + 24, y - 13], [x + 48, y], 6).slice(pts.length ? 1 : 0));
+      this.waves.push(new P(wob(pts, 570 + row, 0.4)));
+    }
+    this.buoy = new P([[-14, 0], [14, 0], [9, -26], [-9, -26]], true);
+    this.buoyMast = ln(0, -26, 0, -62, 580, 0.1);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('TODO_NOTE_SEA', 1862, 1052, 4.4, lt, { a: 0.36 });
+    note('بحر', 1000, 1052, 4.8, lt, { ar: true, size: 34, align: 'left', a: 0.3 });
+    const qp = easeInOut(prog(lt, 0.2, 1.0));
+    hatch(this.quay, [985, 690, 1252, 800], 0.8, 8, qp, INK, 1, 0.35, 542);
+    stroke(this.quayTop, qp, INK, 2.2);
+    this.bollards.forEach(b => stroke(b, prog(lt, 1.0, 0.4), INK, 1.6));
+    // the ship
+    const hp = easeInOut(prog(lt, 0.4, 1.2));
+    mask(this.hull); fill(this.boot, RED, 0.75 * hp);
+    hatch(this.hull, [1258, 652, 1874, 776], 0.15, 9, hp, INK, 1, 0.25, 547);
+    stroke(this.hull, hp, INK, 2.2);
+    const bp = easeOut(prog(lt, 1.0, 0.8));
+    mask(this.bridge); stroke(this.bridge, bp, INK, 1.8); this.bridgeWin.forEach(w => stroke(w, bp, BLUE, 2.2, 0.8));
+    fill(this.stack, RED, 0.8 * bp); stroke(this.stack, bp, INK, 1.4);
+    // containers stack up column by column, like books on a shelf
+    this.boxes.forEach(b => {
+      const q = easeOut(prog(lt, 1.3 + b.c * 0.28 + b.k * 0.08, 0.35));
+      if (q <= 0) return;
+      ctx.save(); ctx.translate(0, -(1 - q) * 18);
+      fill(b.p, b.col, 0.85 * q); stroke(b.p, q, INK, 1.1, 0.85);
+      ctx.restore();
+    });
+    // the crane and its trolley
+    this.crane.forEach((c, i) => stroke(c, easeOut(prog(lt, 0.5 + i * 0.07, 0.8)), INK, i < 4 ? 2 : 1.6));
+    const hq = easeOut(prog(lt, 1.2, 0.6));
+    mask(this.house); hatch(this.house, [1112, 326, 1196, 350], 1.3, 5, hq, INK, 1, 0.4, 548); stroke(this.house, hq, INK, 1.4);
+    if (lt > 1.6) {
+      const tx = 1320 + 400 * (0.5 - 0.5 * Math.cos((TAU * (lt - 1.6)) / 4.2)), sy = 468 + 26 * Math.sin((TAU * (lt - 1.6)) / 2.1);
+      const tr = new P([[tx - 18, 366], [tx + 18, 366], [tx + 18, 380], [tx - 18, 380]], true);
+      mask(tr); stroke(tr, 1, INK, 1.4);
+      stroke(new P([[tx - 10, 380], [tx - 16, sy]]), 1, INK, 1, 0.8); stroke(new P([[tx + 10, 380], [tx + 16, sy]]), 1, INK, 1, 0.8);
+      const box = new P([[tx - 22, sy], [tx + 22, sy], [tx + 22, sy + 23], [tx - 22, sy + 23]], true);
+      fill(box, BLUE, 0.85); stroke(box, 1, INK, 1.1);
+    }
+    // the sea, with a buoy riding the swell
+    stroke(this.sea, prog(lt, 0.3, 1.0), INK, 1.4, 0.7);
+    this.waves.forEach((w, i) => stroke(w, prog(lt, 0.5 + i * 0.18, 1.6), BLUE, 1.2, 0.5));
+    const by = 868 + 7 * Math.sin(lt * 2.2), bq = easeOut(prog(lt, 2.2, 0.6));
+    if (bq > 0) {
+      ctx.save(); ctx.translate(1786, by); ctx.rotate(0.1 * Math.sin(lt * 1.9));
+      fill(this.buoy, RED, 0.85 * bq); stroke(this.buoy, bq, INK, 1.4); stroke(this.buoyMast, bq, INK, 1.4);
+      disc(0, -66, 5, Math.floor(lt * 2) % 2 ? OCHRE : RED, bq, 'source-over');
+      ctx.restore();
+    }
+    // wave height, marked on the swell
+    const wh = easeOut(prog(lt, 3.0, 0.6));
+    stroke(new P([[1030, 808], [1030, 836]]), wh, INK, 1.2, 0.8);
+    arrowHead(1030, 808, -Math.PI / 2, 7, INK, 0.8 * wh, 1.2); arrowHead(1030, 836, Math.PI / 2, 7, INK, 0.8 * wh, 1.2);
+    small('WAVE HEIGHT', 1042, 826, wh, { size: 12, ls: 3, a: 0.7 });
+  },
+});
+
+// VIII · Al Taqa — the sun's path over a solar field; a platform on the horizon
+scene({
+  start: 62, dur: 8, num: 'VIII', name: 'AL TAQA', ar: 'الطاقة', readout: 'TODO_READOUT_ENERGY',
+  kicker: 'TODO_KICKER_ENERGY',
+  head: ['TODO', 'ENERGY', 'HEADLINE.'], accent: {},
+  arHead: 'TODO_AR_ENERGY',
+  init() {
+    const HY = 560;
+    this.HY = HY;
+    this.horizon = ln(985, HY, 1885, HY, 600, 0.6);
+    this.arc = el(1430, HY, 420, 372, Math.PI, TAU, 601, 0.5);
+    this.ticks = [];
+    for (let k = 1; k < 12; k++) { const a = Math.PI + (k * Math.PI) / 12; this.ticks.push(ln(1430 + 408 * Math.cos(a), HY + 360 * Math.sin(a), 1430 + 432 * Math.cos(a), HY + 384 * Math.sin(a), 602 + k, 0.1)); }
+    const yb = z => HY + 450 / (1 + 0.55 * z), hg = z => 74 / (1 + 0.55 * z), hw = z => 470 / (1 + 0.1 * z);
+    this.rows = [];
+    for (let z = 5; z >= 0; z--) {
+      const b = yb(z), h = hg(z), w = hw(z), xl = 1430 - w, xr = 1430 + w, inset = 14 / (1 + 0.55 * z);
+      const face = new P([[xl, b], [xr, b], [xr - inset, b - h], [xl + inset, b - h]], true);
+      const cells = [], n = 16;
+      for (let i = 1; i < n; i++) { const f = i / n; cells.push(new P([[lerp(xl, xr, f), b], [lerp(xl + inset, xr - inset, f), b - h]])); }
+      cells.push(new P([[lerp(xl, xl + inset, 0.5), b - h / 2], [lerp(xr, xr - inset, 0.5), b - h / 2]]));
+      const legs = [0.15, 0.5, 0.85].map(f => new P([[lerp(xl, xr, f), b], [lerp(xl, xr, f), b + 12 / (1 + 0.55 * z)]]));
+      this.rows.push({ z, face, cells, legs });
+    }
+    // offshore platform on the horizon
+    this.rig = [ln(1010, HY, 1016, HY - 46, 620, 0.2), ln(1070, HY, 1064, HY - 46, 621, 0.2), ln(1004, HY - 46, 1080, HY - 46, 622, 0.2),
+      ln(1040, HY - 46, 1040, HY - 104, 623, 0.2), ln(1030, HY - 46, 1040, HY - 104, 624, 0.2), ln(1050, HY - 46, 1040, HY - 104, 625, 0.2), ln(1066, HY - 58, 1100, HY - 82, 626, 0.2)];
+    // pyranometer: the instrument that measures sunlight
+    this.tripod = [ln(1042, 1010, 1060, 940, 630, 0.2), ln(1080, 1010, 1060, 940, 631, 0.2), ln(1060, 1016, 1060, 940, 632, 0.2)];
+    this.plate = ln(1036, 940, 1084, 940, 633, 0.1);
+    this.dome = el(1060, 938, 18, 18, Math.PI, TAU, 634, 0.1);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('TODO_NOTE_ENERGY', 1862, 1052, 4.4, lt, { a: 0.36 });
+    small('PYRANOMETER', 1092, 972, prog(lt, 3.4, 0.6), { size: 12, ls: 3, a: 0.65 });
+    const HY = this.HY;
+    stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
+    stroke(this.arc, easeInOut(prog(lt, 0.4, 1.6)), INK, 1.2, 0.55, [4, 9], 0);
+    this.ticks.forEach((t, i) => stroke(t, prog(lt, 1.0 + i * 0.06, 0.3), INK, 1.1, 0.6));
+    // the sun travels its arc
+    const sa = Math.PI + Math.PI * (0.18 + 0.6 * easeInOut(prog(lt, 0.6, 7.2))), sx = 1430 + 420 * Math.cos(sa), sy = HY + 372 * Math.sin(sa), sq = easeOut(prog(lt, 0.8, 0.6));
+    if (sq > 0) {
+      for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU + lt * 0.4, r1 = i % 2 ? 50 : 62; stroke(new P([[sx + 40 * Math.cos(a), sy + 40 * Math.sin(a)], [sx + r1 * Math.cos(a), sy + r1 * Math.sin(a)]]), sq, INK, 1.2, 0.6); }
+      disc(sx, sy, 32 * sq, OCHRE, 0.95); stroke(el(sx, sy, 32 * sq, 32 * sq, 0, TAU, 640, 0), 1, INK, 1.4, 0.8); disc(sx, sy, 5 * sq, RED, 0.9);
+    }
+    // rows of panels, far to near
+    this.rows.forEach((r, i) => {
+      const q = easeOut(prog(lt, 1.0 + i * 0.28, 0.6));
+      if (q <= 0) return;
+      fill(r.face, BLUE, 0.55 * q); stroke(r.face, q, INK, 1.6 / (1 + 0.3 * r.z) + 0.4);
+      r.cells.forEach(c => stroke(c, q, INK, 0.8, 0.55)); r.legs.forEach(l => stroke(l, q, INK, 1.2, 0.8));
+      // glint: a band of light sweeping across each row as the sun moves
+      const gx = ((lt * 0.35 + i * 0.13) % 1);
+      const [a0, b0] = [r.face.pts[0], r.face.pts[1]];
+      disc(lerp(a0[0], b0[0], gx), a0[1] - 10 / (1 + 0.55 * r.z), 5 / (1 + 0.3 * r.z), '#FFF6E0', 0.8 * q, 'source-over');
+    });
+    this.rig.forEach((l, i) => stroke(l, easeOut(prog(lt, 1.8 + i * 0.08, 0.5)), INK, 1.4, 0.8));
+    const fl = easeOut(prog(lt, 2.6, 0.5)) * (0.8 + 0.2 * Math.sin(lt * 11));
+    disc(1102, HY - 88, 6 * fl, RED, 0.9); disc(1102, HY - 94, 3.5 * fl, OCHRE, 0.9);
+    this.tripod.forEach(l => stroke(l, easeOut(prog(lt, 2.6, 0.6)), INK, 1.4));
+    const dq = easeOut(prog(lt, 3.0, 0.5));
+    stroke(this.plate, dq, INK, 2); stroke(this.dome, dq, INK, 1.4); fill(this.dome, BLUE, 0.25 * dq);
+  },
+});
+
+// IX · Al Mujtamaʿ — a warning ripples across the city and lights every phone
+scene({
+  start: 70, dur: 8, num: 'IX', name: 'AL MUJTAMAʿ', ar: 'المجتمع', readout: 'TODO_READOUT_SOCIETY',
+  kicker: 'TODO_KICKER_SOCIETY',
+  head: ['WE WATCH', 'OVER EVERY', 'HOME.'], accent: { 'HOME.': RED },
+  arHead: 'ونسهر على كل بيت',
+  init() {
+    const base = 800;
+    this.base = base;
+    const B = [[1000, 58, 170], [1064, 44, 250], [1114, 70, 205], [1190, 50, 320], [1246, 78, 235], [1392, 88, 280], [1486, 54, 350], [1546, 72, 200], [1624, 48, 300], [1678, 86, 225], [1770, 58, 275], [1834, 46, 175]];
+    this.blocks = B.map(([x, w, h], i) => ({ body: new P(wob([[x, base], [x, base - h], [x + w, base - h], [x + w, base], [x, base]], 700 + i, 0.4).slice(0, -1), true), x, w, h, i }));
+    // the tall tower with setbacks and a spire, carrying the warning mast
+    const T = [[1330, base], [1334, 500], [1342, 500], [1346, 400], [1354, 400], [1358, 320], [1364, 320], [1368, 400], [1376, 400], [1380, 500], [1388, 500], [1392, base]];
+    this.tower = new P(wob(T.concat([T[0]]), 720, 0.3).slice(0, -1), true);
+    this.spire = ln(1361, 320, 1361, 236, 721, 0.1);
+    // villas and a mosque in the foreground
+    this.villas = [1004, 1150, 1440, 1600, 1760].map((x, i) => ({ x, p: new P(wob([[x, 930], [x, 872], [x + 86, 872], [x + 86, 930], [x, 930]], 730 + i, 0.4).slice(0, -1), true) }));
+    this.dome = el(1320, 900, 44, 40, Math.PI, TAU, 740, 0.3);
+    this.drum = new P([[1272, 930], [1272, 900], [1368, 900], [1368, 930]], true);
+    this.minaret = new P([[1382, 930], [1382, 800], [1378, 790], [1398, 790], [1394, 800], [1394, 930]], true);
+    this.minTop = new P([[1380, 790], [1388, 752], [1396, 790]], true);
+    this.ground = ln(985, 930, 1885, 930, 745, 0.5);
+    // weather glyphs across the top
+    this.glyphs = [0, 1, 2, 3, 4, 5].map(k => ({ cx: 1110 + k * 128, cy: 190, ring: el(1110 + k * 128, 190, 34, 34, 0, TAU, 750 + k, 0.3) }));
+  },
+  glyph(k, cx, cy, q) {
+    if (q <= 0) return;
+    const cloud = (x, y, s) => { [[-12, 2, 10], [0, -5, 13], [13, 2, 9]].forEach(([dx, dy, r]) => stroke(el(x + dx * s, y + dy * s, r * s, r * s, Math.PI * 0.95, Math.PI * 2.05, 760 + k, 0), q, INK, 1.3)); stroke(new P([[x - 22 * s, y + 10 * s], [x + 22 * s, y + 10 * s]]), q, INK, 1.3); };
+    if (k === 0) { disc(cx, cy, 11 * q, OCHRE, 0.95); for (let i = 0; i < 8; i++) { const a = (i / 8) * TAU; stroke(new P([[cx + 15 * Math.cos(a), cy + 15 * Math.sin(a)], [cx + 22 * Math.cos(a), cy + 22 * Math.sin(a)]]), q, INK, 1.3); } }
+    if (k === 1) cloud(cx, cy + 2, 1);
+    if (k === 2) { cloud(cx, cy - 6, 0.9); for (let i = 0; i < 4; i++) stroke(new P([[cx - 12 + i * 8, cy + 10], [cx - 16 + i * 8, cy + 20]]), q, BLUE, 1.6); }
+    if (k === 3) for (let i = 0; i < 4; i++) stroke(new P([[cx - 20 + (i % 2) * 4, cy - 12 + i * 8], [cx + 18 - (i % 2) * 4, cy - 12 + i * 8]]), q, SEPIA, 1.8);
+    if (k === 4) { stroke(new P(quad([cx - 20, cy], [cx, cy - 14], [cx + 20, cy], 10)), q, OCHRE, 1.8); for (let i = 0; i < 7; i++) disc(cx - 15 + i * 5, cy + 8 + (i % 2) * 5, 1.8 * q, SEPIA); }
+    if (k === 5) { cloud(cx, cy - 8, 0.9); stroke(new P([[cx + 2, cy + 4], [cx - 6, cy + 14], [cx + 2, cy + 14], [cx - 6, cy + 24]]), q, RED, 2); }
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('TODO_NOTE_SOCIETY', 1862, 1052, 4.4, lt, { a: 0.36 });
+    const base = this.base;
+    this.blocks.forEach((b, i) => {
+      const q = easeOut(prog(lt, 0.3 + i * 0.07, 0.6));
+      if (q <= 0) return;
+      mask(b.body); stroke(b.body, q, INK, 1.6);
+      ctx.save(); ctx.beginPath(); b.body.trace(ctx, 1); ctx.clip();
+      ctx.globalAlpha = SA * 0.35 * q; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.beginPath();
+      for (let y = base - b.h + 12; y < base; y += 14) { ctx.moveTo(b.x + 4, y); ctx.lineTo(b.x + b.w - 4, y); }
+      ctx.stroke(); ctx.restore();
+    });
+    const tq = easeInOut(prog(lt, 0.6, 1.0));
+    mask(this.tower); hatch(this.tower, [1328, 318, 1394, base], 1.4, 6, tq, INK, 1, 0.35, 722); stroke(this.tower, tq, INK, 1.8); stroke(this.spire, prog(lt, 1.4, 0.4), INK, 1.6);
+    stroke(this.ground, prog(lt, 0.5, 1.0), INK, 1.6, 0.8);
+    const fq = easeOut(prog(lt, 1.2, 0.8));
+    mask([this.drum, this.minaret]); fill(this.dome, OCHRE, 0.45 * fq);
+    [this.drum, this.minaret, this.minTop].forEach(q => stroke(q, fq, INK, 1.5)); stroke(this.dome, fq, INK, 1.6);
+    // the warning: rings leave the mast every beat and light each home as they pass
+    const mx = 1361, my = 236, t0 = 2.2;
+    for (let k = 0; k < 6; k++) {
+      const age = lt - t0 - k * 0.5;
+      if (age < 0 || age > 2.4) continue;
+      const r = age * 420;
+      stroke(el(mx, my, r, r * 0.55, 0, TAU, 780 + k, 0), 1, RED, 1.6, 0.55 * (1 - age / 2.4));
+    }
+    this.villas.forEach((v, i) => {
+      const q = easeOut(prog(lt, 1.0 + i * 0.1, 0.6));
+      mask(v.p); stroke(v.p, q, INK, 1.6);
+      stroke(new P([[v.x + 30, 930], [v.x + 30, 900], [v.x + 52, 900], [v.x + 52, 930]]), q, INK, 1.1, 0.8);
+      // phone above each home lights up when the first ring reaches it
+      const cx = v.x + 43, cy = 846, d = Math.hypot((cx - mx) / 1, (cy - my) / 0.55), hit = lt > t0 + d / 420;
+      const ph = new P([[cx - 9, cy - 15], [cx + 9, cy - 15], [cx + 9, cy + 15], [cx - 9, cy + 15]], true), pq = easeOut(prog(lt, 1.6 + i * 0.1, 0.4));
+      mask(ph); stroke(ph, pq, INK, 1.3);
+      if (hit) { fill(new P([[cx, cy - 8], [cx + 7, cy + 5], [cx - 7, cy + 5]], true), RED, 0.9); disc(cx, cy + 10, 1.5, '#FFF8EA', 1, 'source-over'); }
+    });
+    // weather glyphs: sun, cloud, rain, fog, dust, storm
+    this.glyphs.forEach((g, k) => {
+      const q = easeOut(prog(lt, 0.8 + k * 0.15, 0.5));
+      stroke(g.ring, q, INK, 1.2, 0.7);
+      this.glyph(k, g.cx, g.cy, q);
+    });
+    const active = this.glyphs[5], pulse = lt > t0 ? 1 + 0.12 * Math.sin((lt - t0) * TAU * 2) : 1;
+    if (lt > t0) stroke(el(active.cx, active.cy, 40 * pulse, 40 * pulse, 0, TAU, 790, 0), 1, RED, 2, 0.85);
+  },
+});
+
 // VI · Al Istimtar — seeding the cloud, then rain
 scene({
-  start: 60, dur: 11, num: 'VI', name: 'AL ISTIMTAR', ar: 'الاستمطار', readout: '311 MISSIONS · 2022',
+  start: 78, dur: 8, speed: 11 / 8, num: 'X', name: 'AL ISTIMTAR', ar: 'الاستمطار', readout: '311 MISSIONS · 2022',
   kicker: 'FIRST TRIAL 1982 · NATIONWIDE SINCE 2010',
   head: ['WE ASKED', 'THE CLOUDS', 'FOR MORE.'], accent: { 'MORE.': BLUE },
   arHead: 'واستمطرنا السحاب',
@@ -786,7 +1127,7 @@ scene({
 
 // VII · Al ʿIlm — a plate of four figures from UAEREP research
 scene({
-  start: 71, dur: 11, num: 'VII', name: 'AL ʿILM', ar: 'العلم', readout: '6 AWARD CYCLES · 2016 — 2026',
+  start: 86, dur: 8, speed: 11 / 8, num: 'XI', name: 'AL ʿILM', ar: 'العلم', readout: '6 AWARD CYCLES · 2016 — 2026',
   kicker: 'UAEREP · SINCE 2015 · 17 PROJECTS · 8 PATENTS',
   head: ['WE FUNDED', 'THE SCIENCE', 'OF RAIN.'], accent: { 'RAIN.': BLUE },
   arHead: 'ودعمنا علوم الاستمطار',
@@ -885,7 +1226,7 @@ function ortho(lat, lon, lat0, lon0, R) {
 function toVec(lat, lon) { const f = (lat * Math.PI) / 180, l = (lon * Math.PI) / 180; return [Math.cos(f) * Math.cos(l), Math.cos(f) * Math.sin(l), Math.sin(f)]; }
 function toLatLon([x, y, z]) { return [(Math.asin(clamp(z, -1, 1)) * 180) / Math.PI, (Math.atan2(y, x) * 180) / Math.PI]; }
 scene({
-  start: 82, dur: 11, num: 'VIII', name: 'AL ʿĀLAM', ar: 'العالم', readout: '24.45°N 54.38°E → 46.20°N 6.14°E',
+  start: 94, dur: 8, speed: 11 / 8, num: 'XII', name: 'AL ʿĀLAM', ar: 'العالم', readout: '24.45°N 54.38°E → 46.20°N 6.14°E',
   kicker: 'WMO PRESIDENCY · 2023 — 2027',
   head: ['NOW WE SHARE', 'IT WITH', 'THE WORLD.'], accent: { 'WORLD.': RED },
   arHead: 'واليوم نشارك علمنا مع العالم',
@@ -958,7 +1299,7 @@ scene({
 
 // IX · Al Ghad — twenty years, a rain gauge filling to 2027
 scene({
-  start: 93, dur: 13, num: 'IX', name: 'AL GHAD', ar: 'الغد', readout: 'MARCH 2027',
+  start: 102, dur: 12, speed: 0.975, num: 'XIII', name: 'AL GHAD', ar: 'الغد', readout: 'MARCH 2027',
   kicker: 'NATIONAL CENTER OF METEOROLOGY · 2007 — 2027',
   head: ['TWENTY YEARS', 'OF READING', 'THE SKY.'], accent: { 'SKY.': BLUE },
   arHead: 'عشرون عاماً في قراءة السماء',
@@ -1067,22 +1408,30 @@ function light(t) {
   ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
   ctx.restore();
 }
-const XF = 0.9, DURATION = 106;
+const XF = 0.4, DURATION = 114, BAR = 2; // 120 BPM
 function render(t) {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
   ctx.drawImage(PAPER_CV, 0, 0);
+  // every cut lands on a downbeat: a small punch-in and a flash of light
+  let since = Infinity;
+  SCENES.forEach((s, i) => { if (i > 0 && t >= s.start) since = Math.min(since, t - s.start); });
+  const punch = since < 0.8 ? 0.022 * Math.exp(-since * 6) : 0;
+  ctx.save();
+  if (punch) { ctx.translate(W / 2, H / 2); ctx.scale(1 + punch, 1 + punch); ctx.translate(-W / 2, -H / 2); }
   SCENES.forEach((s, i) => {
     const lt = t - s.start;
     let a = 1;
     if (i > 0) a = Math.min(a, clamp((lt + XF / 2) / XF));
     if (i < SCENES.length - 1) a = Math.min(a, clamp((s.dur + XF / 2 - lt) / XF));
     if (a <= 0) return;
-    SA = a; ctx.save(); s.draw(lt); ctx.restore();
+    SA = a; REAL_LT = lt; ctx.save(); s.draw(lt * (s.speed || 1)); ctx.restore();
   });
+  ctx.restore();
   SA = 1;
   corners(1);
   small('NCM · XX', W - 78, 72, 1, { size: 18, ls: 8, align: 'right', weight: 600, a: 0.85 });
   light(t);
+  if (since < 0.6) { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = `rgba(255,246,228,${(0.2 * Math.exp(-since * 9)).toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
   const fadeIn = 1 - easeOut(prog(t, 0, 1.6)), fadeOut = easeInOut(prog(t, DURATION - 1.8, 1.8)), dark = Math.max(fadeIn, fadeOut);
   if (dark > 0) { ctx.fillStyle = `rgba(20,16,12,${dark})`; ctx.fillRect(0, 0, W, H); }
 }
@@ -1099,6 +1448,7 @@ async function boot() {
   let widest = 0;
   SCENES.forEach(s => s.head && s.head.forEach(l => { widest = Math.max(widest, ctx.measureText(l).width); }));
   HEAD_SIZE = Math.min(104, Math.floor((810 / widest) * 100));
+  SCENES.sort((a, b) => a.start - b.start);
   SCENES.forEach(s => s.init && s.init());
   return true;
 }
