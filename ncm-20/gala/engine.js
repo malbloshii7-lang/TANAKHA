@@ -682,12 +682,31 @@ function voSubs(t) {
   const v = VO.find(l => t >= l.in - 0.1 && t <= l.out + 0.4);
   if (!v) return;
   const q = clamp((t - v.in + 0.1) / 0.25) * clamp((v.out + 0.4 - t) / 0.3);
+  // wrap to the frame (the caption form, without the narrator's vowels, as the audience's captions will read)
+  const wrap = (text, font, dir, maxW) => {
+    ctx.font = font; ctx.direction = dir;
+    const lines = [];
+    let cur = '';
+    text.split(' ').forEach(w => { const tryL = cur ? cur + ' ' + w : w; if (cur && ctx.measureText(tryL).width > maxW) { lines.push(cur); cur = w; } else cur = tryL; });
+    if (cur) lines.push(cur);
+    if (lines.length !== 2) return lines;
+    // two lines: balance them (the break that makes the longer line shortest), so a name is not left dangling
+    const W_ = text.split(' ');
+    let best = null;
+    for (let k = 1; k < W_.length; k++) { const l1 = W_.slice(0, k).join(' '), l2 = W_.slice(k).join(' '), m = Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width), score = m - (/[،,:;]$/.test(l1) ? 0.25 * maxW : 0); if (m <= maxW && (!best || score < best.score)) best = { score, l: [l1, l2] }; }
+    return best ? best.l : lines; // prefer a break after a comma, so a phrase or a name is not split
+  };
   ctx.save(); ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-  ctx.globalAlpha = 0.55 * q; ctx.fillStyle = '#0B0C10'; ctx.fillRect(0, H - 128, W, 128);
-  ctx.globalAlpha = q; ctx.fillStyle = '#F3EAD6'; ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.font = `600 34px ${F_KUFI}`;
-  ctx.fillText(v.ar, W / 2, H - 76);
-  ctx.direction = 'ltr'; ctx.font = `italic 400 25px ${F_FELL}`; ctx.fillStyle = '#D9CFBA'; ctx.fillText(v.en, W / 2, H - 34);
-  ctx.globalAlpha = 0.5 * q; ctx.font = `600 12px ${F_MONO}`; ctx.letterSpacing = '3px'; ctx.textAlign = 'left'; ctx.fillText('NARRATION · SCRATCH SUBTITLE', 40, H - 108);
+  const fa = `600 34px ${F_KUFI}`, fe = `italic 400 25px ${F_FELL}`;
+  const A = wrap(typeof voSubAr === 'function' ? voSubAr(v) : v.ar, fa, 'rtl', 1680), E = wrap(v.en, fe, 'ltr', 1680);
+  const h = 40 + A.length * 44 + E.length * 32;
+  ctx.globalAlpha = 0.55 * q; ctx.fillStyle = '#0B0C10'; ctx.fillRect(0, H - h, W, h);
+  ctx.globalAlpha = q; ctx.fillStyle = '#F3EAD6'; ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.font = fa;
+  let y = H - h + 50;
+  A.forEach(l => { ctx.fillText(l, W / 2, y); y += 44; });
+  ctx.direction = 'ltr'; ctx.font = fe; ctx.fillStyle = '#D9CFBA';
+  y -= 6; E.forEach(l => { ctx.fillText(l, W / 2, y); y += 32; });
+  ctx.globalAlpha = 0.5 * q; ctx.font = `600 12px ${F_MONO}`; ctx.letterSpacing = '3px'; ctx.textAlign = 'left'; ctx.fillText('NARRATION · SCRATCH SUBTITLE', 40, H - h + 18);
   ctx.restore();
 }
 // Burned-in timecode for the show-caller's reference copy (?tc), at 25 fps SMPTE.
