@@ -278,6 +278,106 @@ def pizz(m, gain=1.0):
     return lp(s, 1600, 2) * 0.35 * gain
 
 
+# ---------- Emirati instruments (for Al Ayyala, Al Razfa, the Khaleeji sawt and the sea songs) ----------
+def tabl(gain=1.0, stroke="dum"):
+    """the big double-headed tabl of Al Ayyala, struck with a curved stick: 'dum' a deep open boom,
+    'tak' the rim and upper skin, dry and cracking"""
+    if stroke == "dum":
+        n = int(1.6 * SR)
+        t = np.arange(n) / SR
+        f = 58 + 34 * np.exp(-t * 22)
+        s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 3.2)
+        s += 0.35 * np.sin(2 * np.pi * np.cumsum(f * 1.52) / SR) * np.exp(-t * 6)
+        s += lp(noise(n), 700, 2) * np.exp(-t * 40) * 0.5  # the stick on the skin
+        return s * 0.55 * gain
+    n = int(0.35 * SR)
+    t = np.arange(n) / SR
+    s = bp(noise(n), 700, 4200, 2) * np.exp(-t * 45) * 0.7 + np.sin(2 * np.pi * 210 * t) * np.exp(-t * 30) * 0.5
+    return s * 0.45 * gain
+
+
+def mirwas(gain=1.0, open_=True):
+    """the small double-headed hand drum of the Khaleeji sawt: a tight, pitched pop (open) or a muted tick"""
+    n = int(0.45 * SR)
+    t = np.arange(n) / SR
+    f = (310 if open_ else 420) * (1 + 0.25 * np.exp(-t * 60))
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * (14 if open_ else 40))
+    s += bp(noise(n), 1500, 6000, 2) * np.exp(-t * 70) * 0.35
+    return s * 0.35 * gain
+
+
+def jahla(gain=1.0):
+    """the clay-pot drum of the sea songs: a hollow, airy low note from the pot's mouth"""
+    n = int(0.9 * SR)
+    t = np.arange(n) / SR
+    f = 96 * (1 + 0.12 * np.exp(-t * 25))
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 7) + bp(noise(n), 80, 260, 2) * np.exp(-t * 9) * 0.6
+    return s * 0.5 * gain
+
+
+def tus(gain=1.0):
+    """the small brass tus cymbals: a bright, inharmonic clash that rings briefly"""
+    n = int(0.8 * SR)
+    t = np.arange(n) / SR
+    s = sum(a * np.sin(2 * np.pi * f * t + p) for a, f, p in [(1, 3130, 0), (0.8, 4420, 1.1), (0.6, 5310, 2.3), (0.5, 6870, 0.7), (0.35, 8210, 1.9)])
+    s = s * np.exp(-t * 7) + hp(noise(n), 5000, 2) * np.exp(-t * 30) * 0.4
+    return s * 0.05 * gain
+
+
+def clap(gain=1.0, people=6):
+    """the tasfeeq: several men clapping together, each a little early or late, a hollow-palm crack"""
+    n = int(0.3 * SR)
+    out = np.zeros(n)
+    for k in range(people):
+        d = int(abs(rng.normal(0, 0.006)) * SR)
+        m = n - d
+        t = np.arange(m) / SR
+        c = bp(noise(m), 900 + 300 * rng.random(), 2800 + 800 * rng.random(), 2) * np.exp(-t * (55 + 20 * rng.random()))
+        out[d:] += c * (0.7 + 0.3 * rng.random())
+    return out * 0.18 * gain / np.sqrt(people)
+
+
+def rababa(m, dur, gain=1.0):
+    """the bowed rababa: one horsehair string over a skin belly, nasal and a little rough, with a slow bow swell"""
+    n = int((dur + 0.4) * SR)
+    f = vib(hz(m), n, rate=5.6, depth=0.009, delay=0.2)
+    src = saw(f, n, harmonics=30) + 0.12 * bp(noise(n), 1500, 5000, 2)  # the bow's rosin noise
+    body = bp(src, 500, 1100, 2) * 1.0 + bp(src, 2200, 3200, 2) * 0.6 + lp(src, 400, 2) * 0.3
+    env = adsr(n, 0.12, 0.2, 0.85, 0.3)
+    return body * env * 0.3 * gain
+
+
+def mizmar(m, dur, gain=1.0):
+    """the surnai / mizmar double-reed pipe of Liwa and the sea: bright, buzzing, with a quick grace into each note"""
+    n = int((dur + 0.3) * SR)
+    f = vib(hz(m), n, rate=6.2, depth=0.006, delay=0.15)
+    f = f * (1 - 0.03 * np.exp(-np.arange(n) / (0.04 * SR)))  # the scoop into the note
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    src = np.tanh(2.5 * np.sin(ph)) + 0.4 * np.tanh(2.0 * np.sin(2 * ph + 0.4))
+    tone = bp(src, 700, 4200, 2) + 0.2 * src
+    env = adsr(n, 0.04, 0.1, 0.9, 0.2)
+    return tone * env * 0.16 * gain
+
+
+def chant(m, dur, gain=1.0, men=8, vowel="a"):
+    """men chanting in unison, as the two rows of Al Ayyala answer each other: a rougher, drier voice than the choir,
+    each singer slightly out of tune and time with the others"""
+    n = int((dur + 0.6) * SR)
+    F = {"a": [(650, 110), (1080, 130), (2500, 200)], "o": [(500, 90), (820, 110), (2450, 200)], "e": [(420, 80), (1900, 150), (2600, 200)]}[vowel]
+    L, R = np.zeros(n), np.zeros(n)
+    for v in range(men):
+        off = int(abs(rng.normal(0, 0.03)) * SR)
+        f = vib(hz(m) * 2 ** (rng.normal(0, 10) / 1200), n, rate=4.5 + rng.random(), depth=0.008, delay=0.1)
+        src = saw(f, n, harmonics=36) * 0.9 + 0.08 * noise(n)
+        voice = sum(bp(src, c - w, c + w, 2) * (1.0, 0.55, 0.3)[i] for i, (c, w) in enumerate(F))
+        voice = np.roll(voice * adsr(n, 0.08, 0.15, 0.85, 0.35), off)
+        pan = (v / max(1, men - 1)) * 1.2 - 0.6
+        a = (pan + 1) * np.pi / 4
+        L += voice * np.cos(a)
+        R += voice * np.sin(a)
+    return np.vstack([L, R]) * 0.33 * gain / np.sqrt(men)
+
+
 # ---------- sound effects (restrained: no alarms, no sirens, nothing that reads as a weapon) ----------
 def wind(dur, gain=1.0, gust=0.08):
     n = int(dur * SR)
