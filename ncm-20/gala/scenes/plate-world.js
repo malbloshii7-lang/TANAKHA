@@ -88,9 +88,17 @@ scene({
     const hp = easeOut(prog(lt, 2.0, 0.6));
     ornament(hx, hy, 11 * hp, 1);
     smallAr('أبوظبي', hx - 18, hy + 36, hp, { size: 30, align: 'right', weight: 700, a: 0.9 });
-    small('ABU DHABI', hx - 18, hy + 58, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });
+    small('ABU DHABI', hx - 18, hy + 66, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });
     // partners are pins, not trajectories: one quiet, dotted thread runs only to Geneva, the seat of the WMO
     const a = toVec(...this.home);
+    // paper patches under every pin label first, so the limb, the night hatching and the ring never run through a name
+    this.places.forEach(pl => {
+      const [ex, ey, vis] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t, 0.8));
+      if (vis <= 0.02 || lq <= 0) return;
+      const lx = ex > cx ? ex + 14 : ex - 14, w = Math.max(textWidth(pl.ar, `700 28px ${F_KUFI}`, 0, 'rtl'), textWidth(pl.label, `600 14px ${F_MONO}`, 2) + 2 * pl.label.length) + 8;
+      ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * lq; ctx.fillStyle = PAPER_PAT;
+      ctx.fillRect(ex > cx ? lx - 4 : lx - w + 4, ey - 24, w, 64); ctx.restore();
+    });
     this.places.forEach((pl, k) => {
       const [ex, ey, vis] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t, 0.8));
       if (vis <= 0.02 || lq <= 0) return;
@@ -107,7 +115,7 @@ scene({
       const lx = ex > cx ? ex + 14 : ex - 14, al = ex > cx ? 'left' : 'right';
       smallAr(pl.ar, lx, ey + 8, lq, { size: 28, align: al, weight: 700, a: 0.88 });
       if (pl.ar2) smallAr(pl.ar2, lx, ey + 36, lq, { size: 19, align: al, weight: 600, a: 0.8 });
-      small(pl.label, lx, ey + (pl.ar2 ? 56 : 30), lq, { size: 14, ls: 2, align: al, weight: 600, a: 0.7 });
+      small(pl.label, lx, ey + (pl.ar2 ? 56 : 34), lq, { size: 14, ls: 2, align: al, weight: 600, a: 0.7 });
     });
   },
 });

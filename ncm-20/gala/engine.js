@@ -372,7 +372,7 @@ const textIn = (f, tin, tout, fi = 0.5, fo = 0.35) => easeOut(prog(f, tin, fi)) 
 // Every words block can be recorded with its film times (TEXT_REC), so the subtitle files come from the build itself.
 let TEXT_REC = null;
 const recText = (level, tin, tout, ar, en) => { if (TEXT_REC) TEXT_REC.push({ level, tin, tout, ar: [].concat(ar || []), en: [].concat(en || []) }); };
-function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = enSize * 1.55 } = {}) {
+function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = Math.ceil(arSize * 0.48 + enSize * 0.72) + 6 } = {}) {
   recText('B', tin, tout, ar, en);
   const q = textIn(f, tin, tout), q2 = textIn(f, tin + 0.15, tout);
   const A = [].concat(ar || []), E = [].concat(en || []);

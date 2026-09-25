@@ -73,7 +73,7 @@ scene({
       if (p >= 1) arrowHead(w.end[0], w.end[1], w.ang, 18, w.col, 0.9, w.lw * 0.8);
       const lp = easeOut(prog(lt, t0 + 0.8, 0.7));
       smallAr(w.ar, w.lx, w.ly, lp, { size: 32, align: w.align, a: 0.88, weight: 700 });
-      small(w.name, w.lx, w.ly + 28, lp, { size: 17, ls: 4, align: w.align, a: 0.75, weight: 600 });
+      small(w.name, w.lx, w.ly + 34, lp, { size: 17, ls: 4, align: w.align, a: 0.75, weight: 600 });
     });
     // the pearling sea
     stroke(this.surface, prog(lt, 0.6, 1.4), INK, 1.3, 0.65);

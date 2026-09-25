@@ -1,5 +1,5 @@
 'use strict';
-// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 and 3): 21 beats, 50.5 bars at 72 BPM, 2:48.3.
+// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 and 3): 21 beats, 54 bars at 72 BPM, 3:00.0.
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -28,135 +28,151 @@ function monsoonCircle(f) {
 const WORLD_CAM = t => camPath([{ t: 0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 4.0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 },
   { t: 7.5, s: 1.3, px: 1322, py: 428, sx: 470, sy: 430 }, { t: 10.5, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }], t);
 
-// B11 and B13: the two beats added in Revision 3 (words to follow the verified research)
-const RAIL_BEAT = { id: 'rail', start: at(26), dur: at(1.5), speed: 1, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, at(1.5)) };
-const TANKER_BEAT = { id: 'tanker', start: at(29), dur: at(1.5), speed: 1, offset: 0.4, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, 0.4 + at(1.5)) };
+// B11 and B13, added in Revision 3. Each claims only what NCM does (research of 25 Sep 2026, fact-checked): no
+// NCM agreement with Etihad Rail or with ADNOC is documented, so the rail beat names NCM's public dust and fog warnings
+// and the tanker beat names the east-coast marine bulletin, which NCM's AI assistant drafts and a forecaster approves.
+// Never "safe passage" or «عبور آمن»: in the 2026 context it would be heard as a security claim.
+// Brand names on screen need their owners' written consent, obtained through NCM:
+const CONSENT = { adnocMurban: false }; // true only with ADNOC's written consent: the tanker's label then names Murban
+const RAIL_BEAT = { id: 'rail', start: at(27), dur: at(1.5), speed: 1, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, at(1.5)),
+  words(t) {
+    const f = filmT(this, t), s = this.start;
+    levelB(f, s + 0.5, s + 4.6, 'قطارات الاتحاد · الذيد، الشارقة', 'ETIHAD RAIL · AL DHAID, SHARJAH', { y: 330 });
+    levelA(f, s + 0.9, s + 4.6, 'لكل طريق وسكة حديد', 'FOR EVERY ROAD AND RAILWAY', { y: 520, arSize: 70, enSize: 30 });
+  } };
+const TANKER_BEAT = { id: 'tanker', start: at(30), dur: at(1.5), speed: 1, offset: 0.4, xf: 0.5, cam: PLATE_LEFT(1.15, 1.2, 0.4 + at(1.5), 1435, 540),
+  words(t) {
+    const f = filmT(this, t), s = this.start;
+    if (CONSENT.adnocMurban) levelB(f, s + 0.5, s + 4.6, 'الفجيرة · تحميل خام مربان', 'FUJAIRAH · LOADING MURBAN CRUDE', { y: 330 });
+    else levelB(f, s + 0.5, s + 4.6, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
+    levelA(f, s + 0.9, s + 4.6, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
+  } };
 
 const TIMELINE = [
   // B01 · Night: Suhail rises
   { id: 'suhail', start: 0, dur: at(3.5), cam: SUHAIL_CAM,
-    words(t) { const f = filmT(this, t), [x, y] = suhailScreen(f); levelB(f, 8.8, 11.0, 'سهيل', 'SUHAIL · CANOPUS', { x: x + 34, y: y - 16, align: 'left', arSize: 30, enSize: 15 }); } },
+    words(t) { const f = filmT(this, t), [x, y] = suhailScreen(f); levelB(f, 8.0, 11.6, 'سهيل', 'SUHAIL · CANOPUS', { x: x + 34, y: y - 48, align: 'left', arSize: 30, enSize: 15, gap: 24 }); } },
   // B02 · The Durour wheel
   { id: 'durour', start: at(3.5), dur: at(2), speed: SP.durour, xf: 2.8, enter: { type: 'dawn' }, cam: DUROUR_CAM,
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 13.2, 18.0, 'حساب الدرور · ' + ltr('36') + ' دَرّاً × ' + ltr('10') + ' أيام + ' + ltr('5') + ' أيام', 'THE DUROUR CALENDAR · 36 × 10 DAYS + 5 DAYS', { y: 330 });
-      levelA(f, 15.6, 18.0, 'عدّوا أيام السنة', 'THEY COUNTED THE DAYS OF THE YEAR', { y: 520 });
+      levelB(f, 12.5, 18.0, 'حساب الدرور · ' + ltr('36') + ' دَرّاً × ' + ltr('10') + ' أيام + ' + ltr('5') + ' أيام', 'THE DUROUR CALENDAR · 36 × 10 DAYS + 5 DAYS', { y: 330 });
+      levelA(f, 12.9, 18.0, 'عدّوا أيام السنة', 'THEY COUNTED THE DAYS OF THE YEAR', { y: 520 });
     } },
   // B03 · Ibn Majid and the monsoon
   { id: 'monsoon', start: at(5.5), dur: at(1.5), speed: SP.monsoon, offset: 2.0, xf: 0.8, cam: MONSOON_CAM,
-    words(t) { const f = filmT(this, t); levelB(f, 18.9, 23.2, 'أحمد بن ماجد · جلفار، رأس الخيمة · نحو ' + ltr('1490'), 'AHMED BIN MAJID · JULFAR, RAS AL KHAIMAH · c. 1490', { y: 330 }); } },
+    words(t) { const f = filmT(this, t); levelB(f, 18.9, 23.2, 'أحمد بن ماجد · جلفار', 'AHMED BIN MAJID · JULFAR', { y: 330 }); } },
   // B04 · Every wind by name
   { id: 'pearling', start: at(7), dur: at(1.5), speed: SP.pearling, offset: 0.8, xf: 0.8,
     cam: lockCam(() => monsoonCircle(at(7)), CIRCLES.pearling, { off: 0.8, settle: 2.0 * SP.pearling,
       then: [{ t: 6.5 * SP.pearling, s: 0.95, px: 1435, py: 700, sx: 560, sy: 560 }] }),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 24.6, 28.0, 'الغوص الكبير · من يونيو إلى سبتمبر', 'THE GREAT DIVE · JUNE TO SEPTEMBER', { y: 330 });
+      levelB(f, 24.6, 28.0, 'الغوص الكبير', 'THE GREAT DIVE', { y: 330 });
     } },
   // B05 · The aflaj, and Sheikh Zayed
   { id: 'falaj', start: at(8.5), dur: at(2.5), speed: SP.falaj, offset: 0.5, xf: 0.8,
     cam: t => camPath([{ t: 0, s: 1.04, px: 1300, py: 640, sx: 560, sy: 560 }, { t: 0.5 + at(2.5) * SP.falaj, s: 1.10, px: 1560, py: 660, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 29.4, 33.0, ['هيلي، العين · العصر الحديدي', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
+      levelB(f, 29.4, 35.5, ['هيلي، العين · العصر الحديدي', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
     } },
   // B06 · Card: the Founding Father (no VO)
-  { id: 'quote-zayed', use: 'quote', quote: 'zayed', start: at(11), dur: at(2.5), xf: 1.2 },
+  { id: 'quote-zayed', use: 'quote', quote: 'zayed', start: at(11), dur: at(3.5), xf: 1.2 },
   // B07 · 2007: one national center
-  { id: 'centre', start: at(13.5), dur: at(2.5), speed: SP.centre, xf: 1.6, enter: { type: 'iris', x: 555, y: 675 }, cam: PLATE_LEFT(1.0, 1.12, at(2.5) * SP.centre),
+  { id: 'centre', start: at(14.5), dur: at(2.5), speed: SP.centre, xf: 1.6, enter: { type: 'iris', x: 555, y: 675 }, cam: PLATE_LEFT(1.0, 1.12, at(2.5) * SP.centre),
     words(t) {
-      const f = filmT(this, t);
-      levelB(f, 45.9, 52.9, 'المرسوم بقانون اتحادي رقم ' + ltr('(6)') + ' لسنة ' + ltr('2007'), 'FEDERAL DECREE-LAW NO. 6 OF 2007', { y: 330 });
-      levelA(f, 50.4, 52.9, 'مركز وطني واحد', 'ONE NATIONAL CENTER', { y: 540, arSize: 96, enSize: 38 });
+      const f = filmT(this, t), s = this.start;
+      levelB(f, s + 0.9, s + 7.9, 'المرسوم بقانون اتحادي رقم ' + ltr('(6)') + ' لسنة ' + ltr('2007'), 'FEDERAL DECREE-LAW NO. 6 OF 2007', { y: 330 });
+      levelA(f, s + 4.0, s + 7.9, 'مركز وطني واحد', 'ONE NATIONAL CENTER', { y: 540, arSize: 96, enSize: 38 });
     } },
   // B08 · Seven emirates, one official source
-  { id: 'nation', start: at(16), dur: at(3.5), xf: 1.6, enter: { type: 'iris', x: 554, y: 689 },
+  { id: 'nation', start: at(17), dur: at(3.5), xf: 1.6, enter: { type: 'iris', x: 554, y: 689 },
     cam(t) { const [hx, hy] = this.hq.xy; return camPath([{ t: 0, s: 2.2, px: hx, py: hy, sx: 554.4, sy: 688.8 }, { t: 3.67, s: 1.0, px: 960, py: 540, sx: 960, sy: 540 }, { t: at(3.5), s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }], t); },
     words(t) {
-      const f = filmT(this, t);
-      levelA(f, 61.2, 64.6, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 520, arSize: 64, enSize: 24 });
+      const f = filmT(this, t), s = this.start;
+      levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 520, arSize: 64, enSize: 20 });
     } },
   // B09 · April 2024
-  { id: 'homes', use: 'nation', storm: true, start: at(19.5), dur: at(5), offset: 12, xf: 1.0,
+  { id: 'homes', use: 'nation', storm: true, start: at(20.5), dur: at(5), offset: 12, xf: 1.0,
     cam: t => camPath([{ t: 12, s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }, { t: 12 + at(5), s: 1.05, px: 900, py: 540, sx: 960, sy: 540 }], t),
-    tint: f => 0.34 * easeInOut(prog(f, 65.8, 7.2)) * (1 - easeInOut(prog(f, 77.5, 3.5))),
+    tint(f) { const s = this.start; return 0.34 * easeInOut(prog(f, s + 0.8, 7.2)) * (1 - easeInOut(prog(f, s + 12.5, 3.5))); },
     words(t) {
-      const f = filmT(this, t);
-      levelB(f, 66.4, 72.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
-      levelB(f, 72.4, 77.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
+      const f = filmT(this, t), s = this.start;
+      levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
+      levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } },
   // B10 · For every flight
-  { id: 'airport', start: at(24.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
+  { id: 'airport', start: at(25.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.933, s + 4.633, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
-      levelA(f, s + 2.333, s + 4.633, 'لكل رحلة رصد لا ينقطع', 'FOR EVERY FLIGHT, A WATCH THAT NEVER SLEEPS', { y: 520 });
+      levelA(f, s + 1.7, s + 4.633, 'لكل رحلة', 'FOR EVERY FLIGHT', { y: 520 });
     } },
   // B11 · For every train (Etihad Rail)
   RAIL_BEAT,
   // B12 · For every ship
-  { id: 'port', start: at(27.5), dur: at(1.5), speed: SP.port, offset: 1.5, xf: 0.5,
+  { id: 'port', start: at(28.5), dur: at(1.5), speed: SP.port, offset: 1.5, xf: 0.5,
     cam: t => camPath([{ t: 1.5, s: 1.0, px: 1400, py: 585, sx: 560, sy: 560 }, { t: 1.5 + at(1.5) * SP.port, s: 1.04, px: 1470, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.333, s + 4.633, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
-      levelA(f, s + 1.533, s + 4.633, 'لكل سفينة', 'FOR EVERY SHIP', { y: 520 });
+      levelA(f, s + 0.733, s + 4.633, 'لكل سفينة', 'FOR EVERY SHIP', { y: 520 });
     } },
   // B13 · For every voyage (a laden Murban tanker off Fujairah)
   TANKER_BEAT,
   // B14 · For clean energy
-  { id: 'energy', start: at(30.5), dur: at(1.5), speed: SP.energy, offset: 1.0, xf: 0.5,
+  { id: 'energy', start: at(31.5), dur: at(1.5), speed: SP.energy, offset: 1.0, xf: 0.5,
     cam: t => camPath([{ t: 1.0, s: 1.0, px: 1435, py: 620, sx: 560, sy: 560 }, { t: 1.0 + at(1.5) * SP.energy, s: 1.05, px: 1435, py: 540, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.333, s + 4.333, 'شمس ' + ltr('1') + ' · قرب مدينة زايد، منطقة الظفرة', 'SHAMS 1 · NEAR MADINAT ZAYED, AL DHAFRA', { y: 330 });
-      levelA(f, s + 1.533, s + 4.333, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
+      levelB(f, s + 0.333, s + 4.333, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 330 });
+      levelA(f, s + 0.433, s + 4.333, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
     } },
   // B15 · Card: HH the President (reported speech, no VO)
-  { id: 'quote-president', use: 'quote', quote: 'president', start: at(32), dur: at(2.5), xf: 1.2 },
+  { id: 'quote-president', use: 'quote', quote: 'president', start: at(33), dur: at(3.5), xf: 1.2 },
   // B16 · More rain from the clouds
-  { id: 'seeding', start: at(34.5), dur: at(2), speed: SP.seeding, offset: 0.5, xf: 1.2, cam: t => PLATE_LEFT(1.0, 1.06, 0.5 + at(2) * SP.seeding)(t),
+  { id: 'seeding', start: at(36.5), dur: at(2), speed: SP.seeding, offset: 0.5, xf: 1.2, cam: t => PLATE_LEFT(1.0, 1.06, 0.5 + at(2) * SP.seeding)(t),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.8, s + 6.3, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
-      levelB(f, s + 1.2, s + 6.3, 'دولة الإمارات · أقل من ' + ltr('100') + ' ملم من المطر في العام المعتاد', 'THE UAE · LESS THAN 100 MM OF RAIN IN A TYPICAL YEAR', { y: 440 });
     } },
   // B17 · The science of rain
-  { id: 'science', start: at(36.5), dur: at(1.5), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
-    cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(1.5) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
+  { id: 'science', start: at(38.5), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
+    cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.533, s + 4.633, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
+      levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
     } },
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
-  { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(38), dur: at(2.5), xf: 1.2 },
+  { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(40.5), dur: at(3.5), xf: 1.2 },
   // B19 · From the skies of the Emirates to the world
-  { id: 'world', start: at(40.5), dur: at(3.5) + 0.5, speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
+  { id: 'world', start: at(44), dur: at(3.5) + 0.5, speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
     words(t) { worldWords(filmT(this, t)); } },
   // B20 · Twenty years
-  { id: 'gauge', start: at(44) + 0.5, dur: at(3.5) - 0.5, speed: 1, xf: 1.0, t20: 6.167, dt: 60 / 72 / 4, // 0.5 s after the split (where its dissolve begins); the 20th drop lands 6.167 s after its start
+  { id: 'gauge', start: at(47.5) + 0.5, dur: at(3.5) - 0.5, speed: 1, xf: 1.0, t20: 6.167, dt: 60 / 72 / 4, // 0.5 s after the split (where its dissolve begins); the 20th drop lands 6.167 s after its start
     cam: lockCam(() => { const c = WORLD_CAM(at(3.5)); return { sx: c.sx + (1430 - c.px) * c.s, sy: c.sy + (560 - c.py) * c.s, R: 318 * c.s }; }, CIRCLES.gauge,
-      { settle: 1.833, then: [{ t: at(3.5), s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }] }),
+      { settle: 1.833, py: 610, then: [{ t: at(3.5), s: 1.0, px: 1435, py: 610, sx: 560, sy: 560 }] }),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 2.633, s + 9.433, ['إلى المتنبئين الجويين والراصدين وعلماء الزلازل،', 'والطيارين والمهندسين والعلماء'], ['TO THE FORECASTERS, OBSERVERS AND SEISMOLOGISTS,', 'THE PILOTS, ENGINEERS AND SCIENTISTS'], { y: 330, arSize: 30, enSize: 16 });
-      levelA(f, s + 6.333, s + 9.433, 'عشرون عاماً', 'TWENTY YEARS', { y: 580, arSize: 120, enSize: 44 });
+      levelA(f, s + 6.333, s + 9.933, 'عشرون عاماً', 'TWENTY YEARS', { y: 580, arSize: 120, enSize: 44 });
     } },
   // B21 · Night: the same star; title; lockup
-  { id: 'finale', start: at(47.5), dur: at(3), xf: 3.0, enter: { type: 'dusk' },
+  { id: 'finale', start: at(51), dur: at(3), xf: 3.0, enter: { type: 'dusk' },
     cam: t => camPath([{ t: 0, s: 1.0, px: 977, py: 698, sx: 977, sy: 698 }, { t: 5.0, s: 1.04, px: 977, py: 698, sx: 977, sy: 698 }], t),
     words(t) { finaleWords(this, filmT(this, t)); } },
 ];
 
-const START = id => TIMELINE.find(e => e.id === id).start; // a beat's start in film seconds
+// a beat's start in film seconds, captured here, before a ?hold empties TIMELINE
+const STARTS = Object.fromEntries(TIMELINE.map(e => [e.id, e.start])), START = id => STARTS[id];
 
 // B17's words; `out` is Infinity in the applause hold, so the office and the name stay up until the caller releases it
 function worldWords(f, out = START('world') + 12.1) {
   const s = START('world');
   // set below the pins (their labels reach x ~1350 at y 400-560 while the camera pushes toward Geneva)
-  levelA(f, s + 2.2, s + 5.4, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32 });
-  levelB(f, s + 5.8, out, 'رئاسة المنظمة العالمية للأرصاد الجوية · ' + ltr('2023–2027'), ['PRESIDENCY OF THE WORLD METEOROLOGICAL', 'ORGANIZATION · 2023–2027'], { y: 640, arSize: 28, enSize: 17 });
+  levelA(f, s + 2.2, s + 7.9, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32 });
+  levelB(f, s + 8.0, out, 'رئاسة المنظمة العالمية للأرصاد الجوية · ' + ltr('2023–2027'), ['PRESIDENCY OF THE WORLD METEOROLOGICAL', 'ORGANIZATION · 2023–2027'], { y: 640, arSize: 28, enSize: 17 });
   levelB(f, s + 9.6, out, 'معالي الدكتور عبدالله أحمد المندوس', 'HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS', { y: 790, arSize: 28, enSize: 16 });
 }
 
@@ -193,13 +209,15 @@ const VO = [
   { id: 'VO-03', in: 18.6, out: 24.2, ar: 'ومِن جُلْفار، وقَّتَ ابنُ ماجدٍ أسفارَهُ برياحِ الموسِم، وقاسَ ارتفاعَ النُّجومِ بالأصابِع.', en: 'From Julfar, Ahmed bin Majid timed his voyages by the monsoon winds and measured star heights in fingers.' },
   { id: 'VO-04', in: 24.6, out: 27.0, ar: 'وعرَفَ البحّارةُ كلَّ ريحٍ باسمِها.', en: 'Sailors knew every wind by name.' },
   { id: 'VO-05', in: 29.0, out: 36.6, ar: 'وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه.', en: 'In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them.' },
-  { id: 'VO-06', in: 45.3, out: 51.7, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
-  { id: 'VO-07', in: 53.6, out: 63.2, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
-  { id: 'VO-08a', in: 66.0, out: 72.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
-  { id: 'VO-08b', in: 72.2, out: 77.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
-  { id: 'VO-08c', in: 77.6, out: 82.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
+  { id: 'VO-06', beat: 'centre', in: 0.3, out: 6.7, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
+  { id: 'VO-07', beat: 'nation', in: 0.267, out: 9.867, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
+  { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
+  { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
+  { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
   { id: 'VO-09', beat: 'airport', in: 1.733, out: 4.133, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
+  { id: 'VO-09r', beat: 'rail', in: 0.3, out: 3.8, ar: 'ولكلِّ طريقٍ وسِكّةِ حديدٍ تحذيراتٌ من الغبارِ والضَّباب،', en: 'for every road and railway, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
+  { id: 'VO-10t', beat: 'tanker', in: 0.2, out: 4.9, ar: 'وللساحلِ الشرقيّ نشرةٌ بحريّةٌ يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبّئ،', en: 'for the east coast, a marine bulletin that AI helps draft and a forecaster approves;' },
   { id: 'VO-11', beat: 'energy', in: 0.433, out: 3.733, ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح.', en: 'for clean energy, forecasts of sunshine and wind.' },
   { id: 'VO-12', beat: 'seeding', in: 0.5, out: 7.4, ar: 'وفي أرضٍ يقِلُّ مطرُها عن مِئةِ مِلّيمترٍ في العامِ المُعتاد، سعَينا إلى استمطارِ السَّحاب.', sub: 'وفي أرض يقلّ مطرها عن ' + ltr('100') + ' ملّيمتر في العام المعتاد، سعينا إلى استمطار السحاب.', en: 'In a land with less than 100 millimetres of rain in a typical year, we sought more rain from the clouds.' },
   { id: 'VO-13', beat: 'science', in: 1.333, out: 5.333, ar: 'ثمَّ استثمَرْنا في العلمِ نفسِه، للدُّوَلِ التي تُواجِهُ شُحَّ المياه.', en: 'Then we invested in the science itself, for the countries facing water scarcity.' },

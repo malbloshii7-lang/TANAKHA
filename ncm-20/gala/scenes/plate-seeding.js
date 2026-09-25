@@ -57,7 +57,7 @@ scene({
     const hq = easeOut(prog(lt, 6.2, 0.8));
     if (hq > 0) { disc(this.hero[0], this.hero[1], 3 + 5 * hq, BLUE, 0.85); stroke(el(this.hero[0], this.hero[1], 8 + 6 * hq, 8 + 6 * hq, 0, TAU, 279, 0), hq, GOLD, 1.4, 0.8); }
     // hygroscopic flares burn at the wing racks and leave a pale plume of salt particles that the updraft
-    // carries into the cloud base: drawn as soft, spreading smoke, never as sparks
+    // carries into the cloud base: drawn as fine salt particles, never as sparks or puffs
     this.flares.forEach(f => {
       const age = lt - f.te;
       if (age < 0 || age > f.life * 1.6) return;
@@ -65,7 +65,7 @@ scene({
       if (px < 1110 || px > 1780) return;
       const u = age / (f.life * 1.6), x = px - 40 + f.vx * age * 0.6, y = 590 + f.side * 26 - f.vy * age * 0.9;
       if (y < 505) return;
-      disc(x, y, 3 + 14 * u, SEPIA, 0.16 * (1 - u));
+      disc(x, y, 1.3, BLUE, 0.45 * (1 - u)); // fine rising salt particles, never puffs (they read as smoke)
     });
     // the aircraft
     const px = this.planeX(lt);

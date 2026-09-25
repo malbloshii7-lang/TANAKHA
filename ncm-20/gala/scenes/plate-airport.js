@@ -100,7 +100,7 @@ scene({
       const fq = easeOut(prog(lt, 2.4, 0.6));
       ctx.save(); ctx.translate(1860, 820); ctx.rotate(-Math.PI / 2);
       ctx.restore();
-      smallAr('برج المراقبة', 1801, 1024, fq, { size: 22, align: 'center', a: 0.8, weight: 600 });
+      smallAr('برج المراقبة', 1801, 622, fq, { size: 22, align: 'center', a: 0.8, weight: 600 });
       ctx.restore();
     }
     // windsock streaming in the breeze

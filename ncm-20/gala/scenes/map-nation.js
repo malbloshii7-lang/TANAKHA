@@ -38,7 +38,8 @@ scene({
     this.labelXY = {};
     this.caps.forEach(c => { this.labelXY[c.id] = { 'cap-abu-dhabi': [c.xy[0] - 120, c.xy[1] - 70, 'right'], 'cap-fujairah': [c.xy[0] + 34, c.xy[1] + 34, 'left'] }[c.id]; });
     const coastal = ['cap-ras-al-khaimah', 'cap-umm-al-quwain', 'cap-ajman', 'cap-sharjah', 'cap-dubai'], y0 = this.caps.find(c => c.id === 'cap-ras-al-khaimah').xy[1] - 30;
-    coastal.forEach((id, k) => { const c = this.caps.find(q => q.id === id); this.labelXY[id] = [col(c.xy[0]) - 10 - k * 10, y0 - 20 + k * 58, 'right']; });
+    // a column in the Gulf, at least 9 px from Abu Musa, the Tunbs, Sir Abu Nu'ayr, the coast and the other labels
+    coastal.forEach((id, k) => { this.labelXY[id] = [708 - k * 18, 228 + k * 70, 'right']; });
   },
   draw(t) {
     const pr = this.pr;
@@ -83,7 +84,7 @@ scene({
       disc(x, y, 3.6 * q, INK, 0.9 * dim);
       stroke(new P([[x, y], [lx + (al === 'right' ? 6 : -6), ly - 6]]), q, INK, 0.7, 0.4 * dim);
       smallAr(c.name_ar, lx, ly, q * dim, { size: 30, align: al, a: 0.9, weight: 700 });
-      small(c.name_en.toUpperCase(), lx, ly + 22, q * dim, { size: 13, ls: 2, align: al, a: 0.7, weight: 600 });
+      small(c.name_en.toUpperCase(), lx, ly + 30, q * dim, { size: 13, ls: 2, align: al, a: 0.7, weight: 600 });
     });
     if (hq > 0) ornament(hx, hy, 12 * hq, 1);
     if (this.storm) this.weather(t);
