@@ -10,3 +10,5 @@
 <!-- Append each entry as: `- YYYY-MM-DD — <what went wrong> → <what to do instead>` -->
 - 2026-09-25 — Put a Latin year range ("2007–2027") inside an RTL page without isolating it, so the bidi algorithm displayed it as "2027–2007" → wrap Latin and number runs in RTL text with `dir="ltr"` or `<bdi dir="ltr">`, and screenshot the Arabic view before shipping.
 - 2026-09-25 — Sized a stat-figure grid for short numbers only; "US$22.5m" overran into the next cell → size figure grids for the widest value and measure cell overflow at desktop, tablet and phone widths.
+- 2026-09-25 — Wrote an estimated distance ("4,800 km") into a film readout without computing it; the great-circle figure is ~4,915 km → never put a number on screen that isn't sourced or computed; prefer raw data (coordinates) over estimates.
+- 2026-09-25 — Crossfaded persistent chapter labels between scenes, so two labels overlapped mid-transition → switch labels and other fixed UI at the cut (fade out before, fade in after), and review a frame at the exact midpoint of every transition.

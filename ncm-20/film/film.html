@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reading the Sky</title>
+<meta name="description" content="A short film for the 20th anniversary of the UAE National Center of Meteorology, rendered live on a canvas. The MP4 in this folder is the same film, frame for frame, with its score." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=IM+Fell+English:ital@1&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  html,body{margin:0;height:100%;background:#14110e}
+  body{display:grid;place-items:center;overflow:hidden}
+  canvas{display:block;width:min(100vw,calc(100vh * 16 / 9));height:auto;aspect-ratio:16/9}
+</style>
+</head>
+<body>
+<canvas id="film" width="1920" height="1080" aria-label="Reading the Sky: a film for the 20th anniversary of the National Center of Meteorology"></canvas>
+<script>
+'use strict';
+/* ==========================================================================
+   Reading the Sky — a film for NCM's 20th anniversary.
+   Everything is a pure function of time: render(t) draws frame t, so the same
+   code plays live in a browser and renders frame-exact for the MP4
+   (see render.js). Open with ?capture to expose window.__render for capture,
+   or ?t=SECONDS to jump.
+   ========================================================================== */
+const W = 1920, H = 1080, TAU = Math.PI * 2;
+const INK = '#1D1813', RED = '#B3391D', BLUE = '#28478C', OCHRE = '#C9973B', SEPIA = '#6E6253';
+const cv = document.getElementById('film');
+const ctx = cv.getContext('2d');
+let SA = 1; // alpha of the scene being drawn (crossfades)
+
+/* ---------- maths & motion ---------- */
+const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const prog = (t, start, dur) => clamp((t - start) / dur);
+function rng(seed) {
+  let s = (Math.imul(seed | 0, 2654435761) >>> 0) || 1;
+  return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
+}
+function wobble(seed, amp) {
+  const r = rng(seed), p1 = r() * TAU, p2 = r() * TAU, p3 = r() * TAU;
+  const f1 = 0.012 + r() * 0.006, f2 = 0.03 + r() * 0.01, f3 = 0.07 + r() * 0.02;
+  return s => amp * (Math.sin(s * f1 + p1) * 0.55 + Math.sin(s * f2 + p2) * 0.3 + Math.sin(s * f3 + p3) * 0.15);
+}
+
+/* ---------- paths: hand-inked polylines that can be drawn on ---------- */
+class P {
+  constructor(pts, closed = false) {
+    this.pts = pts; this.closed = closed;
+    const L = [0]; let acc = 0;
+    for (let i = 1; i < pts.length; i++) { acc += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(acc); }
+    this.open = acc;
+    if (closed && pts.length > 1) acc += Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]);
+    this.L = L; this.total = acc;
+  }
+  trace(c, p = 1) {
+    const pts = this.pts, n = pts.length;
+    if (p <= 0 || n < 2) return;
+    const target = this.total * Math.min(1, p);
+    c.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < n; i++) {
+      if (this.L[i] <= target) { c.lineTo(pts[i][0], pts[i][1]); continue; }
+      const f = (target - this.L[i - 1]) / (this.L[i] - this.L[i - 1] || 1);
+      c.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f));
+      return;
+    }
+    if (!this.closed) return;
+    if (p >= 1) { c.closePath(); return; }
+    const last = pts[n - 1], f = (target - this.open) / (this.total - this.open || 1);
+    c.lineTo(lerp(last[0], pts[0][0], f), lerp(last[1], pts[0][1], f));
+  }
+  at(p) { // point at fraction p of length
+    const target = this.total * clamp(p), pts = this.pts;
+    for (let i = 1; i < pts.length; i++) if (this.L[i] >= target) {
+      const f = (target - this.L[i - 1]) / (this.L[i] - this.L[i - 1] || 1);
+      return [lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)];
+    }
+    return pts[pts.length - 1];
+  }
+}
+function wob(pts, seed, amp) { // subdivide a polyline and add a hand-drawn tremor
+  if (!amp) return pts;
+  const w = wobble(seed, amp), out = [];
+  let s = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x1, y1] = pts[i], [x2, y2] = pts[i + 1], L = Math.hypot(x2 - x1, y2 - y1) || 1;
+    const n = Math.max(1, Math.ceil(L / 9)), nx = -(y2 - y1) / L, ny = (x2 - x1) / L;
+    for (let k = 0; k < n; k++) { const t = k / n, o = w(s + t * L); out.push([x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o]); }
+    s += L;
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+const ln = (x1, y1, x2, y2, seed = 1, amp = 0.9) => new P(wob([[x1, y1], [x2, y2]], seed, amp));
+const pl = (pts, closed = false, seed = 1, amp = 0.7) => new P(wob(closed ? pts.concat([pts[0]]) : pts, seed, amp).slice(0, closed ? -1 : undefined), closed);
+function el(cx, cy, rx, ry, a0 = 0, a1 = TAU, seed = 1, amp = 0.9, rot = 0) {
+  const span = a1 - a0, L = Math.abs(span) * (rx + ry) / 2, n = Math.max(12, Math.ceil(L / 7));
+  const w = wobble(seed, amp), cr = Math.cos(rot), sr = Math.sin(rot), pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, a = a0 + span * t, o = w(t * L), x = (rx + o) * Math.cos(a), y = (ry + o * ry / rx) * Math.sin(a);
+    pts.push([cx + x * cr - y * sr, cy + x * sr + y * cr]);
+  }
+  const closed = Math.abs(span) >= TAU - 1e-6;
+  if (closed) pts.pop();
+  return new P(pts, closed);
+}
+function quad(p0, c, p1, n = 16) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) { const t = i / n, u = 1 - t; pts.push([u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0], u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1]]); }
+  return pts;
+}
+function cubic(p0, c1, c2, p1, n = 40) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, u = 1 - t;
+    pts.push([u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0],
+      u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1]]);
+  }
+  return pts;
+}
+function starP(cx, cy, r1, r2, n, rot = -Math.PI / 2) {
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) { const r = i % 2 ? r2 : r1, a = rot + (i * Math.PI) / n; pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); }
+  return new P(pts, true);
+}
+
+/* ---------- ink on paper ---------- */
+function stroke(path, p = 1, col = INK, lw = 2, a = 0.92, dash = null, dashOff = 0) {
+  if (p <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply';
+  ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (dash) { ctx.setLineDash(dash); ctx.lineDashOffset = dashOff; }
+  ctx.beginPath(); path.trace(ctx, p); ctx.stroke();
+  ctx.restore();
+}
+function fill(path, col, a = 1) {
+  if (a <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = col;
+  ctx.beginPath(); path.trace(ctx, 1); ctx.fill();
+  ctx.restore();
+}
+let PAPER_CV, PAPER_PAT, SPECKLE_CV;
+function mask(paths) { // repaint paper over paths (hides lines behind a shape)
+  ctx.save();
+  PAPER_PAT.setTransform(ctx.getTransform().inverse());
+  ctx.globalAlpha = SA; ctx.fillStyle = PAPER_PAT;
+  ctx.beginPath(); (Array.isArray(paths) ? paths : [paths]).forEach(q => q.trace(ctx, 1)); ctx.fill();
+  ctx.restore();
+}
+function hatch(clip, box, ang, gap, p, col = INK, lw = 1, a = 0.35, seed = 3) {
+  if (p <= 0) return;
+  const [x0, y0, x1, y1] = box, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, R = Math.hypot(x1 - x0, y1 - y0) / 2;
+  const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, n = Math.floor((2 * R) / gap), shown = Math.floor(n * p), r = rng(seed);
+  ctx.save();
+  ctx.beginPath(); (Array.isArray(clip) ? clip : [clip]).forEach(q => q.trace(ctx, 1)); ctx.clip();
+  ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  ctx.beginPath();
+  for (let i = 0; i < shown; i++) {
+    const o = -R + i * gap + (r() - 0.5) * gap * 0.3, px = cx + nx * o, py = cy + ny * o, j = (r() - 0.5) * R * 0.08;
+    ctx.moveTo(px - dx * (R + j), py - dy * (R + j)); ctx.lineTo(px + dx * (R - j), py + dy * (R - j));
+  }
+  ctx.stroke(); ctx.restore();
+}
+function disc(x, y, r, col, a = 1, mode = 'multiply') {
+  if (a <= 0 || r <= 0) return;
+  ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = mode; ctx.fillStyle = col;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); ctx.restore();
+}
+function arrowHead(x, y, ang, size, col, a = 0.92, lw = 2) {
+  stroke(new P([[x - size * Math.cos(ang - 0.45), y - size * Math.sin(ang - 0.45)], [x, y], [x - size * Math.cos(ang + 0.45), y - size * Math.sin(ang + 0.45)]]), 1, col, lw, a);
+}
+
+/* ---------- type ---------- */
+const F_HEAD = 'Cinzel', F_MONO = '"IBM Plex Mono"', F_AR = '"Reem Kufi"', F_RUQ = '"Aref Ruqaa"', F_FELL = '"IM Fell English"';
+let HEAD_SIZE = 96;
+function setText(font, ls = 0, dir = 'ltr', align = 'left') {
+  ctx.font = font; ctx.letterSpacing = ls + 'px'; ctx.direction = dir; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+}
+function typeLine(text, x, y, t0, lt, { size = 20, ls = 7, a = 0.85, weight = 500, align = 'left', cps = 42, col = INK } = {}) {
+  const n = Math.floor(clamp((lt - t0) * cps, 0, text.length));
+  if (n <= 0) return;
+  ctx.save();
+  setText(`${weight} ${size}px ${F_MONO}`, ls);
+  let sx = x;
+  if (align === 'center') sx = x - ctx.measureText(text).width / 2;
+  if (align === 'right') sx = x - ctx.measureText(text).width;
+  ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = col;
+  ctx.fillText(text.slice(0, n), sx, y);
+  ctx.restore();
+}
+function blurIn(draw, p, maxBlur = 14, dx = 26) {
+  if (p <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = SA * p; ctx.globalCompositeOperation = 'multiply';
+  const b = (1 - p) * maxBlur;
+  if (b > 0.25) ctx.filter = `blur(${b.toFixed(2)}px)`;
+  draw((1 - p) * dx);
+  ctx.restore();
+}
+// Big inscriptional headline, revealed word by word (blur to sharp).
+function headline(lines, accent, x, top, t0, lt, { size = HEAD_SIZE, align = 'left', step = 0.2 } = {}) {
+  setText(`900 ${size}px ${F_HEAD}`, 1);
+  let wi = 0, y = top + size * 0.88;
+  for (const line of lines) {
+    const words = line.split(' '), sp = ctx.measureText(' ').width;
+    const widths = words.map(w => ctx.measureText(w).width);
+    let wx = align === 'center' ? x - (widths.reduce((s, v) => s + v, 0) + sp * (words.length - 1)) / 2 : x;
+    words.forEach((w, i) => {
+      const p = easeOut(prog(lt, t0 + wi * step, 0.8));
+      blurIn(off => { setText(`900 ${size}px ${F_HEAD}`, 1); ctx.fillStyle = accent[w] || INK; ctx.fillText(w, wx + off, y); }, p);
+      wx += widths[i] + sp; wi++;
+    });
+    y += size * 1.06;
+  }
+  return { bottom: y - size * 1.06, words: wi };
+}
+function arabic(text, x, y, t0, lt, { size = 58, align = 'left', a = 0.9, font = F_AR, weight = 700 } = {}) {
+  const p = easeOut(prog(lt, t0, 0.9));
+  blurIn(off => {
+    setText(`${weight} ${size}px ${font}`, 0, 'rtl', align);
+    ctx.globalAlpha *= a; ctx.fillStyle = INK; ctx.fillText(text, x + (align === 'left' ? off : -off), y);
+  }, p, 12, 18);
+}
+function note(text, x, y, t0, lt, { ar = false, size, a = 0.34, align = 'right' } = {}) {
+  const p = prog(lt, t0, 1.4);
+  if (p <= 0) return;
+  ctx.save();
+  if (ar) setText(`400 ${size || 30}px ${F_RUQ}`, 0, 'rtl', align);
+  else setText(`italic 400 ${size || 25}px ${F_FELL}`, 0, 'ltr', align);
+  ctx.globalAlpha = SA * p * a; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = INK;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+// Paper patch behind a small label so engraved lines don't cut through it.
+function back(text, x, y, align, p, size = 14, ls = 3) {
+  if (p <= 0) return;
+  ctx.save();
+  setText(`600 ${size}px ${F_MONO}`, ls, 'ltr', 'left');
+  const w = ctx.measureText(text).width, x0 = align === 'right' ? x - w : x;
+  PAPER_PAT.setTransform(ctx.getTransform().inverse());
+  ctx.globalAlpha = SA * p * 0.92; ctx.fillStyle = PAPER_PAT; ctx.fillRect(x0 - 7, y - size - 3, w + 12, size + 10);
+  ctx.restore();
+}
+function small(text, x, y, p, { size = 15, ls = 4, a = 0.8, align = 'left', col = INK, weight = 500 } = {}) {
+  if (p <= 0) return;
+  ctx.save();
+  setText(`${weight} ${size}px ${F_MONO}`, ls, 'ltr', align);
+  ctx.globalAlpha = SA * a * p; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = col;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+function smallAr(text, x, y, p, { size = 22, a = 0.8, align = 'left', weight = 500 } = {}) {
+  if (p <= 0) return;
+  ctx.save();
+  setText(`${weight} ${size}px ${F_AR}`, 0, 'rtl', align);
+  ctx.globalAlpha = SA * a * p; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = INK;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+/* ---------- chapter chrome: label (top left), readout (top right) ---------- */
+function chrome(s, lt) {
+  // Labels switch at the cut: the old one is gone just before the new one appears.
+  const vis = clamp(lt / 0.3) * clamp((s.dur - lt) / 0.3);
+  const p = easeOut(prog(lt, 0, 0.8)) * vis;
+  const name = (s.num ? s.num + ' · ' : '') + s.name;
+  small(name, 78, 72, p, { size: 18, ls: 7, a: 0.82 });
+  setText(`500 18px ${F_MONO}`, 7);
+  smallAr(s.ar, 78 + ctx.measureText(name).width + 18, 74, p, { size: 23, a: 0.72 });
+  typeLine(s.readout, W - 78, 104, 0.2, lt, { size: 13, ls: 4, a: 0.5 * vis, align: 'right', cps: 60 });
+}
+// Left column: mono kicker, inscriptional headline, Arabic line.
+function textBlock(s, lt) {
+  const x = 110, ky = 338;
+  typeLine(s.kicker, x, ky, 0.25, lt, { size: 18, ls: 6, a: 0.8 });
+  const hb = headline(s.head, s.accent, x, ky + 30, 0.55, lt);
+  arabic(s.arHead, x, hb.bottom + 92, 0.55 + hb.words * 0.2 + 0.1, lt, { size: 56 });
+}
+
+/* ---------- scenes ---------- */
+const SCENES = [];
+const scene = s => SCENES.push(s);
+
+// Prologue
+scene({
+  start: 0, dur: 5, num: '', name: 'PROLOGUE', ar: 'المقدمة', readout: '2007 — 2027',
+  init() {
+    this.horizon = ln(620, 380, 1300, 380, 11, 0.8);
+  },
+  draw(lt) {
+    chrome(this, lt);
+    const sp = easeOut(prog(lt, 0.5, 1.6));
+    if (sp > 0) {
+      const tw = 1 + 0.06 * Math.sin(lt * 3.1);
+      fill(starP(960, 262, 30 * sp * tw, 11 * sp, 8), OCHRE, 0.95);
+      stroke(starP(960, 262, 30 * sp * tw, 11 * sp, 8), 1, INK, 1.4, 0.8);
+      disc(960, 262, 4 * sp, RED);
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * TAU, r0 = 44, r1 = i % 2 ? 62 : 80, q = prog(lt, 1.2 + i * 0.03, 0.6);
+        stroke(ln(960 + r0 * Math.cos(a), 262 + r0 * Math.sin(a), 960 + r1 * Math.cos(a), 262 + r1 * Math.sin(a), 40 + i, 0.2), q, INK, 1.1, 0.55);
+      }
+    }
+    stroke(this.horizon, easeInOut(prog(lt, 0.9, 1.8)), INK, 1.4, 0.6);
+    typeLine('UNITED ARAB EMIRATES', 960, 448, 1.0, lt, { size: 18, ls: 8, align: 'center' });
+    headline(['READING THE SKY'], {}, 960, 505, 1.5, lt, { size: 122, align: 'center', step: 0.22 });
+    arabic('قراءة السماء', 960, 715, 2.3, lt, { size: 70, align: 'center' });
+    typeLine('A FILM FOR THE 20TH ANNIVERSARY OF THE NATIONAL CENTER OF METEOROLOGY', 960, 800, 2.6, lt, { size: 15, ls: 5, align: 'center', a: 0.7, cps: 60 });
+  },
+});
+
+// I · Al Durour — the 36-petal calendar wheel and the rising of Suhail
+scene({
+  start: 5, dur: 11, num: 'I', name: 'AL DUROUR', ar: 'الدرور', readout: 'SUHAIL · α CARINAE',
+  kicker: 'THE DUROUR CALENDAR · 36 × 10 DAYS + 5',
+  head: ['WE COUNTED', 'THE YEAR', 'BY A STAR.'], accent: { 'STAR.': RED },
+  arHead: 'عددنا أيام السنة بطلوع سهيل',
+  init() {
+    const cx = 1420, cy = 575, N = 36, step = TAU / N;
+    Object.assign(this, { cx, cy, petals: [], mullions: [], lozenges: [], dots: [], cols: [] });
+    const pt = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    for (let i = 0; i < N; i++) {
+      const a = -Math.PI / 2 + i * step, h = step * 0.43, r1 = 262, r2 = 372;
+      const pts = quad(pt(r1, a - h), pt(r1 + (r2 - r1) * 0.72, a - h * 0.92), pt(r2, a), 12)
+        .concat(quad(pt(r2, a), pt(r1 + (r2 - r1) * 0.72, a + h * 0.92), pt(r1, a + h), 12).slice(1));
+      this.petals.push(new P(wob(pts, 100 + i, 0.45)));
+      this.mullions.push(ln(...pt(r1 + 6, a), ...pt(r1 + (r2 - r1) * 0.52, a), 200 + i, 0.25));
+      this.lozenges.push(new P([pt(186, a), pt(214, a - h * 0.8), pt(243, a), pt(214, a + h * 0.8)], true));
+      this.dots.push(pt(231, a));
+      this.cols.push(i < 10 ? OCHRE : i < 20 ? BLUE : i < 30 ? RED : SEPIA);
+    }
+    this.rings = [el(cx, cy, 256, 256, 0, TAU, 5), el(cx, cy, 248, 248, 0, TAU, 6), el(cx, cy, 180, 180, 0, TAU, 7), el(cx, cy, 124, 124, 0, TAU, 8), el(cx, cy, 382, 382, 0, TAU, 9, 1.1)];
+    const hy = cy + 36, hw = Math.sqrt(124 * 124 - 36 * 36);
+    this.hy = hy;
+    this.horizon = ln(cx - hw, hy, cx + hw, hy, 12, 0.4);
+    this.dunes = [pl([[cx - 110, hy + 38], [cx - 60, hy + 22], [cx - 10, hy + 34], [cx + 40, hy + 18], [cx + 105, hy + 40]], false, 13, 0.5),
+      pl([[cx - 95, hy + 66], [cx - 30, hy + 52], [cx + 30, hy + 64], [cx + 90, hy + 55]], false, 14, 0.5)];
+    this.stolen = [];
+    const ab = -Math.PI / 2 - step / 2;
+    for (let k = 0; k < 5; k++) this.stolen.push(pt(400, ab + (k - 2) * 0.05));
+    const sp = [];
+    for (let i = 0; i <= 180; i++) { const t = i / 180, a = -Math.PI / 2 + 0.35 + TAU * 0.82 * t, r = 404 + 48 * t; sp.push(pt(r, a)); }
+    this.spiral = new P(wob(sp, 17, 0.6));
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('طلوع سهيل', 1862, 168, 5.2, lt, { ar: true, size: 32 });
+    note('الخمس المساريق', 1862, 214, 5.8, lt, { ar: true, size: 28 });
+    const { cx, cy } = this;
+    ctx.save();
+    const z = 1 + 0.03 * easeInOut(prog(lt, 0, 11));
+    ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(lt * 0.012); ctx.translate(-cx, -cy);
+    this.rings.forEach((r, i) => stroke(r, easeInOut(prog(lt, 0.3 + i * 0.15, 1.6)), INK, i === 4 ? 1.2 : 1.8, 0.85));
+    this.petals.forEach((p, i) => { stroke(p, easeOut(prog(lt, 0.5 + i * 0.075, 0.9)), INK, 1.8); stroke(this.mullions[i], prog(lt, 1.1 + i * 0.075, 0.6), INK, 1.1, 0.55); });
+    this.lozenges.forEach((q, i) => {
+      const g = Math.floor(i / 10);
+      fill(q, this.cols[i], 0.85 * easeOut(prog(lt, 2.8 + g * 0.45 + (i % 10) * 0.05, 0.8)));
+      stroke(q, prog(lt, 1.6 + i * 0.05, 0.6), INK, 1.3, 0.8);
+      disc(this.dots[i][0], this.dots[i][1], 4.2 * easeOut(prog(lt, 3.6 + i * 0.03, 0.5)), '#F3E7CF', 1, 'source-over');
+    });
+    this.stolen.forEach(([x, y], k) => { const q = easeOut(prog(lt, 5.6 + k * 0.12, 0.4)); disc(x, y, 5.5 * q, RED, 0.9); });
+    stroke(this.spiral, easeInOut(prog(lt, 4.2, 4.6)), INK, 2, 0.8);
+    ctx.restore();
+    // centre: horizon, dunes, Suhail rising (clipped above the horizon)
+    stroke(this.horizon, prog(lt, 2.0, 1.2), INK, 1.4, 0.8);
+    this.dunes.forEach((d, i) => stroke(d, prog(lt, 2.4 + i * 0.3, 1.2), INK, 1.1, 0.6));
+    const rise = easeInOut(prog(lt, 3.6, 3.2)), sy = this.hy + 30 - 96 * rise;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(cx - 130, cy - 130, 260, this.hy - (cy - 130)); ctx.clip();
+    fill(starP(cx, sy, 24, 9, 8), OCHRE, 0.95); stroke(starP(cx, sy, 24, 9, 8), 1, INK, 1.2, 0.8); disc(cx, sy, 3.5, RED);
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * TAU, r1 = i % 2 ? 44 : 56, q = prog(lt, 6.2 + i * 0.03, 0.5);
+      stroke(ln(cx + 32 * Math.cos(a), sy + 32 * Math.sin(a), cx + r1 * Math.cos(a), sy + r1 * Math.sin(a), 60 + i, 0.15), q, INK, 1, 0.5);
+    }
+    ctx.restore();
+  },
+});
+
+// II · Al Mawsim — Ibn Majid, the dhow and the monsoon
+scene({
+  start: 16, dur: 11, num: 'II', name: 'AL MAWSIM', ar: 'الموسم', readout: 'KITAB AL-FAWAʾID · 895 AH',
+  kicker: 'AHMAD IBN MAJID · JULFAR · c. 1490',
+  head: ['WE SAILED', 'BY THE', 'MONSOON.'], accent: { 'MONSOON.': BLUE },
+  arHead: 'وأبحرنا مع رياح الموسم',
+  init() {
+    const cx = 1575, cy = 408;
+    this.cx = cx; this.cy = cy;
+    this.rhumbs = [];
+    for (let i = 0; i < 32; i++) { const a = (i / 32) * TAU; this.rhumbs.push(ln(cx, cy, cx + 268 * Math.cos(a), cy + 268 * Math.sin(a), 300 + i, 0.3)); }
+    this.circle = el(cx, cy, 268, 268, 0, TAU, 31, 1);
+    this.rose = [];
+    for (let k = 0; k < 16; k++) {
+      const a = -Math.PI / 2 + (k * TAU) / 16, main = k % 2 === 0, r = main ? (k % 4 === 0 ? 124 : 88) : 56, w = main ? 17 : 10;
+      const tip = [cx + r * Math.cos(a), cy + r * Math.sin(a)], l = [cx + w * Math.cos(a - Math.PI / 2), cy + w * Math.sin(a - Math.PI / 2)], rr = [cx + w * Math.cos(a + Math.PI / 2), cy + w * Math.sin(a + Math.PI / 2)];
+      this.rose.push({ a: new P([[cx, cy], l, tip], true), b: new P([[cx, cy], rr, tip], true), main });
+    }
+    // dhow (local coordinates, drawn translated)
+    const hull = quad([-175, -26], [-40, -30], [188, -58], 18).concat(quad([188, -58], [120, 46], [0, 40], 14).slice(1), quad([0, 40], [-120, 34], [-175, -26], 14).slice(1));
+    this.hull = new P(wob(hull, 41, 0.5), true);
+    this.deck = new P(wob(quad([-160, -14], [0, -12], [170, -38], 16), 42, 0.4));
+    this.mast = ln(-8, -28, 8, -262, 43, 0.4);
+    this.yard = ln(196, -66, -158, -306, 44, 0.5);
+    this.sail = new P(wob([[190, -70], [-150, -300], [-34, -34], [190, -70]], 45, 0.6).slice(0, -1), true);
+    this.rig = [ln(-158, -306, -172, -30, 46, 0.3), ln(8, -262, 188, -60, 47, 0.3)];
+    this.waves = [];
+    for (let row = 0; row < 5; row++) {
+      const y = 846 + row * 28, off = row % 2 ? 22 : 0, pts = [];
+      for (let x = 990 + off; x < 1870; x += 44) pts.push(...quad([x, y], [x + 22, y - 12], [x + 44, y], 6).slice(pts.length ? 1 : 0));
+      this.waves.push(new P(wob(pts, 50 + row, 0.4)));
+    }
+    this.sea = ln(990, 826, 1880, 826, 55, 0.5);
+    // the monsoon: low over the water, filling the sail from behind
+    this.winds = [
+      new P(wob(cubic([990, 772], [1300, 730], [1600, 792], [1866, 744]), 60, 1)),
+      new P(wob(cubic([990, 700], [1320, 660], [1620, 722], [1866, 672]), 61, 1)),
+      new P(wob(cubic([1060, 628], [1340, 594], [1620, 650], [1860, 610]), 62, 1)),
+    ];
+    this.scale = ln(1846, 826, 1846, 576, 70, 0.3);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('Aden to East Africa: days 320–330 of the Nayruz year', 1862, 1042, 5.0, lt);
+    note('الفوائد في أصول علم البحر والقواعد', 996, 1044, 5.8, lt, { ar: true, size: 27, align: 'left' });
+    const { cx, cy } = this;
+    ctx.save();
+    const z = 1 + 0.025 * easeInOut(prog(lt, 0, 11));
+    ctx.translate(cx, cy); ctx.scale(z, z); ctx.translate(-cx, -cy);
+    stroke(this.circle, easeInOut(prog(lt, 0.3, 1.8)), INK, 1.4, 0.7);
+    this.rhumbs.forEach((r, i) => stroke(r, easeOut(prog(lt, 0.5 + (i % 8) * 0.06, 1.4)), INK, 0.9, 0.3));
+    this.rose.forEach((q, k) => {
+      const p = easeOut(prog(lt, 1.2 + k * 0.05, 0.6));
+      fill(q.a, q.main ? INK : RED, 0.85 * p); fill(q.b, q.main ? OCHRE : '#EBDDC2', 0.55 * p);
+      stroke(q.a, p, INK, 1.2, 0.8); stroke(q.b, p, INK, 1.2, 0.8);
+    });
+    disc(cx, cy, 14 * easeOut(prog(lt, 1.8, 0.5)), OCHRE); disc(cx, cy, 4.5 * easeOut(prog(lt, 1.9, 0.5)), INK);
+    ctx.restore();
+    this.winds.forEach((w, i) => {
+      const p = easeInOut(prog(lt, 1.8 + i * 0.4, 2.4));
+      stroke(w, p, BLUE, 3, 0.75, [26, 14], -lt * 42);
+      if (p >= 1) { const e = w.pts[w.pts.length - 1], b = w.pts[w.pts.length - 4]; arrowHead(e[0], e[1], Math.atan2(e[1] - b[1], e[0] - b[0]), 16, BLUE, 0.8, 3); }
+    });
+    stroke(this.sea, prog(lt, 0.6, 1.4), INK, 1.3, 0.6);
+    this.waves.forEach((w, i) => stroke(w, prog(lt, 0.8 + i * 0.25, 2), INK, 1.1, 0.45));
+    // the isbaʿ scale: a star's altitude measured in fingers
+    stroke(this.scale, easeOut(prog(lt, 3.2, 1.2)), INK, 1.2, 0.7);
+    for (let k = 0; k <= 5; k++) {
+      const y = 826 - k * 50, q = prog(lt, 3.4 + k * 0.08, 0.3);
+      stroke(ln(1846, y, k % 5 === 0 ? 1826 : 1834, y, 80 + k, 0.1), q, INK, 1.1, 0.7);
+    }
+    small('ISBAʿ', 1822, 580, prog(lt, 4.3, 0.6), { size: 13, ls: 3, align: 'right', a: 0.7 });
+    const sq = easeOut(prog(lt, 4.1, 0.8));
+    fill(starP(1846, 552, 15 * sq, 6 * sq, 8), OCHRE, 0.95); stroke(starP(1846, 552, 15 * sq, 6 * sq, 8), sq, INK, 1, 0.8);
+    // the dhow, riding the swell, in front of the wind
+    const dx = 1170 + 10 * lt, dy = 798 + 5 * Math.sin(lt * 1.4);
+    ctx.save(); ctx.translate(dx, dy); ctx.rotate(0.02 * Math.sin(lt * 1.1));
+    const hp = easeInOut(prog(lt, 1.0, 1.6)), sp = easeInOut(prog(lt, 2.2, 1.6));
+    if (sp > 0) mask(this.sail);
+    mask(this.hull);
+    hatch(this.hull, [-180, -60, 190, 45], 0.2, 7, hp, INK, 1, 0.35, 43);
+    stroke(this.hull, hp, INK, 2.1); stroke(this.deck, hp, INK, 1.2, 0.7);
+    stroke(this.mast, prog(lt, 1.8, 0.8), INK, 2.2);
+    if (sp > 0) { fill(this.sail, OCHRE, 0.22 * sp); hatch(this.sail, [-155, -310, 195, -30], 1.5, 11, sp, INK, 0.9, 0.3, 44); }
+    stroke(this.sail, sp, INK, 1.6); stroke(this.yard, prog(lt, 2.0, 1.0), INK, 2.6);
+    this.rig.forEach((r, i) => stroke(r, prog(lt, 3.0 + i * 0.3, 0.8), INK, 0.9, 0.6));
+    ctx.restore();
+  },
+});
+
+// III · Al Ghous — the named winds over the pearling sea
+scene({
+  start: 27, dur: 11, num: 'III', name: 'AL GHOUS', ar: 'الغوص', readout: 'SHAMAL · NORTH-WEST',
+  kicker: 'AL-GHOUS AL-KABIR · JUNE — SEPTEMBER',
+  head: ['WE KNEW', 'EVERY WIND', 'BY NAME.'], accent: { 'WIND': RED },
+  arHead: 'وعرفنا الرياح بأسمائها',
+  init() {
+    const cx = 1430, cy = 430;
+    Object.assign(this, { cx, cy });
+    this.rings = [el(cx, cy, 182, 182, 0, TAU, 90), el(cx, cy, 174, 174, 0, TAU, 91), el(cx, cy, 60, 60, 0, TAU, 92)];
+    this.spokes = [];
+    for (let k = 0; k < 16; k++) { const a = (k * TAU) / 16, r0 = k % 2 ? 150 : 60; this.spokes.push(ln(cx + r0 * Math.cos(a), cy + r0 * Math.sin(a), cx + 174 * Math.cos(a), cy + 174 * Math.sin(a), 93 + k, 0.2)); }
+    const W8 = (name, ar, a, col, lw, rOut, lx, ly, align) => {
+      const x0 = cx + rOut * Math.cos(a), y0 = cy + rOut * Math.sin(a), x1 = cx + 196 * Math.cos(a), y1 = cy + 196 * Math.sin(a);
+      return { name, ar, col, lw, path: ln(x0, y0, x1, y1, 110 + lw * 10, 0.6), end: [x1, y1], ang: Math.atan2(y1 - y0, x1 - x0), lx, ly, align };
+    };
+    this.winds = [
+      W8('SHAMAL', 'الشمال', (-3 * Math.PI) / 4, RED, 4.2, 330, 1183, 180, 'right'),
+      W8('NASHI', 'الناشي', -Math.PI / 4, SEPIA, 2.6, 310, 1672, 180, 'left'),
+      W8('KAUS', 'الكوس', Math.PI / 4, BLUE, 2.6, 310, 1672, 690, 'left'),
+      W8('SUHAILI', 'السهيلي', Math.PI / 2, OCHRE, 2.6, 290, 1456, 742, 'left'),
+    ];
+    this.waves = [];
+    for (let row = 0; row < 6; row++) {
+      const y = 836 + row * 30, off = row % 2 ? 24 : 0, pts = [];
+      for (let x = 990 + off; x < 1870; x += 48) pts.push(...quad([x, y], [x + 24, y - 13], [x + 48, y], 6).slice(pts.length ? 1 : 0));
+      this.waves.push(new P(wob(pts, 130 + row, 0.4)));
+    }
+    this.surface = ln(990, 812, 1880, 812, 140, 0.5);
+    // a pearling boat at anchor (local coordinates around its waterline)
+    const hull = quad([-110, -16], [-20, -18], [120, -34], 16).concat(quad([120, -34], [76, 28], [0, 26], 12).slice(1), quad([0, 26], [-80, 22], [-110, -16], 12).slice(1));
+    this.boat = new P(wob(hull, 141, 0.4), true);
+    this.boatMast = ln(-6, -18, 4, -150, 148, 0.3);
+    this.boatYard = ln(-72, -118, 62, -140, 149, 0.3); // sail furled on its yard
+    this.rope = ln(1318, 822, 1318, 1000, 142, 0.6);
+    this.stone = new P([[1308, 1000], [1328, 1000], [1333, 1016], [1303, 1016]], true);
+    this.bed = pl([[990, 1034], [1150, 1028], [1330, 1038], [1520, 1030], [1880, 1036]], false, 143, 0.6);
+    this.shellBot = el(1452, 1022, 50, 15, 0, Math.PI, 145, 0.4);
+    this.shellTop = el(1446, 1011, 50, 15, Math.PI, TAU, 144, 0.4, -0.3);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('الغوص الكبير · القفّال', 1862, 1056, 6.0, lt, { ar: true, size: 26, a: 0.3 });
+    const { cx, cy } = this;
+    this.rings.forEach((r, i) => stroke(r, easeInOut(prog(lt, 0.3 + i * 0.2, 1.5)), INK, 1.6, 0.85));
+    this.spokes.forEach((s, i) => stroke(s, prog(lt, 0.9 + i * 0.04, 0.6), INK, i % 2 ? 0.8 : 1.3, 0.6));
+    fill(starP(cx, cy, 44, 12, 4, -Math.PI / 2), INK, 0.8 * easeOut(prog(lt, 1.4, 0.6)));
+    fill(starP(cx, cy, 30, 9, 4, -Math.PI / 4), OCHRE, 0.85 * easeOut(prog(lt, 1.6, 0.6)));
+    this.winds.forEach((w, i) => {
+      const t0 = 2.0 + i * 0.5, p = easeInOut(prog(lt, t0, 1.2));
+      stroke(w.path, p, w.col, w.lw, 0.85, [20, 12], lt * 36);
+      if (p >= 1) arrowHead(w.end[0], w.end[1], w.ang, 18, w.col, 0.9, w.lw * 0.8);
+      const lp = easeOut(prog(lt, t0 + 0.8, 0.7));
+      small(w.name, w.lx, w.ly, lp, { size: 17, ls: 5, align: w.align, a: 0.85, weight: 600 });
+      smallAr(w.ar, w.lx, w.ly + 32, lp, { size: 24, align: w.align, a: 0.75 });
+    });
+    // the pearling sea
+    stroke(this.surface, prog(lt, 0.6, 1.4), INK, 1.3, 0.65);
+    this.waves.forEach((w, i) => stroke(w, prog(lt, 0.8 + i * 0.22, 2.2), BLUE, 1.2, 0.5));
+    const bp = easeInOut(prog(lt, 1.6, 1.2));
+    ctx.save(); ctx.translate(1300 + 3 * Math.sin(lt * 0.9), 812 + 3 * Math.sin(lt * 1.3)); ctx.rotate(0.015 * Math.sin(lt * 1.1));
+    mask(this.boat); hatch(this.boat, [-115, -40, 125, 30], 0.3, 6, bp, INK, 1, 0.45, 146); stroke(this.boat, bp, INK, 2);
+    stroke(this.boatMast, prog(lt, 2.4, 0.7), INK, 2); stroke(this.boatYard, prog(lt, 2.8, 0.7), INK, 2.4);
+    ctx.restore();
+    stroke(this.rope, easeInOut(prog(lt, 3.0, 2.0)), INK, 1.3, 0.8);
+    const sp = easeOut(prog(lt, 4.8, 0.6));
+    fill(this.stone, SEPIA, 0.8 * sp); stroke(this.stone, sp, INK, 1.2);
+    stroke(this.bed, prog(lt, 2.2, 1.6), INK, 1.2, 0.6);
+    const op = easeOut(prog(lt, 5.4, 1.0));
+    fill(this.shellBot, SEPIA, 0.35 * op); fill(this.shellTop, SEPIA, 0.25 * op);
+    stroke(this.shellTop, op, INK, 1.8); stroke(this.shellBot, op, INK, 1.8);
+    const pq = easeOut(prog(lt, 6.0, 0.8));
+    disc(1454, 1012, 11 * pq, '#FBF3E2', 1, 'source-over'); disc(1450, 1008, 3.5 * pq, '#FFFFFF', 0.9, 'source-over');
+    stroke(el(1454, 1012, 11, 11, 0, TAU, 147, 0), pq, INK, 1.1, 0.7);
+  },
+});
+
+// IV · Al Aflaj — carrying water through the desert
+scene({
+  start: 38, dur: 11, num: 'IV', name: 'AL AFLAJ', ar: 'الأفلاج', readout: 'UNESCO WORLD HERITAGE · 2011',
+  kicker: 'HILI · AL AIN · IRON AGE',
+  head: ['WE CARRIED', 'WATER THROUGH', 'THE DESERT.'], accent: { 'WATER': BLUE },
+  arHead: 'وأجرينا الماء في الأفلاج عبر الصحراء',
+  init() {
+    const S = [[985, 468], [1040, 462], [1100, 478], [1160, 470], [1230, 490], [1300, 500], [1380, 520], [1460, 538], [1540, 556], [1620, 578], [1700, 600], [1760, 616], [1820, 628], [1885, 640]];
+    this.S = S;
+    this.surface = pl(S, false, 150, 0.6);
+    this.ys = x => { for (let i = 1; i < S.length; i++) if (x <= S[i][0]) { const f = (x - S[i - 1][0]) / (S[i][0] - S[i - 1][0]); return lerp(S[i - 1][1], S[i][1], f); } return S[S.length - 1][1]; };
+    this.yt = x => 830 - 0.35 * (x - 1060);
+    const mt = [[985, 468], [1000, 432], [1020, 396], [1040, 362], [1058, 334], [1072, 322], [1088, 338], [1106, 302], [1124, 280], [1142, 294], [1160, 322], [1178, 314], [1198, 352], [1216, 400], [1233, 448], [1250, 492]];
+    this.mount = new P(wob(mt, 151, 0.6));
+    this.mountFill = new P(mt.concat([[1230, 490], [1160, 470], [1100, 478], [1040, 462]]), true);
+    this.ridges = [pl([[1124, 280], [1118, 330], [1128, 380], [1120, 440]], false, 158, 0.5), pl([[1072, 322], [1066, 380], [1074, 440]], false, 159, 0.5)];
+    this.tunnelTop = ln(1060, 824, 1700, 600, 152, 0.3);
+    this.tunnelBot = ln(1060, 836, 1706, 610, 153, 0.3);
+    this.water = ln(1060, 830, 1703, 605, 154, 0.2);
+    this.mother = [ln(1056, this.ys(1056), 1056, 836, 155, 0.3), ln(1066, this.ys(1066), 1066, 836, 156, 0.3)];
+    this.shafts = [];
+    for (let k = 0; k < 9; k++) {
+      const x = 1140 + k * 66, top = this.ys(x), bot = this.yt(x) - 6;
+      this.shafts.push({ l: ln(x - 4, top, x - 4, bot, 160 + k, 0.25), r: ln(x + 4, top, x + 4, bot, 170 + k, 0.25), mound: new P(wob(quad([x - 18, top + 1], [x, top - 14], [x + 18, top + 1], 10), 180 + k, 0.3)) });
+    }
+    const below = S.concat([[1885, 1010], [985, 1010]]);
+    this.ground = new P(below, true);
+    this.aquifer = [];
+    for (let k = 0; k < 5; k++) this.aquifer.push(ln(995, 846 + k * 14, 1130 - k * 8, 846 + k * 14, 190 + k, 0.4));
+    this.channel = pl([[1703, 604], [1760, 615], [1820, 626], [1880, 636]], false, 195, 0.4);
+    this.palms = [[1745, 1], [1800, 0.92], [1852, 1.05]].map(([x, s], i) => {
+      const y = this.ys(x), top = [x + 10 * s, y - 150 * s];
+      const trunk = new P(wob(quad([x, y], [x - 8, y - 80 * s], top, 16), 200 + i, 0.4));
+      const fronds = [];
+      for (let f = 0; f < 7; f++) {
+        const a = -Math.PI / 2 + (f - 3) * 0.5, L = (62 + (f % 2) * 12) * s;
+        const end = [top[0] + L * Math.cos(a) * 1.15, top[1] + L * Math.sin(a) + 38 * s];
+        const c = [top[0] + L * 0.6 * Math.cos(a), top[1] + L * 0.6 * Math.sin(a) - 16 * s];
+        fronds.push(new P(wob(quad(top, c, end, 12), 210 + i * 10 + f, 0.3)));
+      }
+      return { trunk, fronds, top, s };
+    });
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('Cultural Sites of Al Ain · 2011', 1862, 170, 5.6, lt);
+    note('فلج', 1300, 980, 6.2, lt, { ar: true, size: 46, a: 0.3 });
+    const p0 = easeInOut(prog(lt, 0.3, 1.8));
+    hatch(this.ground, [985, 460, 1885, 1010], 0.9, 16, prog(lt, 1.0, 2.2), INK, 0.9, 0.16, 197);
+    stroke(this.surface, p0, INK, 2);
+    hatch(this.mountFill, [985, 270, 1250, 494], -0.8, 7, prog(lt, 0.8, 1.6), INK, 1, 0.4, 198);
+    stroke(this.mount, easeInOut(prog(lt, 0.5, 1.4)), INK, 1.9);
+    this.ridges.forEach((r, i) => stroke(r, prog(lt, 1.2 + i * 0.2, 0.8), INK, 1.1, 0.6));
+    this.aquifer.forEach((a, i) => stroke(a, prog(lt, 1.8 + i * 0.1, 0.8), BLUE, 1.4, 0.6, [10, 7], 0));
+    this.mother.forEach(m => stroke(m, prog(lt, 1.6, 1.0), INK, 1.4, 0.85));
+    this.shafts.forEach((s, k) => {
+      const q = easeOut(prog(lt, 2.0 + k * 0.16, 0.7));
+      stroke(s.l, q, INK, 1.3, 0.85); stroke(s.r, q, INK, 1.3, 0.85); stroke(s.mound, q, INK, 1.3, 0.8);
+    });
+    const tq = easeInOut(prog(lt, 2.4, 2.0));
+    stroke(this.tunnelTop, tq, INK, 1.4, 0.85); stroke(this.tunnelBot, tq, INK, 1.4, 0.85);
+    stroke(this.water, easeInOut(prog(lt, 3.4, 2.4)), BLUE, 6, 0.7, [22, 10], -lt * 40);
+    stroke(this.channel, easeOut(prog(lt, 5.4, 1.2)), BLUE, 3, 0.75, [18, 9], -lt * 36);
+    this.palms.forEach((p, i) => {
+      const q = easeOut(prog(lt, 5.8 + i * 0.3, 1.0));
+      stroke(p.trunk, q, INK, 3 * p.s, 0.9);
+      p.fronds.forEach((f, k) => stroke(f, easeOut(prog(lt, 6.4 + i * 0.3 + k * 0.05, 0.7)), INK, 1.6, 0.85));
+      const dq = easeOut(prog(lt, 7.4 + i * 0.2, 0.6));
+      for (let d = 0; d < 6; d++) disc(p.top[0] - 6 + (d % 3) * 6, p.top[1] + 14 + Math.floor(d / 3) * 6, 3.4 * dq, OCHRE, 0.95);
+    });
+  },
+});
+
+// V · Al Markaz — a centre to read the sky: radar, anemometer, the logbook
+scene({
+  start: 49, dur: 11, num: 'V', name: 'AL MARKAZ', ar: 'المركز', readout: '24.45°N · 54.38°E',
+  kicker: 'FEDERAL DECREE-LAW NO. 6 · 2007 · ABU DHABI',
+  head: ['THEN WE BUILT', 'A CENTER TO', 'READ THE SKY.'], accent: { 'SKY.': BLUE },
+  arHead: 'ثم أسسنا مركزاً يرصد السماء',
+  init() {
+    const cx = 1430, cy = 700, k = 0.36;
+    Object.assign(this, { cx, cy, k });
+    this.rings = [100, 190, 280, 370].map((r, i) => el(cx, cy, r, r * k, 0, TAU, 220 + i, 0.6));
+    this.ticks = [];
+    for (let d = 0; d < 72; d++) { const a = (d / 72) * TAU, r0 = 370, r1 = d % 6 === 0 ? 392 : 382; this.ticks.push(ln(cx + r0 * Math.cos(a), cy + r0 * k * Math.sin(a), cx + r1 * Math.cos(a), cy + r1 * k * Math.sin(a), 230 + d, 0.1)); }
+    const r = rng(9);
+    this.echoes = [[0.55, -2.3, 30, RED], [0.72, -1.2, 42, OCHRE], [0.42, 0.45, 26, BLUE], [0.84, 1.3, 36, RED], [0.62, 2.55, 30, OCHRE], [0.3, -0.55, 20, BLUE], [0.8, -2.85, 24, BLUE], [0.68, -0.2, 28, OCHRE]]
+      .map(([rr, a, s, c], i) => {
+        const x = cx + rr * 370 * Math.cos(a), y = cy + rr * 370 * k * Math.sin(a);
+        const pts = [];
+        for (let j = 0; j < 28; j++) { const t = (j / 28) * TAU, w = 1 + 0.28 * Math.sin(t * 3 + r() * 6) + 0.12 * Math.sin(t * 5 + i); pts.push([x + s * w * Math.cos(t), y + s * 0.45 * w * Math.sin(t)]); }
+        const core = pts.map(([px, py]) => [x + (px - x) * 0.45, y + (py - y) * 0.45]);
+        return { outer: new P(pts, true), core: new P(core, true), a, c };
+      });
+    this.legs = [ln(1404, 700, 1419, 420, 240, 0.3), ln(1456, 700, 1441, 420, 241, 0.3)];
+    const zz = [];
+    for (let i = 0; i <= 7; i++) { const y = 700 - i * 40, t = (700 - y) / 280, xl = lerp(1404, 1419, t), xr = lerp(1456, 1441, t); zz.push(i % 2 ? [xr, y] : [xl, y]); }
+    this.brace = new P(wob(zz, 242, 0.3));
+    this.platform = ln(1392, 420, 1468, 420, 243, 0.3);
+    this.dome = el(1430, 362, 58, 58, 0, TAU, 244, 0.4);
+    this.geo = [el(1430, 362, 58, 20, Math.PI, TAU, 245, 0.2), el(1430, 346, 50, 13, Math.PI, TAU, 246, 0.2), ln(1430, 304, 1430, 420, 247, 0.2), ln(1400, 312, 1395, 414, 248, 0.2), ln(1460, 312, 1465, 414, 249, 0.2)];
+    this.pole = ln(1085, 760, 1085, 540, 250, 0.4);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('16 · IV · 2024 — Khatm Al Shakla — 254.8 mm', 1862, 168, 5.0, lt, { a: 0.4 });
+    note('01 · VIII · 2025 — Sweihan — 51.8 °C', 1862, 204, 5.5, lt, { a: 0.4 });
+    note('03 · II · 2017 — Jebel Jais — −5.7 °C', 1862, 240, 6.0, lt, { a: 0.4 });
+    const { cx, cy, k } = this;
+    this.rings.forEach((r, i) => stroke(r, easeInOut(prog(lt, 0.3 + i * 0.25, 1.4)), i === 3 ? INK : SEPIA, i === 3 ? 1.8 : 1.2, 0.8));
+    this.ticks.forEach((t, d) => stroke(t, prog(lt, 1.2 + d * 0.012, 0.3), INK, d % 6 ? 0.8 : 1.3, 0.7));
+    // sweep: one revolution every ~5 s, with a fading wedge
+    const sweepOn = prog(lt, 1.6, 0.6);
+    if (sweepOn > 0) {
+      const th = -Math.PI / 2 + Math.max(0, lt - 1.6) * 1.25;
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      for (let j = 0; j < 22; j++) {
+        const a0 = th - j * 0.045, a1 = a0 - 0.045;
+        ctx.globalAlpha = SA * sweepOn * 0.26 * (1 - j / 22);
+        ctx.fillStyle = BLUE; ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + 370 * Math.cos(a0), cy + 370 * k * Math.sin(a0)); ctx.lineTo(cx + 370 * Math.cos(a1), cy + 370 * k * Math.sin(a1)); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+      stroke(new P([[cx, cy], [cx + 372 * Math.cos(th), cy + 372 * k * Math.sin(th)]]), 1, BLUE, 2.2, 0.85 * sweepOn);
+      // echoes appear as the beam first passes them
+      this.echoes.forEach(e => {
+        const rel = ((e.a + Math.PI / 2) % TAU + TAU) % TAU, tPass = 1.6 + rel / 1.25, q = easeOut(prog(lt, tPass, 0.7));
+        if (q <= 0) return;
+        const since = ((Math.max(0, lt - 1.6) * 1.25 - rel) % TAU + TAU) % TAU, glow = 1 + 0.25 * Math.exp(-since * 2.2);
+        fill(e.outer, e.c, 0.5 * q * glow); fill(e.core, e.c === OCHRE ? RED : e.c, 0.6 * q * glow);
+        stroke(e.outer, q, INK, 0.9, 0.5);
+      });
+    }
+    // radar tower and radome
+    this.legs.forEach(l => stroke(l, easeOut(prog(lt, 0.8, 1.2)), INK, 2));
+    stroke(this.brace, easeOut(prog(lt, 1.4, 1.2)), INK, 1.1, 0.8);
+    stroke(this.platform, prog(lt, 1.9, 0.5), INK, 2);
+    const dp = easeInOut(prog(lt, 2.0, 1.2));
+    mask(this.dome);
+    hatch(this.dome, [1430, 300, 1492, 424], 1.1, 6, dp, INK, 1, 0.35, 251);
+    stroke(this.dome, dp, INK, 2);
+    this.geo.forEach((g, i) => stroke(g, prog(lt, 2.6 + i * 0.12, 0.6), INK, 1, 0.6));
+    // cup anemometer, spinning
+    stroke(this.pole, easeOut(prog(lt, 1.0, 1.0)), INK, 2);
+    const ap = easeOut(prog(lt, 1.8, 0.8));
+    if (ap > 0) {
+      const spin = lt * 5.2;
+      for (let j = 0; j < 3; j++) {
+        const a = spin + (j * TAU) / 3, x = 1085 + 46 * Math.cos(a) * ap, y = 540 + 46 * 0.35 * Math.sin(a) * ap;
+        stroke(new P([[1085, 540], [x, y]]), 1, INK, 1.6, 0.9);
+        disc(x, y, 9 * ap, j === 0 ? RED : INK, 0.85);
+      }
+    }
+    small('WIND', 1085, 790, prog(lt, 2.4, 0.6), { size: 13, ls: 4, align: 'center', a: 0.6 });
+  },
+});
+
+// VI · Al Istimtar — seeding the cloud, then rain
+scene({
+  start: 60, dur: 11, num: 'VI', name: 'AL ISTIMTAR', ar: 'الاستمطار', readout: '311 MISSIONS · 2022',
+  kicker: 'FIRST TRIAL 1982 · NATIONWIDE SINCE 2010',
+  head: ['WE ASKED', 'THE CLOUDS', 'FOR MORE.'], accent: { 'MORE.': BLUE },
+  arHead: 'واستمطرنا السحاب',
+  init() {
+    const C = [[1180, 380, 108], [1300, 300, 148], [1452, 262, 162], [1606, 316, 132], [1726, 392, 96], [1392, 402, 118], [1546, 412, 112], [1262, 432, 90], [1660, 448, 70]];
+    this.circles = C.map(([x, y, r], i) => el(x, y, r, r, 0, TAU, 260 + i, 1.2));
+    this.inside = C.map(([x, y, r], i) => el(x, y, r - 2.2, r - 2.2, 0, TAU, 900 + i, 0));
+    this.base = pl([[1112, 505], [1300, 510], [1500, 503], [1700, 508], [1766, 505]], false, 270, 0.8);
+    this.ground = pl([[985, 958], [1100, 946], [1230, 960], [1380, 944], [1540, 962], [1700, 948], [1885, 960]], false, 271, 0.8);
+    this.groundFill = new P([[985, 958], [1100, 946], [1230, 960], [1380, 944], [1540, 962], [1700, 948], [1885, 960], [1885, 1080], [985, 1080]], true);
+    // aircraft, local coordinates (nose to the right)
+    this.fuse = el(0, 0, 70, 10, 0, TAU, 272, 0.2);
+    this.wing = new P([[-6, -3], [18, -3], [0, 44], [-16, 44]], true);
+    this.wing2 = new P([[-6, 3], [18, 3], [4, -30], [-10, -30]], true);
+    this.fin = new P([[-58, -6], [-72, -30], [-60, -30], [-44, -6]], true);
+    this.drops = [];
+    const r = rng(33);
+    for (let i = 0; i < 170; i++) this.drops.push({ x: 1120 + r() * 640, ph: r(), v: 620 + r() * 260, len: 16 + r() * 16, on: 5.0 + (i / 170) * 3.2, a: 0.35 + r() * 0.45 });
+    this.flares = [];
+    for (let i = 0; i < 90; i++) this.flares.push({ te: 1.6 + i * 0.06, side: i % 2 ? 1 : -1, vy: 40 + r() * 70, vx: -30 + r() * 60, life: 1.8 + r() * 1.2 });
+  },
+  planeX(lt) { return lerp(930, 1910, prog(lt, 1.4, 6.2)); },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('hygroscopic flares: natural salts, NaCl · KCl', 1862, 1052, 5.0, lt, { a: 0.36 });
+    note('استمطار', 1000, 1050, 6.0, lt, { ar: true, size: 34, align: 'left', a: 0.3 });
+    // ground
+    hatch(this.groundFill, [985, 940, 1885, 1080], 0.5, 9, prog(lt, 1.0, 1.6), OCHRE, 1.2, 0.5, 273);
+    stroke(this.ground, easeInOut(prog(lt, 0.6, 1.6)), INK, 1.8);
+    // the cloud: outlines, then paper over the inside, then shading below
+    const cp = easeInOut(prog(lt, 0.3, 2.2));
+    ctx.save(); ctx.beginPath(); ctx.rect(1000, 80, 900, 426); ctx.clip();
+    this.circles.forEach((c, i) => stroke(c, clamp(cp * 1.1 - i * 0.02), INK, 2));
+    mask(this.inside);
+    hatch(this.circles, [1070, 330, 1830, 505], 0.55, 8, prog(lt, 1.6, 1.8), INK, 1, 0.3, 274);
+    ctx.restore();
+    stroke(this.base, easeInOut(prog(lt, 1.2, 1.2)), INK, 1.8);
+    // droplets gathering at the cloud base after seeding
+    const r = rng(77);
+    for (let i = 0; i < 26; i++) {
+      const x = 1150 + r() * 600, y = 470 + r() * 28, q = easeOut(prog(lt, 4.2 + r() * 1.6, 0.8));
+      disc(x, y, (2 + r() * 3) * q, BLUE, 0.7);
+    }
+    // flares: sparks released at the wings, rising into the cloud
+    this.flares.forEach(f => {
+      const age = lt - f.te;
+      if (age < 0 || age > f.life) return;
+      const px = this.planeX(f.te);
+      if (px < 1110 || px > 1780) return;
+      const x = px + f.vx * age, y = 590 + f.side * 30 - f.vy * age, fade = 1 - age / f.life;
+      disc(x, y, 5 * fade + 1.5, OCHRE, 0.5 * fade);
+      disc(x, y, 2.6 * fade + 0.8, RED, 0.95 * fade);
+    });
+    // the aircraft
+    const px = this.planeX(lt);
+    if (lt > 1.3 && px < 1905) {
+      ctx.save(); ctx.translate(px, 590 + 3 * Math.sin(lt * 2));
+      mask([this.fuse, this.wing, this.wing2, this.fin]);
+      [this.wing2, this.fuse, this.wing, this.fin].forEach(q => stroke(q, 1, INK, 1.8));
+      disc(5, 22, 5, INK, 0.9); disc(5, -16, 4, INK, 0.9);
+      ctx.restore();
+    }
+    // rain, thickening as the seeding takes hold
+    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = BLUE; ctx.lineCap = 'round'; ctx.lineWidth = 1.5;
+    this.drops.forEach(d => {
+      const q = prog(lt, d.on, 0.6);
+      if (q <= 0) return;
+      const span = 440, y = 512 + ((d.ph * span + (lt - d.on) * d.v) % span), x = d.x - (y - 512) * 0.06;
+      if (y > 950) return;
+      ctx.globalAlpha = SA * d.a * q;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + d.len * 0.06, y - d.len); ctx.stroke();
+    });
+    ctx.restore();
+  },
+});
+
+// VII · Al ʿIlm — a plate of four figures from UAEREP research
+scene({
+  start: 71, dur: 11, num: 'VII', name: 'AL ʿILM', ar: 'العلم', readout: '6 AWARD CYCLES · 2016 — 2026',
+  kicker: 'UAEREP · SINCE 2015 · 17 PROJECTS · 8 PATENTS',
+  head: ['WE FUNDED', 'THE SCIENCE', 'OF RAIN.'], accent: { 'RAIN.': BLUE },
+  arHead: 'ودعمنا علوم الاستمطار',
+  init() {
+    this.cells = [[1010, 170], [1440, 170], [1010, 520], [1440, 520]].map(([x, y], i) => ({
+      x, y, outer: pl([[x, y], [x + 400, y], [x + 400, y + 320], [x, y + 320]], true, 300 + i, 0.5),
+      inner: pl([[x + 7, y + 7], [x + 393, y + 7], [x + 393, y + 313], [x + 7, y + 313]], true, 310 + i, 0.4),
+    }));
+    this.caps = ['FIG. I · NANOMATERIAL', 'FIG. II · ELECTRIC CHARGE', 'FIG. III · LASER', 'FIG. IV · MACHINE LEARNING'];
+    // Fig I: salt core in a titanium-dioxide shell
+    this.shellO = el(1210, 318, 92, 92, 0, TAU, 320, 0.5); this.shellI = el(1210, 318, 76, 76, 0, TAU, 321, 0.5);
+    const sq = [];
+    for (let i = 0; i < 4; i++) { const a = 0.2 + Math.PI / 4 + (i * Math.PI) / 2; sq.push([1210 + 64 * Math.cos(a), 318 + 64 * Math.sin(a)]); }
+    this.core = new P(sq, true);
+    this.lattice = [];
+    for (let j = 1; j < 4; j++) {
+      const f = j / 4;
+      this.lattice.push(new P([[lerp(sq[0][0], sq[1][0], f), lerp(sq[0][1], sq[1][1], f)], [lerp(sq[3][0], sq[2][0], f), lerp(sq[3][1], sq[2][1], f)]]));
+      this.lattice.push(new P([[lerp(sq[0][0], sq[3][0], f), lerp(sq[0][1], sq[3][1], f)], [lerp(sq[1][0], sq[2][0], f), lerp(sq[1][1], sq[2][1], f)]]));
+    }
+    this.sats = [0.5, 1.9, 3.6, 5.1].map(a => [1210 + 128 * Math.cos(a), 318 + 118 * Math.sin(a)]);
+    // Fig II: a small drone emitting charge
+    this.dFuse = el(1580, 322, 92, 15, 0, TAU, 330, 0.3);
+    this.dWing = new P([[1566, 318], [1612, 318], [1594, 252], [1556, 252]], true);
+    this.dTail = new P([[1504, 316], [1486, 280], [1504, 280], [1526, 316]], true);
+    this.dProp = el(1675, 322, 4, 24, 0, TAU, 331, 0);
+    this.drops2 = [[1720, 250], [1760, 300], [1712, 356], [1782, 380], [1744, 424]];
+    // Fig III: a laser into a small cloud
+    this.box = new P([[1070, 780], [1134, 780], [1134, 806], [1070, 806]], true);
+    this.beam = ln(1134, 790, 1318, 620, 340, 0.2);
+    this.puffs = [[1300, 620, 30], [1340, 600, 38], [1380, 620, 28]].map(([x, y, r], i) => ({ c: el(x, y, r, r, 0, TAU, 341 + i, 0.6), m: el(x, y, r - 2, r - 2, 0, TAU, 344 + i, 0) }));
+    // Fig IV: a small network whose output is a raindrop
+    const layers = [4, 5, 4], xs = [1500, 1590, 1680];
+    this.nodes = [];
+    layers.forEach((n, li) => { for (let j = 0; j < n; j++) this.nodes.push({ x: xs[li], y: 680 - ((n - 1) * 46) / 2 + j * 46, l: li }); });
+    this.out = { x: 1772, y: 680 };
+    this.edges = [];
+    this.nodes.forEach(a => this.nodes.forEach(b => { if (b.l === a.l + 1) this.edges.push(new P([[a.x, a.y], [b.x, b.y]])); }));
+    this.nodes.filter(n => n.l === 2).forEach(a => this.edges.push(new P([[a.x, a.y], [this.out.x, this.out.y]])));
+    const ox = this.out.x, oy = this.out.y, bottom = [];
+    for (let i = 0; i <= 20; i++) { const a = (Math.PI * i) / 20; bottom.push([ox + 16 * Math.cos(a), oy + 4 + 16 * Math.sin(a)]); }
+    this.dropP = new P(quad([ox, oy - 30], [ox + 6, oy - 14], [ox + 16, oy + 4], 12).concat(bottom.slice(1), quad([ox - 16, oy + 4], [ox - 6, oy - 14], [ox, oy - 30], 12).slice(1)), true);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    small('TAB. I — UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE', 1010, 150, prog(lt, 0.6, 0.8), { size: 13, ls: 3, a: 0.7 });
+    note('nanomaterials · drones · lasers · machine learning', 1840, 892, 6.2, lt, { a: 0.38 });
+    this.cells.forEach((c, i) => {
+      const p = easeInOut(prog(lt, 0.4 + i * 0.25, 1.4));
+      stroke(c.outer, p, INK, 1.8); stroke(c.inner, p, INK, 0.9, 0.6);
+      typeLine(this.caps[i], c.x + 22, c.y + 298, 3.0 + i * 0.5, lt, { size: 13, ls: 3, a: 0.75, cps: 30 });
+    });
+    // Fig I
+    const f1 = easeOut(prog(lt, 1.4, 1.2));
+    if (f1 > 0) {
+      ctx.save(); ctx.globalAlpha = SA * 0.85 * f1; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = BLUE;
+      ctx.beginPath(); this.shellO.trace(ctx, 1); this.shellI.trace(ctx, 1); ctx.fill('evenodd'); ctx.restore();
+      fill(this.core, OCHRE, 0.6 * f1);
+    }
+    stroke(this.shellO, f1, INK, 1.5); stroke(this.shellI, f1, INK, 1.2, 0.8); stroke(this.core, f1, INK, 1.4);
+    this.lattice.forEach((l, i) => stroke(l, prog(lt, 2.0 + i * 0.06, 0.4), INK, 0.9, 0.7));
+    this.sats.forEach(([x, y], i) => { const q = easeOut(prog(lt, 2.4 + i * 0.12, 0.5)); disc(x, y, 12 * q, BLUE, 0.8); disc(x, y, 6 * q, OCHRE, 0.9); });
+    // Fig II
+    const f2 = easeInOut(prog(lt, 2.0, 1.2));
+    mask([this.dFuse, this.dWing, this.dTail]);
+    [this.dWing, this.dFuse, this.dTail].forEach(q => stroke(q, f2, INK, 1.6)); stroke(this.dProp, f2, INK, 1, 0.6);
+    this.drops2.forEach(([x, y], i) => {
+      const q = easeOut(prog(lt, 2.8 + i * 0.15, 0.5));
+      disc(x, y, 9 * q, BLUE, 0.75);
+      small(i % 2 ? '−' : '+', x + 16, y - 8, q, { size: 16, ls: 0, weight: 600, a: 0.8 });
+      const flick = 0.5 + 0.5 * Math.sin(lt * 9 + i * 2);
+      if (q >= 1) stroke(new P([[1640, 334], [1664 + i * 8, y + 16], [1684 + i * 6, y + 2], [x - 10, y + 4]]), 1, RED, 1.4, 0.4 + 0.5 * flick);
+    });
+    // Fig III
+    const f3 = easeOut(prog(lt, 2.6, 1.0));
+    fill(this.box, INK, 0.8 * f3); stroke(this.box, f3, INK, 1.4);
+    this.puffs.forEach((pf, i) => stroke(pf.c, easeInOut(prog(lt, 2.8 + i * 0.15, 0.9)), INK, 1.6));
+    if (lt > 2.8) mask(this.puffs.map(pf => pf.m));
+    stroke(this.beam, easeOut(prog(lt, 3.6, 0.9)), RED, 2.4, 0.9, [14, 8], -lt * 60);
+    // Fig IV
+    this.edges.forEach((e, i) => stroke(e, prog(lt, 3.2 + i * 0.015, 0.5), INK, 0.8, 0.3));
+    this.nodes.forEach((n, i) => { const q = easeOut(prog(lt, 3.1 + i * 0.05, 0.4)); disc(n.x, n.y, 10 * q, n.l === 1 ? RED : BLUE, 0.85); });
+    const dq = easeOut(prog(lt, 4.3, 0.8));
+    fill(this.dropP, BLUE, 0.8 * dq); stroke(this.dropP, dq, INK, 1.4);
+    if (lt > 4.8) this.edges.forEach((e, i) => { const t = ((lt * 0.9 + i * 0.137) % 1), [x, y] = e.at(t); if (i % 3 === 0) disc(x, y, 3, OCHRE, 0.9); });
+  },
+});
+
+// VIII · Al ʿĀlam — sharing it with the world: a turning globe
+function ortho(lat, lon, lat0, lon0, R) {
+  const f = (lat * Math.PI) / 180, l = ((lon - lon0) * Math.PI) / 180, f0 = (lat0 * Math.PI) / 180;
+  const x = R * Math.cos(f) * Math.sin(l), y = R * (Math.cos(f0) * Math.sin(f) - Math.sin(f0) * Math.cos(f) * Math.cos(l));
+  const vis = Math.sin(f0) * Math.sin(f) + Math.cos(f0) * Math.cos(f) * Math.cos(l);
+  return [x, y, vis];
+}
+function toVec(lat, lon) { const f = (lat * Math.PI) / 180, l = (lon * Math.PI) / 180; return [Math.cos(f) * Math.cos(l), Math.cos(f) * Math.sin(l), Math.sin(f)]; }
+function toLatLon([x, y, z]) { return [(Math.asin(clamp(z, -1, 1)) * 180) / Math.PI, (Math.atan2(y, x) * 180) / Math.PI]; }
+scene({
+  start: 82, dur: 11, num: 'VIII', name: 'AL ʿĀLAM', ar: 'العالم', readout: '24.45°N 54.38°E → 46.20°N 6.14°E',
+  kicker: 'WMO PRESIDENCY · 2023 — 2027',
+  head: ['NOW WE SHARE', 'IT WITH', 'THE WORLD.'], accent: { 'WORLD.': RED },
+  arHead: 'واليوم نشارك علمنا مع العالم',
+  init() {
+    this.cx = 1430; this.cy = 560; this.R = 318;
+    this.home = [24.45, 54.38];
+    this.places = [
+      { ll: [46.2, 6.14], label: 'GENEVA · WMO', t: 2.6 },
+      { ll: [43.3, 68.27], label: 'TURKISTAN · 2026', t: 3.4 },
+      { ll: [33.57, -7.59], label: 'MOROCCO · 2025', t: 4.2 },
+      { ll: [31.55, 74.34], label: 'LAHORE · 2023', t: 5.0 },
+    ];
+    this.outline = el(this.cx, this.cy, this.R, this.R, 0, TAU, 360, 0.5);
+    this.ring = el(this.cx, this.cy, 452, 118, 0, TAU, 361, 0.6, -0.22);
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    note('Abu Dhabi · UN 2026 Water Conference · 8–10 December', 1862, 1050, 6.8, lt, { a: 0.38 });
+    const { cx, cy, R } = this, lat0 = 24, lon0 = 30 + lt * 1.1;
+    const P2 = (lat, lon, lift = 1) => { const [x, y, v] = ortho(lat, lon, lat0, lon0, R * lift); return [cx + x, cy - y, v]; };
+    const op = easeInOut(prog(lt, 0.3, 1.4));
+    mask(new P(this.outline.pts, true));
+    stroke(this.outline, op, INK, 2.2);
+    // graticule every 15°
+    const gp = easeOut(prog(lt, 0.9, 1.6));
+    if (gp > 0) {
+      ctx.save(); ctx.globalAlpha = SA * 0.45 * gp; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 0.9; ctx.beginPath();
+      const run = pts => { let on = false; pts.forEach(([x, y, v]) => { if (v > 0.02) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; }); };
+      for (let lon = -180; lon < 180; lon += 15) { const pts = []; for (let lat = -90; lat <= 90; lat += 3) pts.push(P2(lat, lon)); run(pts); }
+      for (let lat = -75; lat <= 75; lat += 15) { const pts = []; for (let lon = -180; lon <= 180; lon += 3) pts.push(P2(lat, lon)); run(pts); }
+      ctx.stroke(); ctx.restore();
+    }
+    // engraved shading on the far limb
+    const shade = new P(el(cx, cy, R, R, 0, TAU, 362, 0).pts, true);
+    ctx.save(); ctx.beginPath(); ctx.arc(cx - 70, cy - 60, R, 0, TAU); ctx.rect(cx + R + 10, cy - R - 10, -2 * R - 20, 2 * R + 20); ctx.clip('evenodd');
+    hatch(shade, [cx - R, cy - R, cx + R, cy + R], -0.7, 7, prog(lt, 1.4, 1.6), INK, 1, 0.32, 363);
+    ctx.restore();
+    // the armillary ring and a small satellite on it
+    stroke(this.ring, easeInOut(prog(lt, 1.0, 2.0)), SEPIA, 1.2, 0.65);
+    if (lt > 3) { const [sx, sy] = this.ring.at((lt * 0.045) % 1); disc(sx, sy, 5, INK, 0.9); disc(sx, sy, 2.5, OCHRE, 1); }
+    // home and arcs
+    const [hx, hy] = P2(...this.home);
+    const hp = easeOut(prog(lt, 2.0, 0.6));
+    disc(hx, hy, 7 * hp, RED, 0.95);
+    back('ABU DHABI', hx - 16, hy + 30, 'right', hp);
+    small('ABU DHABI', hx - 16, hy + 30, hp, { size: 14, ls: 3, align: 'right', weight: 600 });
+    if (lt > 6.4) for (let k = 0; k < 3; k++) {
+      const ph = ((lt - 6.4) * 0.5 + k / 3) % 1;
+      stroke(el(hx, hy, 10 + ph * 46, 10 + ph * 46, 0, TAU, 370 + k, 0), 1, RED, 1.4, 0.7 * (1 - ph));
+    }
+    const a = toVec(...this.home);
+    this.places.forEach(pl => {
+      const b = toVec(...pl.ll), om = Math.acos(clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1)), pts = [];
+      for (let i = 0; i <= 48; i++) {
+        const t = i / 48, s1 = Math.sin((1 - t) * om) / Math.sin(om), s2 = Math.sin(t * om) / Math.sin(om);
+        const v = [a[0] * s1 + b[0] * s2, a[1] * s1 + b[1] * s2, a[2] * s1 + b[2] * s2];
+        const [la, lo] = toLatLon(v), [x, y] = P2(la, lo, 1 + 0.16 * Math.sin(Math.PI * t));
+        pts.push([x, y]);
+      }
+      const q = easeInOut(prog(lt, pl.t, 1.4));
+      stroke(new P(pts), q, RED, 2.2, 0.9);
+      const [ex, ey] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t + 1.2, 0.6));
+      disc(ex, ey, 5.5 * lq, INK, 0.9);
+      const right = ex > cx;
+      back(pl.label, ex + (right ? 14 : -14), ey - 12, right ? 'left' : 'right', lq);
+      small(pl.label, ex + (right ? 14 : -14), ey - 12, lq, { size: 14, ls: 3, align: right ? 'left' : 'right', weight: 600 });
+    });
+  },
+});
+
+// IX · Al Ghad — twenty years, a rain gauge filling to 2027
+scene({
+  start: 93, dur: 13, num: 'IX', name: 'AL GHAD', ar: 'الغد', readout: 'MARCH 2027',
+  kicker: 'NATIONAL CENTER OF METEOROLOGY · 2007 — 2027',
+  head: ['TWENTY YEARS', 'OF READING', 'THE SKY.'], accent: { 'SKY.': BLUE },
+  arHead: 'عشرون عاماً في قراءة السماء',
+  init() {
+    this.rim = ln(1392, 150, 1608, 150, 400, 0.4);
+    this.funnel = [ln(1392, 150, 1452, 226, 401, 0.3), ln(1608, 150, 1548, 226, 402, 0.3)];
+    this.tube = pl([[1450, 226], [1450, 960], [1550, 960], [1550, 226]], false, 403, 0.4);
+    this.ticks = [];
+    for (let k = 0; k <= 20; k++) { const y = 950 - k * 35.5, major = k % 5 === 0; this.ticks.push({ y, major, p: ln(1550, y, major ? 1574 : 1562, y, 410 + k, 0.1) }); }
+    this.ground = pl([[985, 986], [1200, 978], [1420, 990], [1640, 980], [1885, 988]], false, 440, 0.6);
+    const r = rng(55);
+    this.drops = [];
+    for (let i = 0; i < 150; i++) this.drops.push({ x: 1000 + r() * 880, ph: r(), v: 700 + r() * 300, len: 18 + r() * 18, on: 0.8 + (i / 150) * 3.5, a: 0.3 + r() * 0.4 });
+  },
+  draw(lt) {
+    chrome(this, lt); textBlock(this, lt);
+    small('MARCH 2027', 110, 812, easeOut(prog(lt, 7.6, 0.8)), { size: 18, ls: 6, a: 0.8, weight: 600 });
+    setText(`600 18px ${F_MONO}`, 6);
+    smallAr('المركز الوطني للأرصاد', 110 + ctx.measureText('MARCH 2027').width + 22, 814, easeOut(prog(lt, 7.9, 0.8)), { size: 26, a: 0.8, weight: 700 });
+    note('the gauge, graduated in years', 1862, 1052, 7.0, lt, { a: 0.34 });
+    // rain from the top edge
+    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = BLUE; ctx.lineCap = 'round'; ctx.lineWidth = 1.4;
+    this.drops.forEach(d => {
+      const q = prog(lt, d.on, 0.6);
+      if (q <= 0) return;
+      const span = 1000, y = ((d.ph * span + (lt - d.on) * d.v) % span), x = d.x - y * 0.05;
+      if (y > 978 || (x > 1440 && x < 1560 && y > 140)) return;
+      ctx.globalAlpha = SA * d.a * q;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + d.len * 0.05, y - d.len); ctx.stroke();
+    });
+    ctx.restore();
+    stroke(this.ground, easeInOut(prog(lt, 0.4, 1.4)), INK, 1.8);
+    // the gauge
+    const gp = easeInOut(prog(lt, 0.4, 1.4));
+    stroke(this.rim, gp, INK, 2.4); this.funnel.forEach(f => stroke(f, gp, INK, 2));
+    stroke(this.tube, easeInOut(prog(lt, 0.8, 1.6)), INK, 2.2);
+    const level = easeInOut(prog(lt, 1.6, 6.2)), top = 958 - level * (958 - 240);
+    if (level > 0) {
+      ctx.save(); ctx.globalAlpha = SA * 0.22; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = BLUE; ctx.fillRect(1453, top, 94, 958 - top);
+      ctx.beginPath(); ctx.rect(1453, top, 94, 958 - top); ctx.clip();
+      ctx.globalAlpha = SA * 0.55; ctx.strokeStyle = BLUE; ctx.lineWidth = 1.1; ctx.beginPath();
+      for (let y = 956; y > top + 3; y -= 7) { ctx.moveTo(1456, y); ctx.lineTo(1544, y); }
+      ctx.stroke(); ctx.restore();
+      stroke(ln(1453, top, 1547, top, 450, 0.3), 1, BLUE, 2.4, 0.95);
+      const year = Math.min(2027, Math.floor(2007 + 20 * level + 1e-6));
+      small(String(year), 1432, top + 6, 1, { size: 22, ls: 2, align: 'right', weight: 600, col: year === 2027 ? RED : INK, a: 0.9 });
+    }
+    this.ticks.forEach((t, k) => {
+      const q = prog(lt, 1.2 + k * 0.04, 0.4);
+      stroke(t.p, q, INK, t.major ? 1.5 : 1, 0.85);
+      if (t.major) small(String(2007 + k), 1584, t.y + 5, q, { size: 15, ls: 2, a: 0.75 });
+    });
+  },
+});
+
+/* ---------- paper, light, and the frame ---------- */
+function makePaper() {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), r = rng(7);
+  g.fillStyle = '#E4D7BE'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 80; i++) {
+    const x = r() * W, y = r() * H, rad = 80 + r() * 420, light = r() < 0.55, a = 0.03 + r() * 0.05;
+    const grd = g.createRadialGradient(x, y, 0, x, y, rad);
+    grd.addColorStop(0, light ? `rgba(250,243,228,${a})` : `rgba(140,112,78,${a})`); grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = grd; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+  }
+  g.strokeStyle = 'rgba(120,96,66,0.10)'; g.lineWidth = 0.7;
+  for (let i = 0; i < 520; i++) { const x = r() * W, y = r() * H, a = r() * TAU, L = 10 + r() * 40; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + 0.4) * L * 0.5, y + Math.sin(a + 0.4) * L * 0.5, x + Math.cos(a) * L, y + Math.sin(a) * L); g.stroke(); }
+  const img = g.getImageData(0, 0, W, H), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (r() - 0.5) * 18; d[i] += n; d[i + 1] += n; d[i + 2] += n * 0.9; }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+function makeSpeckle() {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), r = rng(19);
+  for (let i = 0; i < 90000; i++) { g.fillStyle = `rgba(255,250,238,${0.25 + r() * 0.6})`; g.fillRect(r() * W, r() * H, r() < 0.8 ? 1 : 2, 1); }
+  return c;
+}
+function corners(a) {
+  ctx.save(); ctx.globalAlpha = a * 0.7; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(42, 78); ctx.lineTo(42, 42); ctx.lineTo(78, 42);
+  ctx.moveTo(W - 78, 42); ctx.lineTo(W - 42, 42); ctx.lineTo(W - 42, 78);
+  ctx.stroke(); ctx.restore();
+}
+function light(t) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const gx = 560 + Math.sin(t * 0.05) * 120, glow = ctx.createRadialGradient(gx, 520, 0, gx, 520, 820);
+  glow.addColorStop(0, 'rgba(255,246,226,0.20)'); glow.addColorStop(1, 'rgba(255,246,226,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+  // two slow light shafts from the upper left
+  [[-240 + t * 7, 260, 0.07], [260 + t * 5, 150, 0.05]].forEach(([x, w, a]) => {
+    ctx.save(); ctx.translate(x, -100); ctx.rotate(-0.62);
+    const g = ctx.createLinearGradient(-w, 0, w, 0);
+    g.addColorStop(0, 'rgba(255,248,232,0)'); g.addColorStop(0.5, `rgba(255,248,232,${a})`); g.addColorStop(1, 'rgba(255,248,232,0)');
+    ctx.fillStyle = g; ctx.fillRect(-w, -400, w * 2, 3000); ctx.restore();
+  });
+  ctx.globalAlpha = 0.09; ctx.drawImage(SPECKLE_CV, 0, 0);
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  const v = ctx.createRadialGradient(W / 2, H / 2, H * 0.42, W / 2, H / 2, H * 1.05);
+  v.addColorStop(0, 'rgba(255,255,255,1)'); v.addColorStop(1, 'rgba(178,150,116,1)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+const XF = 0.9, DURATION = 106;
+function render(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  ctx.drawImage(PAPER_CV, 0, 0);
+  SCENES.forEach((s, i) => {
+    const lt = t - s.start;
+    let a = 1;
+    if (i > 0) a = Math.min(a, clamp((lt + XF / 2) / XF));
+    if (i < SCENES.length - 1) a = Math.min(a, clamp((s.dur + XF / 2 - lt) / XF));
+    if (a <= 0) return;
+    SA = a; ctx.save(); s.draw(lt); ctx.restore();
+  });
+  SA = 1;
+  corners(1);
+  small('NCM · XX', W - 78, 72, 1, { size: 18, ls: 8, align: 'right', weight: 600, a: 0.85 });
+  light(t);
+  const fadeIn = 1 - easeOut(prog(t, 0, 1.6)), fadeOut = easeInOut(prog(t, DURATION - 1.8, 1.8)), dark = Math.max(fadeIn, fadeOut);
+  if (dark > 0) { ctx.fillStyle = `rgba(20,16,12,${dark})`; ctx.fillRect(0, 0, W, H); }
+}
+
+/* ---------- boot ---------- */
+async function boot() {
+  const fonts = ['900 100px Cinzel', '700 100px Cinzel', '500 20px "IBM Plex Mono"', '600 20px "IBM Plex Mono"', 'italic 400 24px "IM Fell English"'];
+  const arFonts = ['700 60px "Reem Kufi"', '500 24px "Reem Kufi"', '400 30px "Aref Ruqaa"'];
+  await Promise.all(fonts.map(f => document.fonts.load(f, 'AZ az 09 ·')).concat(arFonts.map(f => document.fonts.load(f, 'السماء عربي'))));
+  await document.fonts.ready;
+  PAPER_CV = makePaper(); SPECKLE_CV = makeSpeckle(); PAPER_PAT = ctx.createPattern(PAPER_CV, 'no-repeat');
+  // one headline size for every chapter: the widest line must fit the left column
+  setText(`900 100px ${F_HEAD}`, 1);
+  let widest = 0;
+  SCENES.forEach(s => s.head && s.head.forEach(l => { widest = Math.max(widest, ctx.measureText(l).width); }));
+  HEAD_SIZE = Math.min(104, Math.floor((810 / widest) * 100));
+  SCENES.forEach(s => s.init && s.init());
+  return true;
+}
+const params = new URLSearchParams(location.search);
+window.__duration = DURATION;
+window.__ready = boot().then(() => {
+  if (params.has('capture')) { window.__render = render; render(Number(params.get('t') || 0)); return true; }
+  const t0 = performance.now() - Number(params.get('t') || 0) * 1000;
+  const loop = () => { render(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+  cv.addEventListener('click', () => location.reload());
+  return true;
+});
+</script>
+</body>
+</html>

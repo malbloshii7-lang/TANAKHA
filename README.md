@@ -226,6 +226,9 @@ portal lists it under "Other published pages".
 - **Design:** the Diplomatic Ledger palette (paper, navy ink, one petrol "rain" accent, no
   gold); Source Serif 4 and Noto Naskh Arabic for headings, the IBM Plex Sans / Plex Sans
   Arabic superfamily for matched body text. Light/dark and reduced motion are respected.
+- **Film:** `ncm-20/film/` holds *Reading the Sky*, a 1:46 companion film (1080p MP4 with an
+  original synthesized score), plus the code that draws and scores it. See
+  `ncm-20/film/README.md`.
 - **Before publishing officially:** the page is marked as a draft for review in its colophon.
   Give the Arabic a native editorial pass, confirm leaders' current titles with protocol,
   then remove the draft line.
