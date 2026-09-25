@@ -1,11 +1,13 @@
 'use strict';
-// IX · Al Mujtamaʿ — Abu Dhabi's Corniche across the water; NCM's weather map raises its storm glyph to red, and the rain follows
+// IX · Al Mujtamaʿ — April 2024: Abu Dhabi's Corniche across the water under a greying sky and fine rain; along the top,
+// NCM's own weather-map symbols, whose storm symbol takes a steady red ring (the red warning level); then the sky clears
 scene({
   id: 'homes', // plate carried over from the v3 film (drawing only; words, timing and camera come from timeline.js)
   start: 70, dur: 8, num: 'IX', name: 'AL MUJTAMA‘', ar: 'المجتمع', readout: 'WMO · 24 H NOTICE CAN CUT DAMAGE BY 30%',
   kicker: 'FORECAST 11 APRIL · RED ALERT 16 APRIL 2024',
   head: ['WE WATCH', 'OVER EVERY', 'HOME.'], accent: { 'HOME.': RED },
   arHead: 'ونسهر على كل بيت',
+  alertT: 11.2, rainT: 1.0, clearT: 12.5,
   init() {
     const base = 800;
     this.base = base;
@@ -86,31 +88,33 @@ scene({
     fill(this.palaceDome, OCHRE, 0.35 * pq0); stroke(this.palaceDome, pq0, INK, 1.3); stroke(this.palaceFinial, pq0, INK, 1.1);
     this.palaceDomes.forEach(d => { fill(d, OCHRE, 0.35 * pq0); stroke(d, pq0, INK, 1); });
     this.water.forEach((w, i) => stroke(w, prog(lt, 0.5 + i * 0.1, 1.2), BLUE, 1, 0.45, [18 - i * 2, 10 + i * 3], i * 7));
-    small('ABU DHABI · THE CORNICHE', 1319, 578, prog(lt, 2.0, 0.8), { size: 12, ls: 2, a: 0.7, align: 'center' });
+    smallAr('كورنيش أبوظبي', 1319, 572, prog(lt, 2.0, 0.8), { size: 24, align: 'center', a: 0.75, weight: 600 });
     stroke(this.ground, prog(lt, 0.5, 1.0), INK, 1.6, 0.8);
     const fq = easeOut(prog(lt, 1.2, 0.8));
     mask([this.drum, this.minaret, this.minTop]); fill(this.dome, OCHRE, 0.45 * fq);
     [this.drum, this.minaret, this.minTop].forEach(q => stroke(q, fq, INK, 1.5)); stroke(this.dome, fq, INK, 1.6);
-    // NCM's warning on its own channel, the weather map's glyphs: the storm glyph takes a steady red ring (the
-    // red level) and the rain follows. No sirens, no pulsing, no phones: public alert messages belong to NCEMA.
-    const t0 = 2.2;
-    const rq = easeOut(prog(lt, 3.4, 1.6));
+    // NCM's warning on its own channel, the weather map's symbols: the storm symbol takes a steady red ring (the red
+    // level) at alertT. No pulsing, no rings over the city, no phones: public alert messages belong to NCEMA. The rain is
+    // fine and calm; it builds from rainT and thins from clearT.
+    const t0 = this.alertT;
+    const rq = easeOut(prog(lt, this.rainT, 2.0)) * (1 - easeInOut(prog(lt, this.clearT, 3.0)));
     if (rq > 0) {
       ctx.save(); ctx.beginPath(); ctx.rect(985, 250, 900, 680); ctx.clip();
       ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = BLUE; ctx.lineCap = 'round'; ctx.lineWidth = 1.2;
       const r = rng(91);
       for (let i = 0; i < 150; i++) {
-        const x0 = 985 + r() * 930, v = 420 + r() * 180, ph = r(), len = 12 + r() * 12, span = 690;
+        const x0 = 985 + r() * 930, v = 420 + r() * 180, ph = r(), len = 12 + r() * 12, span = 690, keep = r();
+        if (keep > rq) continue; // thinning: fewer streaks, not fainter ones
         const y = 250 + ((ph * span + lt * v) % span), x = x0 - (y - 250) * 0.08;
-        ctx.globalAlpha = SA * rq * (0.18 + 0.2 * r());
+        ctx.globalAlpha = SA * (0.2 + 0.2 * r());
         ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + len * 0.08, y - len); ctx.stroke();
       }
       ctx.restore();
     }
-    this.villas.forEach((v, i) => {
+    this.villas.forEach((vl, i) => {
       const q = easeOut(prog(lt, 1.0 + i * 0.1, 0.6));
-      mask(v.p); stroke(v.p, q, INK, 1.6);
-      stroke(new P([[v.x + 30, 930], [v.x + 30, 900], [v.x + 52, 900], [v.x + 52, 930]]), q, INK, 1.1, 0.8);
+      mask(vl.p); stroke(vl.p, q, INK, 1.6);
+      stroke(new P([[vl.x + 30, 930], [vl.x + 30, 900], [vl.x + 52, 900], [vl.x + 52, 930]]), q, INK, 1.1, 0.8);
     });
     // weather glyphs: sun, cloud, rain, fog, dust, storm
     this.glyphs.forEach((g, k) => {
@@ -119,6 +123,6 @@ scene({
       this.glyph(k, g.cx, g.cy, q);
     });
     const active = this.glyphs[5];
-    stroke(el(active.cx, active.cy, 41, 41, -Math.PI / 2, 1.5 * Math.PI, 790, 0), easeInOut(prog(lt, t0, 0.9)), RED, 2.2, 0.85);
+    stroke(el(active.cx, active.cy, 41, 41, -Math.PI / 2, 1.5 * Math.PI, 790, 0), easeInOut(prog(lt, t0, 1.2)), RED, 2.4, 0.9);
   },
 });

@@ -1,25 +1,38 @@
 'use strict';
 // The finale: the same star, twenty years on. The real sky over Abu Dhabi on a March 2027 evening
 // (15 March, 20:00 Gulf time, time-lapsed a little), facing due south: Suhail stands about 12° up in the
-// south with Sirius high above it. Along the horizon, the Corniche skyline in silhouette, windows lit,
-// its towers in the proportions of the IX plate (CTBUH heights).
-// Checked: at 16:00 UTC on 15 Mar 2027 Canopus is at altitude 12.2°, azimuth 187°; Sirius 48.4°, 189°.
+// south with Sirius high above it. Checked: at 16:00 UTC on 15 Mar 2027 Canopus is at altitude 12.2°, azimuth 187°;
+// Sirius 48.4°, 189°.
+// The viewpoint is real: the Marina beside Marina Mall (24.4769 N, 54.3225 E), looking south across the water.
+//   Etihad Towers (24.4593 N, 54.3213 E): 1.96 km at bearing 183.6°; at 17 px a degree that is 0.497 px a metre, so the
+//   305 m tower stands 8.9° (151 px) high and Suhail, at 12.2°, clears it just above and to its right.
+//   Emirates Palace (24.4619 N, 54.3167 E): 1.76 km at bearing 199.6°, 0.553 px a metre, a long low front (about 1 km).
+// Nothing else rises above the low shore in this direction; the Corniche's other towers lie east, out of frame.
 const FINALE_VIEW = { az0: 186, pxDeg: 17, hz: 905 };
 scene({
-  id: 'finale', night: true,
+  id: 'finale', night: true, ringT: 2.47,
   init() {
     this.stars = BRIGHT_STARS.map(([ra, dec, V, name], i) => ({ ra, dec, V, name, ph: (i * 2.399) % TAU }));
     this.suhail = this.stars.find(s => s.name === 'Canopus');
-    // borrow the Corniche from the homes plate, and set it along the horizon
+    // the five Etihad Towers, borrowed from the homes plate (drawn there at 1.155 px a metre from CTBUH heights) and
+    // rescaled to their true angular size from the viewpoint
     const tmp = {}; SCENE_DEFS.get('homes').init.call(tmp);
-    this.city = tmp.sky; this.cityBase = tmp.base;
+    const V = FINALE_VIEW, xs = b => b.body.pts.map(p => p[0]);
+    this.towers = tmp.sky.filter(b => !b.palace && Math.min(...xs(b)) >= 1620 && Math.max(...xs(b)) <= 1790);
+    this.etihad = { k: 0.497 / 1.155, px: 1703, base: tmp.base, sx: skyXY(0, 183.6, V)[0] };
+    // Emirates Palace at 0.553 px a metre: wings 18 m, central block 34 m, the great dome to about 60 m, small domes
+    const pk = 0.553, pcx = skyXY(0, 199.6, V)[0], hz = V.hz, m = h => hz - h * pk, half = 13 * V.pxDeg;
+    this.palace = new P([[pcx - half, hz], [pcx - half, m(14)], [pcx - half * 0.72, m(18)], [pcx - 60, m(18)], [pcx - 60, m(34)], [pcx + 60, m(34)], [pcx + 60, m(18)], [pcx + half * 0.72, m(18)], [pcx + half, m(14)], [pcx + half, hz]], true);
+    this.palaceDome = el(pcx, m(34), 22 * pk * 1.1, 26 * pk * 1.1, Math.PI, TAU, 730, 0.1);
+    this.palaceDomes = [-0.62, -0.35, 0.35, 0.62].map((f, i) => el(pcx + f * half, m(18), 7 * pk, 8 * pk, Math.PI, TAU, 732 + i, 0));
+    // lit windows: on the towers (in plate coordinates) and along the palace front
     const r = rng(77);
-    this.windows = this.city.filter(b => !b.palace).map(b => {
-      const xs = b.body.pts.map(p => p[0]), ys = b.body.pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), top = Math.min(...ys);
-      const lights = [];
-      for (let y = tmp.base - 10; y > top + 8; y -= 9) for (let x = x0 + 4; x < x1 - 3; x += 7) if (r() < 0.34) lights.push([x, y, r()]);
+    this.windows = this.towers.map(b => {
+      const x = xs(b), x0 = Math.min(...x), x1 = Math.max(...x), top = Math.min(...b.body.pts.map(p => p[1])), lights = [];
+      for (let y = tmp.base - 12; y > top + 10; y -= 11) for (let xx = x0 + 5; xx < x1 - 4; xx += 8) if (r() < 0.3) lights.push([xx, y, r()]);
       return lights;
     });
+    this.palaceLights = Array.from({ length: 70 }, () => [pcx - half * 0.95 + r() * half * 1.9, m(4 + r() * 10), r()]);
   },
   J(t) { return jdUTC(2027, 3, 15, 15.75 + 0.5 * clamp(this.hold ? 1 : t / (this.dur * (this.speed || 1)))); },
   // In the stage hold (hold: true, loop: seconds) the sky stands still, everything is fully drawn, and every
@@ -47,7 +60,7 @@ scene({
       ctx.fillStyle = halo; ctx.fillRect(hx - 120, hy - 120, 240, 240); ctx.restore();
       fill(starP(hx, hy, 19 * q * k, 5.5 * q, 8, -Math.PI / 2), '#FFD9A0', 0.9 * q);
       // a gold ring draws itself around Suhail: the turning circle, closed
-      const rp = easeInOut(prog(t, 2.2, 2.6));
+      const rp = this.hold ? 1 : easeInOut(prog(t, this.ringT - 1.6, 1.6)); // closes at ringT
       if (rp > 0) { stroke(el(hx, hy, 46, 46, -Math.PI / 2, -Math.PI / 2 + TAU * rp, 780, 0.4), 1, GOLD, 1.6, 0.8); stroke(el(hx, hy, 54, 54, -Math.PI / 2, -Math.PI / 2 - TAU * rp, 781, 0.4), 1, GOLD, 0.8, 0.5); }
       // the outer ring keeps turning, slowly, like the sky (one turn per loop in the hold)
       if (rp >= 1) { const turn = this.hold ? TAU * t0 / this.loop : t0 * 0.12; stroke(el(hx, hy, 62, 62, turn, turn + TAU, 782, 0), 1, GOLD, 0.8, 0.35, [2, 7], 0); }
@@ -57,19 +70,26 @@ scene({
     const glow = ctx.createLinearGradient(0, FINALE_VIEW.hz - 200, 0, FINALE_VIEW.hz);
     glow.addColorStop(0, 'rgba(0,0,0,0)'); glow.addColorStop(1, `rgba(120,90,70,${0.35 * fade})`);
     ctx.fillStyle = glow; ctx.fillRect(0, FINALE_VIEW.hz - 200, W, 200); ctx.restore();
-    // plate x 1016–1885 → the middle of the frame; the mid-rise stretch (plate x ~1320) sits under Suhail
-    const k = 0.9, ox = (this.suhailXY ? this.suhailXY[0] : 975) - 1320 * k, oy = FINALE_VIEW.hz - this.cityBase * k;
-    ctx.save(); ctx.translate(ox, oy); ctx.scale(k, k);
-    const cq = easeOut(prog(t, 0.2, 2.0));
-    this.city.forEach((b, i) => {
-      ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = cq; ctx.fillStyle = '#05060B';
-      ctx.beginPath(); b.body.trace(ctx, 1); ctx.fill(); ctx.restore();
-      stroke(b.body, cq, INK, 1.2, 0.18);
-    });
-    this.windows.forEach((ws, i) => ws.forEach(([x, y, v]) => { const on = prog(t, 1.0 + v * 3, 0.6); if (on > 0) { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.55 * on * (0.6 + 0.4 * v); ctx.fillStyle = '#F2C97A'; ctx.fillRect(x, y, 3, 4); ctx.restore(); } }));
+    const cq = easeOut(prog(t, 0.2, 2.0)), hz = FINALE_VIEW.hz, E = this.etihad;
+    const sil = (path, lw = 1.1) => { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = cq; ctx.fillStyle = '#05060B'; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore(); stroke(path, cq, INK, lw, 0.2); };
+    const lamp = (x, y, a, w = 2, h = 3) => { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a; ctx.fillStyle = '#F2C97A'; ctx.fillRect(x, y, w, h); ctx.restore(); };
+    // the low shore across the water
+    sil(new P([[0, hz], [0, hz - 5], [W, hz - 4], [W, hz]], true), 0.8);
+    // Emirates Palace, then the Etihad Towers in front of it (they stand nearer)
+    sil(this.palace); sil(this.palaceDome); this.palaceDomes.forEach(d => sil(d, 0.8));
+    this.palaceLights.forEach(([x, y, v]) => { const on = prog(t, 0.8 + v * 2.5, 0.6); if (on > 0) lamp(x, y, 0.5 * on * (0.5 + 0.5 * v), 2, 2); });
+    ctx.save(); ctx.translate(E.sx - E.px * E.k, hz - E.base * E.k); ctx.scale(E.k, E.k);
+    this.towers.forEach(b => sil(b.body, 2.4));
+    this.windows.forEach(ws => ws.forEach(([x, y, v]) => { const on = prog(t, 1.0 + v * 3, 0.6); if (on > 0) lamp(x, y, 0.6 * on * (0.6 + 0.4 * v), 4, 6); }));
     ctx.restore();
-    // the ground and the water line in front of the city
-    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#04050A'; ctx.fillRect(0, FINALE_VIEW.hz, W, H - FINALE_VIEW.hz); ctx.restore();
-    stroke(ln(0, FINALE_VIEW.hz, W, FINALE_VIEW.hz, 790, 0.4), fade, INK, 1, 0.25);
+    // the water in front: dark, with each light's reflection drawn down as a faint, shimmering column
+    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#04050A'; ctx.fillRect(0, hz, W, H - hz); ctx.restore();
+    stroke(ln(0, hz, W, hz, 790, 0.4), fade, INK, 1, 0.25);
+    const refl = (x, a, len, ph) => { const s = 0.5 + 0.5 * this.tw(t0, ph, 1.7); ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a * (0.6 + 0.4 * s); const g = ctx.createLinearGradient(0, hz, 0, hz + len); g.addColorStop(0, '#F2C97A'); g.addColorStop(1, 'rgba(242,201,122,0)'); ctx.fillStyle = g; ctx.fillRect(x - 1, hz + 2, 2, len); ctx.restore(); };
+    const rq = cq * easeOut(prog(t, 2.0, 2.0));
+    this.windows.forEach((ws, i) => ws.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(E.sx + (x - E.px) * E.k, 0.16 * rq, 40 + 60 * v, v * 6.28); }));
+    this.palaceLights.forEach(([x, y, v], j) => { if (j % 4 === 0) refl(x, 0.1 * rq, 25 + 30 * v, v * 6.28); });
+    // hold C (behind speeches): the whole frame dimmed
+    if (this.dim) { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = this.dim; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
   },
 });

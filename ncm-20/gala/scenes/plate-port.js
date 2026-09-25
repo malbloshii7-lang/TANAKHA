@@ -67,7 +67,6 @@ scene({
   },
   draw(lt) {
     const lq = easeOut(prog(lt, 2.0, 0.8));
-    small('JEBEL ALI · DUBAI', 990, 470, lq, { size: 13, ls: 4, a: 0.75, weight: 600 });
     // the quay and the yard behind it
     const qp = easeInOut(prog(lt, 0.2, 1.0));
     hatch(this.quayFace, [985, 786, 1062, 812], 0.8, 6, qp, INK, 1, 0.35, 542); stroke(this.quayTop, qp, INK, 2);
@@ -139,7 +138,5 @@ scene({
     stroke(new P([[1004, 836], [1040, 836]]), wh, INK, 0.9, 0.6);
     stroke(new P([[1014, 824], [1014, 836]]), wh, INK, 1.2, 0.8);
     arrowHead(1014, 824, -Math.PI / 2, 5, INK, 0.8 * wh, 1.2); arrowHead(1014, 836, Math.PI / 2, 5, INK, 0.8 * wh, 1.2);
-    back('WAVE HEIGHT', 1030, 830, 'left', wh, 12, 3);
-    small('WAVE HEIGHT', 1030, 830, wh, { size: 12, ls: 3, a: 0.7 });
   },
 });

@@ -22,7 +22,7 @@ const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res
 
 async function openPage(browser) {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: SCALE });
-  // Fonts come from Google Fonts: fetch them from Node so TLS is verified against the system CA bundle.
+  // The fonts are self-hosted (fonts/); any other https request is fetched from Node so TLS is verified normally.
   await context.route(/^https:\/\//, async route => { try { await route.fulfill({ response: await route.fetch() }); } catch { await route.abort(); } });
   const page = await context.newPage();
   page.on('pageerror', e => { console.error('page error:', e.message); process.exitCode = 1; });
@@ -38,7 +38,10 @@ async function openPage(browser) {
   if (mode === 'cues') { // the timeline as JSON, for score.py and the subtitle files
     const browser = await chromium.launch(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {});
     const page = await openPage(browser);
-    const cues = await page.evaluate(() => ({ duration: DURATION, scenes: SCENES.map(s => ({ id: s.id, start: s.start, dur: s.dur, speed: s.speed || 1, night: !!s.night, xf: s.xf ?? XF, enter: (s.enter && s.enter.type) || 'fade', sfx: s.sfx || null, text: s.text || null, sub: s.sub || null })) }));
+    const cues = await page.evaluate(() => ({ duration: DURATION, scenes: SCENES.map(s => ({ id: s.id, start: s.start, dur: s.dur, speed: s.speed || 1, offset: s.offset || 0, night: !!s.night, xf: s.xf ?? XF, enter: (s.enter && s.enter.type) || 'fade', t20: s.id === 'gauge' ? s.t20 : undefined, dt: s.id === 'gauge' ? s.dt : undefined, role: s.role || null, text: s.text || null, sub: s.sub || null })),
+      // every words block with its film times (recorded by calling each scene's words once), and the narration
+      text: (() => { TEXT_REC = []; SCENES.forEach(s => { if (s.words) { ctx.save(); try { s.words.call(s, 0.5 * s.dur); } catch (e) { TEXT_REC.push({ error: s.id + ': ' + e.message }); } ctx.restore(); } }); const r = TEXT_REC; TEXT_REC = null; return r; })(),
+      vo: typeof VO === 'undefined' ? [] : VO.map(v => ({ id: v.id, in: v.in, out: v.out, ar: v.ar, sub: voSubAr(v), en: v.en })) }));
     fs.writeFileSync(out, JSON.stringify(cues, null, 1)); console.log('wrote', out, cues.scenes.length, 'scenes,', cues.duration, 's');
     await browser.close(); return;
   }

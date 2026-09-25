@@ -63,15 +63,18 @@ scene({
     this.dropP = new P(quad([ox, oy - 30], [ox + 6, oy - 14], [ox + 16, oy + 4], 12).concat(bottom.slice(1), quad([ox - 16, oy + 4], [ox - 6, oy - 14], [ox, oy - 30], 12).slice(1)), true);
   },
   draw(lt) {
-    smallAr('علوم المطر', 1840, 150, prog(lt, 0.6, 0.8), { size: 26, align: 'right', a: 0.8, weight: 600 });
-    small('TAB. I — THE SCIENCE OF RAIN', 1010, 150, prog(lt, 0.6, 0.8), { size: 13, ls: 3, a: 0.7 });
+    // (the v3 table heading is left out: under the gala framing it fell off the frame, and the words column names the programme)
     this.cells.forEach((c, i) => {
       const p = easeInOut(prog(lt, 0.4 + i * 0.25, 1.4));
       stroke(c.outer, p, INK, 1.8); stroke(c.inner, p, INK, 0.9, 0.6);
       const q = easeOut(prog(lt, 3.0 + i * 0.4, 0.8));
       back(this.caps[i], c.x + 22, c.y + 298, 'left', q, 12, 3);
       small(this.caps[i], c.x + 22, c.y + 298, q, { size: 12, ls: 3, a: 0.72 });
-      smallAr(this.capsAr[i], c.x + 380, c.y + 38, q, { size: 21, align: 'right', a: 0.82, weight: 600 });
+      smallAr(this.capsAr[i], c.x + 380, c.y + 40, q, { size: 26, align: 'right', a: 0.85, weight: 600 });
+      if (i === 0) { // developed at Khalifa University (src-56)
+        smallAr('جامعة خليفة', c.x + 380, c.y + 278, q, { size: 18, align: 'right', a: 0.75, weight: 600 });
+        small('KHALIFA UNIVERSITY', c.x + 380, c.y + 298, q, { size: 11, ls: 1, align: 'right', a: 0.65, weight: 600 });
+      }
     });
     // Fig I
     const f1 = easeOut(prog(lt, 1.4, 1.2));

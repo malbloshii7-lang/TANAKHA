@@ -1,14 +1,15 @@
 'use strict';
-// The nation's network: an engraved map of the seven emirates (data/uae-map.js). The coast inks itself,
-// the emirates are named in their protocol order, then the Center's headquarters lights and its network
-// appears: the ten airports with NCM aviation-weather offices (squares) and the six weather radars that
-// NCM lists as operational in the WMO Radar Database (unlabelled, as small range rings, no count from
-// that file). The sourced count, "more than 100 weather stations · 9 radars (2021)", is left to the words.
+// The nation: an engraved map of the seven emirates (data/uae-map.js). The coast inks itself, the Center's
+// headquarters is marked with a small gold star, and as the narrator says "the seven emirates" all seven are washed
+// in gold together and named in constitutional order. Nothing on this map widens, sweeps or targets: no range ring,
+// no radar marks, no point symbols over the country (a widening ring from a capital is a news "strike radius" graphic).
+// The same map carries April 2024 (storm: true): the whole country under one weather system, cloud and rain crossing
+// from the west and clearing to the east; the event was national, so no single city stands for it.
 // Protocol: Abu Musa, Greater and Lesser Tunb are drawn as UAE territory; Musandam and Madha (Oman) are
 // not UAE; neighbours are faint and unlabelled; the sea is the Arabian Gulf; no maritime lines.
-const MAP_BOX = { x: 70, y: 150, w: 1060, h: 860 }; // where the map sits on the plate
+const MAP_BOX = { x: 40, y: 165, w: 1000, h: 820 }; // where the map sits on the plate
 scene({
-  id: 'nation',
+  id: 'nation', washT: 8.3, storm: false,
   init() {
     const b = UAE_MAP.projection.bbox_array, KX = Math.cos(24.4 * Math.PI / 180);
     const s = Math.min(MAP_BOX.w / ((b[2] - b[0]) * KX), MAP_BOX.h / (b[3] - b[1]));
@@ -25,6 +26,9 @@ scene({
     const pt = id => UAE_MAP.points.find(p => p.id === id);
     this.caps = ['cap-abu-dhabi', 'cap-dubai', 'cap-sharjah', 'cap-ajman', 'cap-umm-al-quwain', 'cap-ras-al-khaimah', 'cap-fujairah'].map(id => { const p = pt(id); return { ...p, xy: pr([p.lon, p.lat]) }; });
     this.hq = (p => ({ ...p, xy: pr([p.lon, p.lat]) }))(pt('ncm-hq'));
+    // great-circle distance from the headquarters to each capital, km; the ring grows at RING_KMS
+    const hav = (a, b) => { const r = Math.PI / 180, dl = (b.lat - a.lat) * r, dn = (b.lon - a.lon) * r, h = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dn / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); };
+    this.caps.forEach(c => { c.km = hav(this.hq, c); });
     this.airports = UAE_MAP.points.filter(p => p.category === 'airport').map(p => ({ ...p, xy: pr([p.lon, p.lat]) }));
     this.radars = UAE_MAP.points.filter(p => p.category === 'radar' && p.status === 'Operational').map(p => ({ ...p, xy: pr([p.lon, p.lat]) }));
     // label anchors for the crowded northern emirates, set off the coast on leader lines
@@ -33,7 +37,7 @@ scene({
     this.labelXY = {};
     this.caps.forEach(c => { this.labelXY[c.id] = { 'cap-abu-dhabi': [c.xy[0] - 120, c.xy[1] - 70, 'right'], 'cap-fujairah': [c.xy[0] + 34, c.xy[1] + 34, 'left'] }[c.id]; });
     const coastal = ['cap-ras-al-khaimah', 'cap-umm-al-quwain', 'cap-ajman', 'cap-sharjah', 'cap-dubai'], y0 = this.caps.find(c => c.id === 'cap-ras-al-khaimah').xy[1] - 30;
-    coastal.forEach((id, k) => { const c = this.caps.find(q => q.id === id); this.labelXY[id] = [col(c.xy[0]) - k * 8, y0 + k * 44, 'right']; });
+    coastal.forEach((id, k) => { const c = this.caps.find(q => q.id === id); this.labelXY[id] = [col(c.xy[0]) - 10 - k * 10, y0 - 20 + k * 58, 'right']; });
   },
   draw(t) {
     const pr = this.pr;
@@ -45,15 +49,15 @@ scene({
     this.land.forEach(e => e.polys.forEach(p => fill(p, OCHRE, 0.13 * lq)));
     const sq = prog(t, 0.6, 2.4);
     if (sq > 0) {
-      ctx.save(); ctx.beginPath(); ctx.rect(MAP_BOX.x - 40, MAP_BOX.y - 40, MAP_BOX.w + 80, MAP_BOX.h + 80);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); // the fade, not a box, sets where the engraving ends
       this.land.forEach(e => e.polys.forEach(p => p.trace(ctx, 1))); this.context.forEach(ps => ps.forEach(p => p.trace(ctx, 1)));
       ctx.clip('evenodd');
       // the engraving fades out toward the edge of the plate instead of stopping on a line
-      const fx = MAP_BOX.x + MAP_BOX.w * 0.52, fy = MAP_BOX.y + MAP_BOX.h * 0.42, grd = ctx.createRadialGradient(fx, fy, 200, fx, fy, 720);
-      grd.addColorStop(0, 'rgba(40,71,140,0.26)'); grd.addColorStop(0.75, 'rgba(40,71,140,0.12)'); grd.addColorStop(1, 'rgba(40,71,140,0)');
+      const fx = MAP_BOX.x + MAP_BOX.w * 0.52, fy = MAP_BOX.y + MAP_BOX.h * 0.42, grd = ctx.createRadialGradient(fx, fy, 150, fx, fy, 640);
+      grd.addColorStop(0, 'rgba(40,71,140,0.26)'); grd.addColorStop(0.6, 'rgba(40,71,140,0.13)'); grd.addColorStop(1, 'rgba(40,71,140,0)');
       ctx.globalAlpha = SA; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = IS_NIGHT ? BLUE : grd; ctx.lineWidth = 0.8; ctx.beginPath();
-      const y0 = MAP_BOX.y - 40, n = Math.floor((MAP_BOX.h + 80) / 7 * sq);
-      for (let i = 0; i < n; i++) { const y = y0 + i * 7; ctx.moveTo(MAP_BOX.x - 40, y); ctx.lineTo(MAP_BOX.x + MAP_BOX.w + 40, y); }
+      const n = Math.floor(H / 7 * sq);
+      for (let i = 0; i < n; i++) { const y = i * 7 + 3; ctx.moveTo(0, y); ctx.lineTo(W, y); }
       ctx.stroke(); ctx.restore();
     }
     // the coast inks itself, the longest line first
@@ -65,43 +69,54 @@ scene({
     smallAr('الخليج العربي', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1], nq, { size: 26, align: 'center', a: 0.45, font: F_NASKH, weight: 400 });
     small('ARABIAN GULF', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1] + 26, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
     smallAr('بحر عُمان', pr([56.95, 24.45])[0], pr([56.95, 24.45])[1], nq, { size: 22, align: 'center', a: 0.4, font: F_NASKH, weight: 400 });
-    // the seven emirates, named in protocol order
+    // the Center's headquarters: a small gold star
+    const hq = easeOut(prog(t, 3.0, 0.8)), [hx, hy] = this.hq.xy;
+    // the seven emirates, washed in gold together and named in constitutional order
+    const wq = easeInOut(prog(t, this.washT, 1.6));
+    if (wq > 0) this.land.forEach(e => e.polys.forEach(p => fill(p, GOLD, 0.2 * wq)));
+    const dim = this.storm ? 1 - 0.35 * this.stormQ(t) : 1;
     this.caps.forEach((c, i) => {
-      const q = easeOut(prog(t, 3.0 + i * 0.22, 0.6)), [x, y] = c.xy, [lx, ly, al] = this.labelXY[c.id];
+      const q = easeOut(prog(t, this.washT + 0.2 + i * 0.14, 0.7)), [x, y] = c.xy, [lx, ly, al] = this.labelXY[c.id];
       if (q <= 0) return;
-      disc(x, y, 3.6 * q, INK, 0.9);
-      stroke(new P([[x, y], [lx + (al === 'right' ? 6 : -6), ly - 6]]), q, INK, 0.7, 0.4);
-      smallAr(c.name_ar, lx, ly, q, { size: 22, align: al, a: 0.88, weight: 600 });
+      disc(x, y, 3.6 * q, INK, 0.9 * dim);
+      stroke(new P([[x, y], [lx + (al === 'right' ? 6 : -6), ly - 6]]), q, INK, 0.7, 0.4 * dim);
+      smallAr(c.name_ar, lx, ly, q * dim, { size: 30, align: al, a: 0.9, weight: 700 });
+      small(c.name_en.toUpperCase(), lx, ly + 22, q * dim, { size: 13, ls: 2, align: al, a: 0.7, weight: 600 });
     });
-    // the Center: a gold star at its headquarters, and its circle widening over the country
-    const hq = easeOut(prog(t, 4.8, 0.8)), [hx, hy] = this.hq.xy;
-    if (hq > 0) {
-      const rr = easeInOut(prog(t, 5.0, 2.6));
-      if (rr > 0 && rr < 1) stroke(el(hx, hy, 40 + rr * 700, 40 + rr * 700, 0, TAU, 800, 0.3), 1, GOLD, 1.6, 0.6 * Math.sin(Math.PI * rr));
-      ornament(hx, hy, 14 * hq, 1);
-    }
-    // the network: aviation-weather offices at the airports, and the radars' slowly sweeping range marks
-    this.airports.forEach((p, i) => {
-      const q = easeOut(prog(t, 5.6 + i * 0.12, 0.5)), [x, y] = p.xy;
-      if (q <= 0) return;
-      const r = 5 * q; mask(new P([[x - r, y - r], [x + r, y - r], [x + r, y + r], [x - r, y + r]], true));
-      stroke(new P([[x - r, y - r], [x + r, y - r], [x + r, y + r], [x - r, y + r]], true), 1, BLUE, 1.4, 0.85);
+    if (hq > 0) ornament(hx, hy, 12 * hq, 1);
+    if (this.storm) this.weather(t);
+  },
+  // April 2024 on the map: storm clock u from stormT0. The rain area is drawn the way a weather chart draws one: a
+  // wavy-edged band of fine blue hatching, with rain streaks inside, crossing from the west and clearing to the east by
+  // the remembrance (u ~12.6). No cloud blobs (they read as smoke), no glow, no alert marks.
+  stormT0: 12,
+  stormQ(t) { const u = t - this.stormT0; return easeInOut(prog(u, 0.6, 3.0)) * (1 - easeInOut(prog(u, 11.6, 3.4))); },
+  weather(t) {
+    const u = t - this.stormT0, q = this.stormQ(t);
+    if (q <= 0) return;
+    if (!this.drops) { const r = rng(2024); this.drops = Array.from({ length: 900 }, () => ({ fx: r(), fy: r(), sp: 0.8 + r() * 0.5 })); }
+    const xL = -1350 + u * 125, xR = xL + 1500; // the band's west and east edges at the map's middle latitude
+    const edge = (x0, y, ph) => x0 + 45 * Math.sin(y / 95 + ph) + 25 * Math.sin(y / 37 + 2 * ph) + (y - 560) * 0.25;
+    const band = (inset, ph) => { const L = [], R = []; for (let y = 60; y <= 1040; y += 20) { L.push([edge(xL + inset, y, ph), y]); R.push([edge(xR - inset, y, ph + 1.7), y]); } return new P(L.concat(R.reverse()), true); };
+    // drawn on the text layer so it can be feathered out before the words column (x 1000 -> 1160), with no hard edge
+    inkText(() => {
+    const outer = band(0, 0.4), inner = band(160, 1.1);
+    fill(outer, BLUE, 0.05 * q); fill(inner, BLUE, 0.06 * q);
+    hatch(outer, [-200, 0, 1400, 1080], -1.15, 9, 1, BLUE, 0.9, 0.22 * q, 2401);
+    hatch(inner, [-200, 0, 1400, 1080], -1.15, 9, 1, BLUE, 0.9, 0.22 * q, 2402);
+    stroke(outer, 1, BLUE, 1.0, 0.35 * q, [2, 6]);
+    // rain streaks inside the band, slanting with the westerly wind
+    ctx.save(); ctx.beginPath(); outer.trace(ctx, 1); ctx.clip();
+    ctx.globalAlpha = SA * 0.45 * q; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = BLUE; ctx.lineWidth = 1; ctx.lineCap = 'round';
+    ctx.beginPath();
+    this.drops.forEach(d => {
+      const x = xL - 120 + d.fx * 1750, span = 1160, y = -40 + ((d.fy * span + u * 300 * d.sp) % span);
+      ctx.moveTo(x, y); ctx.lineTo(x + 6, y + 18);
     });
-    this.radars.forEach((p, i) => {
-      const q = easeOut(prog(t, 6.6 + i * 0.18, 0.8)), [x, y] = p.xy;
-      if (q <= 0) return;
-      const R = 34 * q, a = t * 1.3 + i;
-      stroke(el(x, y, R, R, 0, TAU, 810 + i, 0.2), 1, RED, 1, 0.45);
-      stroke(new P([[x, y], [x + R * Math.cos(a), y + R * Math.sin(a)]]), 1, RED, 1.2, 0.6);
-      disc(x, y, 3 * q, RED, 0.9);
-    });
-    // a small key, set in the Arabian Gulf's open water
-    const kq = easeOut(prog(t, 7.4, 0.8)), kx = MAP_BOX.x + 30, ky = MAP_BOX.y + MAP_BOX.h - 60;
-    if (kq > 0) {
-      stroke(new P([[kx - 5, ky - 5], [kx + 5, ky - 5], [kx + 5, ky + 5], [kx - 5, ky + 5]], true), kq, BLUE, 1.4, 0.85);
-      smallAr('مكاتب الأرصاد في المطارات', kx + 290, ky + 7, kq, { size: 18, align: 'right', a: 0.75 });
-      stroke(el(kx, ky + 34, 8, 8, 0, TAU, 820, 0), kq, RED, 1, 0.6); disc(kx, ky + 34, 2.5, RED, 0.9 * kq);
-      smallAr('رادارات الطقس', kx + 290, ky + 41, kq, { size: 18, align: 'right', a: 0.75 });
-    }
+    ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.globalCompositeOperation = 'destination-in';
+    const g = ctx.createLinearGradient(1000, 0, 1160, 0); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(-400, -200, 2800, 1500); ctx.restore();
+    }, 1, BLEND);
   },
 });

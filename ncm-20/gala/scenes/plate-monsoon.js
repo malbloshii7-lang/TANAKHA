@@ -91,8 +91,6 @@ scene({
       const y = 826 - k * 50, q = prog(lt, 3.4 + k * 0.08, 0.3);
       stroke(ln(1846, y, k % 5 === 0 ? 1826 : 1834, y, 80 + k, 0.1), q, INK, 1.1, 0.7);
     }
-    back('ISBA‘', 1822, 580, 'right', prog(lt, 4.3, 0.6), 13, 3);
-    small('ISBA‘', 1822, 580, prog(lt, 4.3, 0.6), { size: 13, ls: 3, align: 'right', a: 0.7 });
     const sq = easeOut(prog(lt, 4.1, 0.8));
     fill(starP(1846, 552, 15 * sq, 6 * sq, 8), OCHRE, 0.95); stroke(starP(1846, 552, 15 * sq, 6 * sq, 8), sq, INK, 1, 0.8);
     // the ship, riding the swell in front of the wind; everything below the waterline is hidden by the sea

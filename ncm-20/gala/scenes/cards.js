@@ -1,12 +1,16 @@
 'use strict';
 // Typographic scenes: the leadership quote cards and the closing lockup.
-// A quote card: parchment, a large faint eight-pointed star behind the words, the quote set centred.
+// A quote card: parchment, the film's turning circle faint behind the words (two gold rings, a slowly turning dial
+// between them), the quote set centred.
 scene({
   id: 'quote',
-  init() { this.star = starP(W / 2, 470, 330, 250, 8, -Math.PI / 2); this.star2 = starP(W / 2, 470, 300, 228, 8, -Math.PI / 2 + Math.PI / 8); },
+  init() { this.r1 = el(W / 2, 470, 340, 340, 0, TAU, 71, 0.3); this.r2 = el(W / 2, 470, 312, 312, 0, TAU, 72, 0.3); },
   draw(t) {
-    const p = easeInOut(prog(t, 0.2, 2.4));
-    stroke(this.star, p, GOLD, 1.2, 0.22); stroke(this.star2, p, GOLD, 0.8, 0.16);
+    const p = easeInOut(prog(t, 0.2, 2.4)), rot = t * 0.012;
+    stroke(this.r1, p, GOLD, 1.2, 0.22); stroke(this.r2, p, GOLD, 0.8, 0.16);
+    ctx.save(); ctx.globalAlpha = SA * 0.16 * p; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = GOLD; ctx.lineWidth = 1; ctx.beginPath();
+    for (let i = 0; i < 72; i++) { const a = rot + i * TAU / 72, r0 = i % 6 ? 318 : 314; ctx.moveTo(W / 2 + r0 * Math.cos(a), 470 + r0 * Math.sin(a)); ctx.lineTo(W / 2 + 334 * Math.cos(a), 470 + 334 * Math.sin(a)); }
+    ctx.stroke(); ctx.restore();
   },
   words(t) { quoteCard(QUOTES[this.quote], this, t, { cy: 480 }); },
 });
@@ -28,6 +32,6 @@ scene({
     small(en, cx + ls / 2, 572, p, { size: 40, ls, align: 'center', a: 0.9, weight: 600, font: F_HEAD });
     ruleWithStar(cx, 630, wa / 2 - 30, prog(t, 1.0, 1.2) * out, 0.6);
     const yq = easeOut(prog(t, 1.6, 1.0)) * out;
-    smallAr(ltr('2007 — 2027'), cx, 700, yq, { size: 30, align: 'center', a: 0.8, font: F_KUFI });
+    smallAr(ltr('2007–2027'), cx, 700, yq, { size: 30, align: 'center', a: 0.8, font: F_KUFI });
   },
 });

@@ -58,8 +58,6 @@ scene({
   },
   draw(lt) {
     const lq = easeOut(prog(lt, 4.6, 0.8));
-    back('ZAYED INTERNATIONAL', 1643, 480, 'center', lq, 12, 3); small('ZAYED INTERNATIONAL', 1643, 480, lq, { size: 12, ls: 3, align: 'center', a: 0.75 });
-    small('RUNWAY 31L', 1162, 1034, prog(lt, 1.6, 0.6), { size: 12, ls: 3, a: 0.6, align: 'right' });
     const { VX, HY, Y, HW, K } = this;
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
     this.edges.forEach((e, i) => stroke(e, easeOut(prog(lt, 0.3 + i * 0.1, 1.1)), INK, 2.2));
@@ -101,9 +99,8 @@ scene({
       this.scaleBar.forEach(l => stroke(l, prog(lt, 2.2, 0.6), INK, 0.9, 0.6));
       const fq = easeOut(prog(lt, 2.4, 0.6));
       ctx.save(); ctx.translate(1860, 820); ctx.rotate(-Math.PI / 2);
-      back('109 M', 0, 4, 'center', fq, 10, 2); small('109 M', 0, 4, fq, { size: 10, ls: 2, a: 0.75, align: 'center' });
       ctx.restore();
-      small('CONTROL TOWER', 1801, 1022, fq, { size: 10, ls: 2, a: 0.75, align: 'center' });
+      smallAr('برج المراقبة', 1801, 1024, fq, { size: 22, align: 'center', a: 0.8, weight: 600 });
       ctx.restore();
     }
     // windsock streaming in the breeze

@@ -6,6 +6,18 @@
 // Checked: Canopus clears the horizon at about 01:05 UTC at azimuth 151°, and is 2.2° up at 01:25 UTC
 // with the sun 8.7° below the horizon; Sirius stands 23° up in the south-east, Achernar low in the south.
 const SUHAIL_VIEW = { az0: 153.15, pxDeg: 20, hz: 820 };
+// The sky clock, keyed to the music: 00:59:30 UTC at the first frame; Canopus clears the low dunes on bar 2.5 (8.33 s,
+// 01:08:40 UTC, 0.45° up); then faster toward dawn (01:17 UTC at 11.67 s, the sun about 10° down).
+const suhailUTC = t => t < 8.333 ? (59.5 + 9.167 * (t / 8.333)) / 60 : (68 + 40 / 60 + (t - 8.333) * 2.5) / 60;
+const SUHAIL_CAM = t => camPath([{ t: 0, s: 1, px: 960, py: 560, sx: 960, sy: 560 }, { t: 11.667, s: 1.10, px: 960, py: 700, sx: 960, sy: 640 }], t);
+function suhailArt(t) {
+  const J = jdUTC(2026, 8, 24, suhailUTC(t)), c = BRIGHT_STARS.find(s => s[3] === 'Canopus'), [alt, az] = altAz(c[0], c[1], J);
+  return skyXY(alt, az, SUHAIL_VIEW);
+}
+function suhailScreen(t) { // where Suhail is on screen (film time = scene time: the scene starts at 0)
+  const [x, y] = suhailArt(t), c = SUHAIL_CAM(t);
+  return [c.sx + (x - c.px) * c.s, c.sy + (y - c.py) * c.s];
+}
 
 scene({
   id: 'suhail', night: true,
@@ -21,8 +33,7 @@ scene({
     this.stars = BRIGHT_STARS.map(([ra, dec, V, name, ar], i) => ({ ra, dec, V, name, ar, ph: (i * 2.399) % TAU }));
     this.suhail = this.stars.find(s => s.name === 'Canopus');
   },
-  // sky time for local time t: 01:00 → 01:27 UTC across the scene, easing into the rising
-  J(t) { return jdUTC(2026, 8, 24, (60 + 27 * easeInOut(clamp(t / (this.dur * (this.speed || 1)))) ) / 60); },
+  J(t) { return jdUTC(2026, 8, 24, suhailUTC(t)); },
   draw(t) {
     const J = this.J(t), [sra, sdec] = sunRaDec(J), sunAlt = altAz(sra, sdec, J)[0];
     // twilight: the sun is below the horizon in the east (off the left edge); its light grows as it climbs

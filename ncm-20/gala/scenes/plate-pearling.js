@@ -18,7 +18,6 @@ scene({
     };
     this.winds = [
       W8('SHAMAL', 'الشمال', (-3 * Math.PI) / 4, RED, 4.2, 330, 1183, 180, 'right'),
-      W8('NASHI', 'الناشي', -Math.PI / 4, SEPIA, 2.6, 310, 1672, 180, 'left'),
       W8('KAUS', 'الكوس', Math.PI / 4, BLUE, 2.6, 310, 1672, 690, 'left'),
       W8('SUHAILI', 'السهيلي', Math.PI / 2, OCHRE, 2.6, 290, 1456, 742, 'left'),
     ];
@@ -73,8 +72,8 @@ scene({
       stroke(w.path, p, w.col, w.lw, 0.85, [20, 12], lt * 36);
       if (p >= 1) arrowHead(w.end[0], w.end[1], w.ang, 18, w.col, 0.9, w.lw * 0.8);
       const lp = easeOut(prog(lt, t0 + 0.8, 0.7));
-      small(w.name, w.lx, w.ly, lp, { size: 17, ls: 5, align: w.align, a: 0.85, weight: 600 });
-      smallAr(w.ar, w.lx, w.ly + 32, lp, { size: 24, align: w.align, a: 0.75 });
+      smallAr(w.ar, w.lx, w.ly, lp, { size: 32, align: w.align, a: 0.88, weight: 700 });
+      small(w.name, w.lx, w.ly + 28, lp, { size: 17, ls: 4, align: w.align, a: 0.75, weight: 600 });
     });
     // the pearling sea
     stroke(this.surface, prog(lt, 0.6, 1.4), INK, 1.3, 0.65);

@@ -29,6 +29,9 @@ scene({
     this.dome = el(1430, 362, 58, 58, 0, TAU, 244, 0.4);
     this.geo = [el(1430, 362, 58, 20, Math.PI, TAU, 245, 0.2), el(1430, 346, 50, 13, Math.PI, TAU, 246, 0.2), ln(1430, 304, 1430, 420, 247, 0.2), ln(1400, 312, 1395, 414, 248, 0.2), ln(1460, 312, 1465, 414, 249, 0.2)];
     this.pole = ln(1085, 760, 1085, 540, 250, 0.4);
+    // the logbook: an open register lying on the desk, its first entry the year 2007
+    this.book = [new P([[1080, 868], [1166, 856], [1172, 916], [1086, 930]], true), new P([[1166, 856], [1252, 866], [1250, 928], [1172, 916]], true)];
+    this.bookRules = [0, 1, 2, 3, 4].map(k => ln(1182, 878 + k * 9, 1242, 886 + k * 9, 255 + k, 0.2));
   },
   draw(lt) {
     const { cx, cy, k } = this;
@@ -56,6 +59,12 @@ scene({
         stroke(e.outer, q, INK, 0.9, 0.5);
       });
     }
+    // the logbook
+    const bq = easeOut(prog(lt, 1.2, 1.0));
+    this.book.forEach(b => { mask(b); stroke(b, bq, INK, 1.4); });
+    this.bookRules.forEach((l, k) => stroke(l, prog(lt, 1.6 + k * 0.08, 0.4), INK, 0.7, 0.45));
+    const yq = easeOut(prog(lt, 2.4, 0.9));
+    if (yq > 0) { ctx.save(); ctx.translate(1122, 900); ctx.rotate(-0.14); note('2007', 0, 0, -9, 9, { size: 34, a: 0.8 * yq, align: 'center' }); ctx.restore(); }
     // radar tower and radome
     this.legs.forEach(l => stroke(l, easeOut(prog(lt, 0.8, 1.2)), INK, 2));
     stroke(this.brace, easeOut(prog(lt, 1.4, 1.2)), INK, 1.1, 0.8);
@@ -76,6 +85,5 @@ scene({
         disc(x, y, 9 * ap, j === 0 ? RED : INK, 0.85);
       }
     }
-    small('WIND', 1085, 790, prog(lt, 2.4, 0.6), { size: 13, ls: 4, align: 'center', a: 0.6 });
   },
 });

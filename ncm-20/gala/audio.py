@@ -204,13 +204,15 @@ def ney(m, dur, gain=1.0):
 
 
 def bell(m, dur=4.0, gain=1.0):
-    """an FM bell for the stars"""
+    """a celesta-like glint (harmonic partials, soft attack): for starlight and the drops; deliberately not a
+    church-bell timbre, which has no place in this film"""
     n = int(dur * SR)
     t = np.arange(n) / SR
     f = hz(m)
-    mod = np.sin(2 * np.pi * f * 3.5 * t) * 2.2 * np.exp(-t * 2.0)
-    s = np.sin(2 * np.pi * f * t + mod) * np.exp(-t * 1.1) + 0.3 * np.sin(2 * np.pi * f * 2.76 * t) * np.exp(-t * 2.4)
-    return s * 0.25 * gain
+    s = (np.sin(2 * np.pi * f * t) * np.exp(-t * 1.6) + 0.35 * np.sin(2 * np.pi * 2 * f * t) * np.exp(-t * 3.2)
+         + 0.12 * np.sin(2 * np.pi * 4 * f * t) * np.exp(-t * 6.0))
+    att = np.minimum(1, t / 0.004)
+    return s * att * 0.22 * gain
 
 
 def daf(gain=1.0, jingle=True):

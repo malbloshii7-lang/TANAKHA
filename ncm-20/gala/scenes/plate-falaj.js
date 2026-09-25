@@ -82,9 +82,10 @@ scene({
     hatch(this.hafeetFill, [1440, 436, 1880, HZ], -1.25, 8, fq, SEPIA, 0.8, 0.24, 249); stroke(this.hafeet, fq, INK, 1.3, 0.7);
     this.strata.forEach(q => stroke(q, fq, INK, 0.7, 0.3));
     const jl = easeOut(prog(lt, 3.0, 0.8));
-    small('HAJAR MOUNTAINS', 1164, 472, jl, { size: 11, ls: 3, align: 'center', a: 0.6 });
-    small('JEBEL HAFEET', 1590, 426, jl, { size: 12, ls: 3, align: 'center', a: 0.75 });
-    smallAr('جبل حفيت', 1590, 406, jl, { size: 20, align: 'center', a: 0.7 });
+    smallAr('جبال الحجر', 1164, 462, jl, { size: 26, align: 'center', a: 0.7, weight: 600 });
+    small('HAJAR MOUNTAINS', 1164, 486, jl, { size: 15, ls: 3, align: 'center', a: 0.6, weight: 600 });
+    smallAr('جبل حفيت', 1590, 404, jl, { size: 30, align: 'center', a: 0.8, weight: 700 });
+    small('JEBEL HAFEET', 1590, 428, jl, { size: 16, ls: 3, align: 'center', a: 0.7, weight: 600 });
     // the ground in section, the water table and the wet alluvium below it
     const p0 = easeInOut(prog(lt, 0.3, 1.8));
     mask(this.ground);
@@ -92,7 +93,6 @@ scene({
     hatch(this.ground, [985, 580, 1885, 900], 0.9, 16, prog(lt, 1.0, 2.2), INK, 0.9, 0.16, 197);
     stroke(this.surface, p0, INK, 2);
     stroke(this.watertable, easeInOut(prog(lt, 1.6, 1.4)), BLUE, 1.4, 0.6, [10, 7], 0);
-    back('WATER TABLE', 992, 686, 'left', prog(lt, 2.6, 0.6), 11, 3); small('WATER TABLE', 992, 686, prog(lt, 2.6, 0.6), { size: 11, ls: 3, a: 0.55, col: BLUE });
     // the gallery and its shafts
     const gq = easeInOut(prog(lt, 2.0, 1.6));
     mask(this.galCut); stroke(this.galFloor, gq, INK, 1.4, 0.85); stroke(this.galRoof, gq, INK, 1.4, 0.85); stroke(this.galEnd, gq, INK, 1.2, 0.8);
@@ -117,7 +117,6 @@ scene({
     this.sideCh.forEach(q => stroke(q, easeOut(prog(lt, 5.8, 0.6)), BLUE, 1.6, 0.7));
     this.cereal.forEach((q, i) => stroke(q, easeOut(prog(lt, 6.0 + (i % 6) * 0.05, 0.5)), OCHRE, 1.2, 0.8));
     const lq = easeOut(prog(lt, 4.4, 0.8));
-    [['GALLERY', 1236, 728], ['CUT-AND-COVER', 1420, 752], ['OPEN CHANNEL', 1560, 776]].forEach(([t, x, y]) => { back(t, x, y, 'left', lq, 11, 3); small(t, x, y, lq, { size: 11, ls: 3, a: 0.65 }); });
     this.palms.forEach((p, i) => {
       const q = easeOut(prog(lt, 5.8 + i * 0.3, 1.0));
       stroke(p.trunk, q, INK, 3 * p.s, 0.9);

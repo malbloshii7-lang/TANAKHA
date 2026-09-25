@@ -41,9 +41,6 @@ scene({
     this.dome = el(1004, 942, 13, 13, Math.PI, TAU, 634, 0.1);
   },
   draw(lt) {
-    small('PYRANOMETER', 988, 1030, prog(lt, 3.4, 0.6), { size: 12, ls: 3, a: 0.65 });
-    small('ANEMOMETER', 1196, 1030, prog(lt, 3.6, 0.6), { size: 12, ls: 3, a: 0.65, align: 'center' });
-    small('SHAMS 1 · MADINAT ZAYED', 1660, 500, prog(lt, 3.0, 0.6), { size: 12, ls: 3, a: 0.7, align: 'center' });
     const HY = this.HY;
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
     stroke(this.arc, easeInOut(prog(lt, 0.4, 1.6)), INK, 1.2, 0.55, [4, 9], 0);

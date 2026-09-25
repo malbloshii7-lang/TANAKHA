@@ -1,5 +1,6 @@
 'use strict';
-// X · Al Istimtar — seeding the cloud, then rain
+// X · Al Istimtar — seeding the cloud over the Hajar in Ras Al Khaimah: the aircraft level under the cloud base, salt
+// plumes rising into it, droplets gathering, then rain on the foothills
 scene({
   id: 'seeding', // plate carried over from the v3 film (drawing only; words, timing and camera come from timeline.js)
   start: 78, dur: 8, speed: 11 / 8, num: 'X', name: 'AL ISTIMTAR', ar: 'الاستمطار', readout: '311 MISSIONS · 2022',
@@ -14,8 +15,14 @@ scene({
     // a solid band along the base, so the lobes do not leave notches where they meet
     this.band = new P([[1117, 468], [1700, 468], [1764, 480], [1744, 507], [1138, 507]], true);
     this.bandEnds = [new P(quad([1117, 468], [1126, 492], [1140, 505], 8)), new P(quad([1764, 480], [1756, 496], [1742, 505], 8))];
-    this.ground = pl([[985, 958], [1100, 946], [1230, 960], [1380, 944], [1540, 962], [1700, 948], [1885, 960]], false, 271, 0.8);
-    this.groundFill = new P([[985, 958], [1100, 946], [1230, 960], [1380, 944], [1540, 962], [1700, 948], [1885, 960], [1885, 1006], [985, 1006]], true);
+    // the ground: the real skyline of the Hajar in Ras Al Khaimah, seen from the plain at 25.78 N, 56.02 E looking east
+    // (bearings 50-100 deg across the plate, 18 px a degree both ways, so heights are true to the angles). Computed by
+    // data/build/rak_skyline.py from SRTM-derived terrain tiles, counting only ground inside the UAE outline, so the
+    // aircraft works over UAE territory; the highest point in view is 6.3 deg up, a ridge 11.7 km away.
+    this.terrain = [[985, 940]].concat([[985,873.2],[992,872.4],[999,871.2],[1007,870.4],[1014,869.6],[1021,867.2],[1028,861.0],[1035,858.3],[1043,858.8],[1050,860.5],[1057,861.1],[1064,859.9],[1071,858.8],[1079,859.4],[1086,860.5],[1093,862.5],[1100,863.6],[1107,861.6],[1115,862.1],[1122,862.2],[1129,867.9],[1136,872.1],[1143,877.1],[1151,875.4],[1158,875.4],[1165,871.6],[1172,871.7],[1179,874.2],[1187,875.1],[1194,879.0],[1201,877.6],[1208,882.5],[1215,883.9],[1223,885.8],[1230,887.5],[1237,889.2],[1244,890.2],[1251,891.2],[1259,892.4],[1266,890.9],[1273,890.6],[1280,890.1],[1287,889.1],[1295,886.5],[1302,885.4],[1309,886.1],[1316,885.5],[1323,886.3],[1331,884.7],[1338,885.0],[1345,885.9],[1352,885.1],[1359,883.4],[1367,881.0],[1374,879.7],[1381,878.3],[1388,877.4],[1395,876.7],[1403,874.7],[1410,873.6],[1417,873.0],[1424,872.5],[1431,872.8],[1439,873.4],[1446,874.0],[1453,873.6],[1460,874.4],[1467,874.0],[1475,871.6],[1482,870.0],[1489,867.9],[1496,865.9],[1503,863.5],[1511,861.8],[1518,862.7],[1525,864.2],[1532,864.5],[1539,863.0],[1547,861.7],[1554,858.1],[1561,856.3],[1568,856.6],[1575,859.1],[1583,854.5],[1590,853.3],[1597,852.1],[1604,852.3],[1611,852.5],[1619,852.5],[1626,851.5],[1633,848.9],[1640,846.4],[1647,843.2],[1655,841.7],[1662,839.9],[1669,837.5],[1676,833.4],[1683,830.6],[1691,829.5],[1698,826.6],[1705,828.1],[1712,829.0],[1719,828.5],[1727,828.8],[1734,831.6],[1741,834.6],[1748,835.0],[1755,836.2],[1763,838.2],[1770,844.7],[1777,848.2],[1784,853.2],[1791,854.0],[1799,856.5],[1806,857.7],[1813,859.3],[1820,860.4],[1827,861.5],[1835,862.8],[1842,862.9],[1849,864.4],[1856,865.2],[1863,865.2],[1871,866.1],[1878,864.4],[1885,862.3]], [[1885, 940]]);
+    this.ground = pl(this.terrain.slice(1, -1), false, 271, 0.5); // the ridge line only: the plate's edges cut the view, no cliffs
+    this.groundFill = new P(this.terrain.concat([[1885, 1006], [985, 1006]]), true);
+    this.hero = [1450, 489]; // the droplet the next plate opens from
     // aircraft, local coordinates (nose to the right)
     this.fuse = el(0, 0, 70, 10, 0, TAU, 272, 0.2);
     this.wing = new P([[-6, -3], [18, -3], [0, 44], [-16, 44]], true);
@@ -30,7 +37,7 @@ scene({
   planeX(lt) { return lerp(930, 1910, prog(lt, 1.4, 6.2)); },
   draw(lt) {
     // ground
-    hatch(this.groundFill, [985, 940, 1885, 1012], 0.5, 9, prog(lt, 1.0, 1.6), OCHRE, 1.2, 0.5, 273);
+    mask(this.groundFill); hatch(this.groundFill, [985, 780, 1885, 1012], -1.2, 8, prog(lt, 1.0, 1.6), SEPIA, 0.9, 0.3, 273);
     stroke(this.ground, easeInOut(prog(lt, 0.6, 1.6)), INK, 1.8);
     // the cloud: outlines, then paper over the inside, then shading below
     const cp = easeInOut(prog(lt, 0.3, 2.2));
@@ -47,6 +54,8 @@ scene({
       const x = 1150 + r() * 600, y = 470 + r() * 28, q = easeOut(prog(lt, 4.2 + r() * 1.6, 0.8));
       disc(x, y, (2 + r() * 3) * q, BLUE, 0.7);
     }
+    const hq = easeOut(prog(lt, 6.2, 0.8));
+    if (hq > 0) { disc(this.hero[0], this.hero[1], 3 + 5 * hq, BLUE, 0.85); stroke(el(this.hero[0], this.hero[1], 8 + 6 * hq, 8 + 6 * hq, 0, TAU, 279, 0), hq, GOLD, 1.4, 0.8); }
     // hygroscopic flares burn at the wing racks and leave a pale plume of salt particles that the updraft
     // carries into the cloud base: drawn as soft, spreading smoke, never as sparks
     this.flares.forEach(f => {
@@ -73,7 +82,7 @@ scene({
       const q = prog(lt, d.on, 0.6);
       if (q <= 0) return;
       const span = 440, y = 512 + ((d.ph * span + (lt - d.on) * d.v) % span), x = d.x - (y - 512) * 0.06;
-      if (y > 950) return;
+      if (y > yOn(this.terrain, x) - 2) return;
       ctx.globalAlpha = SA * d.a * q;
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + d.len * 0.06, y - d.len); ctx.stroke();
     });

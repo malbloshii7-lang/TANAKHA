@@ -13,6 +13,7 @@ const SCALE = Number(new URLSearchParams(location.search).get('scale')) || 1; //
 // ?grade=led: the LED-wall grade for a dark hall. Parchment at about two-thirds of the web grade's luminance
 // with a deeper vignette, so the page does not glare into the front rows. A starting point for calibration.
 const GRADE = new URLSearchParams(location.search).get('grade') || 'web';
+const OPT = (q => ({ vo: q.has('vo'), tc: q.has('tc'), fadeout: Number(q.get('fadeout') || 0) }))(new URLSearchParams(location.search));
 // Two themes: ink on parchment by day; light on a dark sky by night. Helpers read these at call time.
 const DAY = { INK: '#1D1813', RED: '#B3391D', BLUE: '#28478C', OCHRE: '#C9973B', SEPIA: '#6E6253', BLEND: 'multiply' };
 const NIGHT = { INK: '#F1E4C8', RED: '#F08A63', BLUE: '#9DB9EE', OCHRE: '#F3C862', SEPIA: '#B9AC98', BLEND: 'screen' };
@@ -354,8 +355,9 @@ function wordsBlock(s, lt) {
   if (wA > maxW) arSize = Math.floor(arSize * maxW / wA);
   if (wE > maxW) enSize = Math.floor(enSize * maxW / wE);
   let y = T.top ?? 330;
-  if (T.kAr) { smallAr(T.kAr, x, y, easeOut(prog(lt, t0, 0.8)) * out, { size: 28, align, a: 0.78 }); y += 34; }
-  if (T.kEn) { small(T.kEn, x, y, easeOut(prog(lt, t0 + 0.15, 0.8)) * out, { size: 14, ls: 5, align, a: 0.62 }); y += 26; }
+  // kickers: the place, date or source line, sized to be read from the back of a hall (≥30 px Arabic)
+  if (T.kAr) { smallAr(T.kAr, x, y, easeOut(prog(lt, t0, 0.8)) * out, { size: 30, align, a: 0.8 }); y += 36; }
+  if (T.kEn) { small(T.kEn, x, y, easeOut(prog(lt, t0 + 0.15, 0.8)) * out, { size: 16, ls: 4, align, a: 0.66, weight: 600 }); y += 28; }
   y += arSize * 0.95;
   (T.ar || []).forEach((l, i) => { arLine(l, x, y, t0 + 0.35 + i * 0.45, lt, { size: arSize, align, out, col: T.arCol && T.arCol[i] }); y += arSize * 1.32; });
   y += enSize * 0.35 - arSize * 0.2;
@@ -363,12 +365,42 @@ function wordsBlock(s, lt) {
   (T.en || []).forEach((l, i) => { enLine(l, x, y, tE + i * 0.18, lt, { size: enSize, align, out, col: T.enCol && T.enCol[i] }); y += enSize * 1.22; });
   return y;
 }
-// A small eight-pointed star: the film's ornament (rub el hizb shape).
+// Film-time text (the treatment's §7 gives every line an in and out time in film seconds).
+// Level A echoes the narrator (large); Level B is a label (place, date, source). Both are right-aligned in the
+// words column by default. f is the film time; lines may be arrays.
+const textIn = (f, tin, tout, fi = 0.5, fo = 0.35) => easeOut(prog(f, tin, fi)) * clamp((tout - f) / fo);
+// Every words block can be recorded with its film times (TEXT_REC), so the subtitle files come from the build itself.
+let TEXT_REC = null;
+const recText = (level, tin, tout, ar, en) => { if (TEXT_REC) TEXT_REC.push({ level, tin, tout, ar: [].concat(ar || []), en: [].concat(en || []) }); };
+function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20 } = {}) {
+  recText('B', tin, tout, ar, en);
+  const q = textIn(f, tin, tout), q2 = textIn(f, tin + 0.15, tout);
+  const A = [].concat(ar || []), E = [].concat(en || []);
+  A.forEach((l, i) => smallAr(l, x, y + i * arSize * 1.32, q, { size: arSize, align, a: 0.85, weight: 600 }));
+  let ye = y + (A.length - 1) * arSize * 1.32 + enSize * 1.55;
+  E.forEach((l, i) => small(l, x, ye + i * enSize * 1.5, q2, { size: enSize, ls: 2, align, a: 0.7, weight: 600 }));
+  return ye + (E.length - 1) * enSize * 1.5;
+}
+function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSize = 84, enSize = 34, font = F_KUFI } = {}) {
+  recText('A', tin, tout, ar, en);
+  const out = clamp((tout - f) / 0.35), A = [].concat(ar || []), E = [].concat(en || []);
+  A.forEach((l, i) => arLine(l, x, y + i * arSize * 1.3, tin + i * 0.3, f, { size: arSize, align, out, font }));
+  let ye = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.22;
+  E.forEach((l, i) => enLine(l, x, ye + i * enSize * 1.25, tin + 0.3 + A.length * 0.3 + i * 0.15, f, { size: enSize, align, out }));
+  return ye + (E.length - 1) * enSize * 1.25;
+}
+// The film's ornament is a compass star (long points on the cardinals, short on the diagonals): the navigator's star.
+// Never a blunt eight-pointed star, whose outline is two overlapping squares, the Quran's hizb marker.
+function compassStar(x, y, r) {
+  const pts = [];
+  for (let i = 0; i < 16; i++) { const a = -Math.PI / 2 + i * Math.PI / 8, k = i % 2 ? 0.3 : (i % 4 ? 0.6 : 1); pts.push([x + r * k * Math.cos(a), y + r * k * Math.sin(a)]); }
+  return new P(pts, true);
+}
 function ornament(x, y, r, p, col = null, a = 0.9) {
   if (p <= 0) return;
-  const q = easeOut(p);
-  fill(starP(x, y, r * q, r * 0.72 * q, 8, -Math.PI / 2), col || GOLD, a);
-  stroke(starP(x, y, r * q, r * 0.72 * q, 8, -Math.PI / 2), 1, INK, 1, 0.6);
+  const q = easeOut(p), s = compassStar(x, y, r * 1.25 * q);
+  fill(s, col || GOLD, a);
+  stroke(s, 1, INK, 1, 0.6);
 }
 function ruleWithStar(cx, y, half, p, a = 0.7) {
   if (p <= 0) return;
@@ -377,26 +409,37 @@ function ruleWithStar(cx, y, half, p, a = 0.7) {
   stroke(new P([[cx + 22, y], [cx + 22 + half * q, y]]), 1, INK, 1.2, a);
   ornament(cx, y, 11, p);
 }
-// A leadership quote, set centred: Arabic original first, the English rendering under it, then the credit.
-// q = { ar: [lines], en: [lines], whoAr, whoEn, whatAr, whatEn } — every field exactly as verified.
-function quoteCard(q, s, lt, { cy = 470, arSize = 58, enSize = 27, t0 = 0.3 } = {}) {
+// A leadership card, set centred: Arabic first, the English under it, then the credit. q = { ar, en, whoAr?, titleAr?,
+// whatAr, whoEn?, titleEn?, whatEn, kickerAr?, kickerEn?, reported? } — every field exactly as verified. A `reported`
+// card carries the agency's reported speech: no quotation marks, and the English is set upright, not as a quotation.
+function quoteCard(q, s, lt, { cy = 480, arSize = 54, enSize = 27, t0 = 0.3 } = {}) {
   const out = wordsOut(s, 0.5), cx = W / 2;
   t0 = wordsIn(s, t0);
-  const nA = q.ar.length, nE = q.en.length, blockH = nA * arSize * 1.55 + 40 + nE * enSize * 1.5 + 118;
+  const nA = q.ar.length, nE = q.en.length;
+  if (TEXT_REC) recText('card', s.start + t0, s.start + s.dur - 0.5, [q.kickerAr, ...q.ar, q.whoAr, q.titleAr, q.whatAr].filter(Boolean), [q.kickerEn, ...q.en, q.whoEn, q.titleEn, q.whatEn].filter(Boolean));
+  const credit = (q.whoAr ? 40 : 0) + (q.titleAr ? 36 : 0) + 38 + (q.whoEn ? 28 : 0) + (q.titleEn ? 26 : 0) + 24;
+  const blockH = 34 + nA * arSize * 1.55 + 10 + nE * enSize * 1.5 + 30 + credit + 40;
   let y = cy - blockH / 2;
+  if (q.kickerAr) {
+    const kq = easeOut(prog(lt, t0, 0.8)) * out;
+    smallAr(q.kickerAr, cx, y - 58, kq, { size: 30, align: 'center', a: 0.78 });
+    small(q.kickerEn, cx, y - 26, kq, { size: 16, ls: 4, align: 'center', a: 0.6, weight: 600 });
+  }
   ruleWithStar(cx, y, 230, prog(lt, t0, 1.0) * out);
   y += 34 + arSize;
   q.ar.forEach((l, i) => { arLine(l, cx, y, t0 + 0.4 + i * 0.7, lt, { size: arSize, align: 'center', font: F_NASKH, weight: 700, out, dur: 1.5 }); y += arSize * 1.55; });
-  y += 10;
+  y += 10 - arSize * 0.35;
   const tE = t0 + 0.9 + nA * 0.7;
-  q.en.forEach((l, i) => { enLine(l, cx, y, tE + i * 0.2, lt, { size: enSize, align: 'center', font: F_FELL, weight: 400, ls: 0, italic: true, a: 0.8, out }); y += enSize * 1.5; });
+  q.en.forEach((l, i) => { enLine(l, cx, y, tE + i * 0.2, lt, { size: enSize, align: 'center', font: F_FELL, weight: 400, ls: 0, italic: !q.reported, a: 0.82, out }); y += enSize * 1.5; });
   y += 30;
-  const tC = tE + 0.5 + nE * 0.2;
-  smallAr(q.whoAr, cx, y, easeOut(prog(lt, tC, 0.8)) * out, { size: 27, align: 'center', a: 0.85, weight: 700 });
-  if (q.whatAr) smallAr(q.whatAr, cx, y + 34, easeOut(prog(lt, tC + 0.15, 0.8)) * out, { size: 21, align: 'center', a: 0.66 });
-  small(q.whoEn, cx, y + 70, easeOut(prog(lt, tC + 0.3, 0.8)) * out, { size: 14, ls: 4, align: 'center', a: 0.7 });
-  if (q.whatEn) small(q.whatEn, cx, y + 94, easeOut(prog(lt, tC + 0.4, 0.8)) * out, { size: 12, ls: 3, align: 'center', a: 0.55 });
-  ruleWithStar(cx, y + 124, 230, prog(lt, tC + 0.4, 1.0) * out);
+  const tC = tE + 0.5 + nE * 0.2, c = k => easeOut(prog(lt, tC + k * 0.15, 0.8)) * out;
+  if (q.whoAr) { smallAr(q.whoAr, cx, y, c(0), { size: 30, align: 'center', a: 0.9, weight: 700 }); y += 40; }
+  if (q.titleAr) { smallAr(q.titleAr, cx, y, c(1), { size: 26, align: 'center', a: 0.76 }); y += 36; }
+  smallAr(q.whatAr, cx, y, c(2), { size: 26, align: 'center', a: 0.7 }); y += 38;
+  if (q.whoEn) { small(q.whoEn, cx, y, c(3), { size: 18, ls: 3, align: 'center', a: 0.76, weight: 600 }); y += 28; }
+  if (q.titleEn) { small(q.titleEn, cx, y, c(4), { size: 15, ls: 2, align: 'center', a: 0.62, weight: 600 }); y += 26; }
+  small(q.whatEn, cx, y, c(5), { size: 15, ls: 2, align: 'center', a: 0.6, weight: 600 });
+  ruleWithStar(cx, y + 34, 230, prog(lt, tC + 0.6, 1.0) * out);
 }
 
 /* ---------- camera: art point (px, py) sits at screen (sx, sy), magnified s times ---------- */
@@ -411,6 +454,27 @@ function camPath(keys, t) {
   }
   return keys[keys.length - 1];
 }
+// Circle lock: the incoming plate enters with its own circle (art centre px, py, radius r) exactly where the
+// outgoing circle was on screen (sx, sy, radius R), then settles into the standard plate framing. Every lock uses
+// this, so the turning circles hand over the film from one plate to the next.
+// Times are on the scene clock; `off` is the scene's offset, so the lock always happens at the cut.
+function lockCam(from, to, { settle = 2.6, dur = 11, s1 = 1.0, s2 = 1.06, px = 1435, py = 585, off = 0, then = null } = {}) {
+  const f = typeof from === 'function' ? from : () => from; // `from` may be computed lazily (it can depend on another scene)
+  return t => {
+    const a = f(), keys = [{ t: 0, s: a.R / to.r, px: to.px, py: to.py, sx: a.sx, sy: a.sy }, { t: settle, s: s1, px, py, sx: 560, sy: 560 }];
+    keys.push(...(then || [{ t: dur, s: s2, px, py, sx: 560, sy: 560 }]));
+    return camPath(keys, t - off);
+  };
+}
+// Where a plate's circle sits on screen at scene-clock time t under the standard framing.
+function plateCircle(art, t, dur = 11, s1 = 1.0, s2 = 1.06) {
+  const c = camPath([{ t: 0, s: s1, px: 1435, py: 585, sx: 560, sy: 560 }, { t: dur, s: s2, px: 1435, py: 585, sx: 560, sy: 560 }], t);
+  return { sx: c.sx + (art.px - c.px) * c.s, sy: c.sy + (art.py - c.py) * c.s, R: art.r * c.s };
+}
+const CIRCLES = { // the turning circles of the plates, in art coordinates
+  durour: { px: 1420, py: 575, r: 382 }, monsoon: { px: 1575, py: 408, r: 268 }, pearling: { px: 1430, py: 430, r: 182 },
+  world: { px: 1430, py: 560, r: 318 },
+};
 // The standard move for a re-used v3 plate (drawn in x 985–1885): the art moves into the left half of the
 // frame, so the words can take the right, and the camera eases slowly in over the scene.
 const PLATE_LEFT = (s0 = 1.0, s1 = 1.06, dur = 8, px = 1435, py = 585) => t => camPath([{ t: 0, s: s0, px, py, sx: 560, sy: 560 }, { t: dur, s: s1, px, py, sx: 560, sy: 560 }], t);
@@ -498,7 +562,7 @@ function light(t, night) {
 /* ---------- the timeline: scenes, their dissolves, and one frame ---------- */
 // Per scene: start, dur, speed (local time rate), night (dark theme), xf (length of the dissolve INTO it),
 // enter: { type: 'fade' | 'dawn' | 'iris', x, y }, cam(t) → camera, draw(t, realT) → art, words(t, realT) → text.
-let XF = 0.5, DURATION = 0, FADE_IN = 1.4, FADE_OUT = 2.2;
+let XF = 0.5, DURATION = 0, FADE_IN = 2.0, FADE_OUT = OPT.fadeout; // the film ends on the hold loop's first frame unless ?fadeout=s
 function visible(t) {
   const out = [];
   SCENES.forEach((s, i) => {
@@ -510,13 +574,18 @@ function visible(t) {
 }
 function drawScene(s, lt) {
   setTheme(!!s.night);
-  const sl = (s.offset || 0) + lt * (s.speed || 1); // offset: a plate can enter part-drawn instead of being sped up
+  const off = s.offset || 0, sl = off + lt * (s.speed || 1); // offset: a plate can enter part-drawn instead of being sped up
   ctx.save();
   if (s.cam) camera(s.cam(sl, lt));
   s.draw(sl, lt);
   ctx.restore();
-  if (s.words) { ctx.save(); s.words(sl, lt); ctx.restore(); }
-  else if (s.text) { ctx.save(); wordsBlock(s, sl); ctx.restore(); }
+  if (s.tint) { // a wash over the plate (not the words): the April sky greying and clearing
+    const a = s.tint(s.start + lt);
+    if (a > 0) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(150,156,168,${a.toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+  }
+  // words run on the scene clock measured from the cut (no offset), so they never arrive inside a dissolve
+  if (s.words) { ctx.save(); s.words(sl - off, lt); ctx.restore(); }
+  else if (s.text) { ctx.save(); wordsBlock(s, sl - off); ctx.restore(); }
 }
 function sheet(s) { return s && s.night ? NIGHT_CV : PAPER_CV; }
 function composite(v) {
@@ -577,6 +646,7 @@ function render(t) {
   SA = 1;
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
   setTheme(night > 0.5);
+  if (typeof RING !== 'undefined') drawRing(t);
   if (CHROME.corners) corners(1);
   if (CHROME.mark) small('NCM · XX', W - 78, 72, 1, { size: 18, ls: 8, align: 'right', weight: 600, a: 0.85 });
   light(t, night);
@@ -590,6 +660,41 @@ function render(t) {
   }
   const dark = Math.max(fadeIn, fadeOut);
   if (dark > 0) { ctx.fillStyle = `rgba(6,7,12,${dark})`; ctx.fillRect(0, 0, W, H); }
+  if (OPT.vo && typeof VO !== 'undefined') voSubs(t);
+  if (OPT.tc) timecode(t);
+}
+// The persistent gold ring (the film's device where no plate has a circle of its own). RING is a list of film-time
+// keys { t, x, y, r, a, p } (p: how much of the circle is drawn); x and y may be functions of t. Drawn on the main canvas
+// after compositing, so it never dissolves or ghosts.
+function drawRing(t) {
+  if (!RING.length || t < RING[0].t || t > RING[RING.length - 1].t) return;
+  let i = 1; while (i < RING.length - 1 && RING[i].t < t) i++;
+  const a = RING[i - 1], b = RING[i], u = easeInOut(clamp((t - a.t) / (b.t - a.t || 1)));
+  const v = k => { const va = typeof a[k] === 'function' ? a[k](t) : a[k], vb = typeof b[k] === 'function' ? b[k](t) : b[k]; return lerp(va, vb, u); };
+  const x = v('x'), y = v('y'), r = v('r'), al = v('a'), p = v('p');
+  if (al <= 0.01 || r <= 0 || p <= 0) return;
+  ctx.save(); ctx.globalCompositeOperation = IS_NIGHT ? 'screen' : 'multiply';
+  stroke(el(x, y, r, r, -Math.PI / 2, -Math.PI / 2 + TAU * p, 990, 0), 1, GOLD, 1.8, 0.85 * al);
+  ctx.restore();
+}
+// The review animatic shows the narration as subtitles until the narrator is recorded (?vo). VO: [{ in, out, ar, en }].
+function voSubs(t) {
+  const v = VO.find(l => t >= l.in - 0.1 && t <= l.out + 0.4);
+  if (!v) return;
+  const q = clamp((t - v.in + 0.1) / 0.25) * clamp((v.out + 0.4 - t) / 0.3);
+  ctx.save(); ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  ctx.globalAlpha = 0.55 * q; ctx.fillStyle = '#0B0C10'; ctx.fillRect(0, H - 128, W, 128);
+  ctx.globalAlpha = q; ctx.fillStyle = '#F3EAD6'; ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.font = `600 34px ${F_KUFI}`;
+  ctx.fillText(v.ar, W / 2, H - 76);
+  ctx.direction = 'ltr'; ctx.font = `italic 400 25px ${F_FELL}`; ctx.fillStyle = '#D9CFBA'; ctx.fillText(v.en, W / 2, H - 34);
+  ctx.globalAlpha = 0.5 * q; ctx.font = `600 12px ${F_MONO}`; ctx.letterSpacing = '3px'; ctx.textAlign = 'left'; ctx.fillText('NARRATION · SCRATCH SUBTITLE', 40, H - 108);
+  ctx.restore();
+}
+// Burned-in timecode for the show-caller's reference copy (?tc), at 25 fps SMPTE.
+function timecode(t) {
+  const fr = Math.floor(t * 25 + 1e-6), tc = [Math.floor(fr / 90000), Math.floor(fr / 1500) % 60, Math.floor(fr / 25) % 60, fr % 25].map(n => String(n).padStart(2, '0')).join(':');
+  ctx.save(); ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0); ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W / 2 - 150, 14, 300, 40);
+  ctx.fillStyle = '#FFFFFF'; ctx.font = `600 26px ${F_MONO}`; ctx.letterSpacing = '2px'; ctx.textAlign = 'center'; ctx.fillText(tc, W / 2, 44); ctx.restore();
 }
 
 /* ---------- boot ---------- */
@@ -598,6 +703,9 @@ async function boot() {
   const arFonts = ['700 60px "Reem Kufi"', '500 24px "Reem Kufi"', '400 30px "Aref Ruqaa"', '400 40px "Amiri"', '700 40px "Amiri"', '400 40px "Noto Kufi Arabic"', '600 40px "Noto Kufi Arabic"', '700 40px "Noto Kufi Arabic"'];
   await Promise.all(fonts.map(f => document.fonts.load(f, 'AZ az 09 ·')).concat(arFonts.map(f => document.fonts.load(f, 'السماء عربي ٢٠'))));
   await document.fonts.ready;
+  // never render with a fallback face: a missing font stops the render (render.js exits on the page error)
+  const missing = fonts.filter(f => !document.fonts.check(f, 'AZ az 09')).concat(arFonts.filter(f => !document.fonts.check(f, 'السماء')));
+  if (missing.length) throw new Error('fonts failed to load: ' + missing.join(', '));
   LAYER_CV = document.createElement('canvas'); LAYER_CV.width = W * SCALE; LAYER_CV.height = H * SCALE; LAYER = LAYER_CV.getContext('2d');
   TXT_CV = document.createElement('canvas'); TXT_CV.width = W * SCALE; TXT_CV.height = H * SCALE; TXT = TXT_CV.getContext('2d');
   PAPER_CV = makePaper(); NIGHT_CV = makeNight(); SPECKLE_CV = makeSpeckle();
