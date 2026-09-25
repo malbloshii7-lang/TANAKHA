@@ -3,7 +3,7 @@
 //   node render.js preview <out-prefix> <seconds...> [--scale 2]          PNG stills at those times
 //   node render.js film <out.mp4> [score.wav] [--scale 2] [--jobs 3]       every frame at 30 fps → H.264 (+ AAC)
 //   node render.js cues <cues.json>                                        the timeline, for score.py and subtitles
-//        [--from S] [--to S] [--crf 16] [--fps 50] [--grade led]          a time range; 50 fps for 50 Hz broadcast cameras; the LED-wall grade
+//        [--from S] [--to S] [--afrom S] [--crf 16] [--fps 50] [--grade led]   a time range (--afrom 0 when the audio file starts there); 50 fps; the LED-wall grade
 //
 // --scale 2 renders a 3840×2160 master. --jobs N renders N contiguous chunks in parallel pages and joins
 // them without re-encoding. Needs Playwright (NODE_PATH may point at a global install) and an ffmpeg with
@@ -16,7 +16,7 @@ const path = require('path');
 const argv = process.argv.slice(2);
 const opt = (name, dflt) => { const i = argv.indexOf('--' + name); if (i < 0) return dflt; const v = argv[i + 1]; argv.splice(i, 2); return v; };
 const FPS = Number(opt('fps', 30)), SCALE = Number(opt('scale', 1)), JOBS = Number(opt('jobs', 1)), CRF = String(opt('crf', SCALE > 1 ? 18 : 16));
-const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web');
+const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: film time where the audio file starts (default --from); 0 for part2.wav
 const FF = process.env.FFMPEG || 'ffmpeg';
 const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res, rej) => { const p = spawn(FF, args, { stdio }); p.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))); });
 
@@ -84,7 +84,7 @@ async function openPage(browser) {
   const list = `${out}.parts.txt`;
   fs.writeFileSync(list, parts.map(p => `file '${path.resolve(p.file)}'`).join('\n') + '\n');
   const args = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list];
-  if (audio) args.push('-ss', String(f0 / FPS), '-i', audio);
+  if (audio) args.push('-ss', String(AFROM != null ? Number(AFROM) : f0 / FPS), '-i', audio);
   args.push('-map', '0:v');
   if (audio) args.push('-map', '1:a', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest');
   args.push('-c:v', 'copy', '-movflags', '+faststart', out);

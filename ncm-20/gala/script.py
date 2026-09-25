@@ -11,12 +11,15 @@ import json
 import re
 import sys
 
-ISO = re.compile('[⁦-⁩]')
+ISO = re.compile('⁦(.*?)⁩', re.S)
 LEVEL = {'A': 'A (headline)', 'B': 'B (label)', 'card': 'Card', 'title': 'Title', 'lockup': 'Lockup'}
 
 
-def clean(s):
-    return ISO.sub('', s).replace('|', '\\|')
+def clean(s, arabic=False):
+    # number runs inside Arabic keep their protection as LRM pairs (Markdown viewers show isolates badly); Arabic cells
+    # open with RLM, so a cell that begins with a number is still laid out right to left
+    s = ISO.sub(lambda m: '\u200e' + m.group(1) + '\u200e', s).replace('|', '\\|')
+    return ('\u200f' + s) if arabic else s
 
 
 def mmss(t):
@@ -43,12 +46,12 @@ def main(cues_path, out):
          'except where one prevents a misreading. Leaders\' words appear on cards only and are never voiced.', '',
          '## Narration (voice-over)', '', '| ID | Beat | In–out | Arabic (narrator\'s copy) | English |', '|---|---|---|---|---|']
     for v in cues.get('vo', []):
-        L.append(f"| {v['id']} | {which(v['in'])} | {mmss(v['in'])}–{mmss(v['out'])} | {clean(v['ar'])} | {clean(v['en'])} |")
+        L.append(f"| {v['id']} | {which(v['in'])} | {mmss(v['in'])}–{mmss(v['out'])} | {clean(v['ar'], True)} | {clean(v['en'])} |")
     L += ['', '## On screen', '', '| Beat | In–out | Level | Arabic | English |', '|---|---|---|---|---|']
     for t in sorted((t for t in cues.get('text', []) if 'tin' in t), key=lambda t: t['tin']):
         tout = min(t['tout'], cues['duration'])
         L.append(f"| {which(t['tin'])} | {mmss(t['tin'])}–{mmss(tout)} | {LEVEL.get(t['level'], t['level'])} | "
-                 f"{'<br>'.join(clean(x) for x in t['ar'])} | {'<br>'.join(clean(x) for x in t['en'])} |")
+                 f"{'<br>'.join(clean(x, True) for x in t['ar'])} | {'<br>'.join(clean(x) for x in t['en'])} |")
     L += ['', '## Beats', '', '| Beat | Scene | Start | Length | Transition in |', '|---|---|---|---|---|']
     for s in scenes:
         L.append(f"| {beat[s['id']]} | `{s['id']}` | {mmss(s['start'])} | {s['dur']:.2f} s | {s['enter']} ({s['xf']} s) |")

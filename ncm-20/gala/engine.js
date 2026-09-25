@@ -372,12 +372,12 @@ const textIn = (f, tin, tout, fi = 0.5, fo = 0.35) => easeOut(prog(f, tin, fi)) 
 // Every words block can be recorded with its film times (TEXT_REC), so the subtitle files come from the build itself.
 let TEXT_REC = null;
 const recText = (level, tin, tout, ar, en) => { if (TEXT_REC) TEXT_REC.push({ level, tin, tout, ar: [].concat(ar || []), en: [].concat(en || []) }); };
-function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20 } = {}) {
+function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = enSize * 1.55 } = {}) {
   recText('B', tin, tout, ar, en);
   const q = textIn(f, tin, tout), q2 = textIn(f, tin + 0.15, tout);
   const A = [].concat(ar || []), E = [].concat(en || []);
   A.forEach((l, i) => smallAr(l, x, y + i * arSize * 1.32, q, { size: arSize, align, a: 0.85, weight: 600 }));
-  let ye = y + (A.length - 1) * arSize * 1.32 + enSize * 1.55;
+  let ye = y + (A.length - 1) * arSize * 1.32 + gap;
   E.forEach((l, i) => small(l, x, ye + i * enSize * 1.5, q2, { size: enSize, ls: 2, align, a: 0.7, weight: 600 }));
   return ye + (E.length - 1) * enSize * 1.5;
 }
@@ -430,7 +430,7 @@ function quoteCard(q, s, lt, { cy = 480, arSize = 54, enSize = 27, t0 = 0.3 } = 
   q.ar.forEach((l, i) => { arLine(l, cx, y, t0 + 0.4 + i * 0.7, lt, { size: arSize, align: 'center', font: F_NASKH, weight: 700, out, dur: 1.5 }); y += arSize * 1.55; });
   y += 10 - arSize * 0.35;
   const tE = t0 + 0.9 + nA * 0.7;
-  q.en.forEach((l, i) => { enLine(l, cx, y, tE + i * 0.2, lt, { size: enSize, align: 'center', font: F_FELL, weight: 400, ls: 0, italic: !q.reported, a: 0.82, out }); y += enSize * 1.5; });
+  q.en.forEach((l, i) => { enLine(l, cx, y, tE + i * 0.2, lt, { size: enSize, align: 'center', font: F_FELL, weight: 400, ls: 0, italic: !q.reported && !q.upright, a: 0.82, out }); y += enSize * 1.5; });
   y += 30;
   const tC = tE + 0.5 + nE * 0.2, c = k => easeOut(prog(lt, tC + k * 0.15, 0.8)) * out;
   if (q.whoAr) { smallAr(q.whoAr, cx, y, c(0), { size: 30, align: 'center', a: 0.9, weight: 700 }); y += 40; }

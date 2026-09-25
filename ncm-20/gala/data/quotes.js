@@ -7,7 +7,7 @@ const QUOTES = {
     ar: ['«إننا نولي بيئتنا جل اهتمامنا', 'لأنها جزء عضوي من بلادنا وتاريخنا وتراثنا»'],
     en: ['“We cherish our environment because it is an integral part', 'of our country, our history and our heritage.”'],
     whoAr: 'الوالد المؤسس المغفور له الشيخ زايد بن سلطان آل نهيان، طيّب الله ثراه',
-    whatAr: 'كلمته في يوم البيئة الوطني الأول · فبراير ' + ltr('1998'),
+    whatAr: 'من كلمته في يوم البيئة الوطني الأول · فبراير ' + ltr('1998'),
     whoEn: 'THE LATE SHEIKH ZAYED BIN SULTAN AL NAHYAN',
     titleEn: 'FOUNDING FATHER OF THE UAE',
     whatEn: 'FROM HIS SPEECH ON THE FIRST NATIONAL ENVIRONMENT DAY · FEBRUARY 1998',
@@ -42,9 +42,10 @@ const QUOTES = {
     en: ['“In the UAE, we recognise that scientific research and innovation are fundamental', 'to addressing present realities and navigating future challenges.”'],
     whoAr: 'سمو الشيخ منصور بن زايد آل نهيان',
     titleAr: 'نائب رئيس الدولة نائب رئيس مجلس الوزراء رئيس ديوان الرئاسة',
-    whatAr: 'كلمة سموّه في الملتقى الدولي السابع للاستمطار · يناير ' + ltr('2025'),
+    whatAr: 'من كلمة سموّه في النسخة السابعة من الملتقى الدولي للاستمطار، أُلقيت نيابةً عنه · يناير ' + ltr('2025'),
     whoEn: 'HIS HIGHNESS SHEIKH MANSOUR BIN ZAYED AL NAHYAN',
     titleEn: 'VICE PRESIDENT, DEPUTY PRIME MINISTER AND CHAIRMAN OF THE PRESIDENTIAL COURT',
-    whatEn: 'FROM HIS ADDRESS TO THE 7TH INTERNATIONAL RAIN ENHANCEMENT FORUM · JANUARY 2025',
+    whatEn: 'FROM HIS ADDRESS TO THE 7TH INTERNATIONAL RAIN ENHANCEMENT FORUM, DELIVERED ON HIS BEHALF · JANUARY 2025',
+    upright: true, // IM Fell's italic capital U is a V-shaped swash: "UAE" would read "VAE"
   },
 };

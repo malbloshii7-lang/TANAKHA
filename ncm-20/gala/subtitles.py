@@ -8,7 +8,9 @@ Writes, as UTF-8 SRT:
   vo-ar.srt, vo-en.srt                the narration (VO-01 ... VO-16), for Arabic and English captions (accessibility)
 
 Caption renderers often draw the Unicode isolate marks (U+2066-2069) that keep "2007-2027" in order inside Arabic as
-boxes, so every isolated run is re-marked here with LEFT-TO-RIGHT MARKs (U+200E) on both sides instead.
+boxes, so every isolated run is re-marked here with LEFT-TO-RIGHT MARKs (U+200E) on both sides instead, and every Arabic
+line starts with a RIGHT-TO-LEFT MARK (U+200F), so a player that takes a line's direction from its first strong
+character never lays out a line that opens with a number left to right.
 The Arabic narration is set without the narrator's vowel marks (the shadda and the tanween on alif are kept).
 """
 import json
@@ -16,6 +18,7 @@ import re
 import sys
 
 ISO = re.compile('⁦(.*?)⁩', re.S)
+RLM = '\u200f'
 
 
 def plain(s):
@@ -47,13 +50,13 @@ def main(cues_path, out):
         if b - a < 0.3:
             continue
         if t['ar']:
-            ar.append((a, b, [plain(l) for l in t['ar']]))
+            ar.append((a, b, [RLM + plain(l) for l in t['ar']]))
         if t['en']:
             en.append((a, b, [plain(l) for l in t['en']]))
     write(f'{out}/on-screen-ar.srt', ar)
     write(f'{out}/on-screen-en.srt', en)
     vo = cues.get('vo', [])
-    write(f'{out}/vo-ar.srt', [(v['in'], v['out'], [plain(v['sub'])]) for v in vo])
+    write(f'{out}/vo-ar.srt', [(v['in'], v['out'], [RLM + plain(v['sub'])]) for v in vo])
     write(f'{out}/vo-en.srt', [(v['in'], v['out'], [v['en']]) for v in vo])
 
 

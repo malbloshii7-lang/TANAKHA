@@ -79,7 +79,7 @@ scene({
     const h = lt - this.t20;
     if (h >= 0) {
       const g = easeOut(clamp(h / 0.6)) * (1 - easeInOut(prog(h, 0.6, 1.2)) * 0.5); // ramps over 0.6 s: no flash
-      ornament(1587, this.levelY(20), 12 * g, 1);
+      ornament(1564, this.levelY(20), 12 * g, 1); // on the major tick, clear of the 2027 label
       const rr = easeOut(prog(h, 0, 2.4));
       if (rr < 1) { stroke(el(1500, 150, 108 + 700 * rr, 16 + 104 * rr, 0, TAU, 470, 0.3), 1, GOLD, 2, 0.8 * (1 - rr)); }
     }

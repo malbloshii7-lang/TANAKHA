@@ -24,7 +24,8 @@ scene({
     this.borders = arcs.filter(a => a.type === 'emirate_border');
     this.landBorders = arcs.filter(a => a.type === 'land_border');
     const pt = id => UAE_MAP.points.find(p => p.id === id);
-    this.caps = ['cap-abu-dhabi', 'cap-dubai', 'cap-sharjah', 'cap-ajman', 'cap-umm-al-quwain', 'cap-ras-al-khaimah', 'cap-fujairah'].map(id => { const p = pt(id); return { ...p, xy: pr([p.lon, p.lat]) }; });
+    // the capitals in the order of Article 1 of the Constitution
+    this.caps = ['cap-abu-dhabi', 'cap-dubai', 'cap-sharjah', 'cap-ajman', 'cap-umm-al-quwain', 'cap-fujairah', 'cap-ras-al-khaimah'].map(id => { const p = pt(id); return { ...p, xy: pr([p.lon, p.lat]) }; });
     this.hq = (p => ({ ...p, xy: pr([p.lon, p.lat]) }))(pt('ncm-hq'));
     // great-circle distance from the headquarters to each capital, km; the ring grows at RING_KMS
     const hav = (a, b) => { const r = Math.PI / 180, dl = (b.lat - a.lat) * r, dn = (b.lon - a.lon) * r, h = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dn / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); };
@@ -69,6 +70,7 @@ scene({
     smallAr('الخليج العربي', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1], nq, { size: 26, align: 'center', a: 0.45, font: F_NASKH, weight: 400 });
     small('ARABIAN GULF', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1] + 26, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
     smallAr('بحر عُمان', pr([56.95, 24.45])[0], pr([56.95, 24.45])[1], nq, { size: 22, align: 'center', a: 0.4, font: F_NASKH, weight: 400 });
+    small('SEA OF OMAN', pr([56.95, 24.45])[0], pr([56.95, 24.45])[1] + 22, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
     // the Center's headquarters: a small gold star
     const hq = easeOut(prog(t, 3.0, 0.8)), [hx, hy] = this.hq.xy;
     // the seven emirates, washed in gold together and named in constitutional order
@@ -98,7 +100,7 @@ scene({
     const xL = -1350 + u * 125, xR = xL + 1500; // the band's west and east edges at the map's middle latitude
     const edge = (x0, y, ph) => x0 + 45 * Math.sin(y / 95 + ph) + 25 * Math.sin(y / 37 + 2 * ph) + (y - 560) * 0.25;
     const band = (inset, ph) => { const L = [], R = []; for (let y = 60; y <= 1040; y += 20) { L.push([edge(xL + inset, y, ph), y]); R.push([edge(xR - inset, y, ph + 1.7), y]); } return new P(L.concat(R.reverse()), true); };
-    // drawn on the text layer so it can be feathered out before the words column (x 1000 -> 1160), with no hard edge
+    // drawn on the text layer so it can be feathered out before the words column (x 980 -> 1140), with no hard edge
     inkText(() => {
     const outer = band(0, 0.4), inner = band(160, 1.1);
     fill(outer, BLUE, 0.05 * q); fill(inner, BLUE, 0.06 * q);
@@ -115,7 +117,9 @@ scene({
     });
     ctx.stroke(); ctx.restore();
     ctx.save(); ctx.globalCompositeOperation = 'destination-in';
-    const g = ctx.createLinearGradient(1000, 0, 1160, 0); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    // over the east coast too (it rained there as well); at the camera's push (s 1.05) x 1140 lands at ~1212,
+    // clear of the April labels, which start at x ~1240
+    const g = ctx.createLinearGradient(980, 0, 1140, 0); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g; ctx.fillRect(-400, -200, 2800, 1500); ctx.restore();
     }, 1, BLEND);
   },

@@ -47,7 +47,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 export NODE_PATH=/opt/node22/lib/node_modules          # Playwright with Chromium
 export FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")
 node render.js cues out/cues.json                     # the timeline, every words block and the narration
-python3 score.py out/cues.json out/                   # music.wav, sfx.wav, mix.wav (-16 LUFS), mix-r128.wav (-23), hold.wav, hold-world.wav
+python3 score.py out/cues.json out/                   # music, sfx, mix (-16 LUFS), mix-r128 (-23), part1/part2, hold, hold-world (.wav)
 python3 subtitles.py out/cues.json out/               # on-screen-ar/en.srt, vo-ar/en.srt
 python3 cuesheet.py out/cues.json out/cuesheet.csv 25 # show control, cue to cue
 python3 script.py out/cues.json SCRIPT.md             # the as-built script for approval
@@ -55,8 +55,8 @@ python3 script.py out/cues.json SCRIPT.md             # the as-built script for 
 FILM_QUERY='vo&tc' node render.js film out/review-vo.mp4 out/mix.wav --jobs 3   # review copy: scratch narration, timecode
 node render.js film out/review.mp4 out/mix.wav --jobs 3                         # clean 1080p 30 fps
 # the event master, cue to cue: part 1 ends on B17, part 2 starts at B18 (4K, 50p, LED grade)
-node render.js film out/part1-4k50.mp4 out/mix.wav --to 136.667 --scale 2 --fps 50 --grade led --jobs 3
-node render.js film out/part2-4k50.mp4 out/mix.wav --from 136.667 --scale 2 --fps 50 --grade led --jobs 3
+node render.js film out/part1-4k50.mp4 out/part1.wav --to 136.667 --scale 2 --fps 50 --grade led --jobs 3
+node render.js film out/part2-4k50.mp4 out/part2.wav --from 136.667 --afrom 0 --scale 2 --fps 50 --grade led --jobs 3
 # the loops: W under the applause after B17 (12 s), A/B/C at the end (20 s); each loops seamlessly
 FILM_QUERY=hold=W node render.js film out/hold-world.mp4 out/hold-world.wav --scale 2 --fps 50 --grade led
 FILM_QUERY=hold=A node render.js film out/hold-a.mp4 out/hold.wav --scale 2 --fps 50 --grade led

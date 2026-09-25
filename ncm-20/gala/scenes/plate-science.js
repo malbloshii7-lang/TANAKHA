@@ -15,7 +15,7 @@ scene({
       inner: pl([[x + 7, y + 7], [x + 393, y + 7], [x + 393, y + 313], [x + 7, y + 313]], true, 310 + i, 0.4),
     }));
     this.caps = ['FIG. I · NANOMATERIAL', 'FIG. II · HYGROSCOPIC GROWTH', 'FIG. III · WEATHER MODEL', 'FIG. IV · MACHINE LEARNING'];
-    this.capsAr = ['مادة نانوية للاستمطار', 'نموّ القطيرة على نواة ملحية', 'النمذجة العددية للطقس', 'تعلّم الآلة'];
+    this.capsAr = ['مادة نانوية', 'نموّ القطيرة على نواة ملحية', 'النمذجة العددية للطقس', 'تعلّم الآلة'];
     // Fig I: salt core in a titanium-dioxide shell
     this.shellO = el(1210, 318, 92, 92, 0, TAU, 320, 0.5); this.shellI = el(1210, 318, 76, 76, 0, TAU, 321, 0.5);
     const sq = [];
@@ -72,8 +72,8 @@ scene({
       small(this.caps[i], c.x + 22, c.y + 298, q, { size: 12, ls: 3, a: 0.72 });
       smallAr(this.capsAr[i], c.x + 380, c.y + 40, q, { size: 26, align: 'right', a: 0.85, weight: 600 });
       if (i === 0) { // developed at Khalifa University (src-56)
-        smallAr('جامعة خليفة', c.x + 380, c.y + 278, q, { size: 18, align: 'right', a: 0.75, weight: 600 });
-        small('KHALIFA UNIVERSITY', c.x + 380, c.y + 298, q, { size: 11, ls: 1, align: 'right', a: 0.65, weight: 600 });
+        smallAr('جامعة خليفة', c.x + 380, c.y + 250, q, { size: 18, align: 'right', a: 0.75, weight: 600 });
+        small('KHALIFA UNIVERSITY', c.x + 380, c.y + 270, q, { size: 11, ls: 1, align: 'right', a: 0.65, weight: 600 });
       }
     });
     // Fig I

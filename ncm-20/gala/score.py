@@ -5,7 +5,8 @@
 
 It writes 48 kHz 24-bit WAVs: music.wav and sfx.wav (stems), mix.wav (-16 LUFS integrated, -1 dBTP, for review and
 online), mix-r128.wav (-23 LUFS, for broadcast), hold.wav (a seamless 20 s loop for the stage hold) and hold-world.wav
-(a seamless 12 s bed for the applause after B17, which the show caller releases). Every cue is
+(a seamless 12 s bed for the applause after B17, which the show caller releases), and part1.wav / part2.wav, the mix
+split at the end of B17 for the cue-to-cue run. Every cue is
 placed from the film's own timeline, so the music stays on the cuts when the film is re-cut. It is the temp track for
 the animatic; the brief asks for an original score recorded live.
 
@@ -224,12 +225,14 @@ def main(cues_path, out_dir):
     card(music, st('quote-mansour'), en('quote-mansour'))
     # B17 · the world, in F major: orchestra, choir, frame drums, the motif in the brass; hold for the applause
     g0, g1 = st('world'), en('world')
+    split = st('gauge') - S['gauge']['xf'] / 2  # the cue-to-cue split: part 1 ends here, on B17's frame
     orch_bloom(g0, music, 1.0, root=41 - 12)
     k, t = 0, g0
     while t < g1 - 0.1:
         chord(music, [F, Bb, Dm, C][k % 4], t, BAR * 1.05, gain=0.36, bright=3000, attack=0.3)
         music.add(A.daf(0.75, jingle=True), t, 0.9)
-        music.add(A.daf(0.5, jingle=False), t + 2 * BEAT, 0.9)
+        if t + 2 * BEAT < split - 0.1:  # no drum on or across the split
+            music.add(A.daf(0.5, jingle=False), t + 2 * BEAT, 0.9)
         k, t = k + 1, t + BAR
     music.add(A.choir(65, g1 - g0 + 2.0, gain=0.45), g0)
     for (t, m, d) in motif(g0 + 0.5, root=65 - 12, major=True):
@@ -268,14 +271,14 @@ def main(cues_path, out_dir):
     chord(music, [D2, D3, A3, 62, 66, 69, 74], 153.33, f1 - 153.33 + 3.0, gain=0.46, bright=2200, attack=0.4, release=4.0)
     music.add(A.timpani(D2 + 12, 0.45), 153.33)
     # detent clicks at the circle locks
-    for t in [18.333, 23.333, 45.0, 53.333, 111.667, 136.667]:
+    for t in [18.333, 23.333, 45.0, 53.333, 111.667, st('gauge')]:
         sfx.add(detent(), t, 0.9)
 
     # fader rides: the loudness follows the story (quiet night, the Center's confidence, the April drop, the world's peak)
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
-                                       'quote-zayed': -2.5, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'port': 0,
-                                       'energy': 0, 'quote-president': -2.5, 'seeding': -2, 'science': -2, 'quote-mansour': -2.5,
-                                       'world': 0, 'gauge': 0.5, 'finale': -1})
+                                       'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'port': 0,
+                                       'energy': 0, 'quote-president': 0, 'seeding': -2, 'science': -2, 'quote-mansour': 0,
+                                       'world': -2.5, 'gauge': 0.5, 'finale': -1})  # each leader's card at or above B17
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9
     mix = m + f
@@ -289,6 +292,12 @@ def main(cues_path, out_dir):
     A.write_wav(f'{out_dir}/mix-r128.wav', A.master(mix, target_lufs=-23.0, ceiling_db=-1.0))
     A.write_wav(f'{out_dir}/music.wav', np.clip(m * g, -1, 1))
     A.write_wav(f'{out_dir}/sfx.wav', np.clip(f * g, -1, 1))
+    # the two parts of the cue-to-cue run, each with a short equal-power edge so the media server's crossfade is clean
+    n, k = int(round(split * A.SR)), int(0.3 * A.SR)
+    p1, p2 = web[:, :n].copy(), web[:, n:].copy()
+    p1[:, -k:] *= np.cos(np.linspace(0, np.pi / 2, k)); p2[:, :k] *= np.sin(np.linspace(0, np.pi / 2, k))
+    A.write_wav(f'{out_dir}/part1.wav', p1)
+    A.write_wav(f'{out_dir}/part2.wav', p2)
     print(f'mix: {A.lufs(web):.1f} LUFS, {A.true_peak_db(web):.1f} dBTP, {web.shape[1] / A.SR:.1f} s')
     hold(out_dir)
     hold_world(out_dir)

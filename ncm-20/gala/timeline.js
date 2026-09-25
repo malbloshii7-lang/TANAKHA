@@ -40,7 +40,7 @@ const TIMELINE = [
     } },
   // B03 · Ibn Majid and the monsoon
   { id: 'monsoon', start: at(5.5), dur: at(1.5), speed: SP.monsoon, offset: 2.0, xf: 0.8, cam: MONSOON_CAM,
-    words(t) { const f = filmT(this, t); levelB(f, 19.0, 23.0, 'أحمد بن ماجد · جلفار، رأس الخيمة · نحو ' + ltr('1490'), 'AHMED BIN MAJID · JULFAR, RAS AL KHAIMAH · c. 1490', { y: 330 }); } },
+    words(t) { const f = filmT(this, t); levelB(f, 18.9, 23.2, 'أحمد بن ماجد · جلفار، رأس الخيمة · نحو ' + ltr('1490'), 'AHMED BIN MAJID · JULFAR, RAS AL KHAIMAH · c. 1490', { y: 330 }); } },
   // B04 · Every wind by name
   { id: 'pearling', start: at(7), dur: at(1.5), speed: SP.pearling, offset: 0.8, xf: 0.8,
     cam: lockCam(() => monsoonCircle(at(7)), CIRCLES.pearling, { off: 0.8, settle: 2.0 * SP.pearling,
@@ -54,7 +54,7 @@ const TIMELINE = [
     cam: t => camPath([{ t: 0, s: 1.04, px: 1300, py: 640, sx: 560, sy: 560 }, { t: 0.5 + at(2.5) * SP.falaj, s: 1.10, px: 1560, py: 660, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 29.4, 33.0, ['هيلي، العين · العصر الحديدي', 'مواقع العين الثقافية', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'CULTURAL SITES OF AL AIN', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
+      levelB(f, 29.4, 33.0, ['هيلي، العين · العصر الحديدي', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
     } },
   // B06 · Card: the Founding Father (no VO)
   { id: 'quote-zayed', use: 'quote', quote: 'zayed', start: at(11), dur: at(2.5), xf: 1.2 },
@@ -78,8 +78,8 @@ const TIMELINE = [
     tint: f => 0.34 * easeInOut(prog(f, 65.8, 7.2)) * (1 - easeInOut(prog(f, 77.5, 3.5))),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 66.4, 72.3, ltr('16') + ' أبريل ' + ltr('2024') + ' · أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949'), ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
-      levelB(f, 72.8, 77.6, [ltr('14') + ' أبريل · المركز يتوقّع تزايد عدم الاستقرار الجوي', ltr('16') + ' أبريل · المركز يُصدر إنذاراً أحمر'], ['14 APRIL · NCM FORECASTS GROWING INSTABILITY', '16 APRIL · NCM ISSUES A RED ALERT'], { y: 640 });
+      levelB(f, 66.4, 72.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
+      levelB(f, 72.4, 77.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } },
   // B10 · For every flight
   { id: 'airport', start: at(24.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
@@ -111,24 +111,24 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t);
       levelB(f, 105.8, 111.3, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
-      levelB(f, 106.6, 111.3, 'أقل من ' + ltr('100') + ' ملم من المطر في العام المعتاد', 'LESS THAN 100 MM OF RAIN IN A TYPICAL YEAR', { y: 440 });
+      levelB(f, 106.2, 111.3, 'دولة الإمارات · أقل من ' + ltr('100') + ' ملم من المطر في العام المعتاد', 'THE UAE · LESS THAN 100 MM OF RAIN IN A TYPICAL YEAR', { y: 440 });
     } },
   // B15 · The science of rain
   { id: 'science', start: at(33.5), dur: at(1.5), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(1.5) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 112.4, 116.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
+      levelB(f, 112.2, 116.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
     } },
   // B16 · Card: HH Sheikh Mansour bin Zayed (no VO)
   { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(35), dur: at(2.5), xf: 1.2 },
   // B17 · From the skies of the Emirates to the world
-  { id: 'world', start: at(37.5), dur: at(3.5), speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
+  { id: 'world', start: at(37.5), dur: at(3.5) + 0.5, speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
     words(t) { worldWords(filmT(this, t)); } },
   // B18 · Twenty years
-  { id: 'gauge', start: at(41), dur: at(3.5), speed: 1, xf: 1.0, t20: 143.333 - at(41), dt: 60 / 72 / 4,
+  { id: 'gauge', start: at(41) + 0.5, dur: at(3.5) - 0.5, speed: 1, xf: 1.0, t20: 143.333 - (at(41) + 0.5), dt: 60 / 72 / 4, // the split at at(41) = 136.667 is where its dissolve begins
     cam: lockCam(() => { const c = WORLD_CAM(at(3.5)); return { sx: c.sx + (1430 - c.px) * c.s, sy: c.sy + (560 - c.py) * c.s, R: 318 * c.s }; }, CIRCLES.gauge,
-      { settle: 139.0 - at(41), then: [{ t: at(3.5), s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }] }),
+      { settle: 139.0 - (at(41) + 0.5), then: [{ t: at(3.5), s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }] }),
     words(t) {
       const f = filmT(this, t);
       levelB(f, 139.8, 146.6, ['إلى المتنبئين الجويين والراصدين وعلماء الزلازل،', 'والطيارين والمهندسين والعلماء'], ['TO THE FORECASTERS, OBSERVERS AND SEISMOLOGISTS,', 'THE PILOTS, ENGINEERS AND SCIENTISTS'], { y: 330, arSize: 30, enSize: 16 });
@@ -141,11 +141,11 @@ const TIMELINE = [
 ];
 
 // B17's words; `out` is Infinity in the applause hold, so the office and the name stay up until the caller releases it
-function worldWords(f, out = 137.2) {
+function worldWords(f, out = 137.1) {
   // set below the pins (their labels reach x ~1350 at y 400-560 while the camera pushes toward Geneva)
   levelA(f, 127.2, 130.4, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32 });
   levelB(f, 130.8, out, 'رئاسة المنظمة العالمية للأرصاد الجوية · ' + ltr('2023–2027'), ['PRESIDENCY OF THE WORLD METEOROLOGICAL', 'ORGANIZATION · 2023–2027'], { y: 640, arSize: 28, enSize: 17 });
-  levelB(f, 134.6, out, 'معالي الدكتور عبدالله أحمد المندوس', 'HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS', { y: 790, arSize: 40, enSize: 20 });
+  levelB(f, 134.6, out, 'معالي الدكتور عبدالله أحمد المندوس', 'HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS', { y: 790, arSize: 28, enSize: 16 });
 }
 
 // the title and the lockup over the night (also the stage hold's frame)
@@ -154,7 +154,7 @@ function finaleWords(s, f, { title = true, lockup = true, dedication = false } =
   if (s.suhailXY && !hold) { const c = s.cam(f - s.start), x = c.sx + (s.suhailXY[0] - c.px) * c.s, y = c.sy + (s.suhailXY[1] - c.py) * c.s; levelB(f, 151.2, 1e9, 'سهيل', 'SUHAIL', { x: x + 70, y: y + 8, align: 'left', arSize: 30, enSize: 15 }); }
   if (TEXT_REC && !hold) { recText('title', 153.33, 158.33, ['عشرون عاماً في قراءة السماء'], ['TWENTY YEARS OF READING THE SKY']); recText('lockup', 155.0, 158.33, ['المركز الوطني للأرصاد', ltr('2007–2027')], ['NATIONAL CENTER OF METEOROLOGY', '2007–2027']); }
   if (title) { arLine('عشرون عاماً في قراءة السماء', 960, 240, hold ? -9 : 153.33, hold ? 9 : f, { size: 88, align: 'center', dur: 1.6 }); enLine('TWENTY YEARS OF READING THE SKY', 960, 312, hold ? -9 : 154.0, hold ? 9 : f, { size: 32, align: 'center', ls: 5 }); }
-  if (dedication) { levelB(9, 0, 1e9, ['إلى المتنبئين الجويين والراصدين وعلماء الزلازل، والطيارين والمهندسين والعلماء،', 'وكل العاملين في المركز الوطني للأرصاد'], ['TO THE FORECASTERS, OBSERVERS, SEISMOLOGISTS, PILOTS, ENGINEERS AND SCIENTISTS,', 'AND EVERYONE WHO SERVES AT THE NATIONAL CENTER OF METEOROLOGY'], { x: 960, y: 200, align: 'center', arSize: 40, enSize: 18 }); }
+  if (dedication) { levelB(9, 0, 1e9, ['إلى المتنبئين الجويين والراصدين وعلماء الزلازل، والطيارين والمهندسين والعلماء،', 'وكل العاملين في المركز الوطني للأرصاد'], ['TO THE FORECASTERS, OBSERVERS, SEISMOLOGISTS, PILOTS, ENGINEERS AND SCIENTISTS,', 'AND EVERYONE WHO SERVES AT THE NATIONAL CENTER OF METEOROLOGY'], { x: 960, y: 200, align: 'center', arSize: 40, enSize: 18, gap: 36 }); }
   if (lockup) {
     const q = hold ? 1 : easeOut(prog(f, 155.0, 1.4)), ar = 'المركز الوطني للأرصاد', en = 'NATIONAL CENTER OF METEOROLOGY';
     const wa = textWidth(ar, `700 46px ${F_KUFI}`, 0, 'rtl'), we = textWidth(en, `600 20px ${F_HEAD}`, 0), ls = Math.max(0, (wa - we) / (en.length - 1));
@@ -181,10 +181,10 @@ const VO = [
   { id: 'VO-03', in: 18.6, out: 24.2, ar: 'ومِن جُلْفار، وقَّتَ ابنُ ماجدٍ أسفارَهُ برياحِ الموسِم، وقاسَ ارتفاعَ النُّجومِ بالأصابِع.', en: 'From Julfar, Ahmed bin Majid timed his voyages by the monsoon winds and measured star heights in fingers.' },
   { id: 'VO-04', in: 24.6, out: 27.0, ar: 'وعرَفَ البحّارةُ كلَّ ريحٍ باسمِها.', en: 'Sailors knew every wind by name.' },
   { id: 'VO-05', in: 29.0, out: 36.6, ar: 'وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه.', en: 'In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them.' },
-  { id: 'VO-06', in: 45.3, out: 51.7, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوي في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
+  { id: 'VO-06', in: 45.3, out: 51.7, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
   { id: 'VO-07', in: 53.6, out: 63.2, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
   { id: 'VO-08a', in: 66.0, out: 72.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
-  { id: 'VO-08b', in: 72.4, out: 77.4, ar: 'وكانَ المركزُ قد توقَّعَها قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'The Center had forecast it two days before, then issued a red alert.' },
+  { id: 'VO-08b', in: 72.2, out: 77.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', in: 77.6, out: 82.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
   { id: 'VO-09', in: 83.4, out: 85.8, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-10', in: 87.1, out: 89.8, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
@@ -199,7 +199,7 @@ const VO = [
 ];
 // Subtitles are set without the narrator's vowels: keep the shadda and the tanween on alif, drop the rest.
 // (and the shadda on a sun letter after the article, which plain text never writes: «السّنة» becomes «السنة»).
-const voSubAr = v => v.sub || v.ar.replace(/[\u064C-\u0650\u0652]/g, '').replace(/(^|[\s«(،])([وفبكل]?ال)([^\s\u0651])\u0651/g, '$1$2$3');
+const voSubAr = v => v.sub || v.ar.replace(/[\u064C-\u0650\u0652]/g, '').replace(/(^|[\s«(،])([وفبكل]?ال|[وف]?لل)([^\s\u0651])\u0651/g, '$1$2$3');
 
 // The stage holds (?hold=A|B|C|W), each a seamless loop:
 //   A: title and lockup · B: the dedication to the Center's people, with the lockup · C: sky and ring only, dimmed, for

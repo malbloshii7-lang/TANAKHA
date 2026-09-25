@@ -88,6 +88,7 @@ scene({
     const hp = easeOut(prog(lt, 2.0, 0.6));
     ornament(hx, hy, 11 * hp, 1);
     smallAr('أبوظبي', hx - 18, hy + 36, hp, { size: 30, align: 'right', weight: 700, a: 0.9 });
+    small('ABU DHABI', hx - 18, hy + 58, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });
     // partners are pins, not trajectories: one quiet, dotted thread runs only to Geneva, the seat of the WMO
     const a = toVec(...this.home);
     this.places.forEach((pl, k) => {

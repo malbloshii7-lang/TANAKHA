@@ -44,7 +44,7 @@ def smpte(t, fps):
 def main(cues_path, out, fps=25):
     cues = json.load(open(cues_path))
     S = {s['id']: s for s in cues['scenes']}
-    split = S['gauge']['start']  # PART 1 ends where B18 begins
+    split = S['gauge']['start'] - S['gauge']['xf'] / 2  # PART 1 ends where the dissolve into B18 begins
     rows = [(0.0, '', 'PART 1 GO', '', '', 'After the anthem and at least 5 s of silence')]
     for s in cues['scenes']:
         what, note = LABEL.get(s['id'], (s['id'], ''))

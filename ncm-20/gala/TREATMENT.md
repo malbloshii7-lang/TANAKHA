@@ -28,7 +28,7 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
 - One term is used for each thing throughout: تنبؤات for forecasts. الاستمطار names the programme and the science; تلقيح السحب names the operation.
 
 **Out: images that read as war graphics.**
-- The ring that widened from the capital across the map is gone. At «في الإمارات السبع» all seven emirates are washed in gold together and named in constitutional order.
+- The ring that widened from the capital across the map is gone. At «في الإمارات السبع» all seven emirates are washed in gold together and named in the order of Article 1 of the Constitution: Abu Dhabi, Dubai, Sharjah, Ajman, Umm Al Quwain, Fujairah, Ras Al Khaimah.
 - The airport squares are gone.
 - The Geneva line now lies on the globe's surface and fades in whole.
 - The globe turns west to east.
@@ -37,12 +37,14 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
 **Prominence.**
 - The world beat's musical peak is the national line, «من سماء الإمارات إلى العالم».
 - Dr Al Mandous's name is held under a steady chord, with no bloom.
-- Each leader's card has full strings, the motif in the horn and a wordless choir, as loud as any beat.
+- Each leader's card has full strings, the motif in the horn and a wordless choir. Measured in `mix.wav`, every card is at or above B17's level (the rides are 0 dB for the cards, −2.5 dB for B17).
+- Dr Al Mandous's name is set no larger than the office line above it (28 px Arabic, 16 px English), smaller than the leaders' names on their cards (30 px, 18 px).
 - The applause after B17 runs **cue to cue**. PART 1 stops on B17's last frame, with the office and the name on screen. LOOP W, a 12 s still with its music bed, plays until the show caller releases PART 2.
 
 **April 2024** is now on the national map. A rain area drawn the way a weather chart draws one (hatched, wavy-edged) crosses the country from the west and clears to the east by the remembrance. The event was national, so no one city stands for it, and no NCM product is imitated.
 - Labels: «14 أبريل · المركز يتوقّع تزايد عدم الاستقرار الجوي» and «16 أبريل · المركز يُصدر إنذاراً أحمر».
-- VO-08b: «وكانَ المركزُ قد توقَّعَها قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.»
+- VO-08b says only what the 14 April bulletin says: «وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.» / "Two days before, the Center had forecast growing instability; then it issued a red alert."
+- One short label: «تنبؤات 14 أبريل · إنذار أحمر 16 أبريل» / FORECASTS 14 APRIL · RED ALERT 16 APRIL.
 - The remembrance line is now the alternate, «نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.» In March 2027, «من فقدناهم» would be heard against losses the film does not name.
 
 **Facts.**
@@ -56,7 +58,7 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
 - Sheikh Mansour's card defaults to the IREF 2025 quote, which has an official English. The May 2026 quote waits for an approved English.
 
 **Places.**
-- The islands' outlines now come from Natural Earth (public domain). No other country's administrative file is used anywhere, and the FGIC map is still required before lock.
+- The islands' outlines now come from Natural Earth (public domain). No other country's administrative file is used for any UAE territory; the geoBoundaries outlines of Oman, Saudi Arabia and Qatar draw only those countries' own faint shapes. The FGIC map is still required before lock.
 - The seeding scene's mountains are the computed skyline of the Hajar in Ras Al Khaimah, seen from the plain at 25.78 N, 56.02 E. Only terrain inside the UAE outline is counted (`data/build/rak_skyline.py`).
 - The finale is drawn from a real viewpoint, Marina Mall (24.4769 N, 54.3225 E), looking south:
   - Etihad Towers stand 1.96 km away on a bearing of 183.6°; the 305 m tower is 8.9° high.
@@ -214,6 +216,8 @@ How it is built (all implementable in the current engine; see Appendix A):
 ---
 
 ## 5. Per-beat table
+
+> **Superseded in part by Revision 2 and by `SCRIPT.md`** (the words and times as built). Where they differ, `SCRIPT.md` is right; this section records the original intent.
 
 Times are film seconds. "src-N" refers to the anniversary page's source list and "README" to `../film/README.md`. VO times are in and out points. On-screen text gives Arabic first, then English.
 
@@ -458,6 +462,8 @@ Times are film seconds. "src-N" refers to the anniversary page's source list and
 
 ## 6. Voice-over script (Arabic and English)
 
+> **Superseded in part by Revision 2 and by `SCRIPT.md`** (the words and times as built). Where they differ, `SCRIPT.md` is right; this section records the original intent.
+
 **Casting.** An Emirati narrator, mature, warm and unhurried: calm authority, not a trailer voice. The narrator reads formal MSA. Audition three voices, male and female, on B09 and B19; NCM decides.
 
 **Recording.** Record to picture, dry, at 48 kHz / 24-bit, with three takes per line plus wild lines for the cut-downs. The Arabic averages 2.07 words a second while speaking (the per-line check is in the table below). Read numbers in full: «ألفين وسبعة», «ألفين وأربعة وعشرين».
@@ -503,6 +509,8 @@ Times are film seconds. "src-N" refers to the anniversary page's source list and
 ---
 
 ## 7. On-screen text (Arabic and English)
+
+> **Superseded in part by Revision 2 and by `SCRIPT.md`** (the words and times as built). Where they differ, `SCRIPT.md` is right; this section records the original intent.
 
 Level A echoes the voice; Level B is a label; "Card" marks leadership text. Every entry below goes to `subtitles.py` and to the sign-off sheet. In the Arabic column every number and Latin run is an LTR isolate in the build.
 
@@ -735,7 +743,7 @@ Legend for the status column:
 | Oman's territory | Musandam and Madha are Omani; Nahwa (inside Madha) is Sharjah's | Excluded or included accordingly; test points pass | [S] the map-data validation |
 | Sea names | «الخليج العربي» / Arabian Gulf; «بحر عُمان» | As labelled | [V] u.ae usage; NCM's bulletin |
 | Maritime lines | None | No maritime boundaries drawn | the map-data record |
-| The seven emirates | Equal treatment | One size and style for all seven names. They light in order of true distance from the headquarters (all within 1.3 s), not by rank. The only departure from constitutional order is Fujairah (192 km) lighting 0.10 s before Ras Al Khaimah (208 km); the protocol office may choose instead to light all seven at once (§11) | computed from `uae-map.json` |
+| The seven emirates | Equal treatment | One size and style for all seven names. All seven are washed in gold together and named in the order of Article 1 of the Constitution (Abu Dhabi, Dubai, Sharjah, Ajman, Umm Al Quwain, Fujairah, Ras Al Khaimah), 0.14 s apart. No ring, no marks. |
 | NMA content standards | Respect the State's governance, symbols and institutions; nothing that harms national unity or foreign relations | Neighbours faint and unnamed; partner pins only; no political content | [V] nma.gov.ae media content standards |
 
 ### 9.3 Facts and numbers on screen
