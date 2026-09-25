@@ -24,15 +24,15 @@ The film has three movements:
 | Time | Chapter | Headline | On screen | Facts used |
 |---|---|---|---|---|
 | 0:00 | Prologue · المقدمة | READING THE SKY · قراءة السماء | Suhail over a horizon | — |
-| 0:06 | I · Al Durour · الدرور | We counted the year by a star. | A 36-petal Durour wheel; Suhail rises; the five "stolen days" | 36 × 10 days + 5, counted from Suhail's rising |
-| 0:14 | II · Al Mawsim · الموسم | We sailed by the monsoon. | A dhow, a compass rose, the monsoon, a star measured in *isbaʿ* | Ibn Majid of Julfar; *Kitab al-Fawaʾid*, c. 1490 (895 AH); Aden to East Africa on days 320–330 of the Nayruz year |
-| 0:22 | III · Al Ghous · الغوص | We knew every wind by name. | A wind rose over a pearling sea | Shamal, Kaus, Suhaili, Nashi; the great dive, June–September |
+| 0:06 | I · Al Durour · الدرور | We counted the year by a star. | A 36-petal Durour wheel turning through the year; Suhail rises; the five "stolen days" | 36 × 10 days + 5, counted from Suhail's rising |
+| 0:14 | II · Al Mawsim · الموسم | We sailed by the monsoon. | A double-ended, sewn-plank ship under a lateen sail, crew aboard; the compass rose turns like the sky about the North Star; the monsoon; a star measured in *isbaʿ* | Ibn Majid of Julfar; *Kitab al-Fawaʾid*, c. 1490 (895 AH); Aden to East Africa on days 320–330 of the Nayruz year |
+| 0:22 | III · Al Ghous · الغوص | We knew every wind by name. | A wind rose over the pearl banks: a sambuk at anchor, oars out carrying the divers' ropes, a diver reaching for an open oyster, the stone weight on the bed | Shamal, Kaus, Suhaili, Nashi; the great dive, June–September |
 | 0:30 | IV · Al Aflaj · الأفلاج | We carried water through the desert. | A falaj in section, feeding an oasis | Hili, Al Ain, Iron Age; UNESCO World Heritage 2011 |
 | 0:38 | V · Al Markaz · المركز | Then we built a center to read the sky. | Radar scope and tower, anemometer, a logbook | Federal Decree-Law No. 6 of 2007; 254.8 mm (16 Apr 2024; WAM, with the decimal from Gallagher Re citing NCM), 51.8 °C (1 Aug 2025), −5.7 °C (3 Feb 2017) |
-| 0:46 | VI · Al Matarat · المطارات | We read the sky for every flight. | Fog lifts off a runway; a jet departs past the tower | NCM's 24-hour aviation weather watch over 10 UAE airports; aviation including aviation-enabled tourism 18.2% of UAE GDP (IATA, 2023 data; direct aviation alone 5.3%); Zayed International about 24 fog days a year (1983–2018) |
-| 0:54 | VII · Al Mawani · الموانئ | We read the sea for every ship. | A crane loads a container ship; a buoy rides the swell | Al Bahar 5-day marine forecasts since 2018; UAE ports ~21 million TEU (2023); Cyclone Shaheen red alert, 3 Oct 2021, 10 ft waves offshore |
-| 1:02 | VIII · Al Taqa · الطاقة | We forecast the sun and the wind. | The sun crosses a solar field; turbines turn; a pyranometer | NCM forecasts for solar plants and wind farms; UAE renewables 6 GW (2024); WMO–IRENA clean-energy workshop hosted by NCM, Abu Dhabi, July 2024 |
-| 1:10 | IX · Al Mujtamaʿ · المجتمع | We watch over every home. | A storm warning ripples out from the forecast and lights the phones below | Forecast on 11 Apr 2024, red "Take Action" alert on 16 Apr 2024; NCM's UAE Weather app warnings (fog, rain, sea); WMO: 24 hours' notice can cut damage by 30% |
+| 0:46 | VI · Al Matarat · المطارات | We read the sky for every flight. | Zayed International from runway 31L: fog lifts off Terminal A and its dune-like roof; the crescent-shaped control tower stands 1 km to the right; a jet departs | NCM's 24-hour aviation weather watch over 10 UAE airports; aviation including aviation-enabled tourism 18.2% of UAE GDP (IATA, 2023 data; direct aviation alone 5.3%); Zayed International about 24 fog days a year (1983–2018) |
+| 0:54 | VII · Al Mawani · الموانئ | We read the sea for every ship. | Jebel Ali from the water: a container ship at berth, quay cranes (seen end-on) working her bays, one idle with its boom raised; a harbour tug; a buoy on the swell | Al Bahar 5-day marine forecasts since 2018; UAE ports ~21 million TEU (2023); Cyclone Shaheen red alert, 3 Oct 2021, 10 ft waves offshore |
+| 1:02 | VIII · Al Taqa · الطاقة | We forecast the sun and the wind. | Shams 1, Madinat Zayed: rows of parabolic troughs turn east to west with the sun and fold its light onto the receiver tubes; the power block and its air-cooled condenser; a wind farm far off; a pyranometer | NCM forecasts for solar plants and wind farms; UAE renewables 6 GW (2024); WMO–IRENA clean-energy workshop hosted by NCM, Abu Dhabi, July 2024 |
+| 1:10 | IX · Al Mujtamaʿ · المجتمع | We watch over every home. | Abu Dhabi's Corniche across the water (WTC and Trust Tower, The Landmark, Nation Towers, ADNOC HQ, Etihad Towers, Emirates Palace); a storm warning ripples out from the forecast and lights the phones in the homes on this shore | Forecast on 11 Apr 2024, red "Take Action" alert on 16 Apr 2024; NCM's UAE Weather app warnings (fog, rain, sea); WMO: 24 hours' notice can cut damage by 30% |
 | 1:18 | X · Al Istimtar · الاستمطار | We asked the clouds for more. | A seeding aircraft under a cumulus, flares, then rain | First trial 1982; nationwide since 2010; 311 missions in 2022; salt flares (NaCl, KCl) |
 | 1:26 | XI · Al ʿIlm · العلم | We funded the science of rain. | A plate of four figures: nanomaterial, charge drone, laser, machine learning | UAEREP since 2015; 17 projects in 6 cycles; 8 patents |
 | 1:34 | XII · Al ʿĀlam · العالم | Now we share it with the world. | A turning globe; arcs to Geneva, Turkistan, Morocco and Lahore | WMO presidency 2023–2027; Kazakhstan pilot 2026; Morocco 2025; Lahore 2023; UN 2026 Water Conference, Abu Dhabi, 8–10 December |
@@ -61,6 +61,40 @@ Facts in chapters I–V and X–XIII come from the sources cited on the NCM at T
   - Aletihad, 16 Apr 2024, the red alert: [en.aletihad.ae](https://en.aletihad.ae/news/uae/4479274/national-center-of-meteorology-issues--red--warning-due-to-h).
   - The UAE Weather app listing: [App Store](https://apps.apple.com/us/app/weather-uae/id497964984).
   - WMO, 7 Nov 2022, 24 hours' notice cutting damage by 30%: [wmo.int](https://wmo.int/news/media-centre/early-warnings-all-action-plan-unveiled-cop27).
+
+### Drawn from real places
+
+The illustrations depict real UAE places, drawn from published descriptions and dimensions:
+
+- **Zayed International (VI).**
+  - Terminal A: one roof swelling into a dune-like arch, 52 m high across 319 m, with piers of rolling arches.
+    - [KPF](https://www.kpf.com/project/zayed-international-airport)
+    - [RIBAJ](https://www.ribaj.com/products/abu-dhabi-international-airport-midfield-complex)
+  - The crescent-shaped control tower, 109 m on a five-storey base.
+    - [CTBUH](https://www.skyscrapercenter.com/building/abu-dhabi-international-airport-air-traffic-control-tower/30422)
+    - [Smithsonian](https://airandspace.si.edu/multimedia-gallery/11537hjpg)
+  - Runway 31L, with the tower 1 km to its right and the terminal beyond on the same line.
+    - [UAE AIP, OMAA](https://www.gcaa.gov.ae/en/ais/AIPHtmlFiles/AIP/Current/AIRACs/2026-P04/html/eAIP/AD-2.OMAA-en-GB.html)
+- **Jebel Ali (VII).** Quay cranes seen end-on from the water, a raised boom on an idle crane, container bays, a harbour tug.
+  - [DP World](https://www.dpworld.com/en/ports-terminals/uae/jebel-ali-port)
+- **Shams 1 (VIII).** The trough geometry and the power block follow the plant's published design.
+  - 100 MW of parabolic troughs near Madinat Zayed, inaugurated on 17 March 2013.
+  - Trough aperture 5.77 m, focal length 1.71 m, rows about 17 m apart, tracking the sun east to west.
+  - Power block: an air-cooled condenser, no tower.
+  - Sources:
+    - [NLR SolarPACES](https://solarpaces.nlr.gov/project/shams-1)
+    - [Shams Power](https://shamspower.ae/en/shams-project/technology)
+- **The Corniche (IX).** Drawn to one scale from CTBUH heights, as seen from the water.
+  - Heights:
+    - WTC tower 381 m
+    - ADNOC HQ 342 m
+    - The Landmark 324 m
+    - Etihad Towers 305/278/260/234/218 m
+    - Nation Towers 268/233 m, sky bridge at 202 m
+  - Emirates Palace at the western end.
+  - [CTBUH Skyscraper Center](https://www.skyscrapercenter.com/)
+
+NCM's role is limited to what the captions say. The film does not claim any NCM service to Jebel Ali or to Shams 1.
 
 The economy figures (GDP share, TEU, GW) describe the size of each sector. They are not NCM
 achievements, and the film does not present them as such.
