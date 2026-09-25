@@ -228,8 +228,10 @@ portal lists it under "Other published pages".
   Arabic superfamily for matched body text. Light/dark and reduced motion are respected.
 - **Film:** `ncm-20/film/` holds *Reading the Sky*, a 1:54 companion film in 14 chapters (1080p
   MP4 with an original, up-tempo synthesized score). It runs from heritage, through the airports,
-  sea ports, energy and society NCM serves, to rain enhancement. The folder also holds the code
-  that draws and scores it. See `ncm-20/film/README.md`.
+  sea ports, energy and society NCM serves, to rain enhancement. It draws real places from
+  published sources: Zayed International, Jebel Ali, Shams 1, the Abu Dhabi Corniche, Jebel Hafeet
+  and the Hili falaj. The folder also holds the code that draws and scores it. See
+  `ncm-20/film/README.md`.
 - **Before publishing officially:** the page is marked as a draft for review in its colophon.
   Give the Arabic a native editorial pass, confirm leaders' current titles with protocol,
   then remove the draft line.

@@ -25,9 +25,9 @@ The film has three movements:
 |---|---|---|---|---|
 | 0:00 | Prologue · المقدمة | READING THE SKY · قراءة السماء | Suhail over a horizon | — |
 | 0:06 | I · Al Durour · الدرور | We counted the year by a star. | A 36-petal Durour wheel turning through the year; Suhail rises; the five "stolen days" | 36 × 10 days + 5, counted from Suhail's rising |
-| 0:14 | II · Al Mawsim · الموسم | We sailed by the monsoon. | A double-ended, sewn-plank ship under a lateen sail, crew aboard; the compass rose turns like the sky about the North Star; the monsoon; a star measured in *isbaʿ* | Ibn Majid of Julfar; *Kitab al-Fawaʾid*, c. 1490 (895 AH); Aden to East Africa on days 320–330 of the Nayruz year |
-| 0:22 | III · Al Ghous · الغوص | We knew every wind by name. | A wind rose over the pearl banks: a sambuk at anchor, oars out carrying the divers' ropes, a diver reaching for an open oyster, the stone weight on the bed | Shamal, Kaus, Suhaili, Nashi; the great dive, June–September |
-| 0:30 | IV · Al Aflaj · الأفلاج | We carried water through the desert. | A falaj in section, feeding an oasis | Hili, Al Ain, Iron Age; UNESCO World Heritage 2011 |
+| 0:14 | II · Al Mawsim · الموسم | We sailed by the monsoon. | A late-15th-century Gulf ship: double-ended and sewn-plank (stitched seams, through-beam ends), a straight raked stem, a central sternpost rudder with an aft tiller, a four-sided palm-mat sail on an oblique yard, a grapnel anchor; the compass rose turns like the sky about the North Star; the monsoon; a star measured in *isbaʿ* | Ibn Majid of Julfar; *Kitab al-Fawaʾid*, c. 1490 (895 AH); Aden to East Africa on days 320–330 of the Nayruz year |
+| 0:22 | III · Al Ghous · الغوص | We knew every wind by name. | A wind rose over the pearl banks: a sambuk at anchor (two masts, the sail spread as an awning, oars out); a diver on the bed on his lifeline, held by his hauler at the rail, reaches for an open oyster while the stone weight is hauled up; resting divers hold ropes tied to the oars; drawn to one scale, the bank about 15 m deep | Shamal, Kaus, Suhaili, Nashi; the great dive, June–September |
+| 0:30 | IV · Al Aflaj · الأفلاج | We carried water through the desert. | An Iron Age falaj at Hili in section: a gallery with stone-collared shafts draining the water table, a slab-covered cut-and-cover channel, an open channel, a distributor with a sluice gate, fields and palms; the Hajar mountains on the east horizon and Jebel Hafeet on the south | Hili, Al Ain, Iron Age; UNESCO World Heritage 2011 |
 | 0:38 | V · Al Markaz · المركز | Then we built a center to read the sky. | Radar scope and tower, anemometer, a logbook | Federal Decree-Law No. 6 of 2007; 254.8 mm (16 Apr 2024; WAM, with the decimal from Gallagher Re citing NCM), 51.8 °C (1 Aug 2025), −5.7 °C (3 Feb 2017) |
 | 0:46 | VI · Al Matarat · المطارات | We read the sky for every flight. | Zayed International from runway 31L: fog lifts off Terminal A and its dune-like roof; the crescent-shaped control tower stands 1 km to the right; a jet departs | NCM's 24-hour aviation weather watch over 10 UAE airports; aviation including aviation-enabled tourism 18.2% of UAE GDP (IATA, 2023 data; direct aviation alone 5.3%); Zayed International about 24 fog days a year (1983–2018) |
 | 0:54 | VII · Al Mawani · الموانئ | We read the sea for every ship. | Jebel Ali from the water: a container ship at berth, quay cranes (seen end-on) working her bays, one idle with its boom raised; a harbour tug; a buoy on the swell | Al Bahar 5-day marine forecasts since 2018; UAE ports ~21 million TEU (2023); Cyclone Shaheen red alert, 3 Oct 2021, 10 ft waves offshore |
@@ -93,6 +93,19 @@ The illustrations depict real UAE places, drawn from published descriptions and 
     - Nation Towers 268/233 m, sky bridge at 202 m
   - Emirates Palace at the western end.
   - [CTBUH Skyscraper Center](https://www.skyscrapercenter.com/)
+
+- **Al Ain (IV).**
+  - The falaj follows the excavated Iron Age falaj Hili 15. Water was drained from a shallow water table to the north-east by a gallery with stone-collared shafts; there is no deep mother well.
+    - [Benoist et al. 2021](https://hal.science/hal-03339631v1/document)
+    - [DCT Abu Dhabi, *The Iron Age Sites of Hili*](https://ar.library.dctabudhabi.ae/sites/default/files/The%20Iron%20Age%20Sites%20of%20Hili_0.pdf)
+  - Jebel Hafeet's outline is its skyline as seen from Hili, computed from the Copernicus 30 m elevation model with heights ×3. Its 1980 road is left out.
+  - [UNESCO, Cultural Sites of Al Ain](https://whc.unesco.org/en/list/1343/)
+- **The ships (II, III).**
+  - The 15th-century ship is based on the Belitung wreck, the *Jewel of Muscat* reconstruction, Ibn Majid, and da Gama's 1498 account of sewn ships with palm-mat sails.
+    - [Flecker](https://www.iseas.edu.sg/wp-content/uploads/2016/05/01_flecker_002to039.pdf)
+    - [Vosmer](https://asia.si.edu/wp-content/uploads/2023/06/shipwrecked-08-vosmer.pdf)
+  - The pearling scene follows Lorimer's *Gazetteer* (1908) and Heard-Bey. At the bank the sails were used as shade; the diver works on a lifeline held by his hauler, and the stone is hauled back up.
+    - [Abu Dhabi Culture, pearl diving](https://abudhabiculture.ae/en/Cultural-Heritage/InTangible/Heritage-Register/Social-Practices/Maritime-Life)
 
 NCM's role is limited to what the captions say. The film does not claim any NCM service to Jebel Ali or to Shams 1.
 
