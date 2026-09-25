@@ -120,8 +120,11 @@ python3 score.py score.wav
 
 # needs Playwright with Chromium (NODE_PATH may point at a global install)
 export FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")
-node render.js film ncm-20-reading-the-sky.mp4 score.wav   # 3,420 frames
+node render.js film master.mp4 score.wav                   # 3,420 frames at CRF 17 (~73 MB)
 node render.js preview stills 13 24 35                     # PNG stills at those seconds
+# the committed copy: two-pass at 3,000 kb/s, ~45 MB, under GitHub's 50 MB warning
+$FFMPEG -i master.mp4 -c:v libx264 -preset slow -b:v 3000k -pass 1 -an -f mp4 /dev/null
+$FFMPEG -i master.mp4 -c:v libx264 -preset slow -b:v 3000k -pass 2 -pix_fmt yuv420p -c:a copy -movflags +faststart ncm-20-reading-the-sky.mp4
 ```
 
 ## Editing
