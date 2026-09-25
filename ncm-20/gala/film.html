@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reading the Sky · Gala Edition</title>
+<meta name="description" content="A short film for the 20th anniversary of the UAE National Center of Meteorology, rendered live on a canvas. The MP4 in this folder is the same film, frame for frame, with its score." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=IM+Fell+English:ital@0;1&family=Reem+Kufi:wght@500;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  html,body{margin:0;height:100%;background:#14110e}
+  body{display:grid;place-items:center;overflow:hidden}
+  canvas{display:block;width:min(100vw,calc(100vh * 16 / 9));height:auto;aspect-ratio:16/9}
+</style>
+</head>
+<body>
+<canvas id="film" width="1920" height="1080" aria-label="Reading the Sky: a film for the 20th anniversary of the National Center of Meteorology"></canvas>
+<script src="engine.js"></script>
+<script src="data/stars.js"></script>
+<script src="data/uae-map.js"></script>
+<script src="data/quotes.js"></script>
+<script src="scenes/sky.js"></script>
+<script src="scenes/night-suhail.js"></script>
+<script src="scenes/night-finale.js"></script>
+<script src="scenes/map-nation.js"></script>
+<script src="scenes/cards.js"></script>
+<script src="scenes/plate-airport.js"></script>
+<script src="scenes/plate-centre.js"></script>
+<script src="scenes/plate-durour.js"></script>
+<script src="scenes/plate-energy.js"></script>
+<script src="scenes/plate-falaj.js"></script>
+<script src="scenes/plate-gauge.js"></script>
+<script src="scenes/plate-homes.js"></script>
+<script src="scenes/plate-monsoon.js"></script>
+<script src="scenes/plate-pearling.js"></script>
+<script src="scenes/plate-port.js"></script>
+<script src="scenes/plate-science.js"></script>
+<script src="scenes/plate-seeding.js"></script>
+<script src="scenes/plate-world.js"></script>
+<script src="timeline.js"></script>
+<script src="start.js"></script>
+</body>
+</html>
