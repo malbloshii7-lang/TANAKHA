@@ -145,8 +145,9 @@ def play(perc, pattern, grid0, t_from, t_to, level='mf', drop=()):
 
 def takhmeera(perc, t_down, level='mf'):
     """the ras player's preliminary strokes that bring the ensemble in on the downbeat t_down"""
+    g = LEVEL[level] if isinstance(level, str) else level
     for b, w in [(-1.0, 0.5), (-0.5, 0.7), (-0.25, 0.9)]:
-        perc.add(A.tabl(LEVEL[level] * w, 'dum'), t_down + b * BEAT, pan=-0.05)
+        perc.add(A.tabl(g * w, 'dum'), t_down + b * BEAT, pan=-0.05)
 
 
 def hum(m, dur, men=8):
@@ -309,7 +310,7 @@ def main(cues_path, out_dir):
     vo_p = vo_end(p0 + 1.5)  # VO-04 ("Sailors knew every wind by name")
     music.add(nahham([(0, 60), (0.12, 62), (0.5, 62), (0.62, EHF), (0.8, 65), (1.0, EHF), (1.15, 62), (1.5, 62)], 0.8), p0 + 0.12, pan=0.1)
     music.add(nahham([(0, 65), (0.1, 67), (0.6, 67), (0.75, 65), (0.9, EHF), (1.1, 65), (1.3, EHF), (1.5, 62), (1.8, 62)], 0.8), vo_p + 0.1, pan=0.1)
-    play(perc, SEA, h0 + 3 * BAR, p0, en('pearling') - 0.15, level=0.55)
+    play(perc, SEA, h0 + 3 * BAR, p0, en('pearling') - 0.15, level=0.75)
     perc.add(A.tus(0.8), p0, pan=0.35)
     sfx.add(A.wind(3.0, gain=0.5, gust=0.3), p0 + 0.2)
     # B05 · the falaj, inland and calm: the rababa descends before Sheikh Zayed's name; a chord under the name
@@ -440,9 +441,11 @@ def main(cues_path, out_dir):
         music.add(A.horn(m, d), t, 0.7)
     answer(music, apex, 53, [48, 53], gain=0.5, dur=(1.4, 1.5))
     answer(music, apex + BAR, 53, [48, 57], gain=0.45, dur=(1.4, 1.5))
-    takhmeera(perc, apex, 'f')
-    play(perc, AYYALA, apex, apex, apex + BAR, 'f')
-    play(perc, RAS + TAKHAMIR + TAR, apex, apex + BAR, office + 0.4, 'mp')  # receding under the office
+    # the full orchestra and voices are some 5 dB louder here than in the working day, so the drums are set higher to sit
+    # about 6 dB under them (measured on the stems), not buried
+    takhmeera(perc, apex, 1.2)
+    play(perc, AYYALA, apex, apex, apex + BAR, 1.2)
+    play(perc, RAS + TAKHAMIR + TAR, apex, apex + BAR, office + 0.4, 0.75)  # receding under the office
     chord(music, F + [69, 72, 77], apex, 3.4, gain=0.44, bright=3400, attack=0.25, release=2.0)  # the apex
     for dt in [2.8, 3.6, 4.2, 4.8]:  # the pins (plate-world.js places[].t)
         music.add(harmonic(77 + 12, 0.6), g0 + dt, pan=0.4)
@@ -501,7 +504,7 @@ def main(cues_path, out_dir):
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
                                        'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'rail': -1,
                                        'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0, 'seeding': -2,
-                                       'science': -2, 'quote-mansour': 0, 'world': -4.2, 'gauge': 0.5, 'finale': -1})
+                                       'science': -2, 'quote-mansour': 0, 'world': -3.1, 'gauge': 0.5, 'finale': -1})
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9
@@ -518,7 +521,7 @@ def main(cues_path, out_dir):
     deliver(m + f, out_dir, '-restrained', split)
     lv = {s['id']: A.lufs(web[:, int(s['start'] * A.SR):int((s['start'] + s['dur']) * A.SR)]) for s in cues['scenes']}
     print('per beat (LUFS):', ', '.join(f'{i} {v:.1f}' for i, v in lv.items()))
-    low = [i for i in lv if i.startswith('quote-') and lv[i] < lv['world'] - 0.1]
+    low = [i for i in lv if i.startswith('quote-') and lv[i] < lv['world']]
     assert not low, f'precedence: {low} quieter than the world beat ({lv["world"]:.1f} LUFS)'
     hold(out_dir)
     hold_world(out_dir)

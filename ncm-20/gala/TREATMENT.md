@@ -162,7 +162,7 @@ shaped what is built. **Where this section and anything above disagree, this sec
   - chanted verse of any kind;
   - the anthem.
 - **A restrained mix** (`mix-restrained.wav`, with its own part files) drops the drums, tus, claps and jahla, for a ceremony in Ramadan or a period of mourning.
-- **Precedence is measured.** The build fails if any leader's card is quieter than the world beat (cards about −14.0 LUFS, world −14.4).
+- **Precedence is measured.** The build fails if any leader's card is quieter than the world beat (in the current mix the cards measure −13.8, −13.3 and −13.5 LUFS, the world beat −13.9). The drums at the national line sit about 6 dB under the orchestra: present, not triumphal.
 - **The temp is a sketch.** Every drum pattern is a programming sketch, not a transcription, and the troupe replaces it with its own. The synthesized voices are never played to heritage advisers as Emirati music.
 - **Credits** (programme, not screen): the troupes by name and emirate; the Ayyala as a joint UNESCO file with Oman (2014); and an original score for NCM (Decree-Law 38/2021, Articles 16, 17 and 29).
 
