@@ -43,7 +43,9 @@ def main(cues_path, out):
     L = ['# عشرون عاماً في قراءة السماء · Twenty Years of Reading the Sky', '',
          '**As-built script** for approval, generated from the build by `script.py` (film times in seconds and m:ss).',
          f"Runtime {mmss(cues['duration'])}. The narrator's copy is fully vowelled; the on-screen text carries no vowels "
-         'except where one prevents a misreading. Leaders\' words appear on cards only and are never voiced.', '',
+         'except where one prevents a misreading. ' + ("Leaders' words appear on cards only and are never voiced."
+                                                       if any(s['id'].startswith('quote') for s in scenes) else
+                                                       "This cut has no leaders' cards; the narration names the late leaders only."), '',
          '## Narration (voice-over)', '', '| ID | Beat | In–out | Arabic (narrator\'s copy) | English |', '|---|---|---|---|---|']
     for v in cues.get('vo', []):
         L.append(f"| {v['id']} | {which(v['in'])} | {mmss(v['in'])}–{mmss(v['out'])} | {clean(v['ar'], True)} | {clean(v['en'])} |")

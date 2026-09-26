@@ -1,29 +1,28 @@
 'use strict';
-// The Etihad Rail beat as a 3D look test (lab/rail-3d.html): the same train, embankment and skyline as
-// scenes/plate-rail.js, built in true 3D and filmed with a moving camera, a crane shot from outside the right-of-way
-// fence. Nothing but the camera is new: the SD70-family locomotive (22.6 m, about 5 m high, six axles, light grey
-// with broad bands engraved as hatching, no logo), open hopper wagons of stone, the double track on its embankment
-// with the ditch and berm on the windward (north) side, the fence, the date palms of the Al Dhaid oasis, and the
-// Hajar front computed from terrain (25.29 N, 55.86 E, bearings 70-115). The train runs west, away from the Hajar,
-// at 80 km/h (22.2 m/s); the sun is in the south-west, late afternoon. The camera stays low and level at first, then
-// rises to an oblique view (never a top-down view).
-const R3 = { ZF: 2.5, ZR: 2.8, v: 22.2, x0: 150, L0: 22.6, LH: 15.0, GAP: 1.0, N: 50 };
-// camera keys: position C, look-at point L, focal length f (px), on the film clock of this test
-const R3_KEYS = [
-  { t: 0, C: [-40, -30, 3.6], L: [600, -6, 42], f: 3000 },
-  { t: 4, C: [-40, -31, 3.8], L: [250, -2, 22], f: 2150 },
-  { t: 6.5, C: [-42, -36, 6], L: [10, 0, 8], f: 1900 },
-  { t: 8.5, C: [-50, -48, 14], L: [-25, 0, 4], f: 1650 },
-  { t: 12, C: [-72, -78, 34], L: [110, 4, 0], f: 1450 },
-];
-// a smooth path through the keys: cubic Hermite in time, velocity continuous, easing in and out at the ends
+// The Etihad Rail hero scene in engraved 3D (lab/rail-3d.html): the same train, embankment and skyline as
+// scenes/plate-rail.js, built in true 3D and filmed as one shot chain in three beats, whose keys lab/rail-3d-shot.js
+// holds (lab/bed.py reads the same keys, so the drums and the diesel are placed from the picture). Nothing but the
+// camera is new: the SD70-family locomotive (22.6 m, about 5 m high, six axles, light grey with broad bands engraved
+// as hatching, no logo), open hopper wagons of stone, the double track on its embankment with the ditch and berm on
+// the windward (north) side, the fence, the date palms of the Al Dhaid oasis, and the Hajar front computed from
+// terrain (25.29 N, 55.86 E), in layers by distance. The train runs west, away from the Hajar, at 80 km/h (22.2 m/s);
+// the sun is in the south-west, late afternoon. The camera watches from outside the right-of-way fence on a long lens,
+// stands at eye height 14 m from the near track for the pass, then rises as on a crane to an oblique view (never a
+// top-down view).
+const R3 = { ZF: 2.5, ZR: 2.8, v: R3_SHOT.v, L0: 22.6, LH: 15.0, GAP: 1.0, N: 50 };
+// the shot that holds film time t (each shot cuts to the next at its t1)
+const r3shot = t => R3_SHOT.shots.find(s => t < s.t1) || R3_SHOT.shots[R3_SHOT.shots.length - 1];
+// the front of the train (its world x) at film time t: each shot sets where the train is on its first frame
+const r3head = t => { const s = r3shot(t); return s.head0 - R3.v * (t - s.t0); };
+// a smooth camera path through the shot's keys: cubic Hermite in time, velocity continuous; the camera is at rest at
+// the shot's ends and at every key marked ease, so a held frame is truly held
 function r3key(t, name) {
-  const K = R3_KEYS, n = K.length;
+  const K = r3shot(t).keys, n = K.length;
   if (t <= K[0].t) return K[0][name];
   if (t >= K[n - 1].t) return K[n - 1][name];
   let i = 1; while (K[i].t < t) i++;
   const a = K[i - 1], b = K[i], h = b.t - a.t, u = (t - a.t) / h;
-  const tan = j => { if (j === 0 || j === n - 1) return [].concat(K[j][name]).map(() => 0); const p = [].concat(K[j - 1][name]), q = [].concat(K[j + 1][name]); return p.map((v, k) => (q[k] - v) / (K[j + 1].t - K[j - 1].t)); };
+  const tan = j => { if (j === 0 || j === n - 1 || K[j].ease) return [].concat(K[j][name]).map(() => 0); const p = [].concat(K[j - 1][name]), q = [].concat(K[j + 1][name]); return p.map((v, k) => (q[k] - v) / (K[j + 1].t - K[j - 1].t)); };
   const pa = [].concat(a[name]), pb = [].concat(b[name]), ma = tan(i - 1), mb = tan(i);
   const h00 = 2 * u ** 3 - 3 * u ** 2 + 1, h10 = u ** 3 - 2 * u ** 2 + u, h01 = -2 * u ** 3 + 3 * u ** 2, h11 = u ** 3 - u ** 2;
   const out = pa.map((v, k) => h00 * v + h10 * h * ma[k] + h01 * pb[k] + h11 * h * mb[k]);
@@ -40,8 +39,7 @@ function r3hull(p) {
 scene({
   id: 'rail3d',
   init() {
-    const src = {}; SCENE_DEFS.get('rail').init.call(src); // borrow the plate's computed skyline and its palms
-    this.sky = src.sky;
+    const src = {}; SCENE_DEFS.get('rail').init.call(src); // borrow the plate's palms
     this.palms = src.palms.map(p => ({ x: p.dist * Math.sin(p.az * Math.PI / 180), y: p.dist * Math.cos(p.az * Math.PI / 180), h: p.h, lean: p.lean }));
     const r = rng(303);
     this.marks = []; // the plain: tufts and stones, thinning into the distance
@@ -63,26 +61,42 @@ scene({
       for (let az = -30; az <= 210; az += 3) { const p = E3.projDir(dir(az, el)); if (p) pts.push(p); }
       if (pts.length > 1) stroke(new P(pts), 1, SEPIA, 0.7, 0.3 * (1 - k / 26), [18 + k * 3, 6 + k]);
     }
-    const veil = []; for (let az = -30; az <= 210; az += 4) { const p = E3.projDir(dir(az, 0.9)); if (p) veil.push(p); }
-    if (hz.length > 1 && veil.length > 1) {
-      const vp = new P(veil.concat(hz.slice().reverse()), true);
-      hatch(vp, [0, Math.min(...veil.map(p => p[1])) - 10, W, Math.max(...hz.map(p => p[1])) + 10], 0, 6, 1, OCHRE, 0.7, 0.12, 815);
+    // the Hajar front at infinity in its computed layers (lab/rail-3d-ridges.js), far to near: each range masks the
+    // ranges behind it and is engraved a little darker, as it stands nearer through the haze; the two nearest layers
+    // are the plain rising to the mountains' foot, hatched level
+    const RG = R3_RIDGES, nL = RG.layers.length;
+    const RS = [[0, 5.0, 0.18, 0.8, 0.3], [0, 5.0, 0.18, 0.8, 0.3], [-1.2, 4.6, 0.3, 1.0, 0.5], [-1.3, 5.2, 0.28, 1.0, 0.5], [-1.3, 6.0, 0.2, 0.9, 0.4]];
+    for (let k = nL - 1; k >= 0; k--) {
+      const top = [], foot = [];
+      RG.layers[k].forEach((el, i) => {
+        const az = RG.az0 + i * RG.daz, p = E3.projDir(dir(az, Math.max(0, el))), q = E3.projDir(dir(az, 0));
+        if (p && q && p[0] > -80 && p[0] < W + 80) { top.push(p); foot.push(q); }
+      });
+      if (top.length < 2) continue;
+      const [ang, gap, ha, lw, la] = RS[k], poly = new P(top.concat(foot.slice().reverse()), true);
+      const bb = [Math.max(0, top[0][0]), Math.max(0, Math.min(...top.map(p => p[1])) - 4), Math.min(W, top[top.length - 1][0]), Math.min(H, Math.max(...foot.map(p => p[1])) + 4)];
+      mask(poly); hatch(poly, bb, ang, gap, 1, SEPIA, 0.7, ha, 811 + k); stroke(new P(top), 1, INK, lw, la);
     }
-    const ridge = this.sky.map(([az, el]) => E3.projDir(dir(az, el))).filter(Boolean);
-    const foot = this.sky.map(([az]) => E3.projDir(dir(az, 0))).filter(Boolean);
-    if (ridge.length > 1 && foot.length > 1) {
-      const rf = new P(ridge.concat(foot.slice().reverse()), true), bb = [Math.min(...ridge.map(p => p[0])), Math.min(...ridge.map(p => p[1])) - 5, Math.max(...ridge.map(p => p[0])), Math.max(...foot.map(p => p[1])) + 5];
-      mask(rf); hatch(rf, bb, -1.3, 5.5, 1, SEPIA, 0.7, 0.3, 811); stroke(new P(ridge), 1, INK, 1.1, 0.55);
-    }
+    // the dust over the plain, thickest at the mountains' foot
+    [[0, 0.45, 0.14], [0.45, 0.9, 0.07]].forEach(([e0, e1, a], j) => {
+      const lo = [], hi = []; for (let az = 20; az <= 160; az += 0.5) { const p = E3.projDir(dir(az, e0)), q = E3.projDir(dir(az, e1)); if (p && q && q[0] > -80 && q[0] < W + 80) { lo.push(p); hi.push(q); } }
+      if (lo.length > 1) hatch(new P(hi.concat(lo.slice().reverse()), true), [0, Math.max(0, Math.min(...hi.map(p => p[1])) - 6), W, Math.min(H, Math.max(...lo.map(p => p[1])) + 6)], 0, 6, 1, OCHRE, 0.7, a, 815 + j);
+    });
     if (hz.length > 1) stroke(new P(hz), 1, INK, 0.8, 0.35);
-    // the date palms of the Al Dhaid oasis, far off
-    this.palms.forEach(p => {
-      const s = E3.clipSeg([p.x, p.y, 0], [p.x + p.lean * p.h, p.y, p.h]);
-      if (!s) return;
-      const [b, tp] = s; if (tp[0] < -20 || tp[0] > W + 20) return;
-      const fr = cam.f * 3.5 / Math.max(50, E3.depth([p.x, p.y, p.h]));
-      stroke(new P([b, tp]), 1, INK, 0.9, 0.45);
-      for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + (k - 2) * 0.6; stroke(new P([tp, [tp[0] + fr * Math.cos(a), tp[1] + fr * 0.4 + fr * 0.5 * Math.sin(a)]]), 1, INK, 0.8, 0.45); }
+    // the date palms of the Al Dhaid oasis, far off: a trunk, and a crown of fronds (3.6-4.4 m) arching out and down
+    // all round, some young and upright, the old ones drooping (drawn in 3D, so a long lens never flattens them to poles)
+    this.palms.forEach((p, j) => {
+      const top = [p.x + p.lean * p.h, p.y, p.h], d = E3.depth(top);
+      if (d < 5) return;
+      const s = E3.clipSeg([p.x, p.y, 0], top);
+      if (!s || s[1][0] < -60 || s[1][0] > W + 60) return;
+      const k = cam.f / d;
+      stroke(new P(s), 1, INK, clamp(0.5 * k, 0.8, 2.4), 0.5);
+      for (let i = 0; i < 12; i++) {
+        const a = i * 2.39996 + j, th = 0.9 - 1.3 * ((i * 7) % 12) / 11, L = 3.6 + 0.4 * ((i * 5) % 3), pts = [];
+        for (let u = 0; u <= 1.001; u += 0.2) pts.push([top[0] + L * u * Math.cos(a) * Math.cos(th), top[1] + L * u * Math.sin(a) * Math.cos(th), top[2] + L * u * Math.sin(th) - 1.6 * u * u]);
+        E3.line(pts, INK, clamp(0.25 * k, 0.6, 1.3), 0.5);
+      }
     });
     // the plain
     E3.segments(this.marks.map(([a, b]) => [a, b, 0.62 * clamp(1 - E3.depth(a) / 2600)]), SEPIA, 0.9);
@@ -95,7 +109,7 @@ scene({
     E3.face(strip(13, 0, 16, 0.6), { tone: 0.05, shade: 0.4, hatchCol: SEPIA, edges: false }, 823);
     E3.face(strip(8, zf, 13, 0), { tone: 0.05, shade: 0.5, hatchCol: SEPIA, edges: false }, 824);
     E3.face(strip(-3.5, zf, 8, zf), { tone: 0.25, shade: 0.5, hatchCol: SEPIA, edges: false }, 825);
-    E3.face(strip(-8.5, 0, -3.5, zf), { tone: 0.05, shade: 0.5, hatchCol: SEPIA, edges: false }, 826);
+    E3.face(strip(-8.5, 0, -3.5, zf), { tone: 0.18, shade: 0.5, hatchCol: SEPIA, edges: false }, 826);
     [[-8.5, 0, 0.55], [-3.5, zf, 0.6], [8, zf, 0.45], [13, 0, 0.3], [16, 0.6, 0.35], [19, 0, 0.3]].forEach(([y, z, a]) => E3.line([[X0, y, z], [X1, y, z]], INK, 0.9, a));
     // the sleepers near the camera, then the rails of both tracks
     const sl = [];
@@ -103,7 +117,7 @@ scene({
     E3.segments(sl, SEPIA, 1);
     [5.22, 3.78, 0.72, -0.72].forEach(y => E3.line([[X0, y, R3.ZR], [X1, y, R3.ZR]], INK, 1.1, 0.8));
     // the train's shadows, cast north-east by the low sun onto the formation (laid over the ballast and the rails)
-    const xs0 = R3.x0 - R3.v * t, SUN = E3.SUN;
+    const xs0 = r3head(t), SUN = E3.SUN;
     for (let k = 0, xx = xs0; k <= R3.N; k++) {
       const len = k === 0 ? R3.L0 : R3.LH, top = R3.ZR + (k === 0 ? 4.9 : 3.9 + 0.3), pts = [];
       [xx, xx + len].forEach(x => [-1.6, 1.6].forEach(y => [R3.ZR + 1.0, top].forEach(z => { const u = (z - R3.ZF) / SUN[2]; pts.push([x - SUN[0] * u, y - SUN[1] * u]); })));
@@ -116,7 +130,7 @@ scene({
       }
     }
     // the train: vehicles far to near; within each, the parts from the ground up and far to near
-    const xf = R3.x0 - R3.v * t, vehicles = [];
+    const xf = r3head(t), vehicles = [];
     let x = xf;
     for (let k = 0; k <= R3.N; k++) { const len = k === 0 ? R3.L0 : R3.LH; vehicles.push({ k, x, len }); x += len + R3.GAP; }
     vehicles.map(v => ({ v, d: E3.depth([v.x + v.len / 2, 0, R3.ZR + 2]) })).filter(o => o.d > -30 && o.d < 2600).sort((a, b) => b.d - a.d)
@@ -201,10 +215,9 @@ scene({
   },
 });
 
-// The lab's own timeline: one 12 s shot, with the beat's words for its first five seconds, as in the film.
-const TIMELINE = [{ id: 'rail3d', start: 0, dur: 12, words(t) {
-  levelB(t, 0.25, 4.75, 'قطارات الاتحاد · الذيد، الشارقة', 'ETIHAD RAIL · AL DHAID, SHARJAH', { y: 330 });
-  levelA(t, 0.7, 4.75, 'على امتداد البر', 'ACROSS THE LAND', { y: 520 });
-  small('3D LOOK TEST · NOT FOR BROADCAST', 110, 1030, 1, { size: 14, ls: 3, a: 0.55, weight: 600 });
-} }];
-FADE_IN = 0.6;
+// The beat's words, in its first beat only (they leave before the cut), above the ranges the long lens raises. s is the
+// scene's start in film seconds; RAIL_NAME is set by the page (timeline.js in the film).
+function r3words(f, s) {
+  levelB(f, s + 1.0, s + R3_SHOT.cut - 0.6, RAIL_NAME.ar + ' · الذيد، الشارقة', RAIL_NAME.en + ' · AL DHAID, SHARJAH', { y: 150 });
+  levelA(f, s + 1.4, s + R3_SHOT.cut - 0.6, 'على امتداد البر', 'ACROSS THE LAND', { y: 300 });
+}

@@ -64,7 +64,10 @@ scene({
   },
   draw(lt) {
     // (the v3 table heading is left out: under the gala framing it fell off the frame, and the words column names the programme)
+    // only: one figure alone (its index), when the cut wants one research image rather than the plate of four
+    const on = i => this.only == null || this.only === i;
     this.cells.forEach((c, i) => {
+      if (!on(i)) return;
       const p = easeInOut(prog(lt, 0.4 + i * 0.25, 1.4));
       stroke(c.outer, p, INK, 1.8); stroke(c.inner, p, INK, 0.9, 0.6);
       const q = easeOut(prog(lt, 3.0 + i * 0.4, 0.8));
@@ -77,17 +80,17 @@ scene({
       }
     });
     // Fig I
-    const f1 = easeOut(prog(lt, 1.4, 1.2));
+    const f1 = on(0) ? easeOut(prog(lt, 1.4, 1.2)) : 0;
     if (f1 > 0) {
       ctx.save(); ctx.globalAlpha = SA * 0.85 * f1; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = BLUE;
       ctx.beginPath(); this.shellO.trace(ctx, 1); this.shellI.trace(ctx, 1); ctx.fill('evenodd'); ctx.restore();
       fill(this.core, OCHRE, 0.6 * f1);
     }
     stroke(this.shellO, f1, INK, 1.5); stroke(this.shellI, f1, INK, 1.2, 0.8); stroke(this.core, f1, INK, 1.4);
-    this.lattice.forEach((l, i) => stroke(l, prog(lt, 2.0 + i * 0.06, 0.4), INK, 0.9, 0.7));
-    this.sats.forEach(([x, y], i) => { const q = easeOut(prog(lt, 2.4 + i * 0.12, 0.5)); disc(x, y, 12 * q, BLUE, 0.8); disc(x, y, 6 * q, OCHRE, 0.9); });
+    if (on(0)) this.lattice.forEach((l, i) => stroke(l, prog(lt, 2.0 + i * 0.06, 0.4), INK, 0.9, 0.7));
+    if (on(0)) this.sats.forEach(([x, y], i) => { const q = easeOut(prog(lt, 2.4 + i * 0.12, 0.5)); disc(x, y, 12 * q, BLUE, 0.8); disc(x, y, 6 * q, OCHRE, 0.9); });
     // Fig II: vapour drifts in and condenses; the droplet swells round its salt nucleus, then merges with a neighbour
-    const f2 = easeOut(prog(lt, 2.0, 0.8)), { x: nx, y: ny } = this.nuc;
+    const f2 = on(1) ? easeOut(prog(lt, 2.0, 0.8)) : 0, { x: nx, y: ny } = this.nuc;
     if (f2 > 0) {
       const g = easeInOut(prog(lt, 2.6, 4.0)), R = 12 + 46 * g;
       this.vapour.forEach(v => {
@@ -102,7 +105,7 @@ scene({
       stroke(new P([[nx - k, ny - k], [nx + k, ny - k], [nx + k, ny + k], [nx - k, ny + k]], true), f2, INK, 1.1);
     }
     // Fig III: the grid inks across the country, then the analysis contours flow over it
-    const f3 = easeInOut(prog(lt, 2.4, 1.4)), gb = this.gridBox;
+    const f3 = on(2) ? easeInOut(prog(lt, 2.4, 1.4)) : 0, gb = this.gridBox;
     this.mini.forEach(q => stroke(q, f3, INK, 0.9, 0.75));
     if (f3 > 0) {
       ctx.save(); ctx.globalAlpha = SA * 0.28 * f3; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.6; ctx.beginPath();
@@ -110,13 +113,14 @@ scene({
       for (let y = gb.y; y <= gb.y + gb.h + 0.1; y += 17.4) { ctx.moveTo(gb.x, y); ctx.lineTo(gb.x + gb.w * f3, y); }
       ctx.stroke(); ctx.restore();
     }
-    const fi = easeInOut(prog(lt, 3.4, 1.6));
+    const fi = on(2) ? easeInOut(prog(lt, 3.4, 1.6)) : 0;
     if (fi > 0) { // the analysis flows across the grid from west to east
       ctx.save(); ctx.beginPath(); ctx.rect(gb.x, gb.y, gb.w * fi, gb.h); ctx.clip();
       ctx.globalAlpha = SA * 0.7; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = BLUE; ctx.lineWidth = 1.2; ctx.lineCap = 'round'; ctx.beginPath();
       this.isoSegs.forEach(([a, c]) => { ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); }); ctx.stroke(); ctx.restore();
     }
     // Fig IV
+    if (!on(3)) return;
     this.edges.forEach((e, i) => stroke(e, prog(lt, 3.2 + i * 0.015, 0.5), INK, 0.8, 0.3));
     this.nodes.forEach((n, i) => { const q = easeOut(prog(lt, 3.1 + i * 0.05, 0.4)); disc(n.x, n.y, 10 * q, n.l === 1 ? RED : BLUE, 0.85); });
     const dq = easeOut(prog(lt, 4.3, 0.8));

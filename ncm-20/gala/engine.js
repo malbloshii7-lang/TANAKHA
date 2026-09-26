@@ -574,7 +574,8 @@ function visible(t) {
 }
 function drawScene(s, lt) {
   setTheme(!!s.night);
-  const off = s.offset || 0, sl = off + lt * (s.speed || 1); // offset: a plate can enter part-drawn instead of being sped up
+  // offset: a plate can enter part-drawn instead of being sped up; warp: a scene clock of its own (a held frame)
+  const off = s.offset || 0, wl = lt * (s.speed || 1), sl = s.warp ? s.warp(lt) : off + wl;
   ctx.save();
   if (s.cam) camera(s.cam(sl, lt));
   s.draw(sl, lt);
@@ -584,8 +585,8 @@ function drawScene(s, lt) {
     if (a > 0) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(150,156,168,${a.toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
   }
   // words run on the scene clock measured from the cut (no offset), so they never arrive inside a dissolve
-  if (s.words) { ctx.save(); s.words(sl - off, lt); ctx.restore(); }
-  else if (s.text) { ctx.save(); wordsBlock(s, sl - off); ctx.restore(); }
+  if (s.words) { ctx.save(); s.words(wl, lt); ctx.restore(); }
+  else if (s.text) { ctx.save(); wordsBlock(s, wl); ctx.restore(); }
 }
 function sheet(s) { return s && s.night ? NIGHT_CV : PAPER_CV; }
 function composite(v) {

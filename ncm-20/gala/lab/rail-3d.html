@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rail 3D Look Test</title>
-<meta name="description" content="A 3D look test for the gala film's Etihad Rail beat: the same researched train, embankment and skyline, in the film's engraved style, filmed with a moving camera." />
+<title>Etihad Rail 3D</title>
+<meta name="description" content="The gala film's Etihad Rail hero scene in engraved 3D: the researched train, embankment and computed Hajar skyline, filmed as one shot chain in three beats." />
 <link href="../fonts/fonts.css" rel="stylesheet" />
 <style>
   html,body{margin:0;height:100%;background:#14110e}
@@ -13,11 +13,23 @@
 </style>
 </head>
 <body>
-<canvas id="film" width="1920" height="1080" aria-label="3D look test: Etihad Rail near Al Dhaid"></canvas>
+<canvas id="film" width="1920" height="1080" aria-label="Engraved 3D: Etihad Rail near Al Dhaid"></canvas>
 <script src="../engine.js"></script>
 <script src="../scenes/plate-rail.js"></script>
 <script src="engrave3d.js"></script>
+<script src="rail-3d-shot.js"></script>
+<script src="rail-3d-ridges.js"></script>
 <script src="rail-3d.js"></script>
+<script>
+// the lab page's own timeline: the hero scene alone, fading in and out
+const RAIL_NAME = { ar: 'قطارات الاتحاد', en: 'ETIHAD RAIL' };
+const TIMELINE = [{ id: 'rail3d', start: 0, dur: R3_SHOT.dur, words(t) {
+  r3words(t, 0);
+  small('ENGRAVED 3D · DRAFT · NOT FOR BROADCAST', 110, 1030, 1, { size: 14, ls: 3, a: 0.55, weight: 600 });
+} }];
+FADE_IN = 0.6;
+FADE_OUT = 1.0;
+</script>
 <script src="../start.js"></script>
 </body>
 </html>
