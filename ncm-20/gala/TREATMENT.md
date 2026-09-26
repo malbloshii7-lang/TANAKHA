@@ -124,20 +124,26 @@ shaped what is built. **Where this section and anything above disagree, this sec
     - No second «بحريّة» after VO-10's.
     - Eight words instead of eleven, so the clause no longer fills its whole beat.
   - The fallback that keeps WAM's own verb is «…نشرةٌ يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،».
-- **Declined, with the reasons given to the client.**
-  - **"Safe passage"** («عبور آمن», «ممر آمن», «مسار آمن»). In September 2026 this is the vocabulary of the Hormuz diplomacy (the UN statement of 24 September: "safe, secure and unimpeded transit"). It claims a security outcome that no weather agency delivers.
+- **Declined, with the reasons given to the client** (each fact checked independently on 26 September 2026).
+  - **"Safe passage"** («عبور آمن», «ممر آمن», «مسار آمن»).
+    - In September 2026 this is the vocabulary of the Hormuz diplomacy. A joint statement read at the UN on 24 September, on behalf of 79 signatories including the UAE, called for "the safe, secure and unimpeded transit of all vessels".
+    - It would claim a security outcome that no weather agency delivers.
   - **ADNOC's name or livery, and a Murban label.**
-    - ADNOC vessels have been attacked in Hormuz since February; ADNOC counts 15, the latest on 20 September. ADNOC declines to discuss vessel movements.
-    - Murban is a traded benchmark, and naming it reads as product placement.
-    - It loads free on board at Fujairah into the buyer's ship, so "an ADNOC vessel laden with Murban" may not even be accurate.
-    - ADNOC's chairman, a board member and its chief executive (a minister) will be in the room.
+    - ADNOC vessels have been attacked while transiting Hormuz since the war began on 28 February:
+      - ADNOC gave 15 on 7 August; Bloomberg reported 23 in mid-August.
+      - The UAE condemned Iranian attacks on ADNOC-affiliated vessels on 8, 14 and 15 August.
+      - Reuters reported an ADNOC-managed LPG carrier struck on 20 September; ADNOC declined to comment on "voyage planning or vessel movements".
+    - Murban is a traded crude grade, and naming it reads as product placement.
+    - It is sold free on board at Fujairah into the buyer's ship, so "an ADNOC vessel laden with Murban" may not even be accurate.
+    - ICE's Murban futures have been winding down since 31 July, when ADNOC announced its move to Platts Dubai pricing from 1 November.
+    - H.H. the President chairs ADNOC's Board, and H.H. Sheikh Mansour bin Zayed sits on it. Dr Sultan Al Jaber is Minister of Industry and Advanced Technology and ADNOC's Managing Director and Group CEO. Protocol confirms who attends.
     - Naming ADNOC or Murban is a new label and a new picture that NCM leadership, the protocol office and MoFA must approve together, with ADNOC. It is not a switch in the build.
-  - **The loading buoy.** It is the literal image of the Fujairah export point, whose terminal was struck on 14 and 16 March and 4 May 2026.
+  - **The loading buoy.** It is the literal image of the Fujairah export point. Fires broke out in the Fujairah Oil Industry Zone after drone attacks or falling interception debris on several days in March and on 4 May 2026.
 - **Removable.**
   - `?pull=tanker` takes the beat out and closes the cut up to 2:55.0, with its narration, its music and the cue sheet.
   - Hold a go/no-go at two weeks and again at 72 hours before the ceremony, against the Hormuz situation and any incident involving a UAE vessel.
   - The beat never goes into a cut-down, a social clip, the international version or a press still. Its headline over a laden tanker reads as a weather service only with the narration under it.
-- **Verification.** The tanker and AI facts were researched and read by the protocol reviewer, who read WAM's text in full. Their separate adversarial check did not complete. Confirm the AI wording with NCM before the script is approved.
+- **Verification.** The AI wording matches WAM's Arabic and English texts of 29 June 2026, checked twice. NCM's marine bulletin (12 June 2026) has ARABIAN GULF and EASTERN COAST sections giving wave height, wind speed and wind direction; take a current original from NCM before any bulletin detail goes on screen.
 
 **Music: an Emirati temp score** (`score.py`).
 - **Every cue is placed from its beat's start**, so the music follows any re-cut, including a pulled tanker.
