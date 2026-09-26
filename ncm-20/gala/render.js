@@ -4,6 +4,7 @@
 //   node render.js film <out.mp4> [score.wav] [--scale 2] [--jobs 3]       every frame at 30 fps → H.264 (+ AAC)
 //   node render.js cues <cues.json>                                        the timeline, for score.py and subtitles
 //        [--from S] [--to S] [--afrom S] [--crf 16] [--fps 50] [--grade led]   a time range (--afrom 0 when the audio file starts there); 50 fps; the LED-wall grade
+//        --from split / --to split: the cue-to-cue split between part 1 and part 2, read from the cut itself
 //
 // --scale 2 renders a 3840×2160 master. --jobs N renders N contiguous chunks in parallel pages and joins
 // them without re-encoding. Needs Playwright (NODE_PATH may point at a global install) and an ffmpeg with
@@ -61,8 +62,11 @@ async function openPage(browser) {
   }
   const probe = await openPage(browser);
   const duration = await probe.evaluate(() => window.__duration);
+  // 'split' is the cue-to-cue split: the gauge's start less half its dissolve (where part 1 ends and part 2 begins)
+  const split = await probe.evaluate(() => { const g = SCENES.find(s => s.id === 'gauge'); return g ? g.start - (g.xf ?? XF) / 2 : null; });
   await probe.context().close();
-  const f0 = Math.round((FROM != null ? Number(FROM) : 0) * FPS), f1 = Math.round((TO != null ? Number(TO) : duration) * FPS);
+  const when = v => { if (v !== 'split') return Number(v); if (split == null) throw new Error('--from/--to split: no gauge beat'); return split; };
+  const f0 = Math.round((FROM != null ? when(FROM) : 0) * FPS), f1 = Math.round((TO != null ? when(TO) : duration) * FPS);
   const audio = rest[0], started = Date.now(), n = f1 - f0;
   const parts = [], per = Math.ceil(n / JOBS);
   for (let j = 0; j < JOBS; j++) { const a = f0 + j * per, b = Math.min(f1, a + per); if (b > a) parts.push({ a, b, file: `${out}.part${j}.mp4` }); }

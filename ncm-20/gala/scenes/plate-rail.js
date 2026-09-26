@@ -7,7 +7,10 @@
 //   The locomotive: an EMD SD70-family diesel-electric as Etihad Rail runs them, 22.6 m long, about 5 m high, six axles
 //   on two three-axle bogies, sand ploughs at both ends; light grey with broad bands (engraved as dense hatching, never
 //   as colour), no logo. Diesel: no overhead wires. In-cab signalling: no lineside signals. No level crossings.
-//   The wagons: flat wagons with single-stacked ISO containers (12.19 m and 6.06 m long, 2.59 m high); no double stacks.
+//   The wagons: open hopper wagons of crushed stone (Etihad Rail carries aggregates and building materials; ADMO 2023),
+//   heading west from the Hajar. No containers: since 20 Sep 2026 a container train on the Fujairah line reads as the
+//   Hormuz bypass. The wagon's size is typical of a four-axle aggregate hopper (15 m, 3 m wide, 3.9 m above the rail);
+//   match it to Etihad Rail's photographs before the master.
 //   The embankment: sand trapped in the ditch on the windward side, clean ballast; the fence along the right of way.
 //   Speed 80 km/h (22.2 m/s). The beat shows the head end only.
 const RAIL = { cx: 1435, hz: 430, f: 1805, eye: 12.0, azC: 90, x0: 985, x1: 1885, y0: 100, y1: 1000 };
@@ -19,10 +22,10 @@ scene({
     this.d = [Math.sin(phi), -Math.cos(phi)]; // direction of travel, on the ground plane (x right, y forward)
     this.n = [Math.cos(phi), Math.sin(phi)]; // across the track, away from the camera
     this.Q = [14, 95]; // the near track's centre line passes here (metres), where the head is at mid-beat
-    // the consist, from the head back: one locomotive, then flat wagons with a 40 ft and a 20 ft container
-    const r = rng(81), cols = [BLUE, OCHRE, SEPIA, INK, BLUE, '#7A8C6A', OCHRE, SEPIA];
+    // the consist, from the head back: one locomotive, then open hopper wagons of stone
+    const r = rng(81);
     this.cars = [{ kind: 'loco', len: 22.6, top: 4.9 }];
-    for (let k = 0; k < 40; k++) this.cars.push({ kind: 'flat', len: 19.5, top: 3.8, c40: cols[Math.floor(r() * cols.length)], c20: cols[Math.floor(r() * cols.length)], swap: r() < 0.5 });
+    for (let k = 0; k < 50; k++) this.cars.push({ kind: 'hopper', len: 15.0, top: 3.9, heap: 0.25 + 0.2 * r() });
     this.posts = []; for (let s = -2400; s < 400; s += 4) this.posts.push(s);
     this.palms = Array.from({ length: 70 }, () => ({ az: 72 + r() * 18, dist: 2200 + r() * 2600, h: 9 + r() * 7, lean: (r() - 0.5) * 0.3 }));
   },
@@ -155,14 +158,27 @@ scene({
       if (plough) { fill(plough, INK, 0.35 * tq); stroke(plough, tq, INK, 1); }
       return;
     }
-    // a flat wagon: the deck, then a 40 ft and a 20 ft container (2.44 m wide, 2.59 m high)
-    const deck = this.box(s0, s1, -1.45, 1.45, zr + 0.95, zr + 1.2, psi);
-    this.paintBox(deck, tq, { side: [INK, 0.5], top: [INK, 0.25], front: [INK, 0.55], lw: 0.9 });
-    const a40 = c.swap ? s1 - 0.4 - 12.19 : s0 + 0.4, a20 = c.swap ? s0 + 0.4 : s0 + 0.4 + 12.19 + 0.3;
-    [[a40, 12.19, c.c40], [a20, 6.06, c.c20]].forEach(([a, len, col]) => {
-      const f = this.box(a, a + len, -1.22, 1.22, zr + 1.2, zr + 3.79, psi);
-      this.paintBox(f, tq, { side: [col, 0.5], front: [col, 0.7], top: [col, 0.3], lw: 0.9 });
-      if (f.side) for (let o = 0.6; o < len; o += 0.6) { const g = seg(L(a + o, zr + 1.3, -1.22), L(a + o, zr + 3.7, -1.22)); if (g) stroke(g, tq, INK, 0.5, 0.3); } // corrugations
+    // an open hopper wagon: straight sides from the underframe to the top, the two discharge pockets hanging below it
+    // between the bogies, and the load of crushed stone heaped a little above the rim (the eye, 12 m up, sees over it)
+    const zs = zr + 1.3, zt = zr + c.top, e0 = s0 + 0.3, e1 = s1 - 0.3;
+    [[s0 + 4.5, s0 + 7.3], [s1 - 7.3, s1 - 4.5]].forEach(([a, e]) => {
+      const pk = this.quad([[a, -1.35, zr + 1.0], [e, -1.35, zr + 1.0], [e - 0.8, -1.1, zr + 0.45], [a + 0.8, -1.1, zr + 0.45]], [], psi);
+      if (pk) { mask(pk); fill(pk, INK, 0.3 * tq); stroke(pk, tq, INK, 0.9, 0.8); }
     });
+    const sill = this.box(e0, e1, -1.45, 1.45, zr + 1.0, zs, psi);
+    this.paintBox(sill, tq, { side: [INK, 0.45], front: [INK, 0.5], lw: 0.8 });
+    const body = this.box(e0, e1, -1.5, 1.5, zs, zt, psi);
+    this.paintBox(body, tq, { side: [SEPIA, 0.16], front: [SEPIA, 0.3], lw: 1.0 });
+    if (body.side) {
+      for (let o = 1.2; o < e1 - e0 - 0.6; o += 1.2) { const g = seg(L(e0 + o, zs, -1.5), L(e0 + o, zt, -1.5)); if (g) stroke(g, tq, INK, 0.55, 0.45); } // the side stakes
+      const ch = seg(L(e0, zt - 0.18, -1.5), L(e1, zt - 0.18, -1.5)); if (ch) stroke(ch, tq, INK, 0.7, 0.6); // the top chord
+    }
+    // the stone: its near slope from the rim up to a low crest along the middle
+    const heap = this.quad([[e0 + 0.5, -1.5, zt], [e1 - 0.5, -1.5, zt], [e1 - 1.4, 0, zt + c.heap], [e0 + 1.4, 0, zt + c.heap]], [], psi);
+    if (heap) {
+      const hb = [Math.min(...heap.pts.map(p => p[0])) - 2, Math.min(...heap.pts.map(p => p[1])) - 2, Math.max(...heap.pts.map(p => p[0])) + 2, Math.max(...heap.pts.map(p => p[1])) + 2];
+      mask(heap); fill(heap, OCHRE, 0.35 * tq); hatch(heap, hb, 0.8, 1.8, tq, SEPIA, 0.6, 0.45, 840); hatch(heap, hb, -0.7, 2.2, tq, SEPIA, 0.5, 0.35, 841);
+      stroke(heap, tq, INK, 0.7, 0.6);
+    }
   },
 });

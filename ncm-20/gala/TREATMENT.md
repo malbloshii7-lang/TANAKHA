@@ -6,7 +6,7 @@ Final treatment by the head of media and PR lead. Draft for NCM and protocol app
 
 | | |
 |---|---|
-| Runtime | **2:38.3** (158.33 s = 47.5 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop |
+| Runtime | **3:00.0** (180 s = 54 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop. 2:55.0 with the tanker beat pulled (Revision 3) |
 | Screen | Large LED wall in a dark hall. The event master is 50p, rendered to the wall's native pixel map (3840×2160 if the wall is 16:9) with the LED grade (`?grade=led`) |
 | Sound | 5.1 cinema mix (7.1 if the hall has it), an original score recorded live, and an Arabic voice-over by an Emirati narrator |
 | Language | Arabic leads everywhere: the voice-over, the first and larger line of every text block, the right-hand text column. English comes second |
@@ -37,7 +37,7 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
 **Prominence.**
 - The world beat's musical peak is the national line, «من سماء الإمارات إلى العالم».
 - Dr Al Mandous's name is held under a steady chord, with no bloom.
-- Each leader's card has full strings, the motif in the horn and a wordless choir. Measured in `mix.wav`, every card is at or above B17's level (the rides are 0 dB for the cards, −2.5 dB for B17).
+- Each leader's card has full strings, the motif in the horn and a wordless choir. Measured in `mix.wav`, every card is at or above the world beat's level (Revision 3: the build now checks it).
 - Dr Al Mandous's name is set no larger than the office line above it (28 px Arabic, 16 px English), smaller than the leaders' names on their cards (30 px, 18 px).
 - The applause after B17 runs **cue to cue**. PART 1 stops on B17's last frame, with the office and the name on screen. LOOP W, a 12 s still with its music bed, plays until the show caller releases PART 2.
 
@@ -70,6 +70,114 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
 - Fonts are self-hosted (`fonts/`, SIL OFL), and a render stops if one fails to load.
 - The subtitle files are generated from the build, with LRM marks in place of isolates for caption renderers.
 - The Arabic and English narration captions are delivered too.
+
+## Revision 3 · 26 September 2026: Etihad Rail, the east coast, and an Emirati score
+
+The client asked for three things:
+- an Etihad Rail scene;
+- an ADNOC vessel laden with Murban crude, "depending on our AI solution for a safe passage";
+- background music that is more Emirati.
+
+Five research briefs (rail, tanker, NCM's AI, Emirati music, protocol) and an adversarial check of the rail facts
+shaped what is built. **Where this section and anything above disagree, this section and the build win.**
+`SCRIPT.md` has the words as built.
+
+**The cut.**
+- 21 beats, 54 bars, **3:00.0**.
+- The working day is now five 5 s beats: the airport, B11 the railway, the port, B13 the east coast, and Shams 1.
+- The President's card starts at 1:50.
+- Beat numbers from B11 on move up by one or two; the cue sheet counts them from the cut itself.
+
+**B11 · Across the land (Etihad Rail near Al Dhaid, Sharjah).**
+- **Picture.**
+  - An EMD SD70-family locomotive, engraved from its published dimensions (22.6 m, about 5 m high, six axles). It has no logo, and its livery bands are hatched, not coloured.
+  - It draws open hopper wagons of crushed stone west from the Hajar, on the double-track embankment with the ditch and berm that stop the sand.
+  - The skyline is computed from a viewpoint near Al Dhaid.
+- **No container train.** Since 20 September 2026 the Fujairah–ICAD container service runs on this section. International press calls it the route that bypasses the Strait of Hormuz. Beside a tanker off Fujairah, containers would tell that story.
+- **Words.**
+  - Label: «قطارات الاتحاد · الذيد، الشارقة» / ETIHAD RAIL · AL DHAID, SHARJAH.
+  - Headline: «على امتداد البر» / ACROSS THE LAND.
+  - VO-09r: «وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،» / "across the land, warnings of dust and fog;". The fatha on «البَرّ» keeps it from being read as «البِرّ» (piety) or «البُرّ» (wheat).
+  - This claims only NCM's public dust and fog warnings (WAM, 4 January and 21 February 2026), which address the public and drivers.
+  - No NCM service to Etihad Rail is documented, so the film never says "for every railway" or "for every train".
+  - The film never says "links all seven emirates": the main line does not run through Ajman or Umm Al Quwain.
+- **Clearance.** Showing the name "Etihad Rail" needs Etihad Rail's written clearance, obtained through NCM. Until then, set `RAIL_NAME` in `timeline.js` to «شبكة السكك الحديدية الوطنية» / NATIONAL RAIL NETWORK.
+- **Sound.** A distant diesel only: no horn (Etihad Rail keeps no-horn zones) and no wheel clack (the main line is continuously welded).
+
+**B13 · For the east coast (the Sea of Oman off Fujairah).**
+- **Picture.**
+  - A very large crude carrier, laden (about 9 m of hull showing), under way on a south-easterly course, away from the strait.
+  - She is drawn at her true size for 1.8 km, with the Hajar behind her (computed skyline).
+  - Her bow wave is small and her wake stays in the water behind her.
+  - She has no name, flag, livery or logo, no terminal or loading buoy, and no funnel smoke. Off Fujairah in 2026, smoke reads as fire.
+- **The bulletin inset.** NCM's EASTERN COAST marine bulletin writes itself line by line, then a forecaster signs it.
+  - Its chart is the UAE's own east coast, from the Oman border at Dibba to the border south of Kalba, taken from the national map's data, with the sea to the east.
+  - It shows no Musandam, no strait, no route line and no ship marker, and no numbers.
+- **Words.**
+  - Label: «الفجيرة · بحر عُمان» / FUJAIRAH · SEA OF OMAN.
+  - Headline: «للساحل الشرقي» / FOR THE EAST COAST.
+  - VO-10t: «وللساحلِ الشرقيِّ نشرةٌ يقترحُها الذكاءُ الاصطناعيّ، ويعتمدُها المتنبِّئون،» / "for the East Coast, a bulletin that AI drafts and forecasters approve;".
+  - This follows WAM, 29 June 2026: NCM's Forecaster Assistant prepares preliminary drafts of weather and marine bulletins, and specialists review and approve every output.
+  - The AI proposes and people approve: the line claims no protection, safety or decision.
+  - The Arabic editor's changes:
+    - The plural «المتنبِّئون», because the singular sounds like the poet «المتنبّي» at a pause.
+    - No second «بحريّة» after VO-10's.
+    - Eight words instead of eleven, so the clause no longer fills its whole beat.
+  - The fallback that keeps WAM's own verb is «…نشرةٌ يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،».
+- **Declined, with the reasons given to the client.**
+  - **"Safe passage"** («عبور آمن», «ممر آمن», «مسار آمن»). In September 2026 this is the vocabulary of the Hormuz diplomacy (the UN statement of 24 September: "safe, secure and unimpeded transit"). It claims a security outcome that no weather agency delivers.
+  - **ADNOC's name or livery, and a Murban label.**
+    - ADNOC vessels have been attacked in Hormuz since February; ADNOC counts 15, the latest on 20 September. ADNOC declines to discuss vessel movements.
+    - Murban is a traded benchmark, and naming it reads as product placement.
+    - It loads free on board at Fujairah into the buyer's ship, so "an ADNOC vessel laden with Murban" may not even be accurate.
+    - ADNOC's chairman, a board member and its chief executive (a minister) will be in the room.
+    - Naming ADNOC or Murban is a new label and a new picture that NCM leadership, the protocol office and MoFA must approve together, with ADNOC. It is not a switch in the build.
+  - **The loading buoy.** It is the literal image of the Fujairah export point, whose terminal was struck on 14 and 16 March and 4 May 2026.
+- **Removable.**
+  - `?pull=tanker` takes the beat out and closes the cut up to 2:55.0, with its narration, its music and the cue sheet.
+  - Hold a go/no-go at two weeks and again at 72 hours before the ceremony, against the Hormuz situation and any incident involving a UAE vessel.
+  - The beat never goes into a cut-down, a social clip, the international version or a press still. Its headline over a laden tanker reads as a weather service only with the narration under it.
+- **Verification.** The tanker and AI facts were researched and read by the protocol reviewer, who read WAM's text in full. Their separate adversarial check did not complete. Confirm the AI wording with NCM before the script is approved.
+
+**Music: an Emirati temp score** (`score.py`).
+- **Every cue is placed from its beat's start**, so the music follows any re-cut, including a pulled tanker.
+- **The drums of Al Ayyala carry the day**: the ras, three takhamir, the tar and the tus.
+  - They enter with the ras player's takhmeera after the iris into the Center (pianissimo).
+  - One tar and tus stroke marks the seven emirates lit together.
+  - They carry the working day at mezzo-forte, with a colour for each place: steady eighths for the railway, the sawt's mirwas and interlocking claps for the port.
+  - The drums rest under the tanker, where only the jahla and the crew's drone play; protocol advised against Ayyala under a ship.
+  - They take the world beat to forte on the national line, recede under the office, and stop before the name.
+  - The twentieth drop lands with the ras and the tus.
+- **Nights have no drums.** A practitioner's account has the Ayyala performed only in the afternoon.
+  - The night open and the finale have the rababa (it replaces the ney) and a hummed lead answered by a group.
+  - The oud replaces the qanun. New Grove: neither the ney nor the qanun has a traditional link to the area.
+- **Pearling** has one wordless nahham call over the crew's drone two octaves below, with two groups of claps and the jahla.
+- **Every leader's card** gets the same hummed lead and answer, strings, horn and choir, and no percussion.
+- **April 2024** has no Emirati percussion, no claps and no voices.
+- **Left out on purpose:**
+  - Al Harbiya and Al Razfa (war and victory);
+  - Liwa and the zaffa (weddings);
+  - the habban (Iranian-coast origins);
+  - the manior (zar);
+  - chanted verse of any kind;
+  - the anthem.
+- **A restrained mix** (`mix-restrained.wav`, with its own part files) drops the drums, tus, claps and jahla, for a ceremony in Ramadan or a period of mourning.
+- **Precedence is measured.** The build fails if any leader's card is quieter than the world beat (cards about −14.0 LUFS, world −14.4).
+- **The temp is a sketch.** Every drum pattern is a programming sketch, not a transcription, and the troupe replaces it with its own. The synthesized voices are never played to heritage advisers as Emirati music.
+- **Credits** (programme, not screen): the troupes by name and emirate; the Ayyala as a joint UNESCO file with Oman (2014); and an original score for NCM (Decree-Law 38/2021, Articles 16, 17 and 29).
+
+**Reading times (critique M1: at least 3 s plus 0.3 s a word).**
+- The new labels meet the rule.
+- The Great Dive, the airport and Shams 1 labels were retimed to meet it. The airport's English is 0.3 s short.
+- Still short by the rule, for decision:
+  - **the three leaders' cards**: up 10.4 s each, while their texts need 13 to 19.5 s. Lengthen all three equally or trim the English (§11, row 39);
+  - **the WMO office and name** in the continuous cut only. In the event master they hold through LOOP W;
+  - **the lockup**, which holds in LOOP A.
+
+**Build.**
+- `render.js --to split` / `--from split` cuts the two show parts at the right frame for either cut.
+- The cue sheet numbers the beats from the cut.
+- `?pull=tanker` works in every tool.
 
 ---
 
@@ -571,6 +679,8 @@ Level A echoes the voice; Level B is a label; "Card" marks leadership text. Ever
 
 ## 8. Music and sound brief
 
+> **Superseded in part by Revisions 2 and 3.** The score as built is `score.py`: Emirati forms, cues placed from each beat's start, the world beat's peak on the national line (never on a name), no drums at night, on the cards or under April 2024. This section records the original brief.
+
 ### 8.1 Concept
 
 "The sky has a pulse." An original, commissioned score recorded live, on a single 72 BPM grid (one bar = 3.333 s), so every cut, ring and hit lands on the beat. Energy changes through subdivision and orchestration, never through tempo. The existing synthesized `score.py` / `audio.py`, retimed to this map, is the temp track for the animatic.
@@ -968,6 +1078,13 @@ Every number on screen, its qualifier and its source:
 | 31 | The logo: if NCM's logo carries the federal emblem, it goes on a plain outro background, not over the sky; the AV vendor's side-screen packages add no animated flag with text over it | Federal identity rules | NCM communications / AV vendor | Text lockup over the sky |
 | 32 | Schedule: approve the script (`SCRIPT.md`) with protocol and legal in November 2026, record the VO after that, lock picture timings, then record the score in January 2027. Plan the February hall visit and the delivery two weeks before the ceremony around Ramadan and Eid (about 8 February to 10 March 2027) | Words recorded before approval get recorded twice | Production | — |
 | 33 | Expiry: "presides" is true until the 20th World Meteorological Congress (about June 2027). The cut-downs and any use at international events need a June 2027 expiry and past-tense alternates, routed through MoFA | Stale claims abroad | NCM / MoFA | Ceremony use only |
+| 34 | **The tanker beat**: keep it as built (weather only, unbranded, under way, removable), replace it with an anonymous operations room where a forecaster approves the AI-drafted east-coast bulletin, or cut it. Go/no-go at two weeks and at 72 hours | Hormuz, attacks on UAE ships and Fujairah in 2026 | NCM leadership, protocol office, MoFA | As built; `?pull=tanker` ready |
+| 35 | Etihad Rail: written clearance for the name and the depiction; which freight runs past Al Dhaid (stone assumed); reference photographs of the Stage 2 SD70 livery and the wagons | The name on screen; draw the real train | NCM communications with Etihad Rail | Name in review copies only; the master needs clearance or `RAIL_NAME` set to the national network |
+| 36 | Does NCM have a forecast, warning or data-sharing arrangement with Etihad Rail or ADNOC? None is documented | If one exists, the rail line could say «لكل قطار» and cite it | NCM | Public warnings only |
+| 37 | The Emirati music: a named cultural adviser; troupes from more than one emirate; the nahham (the Sharjah Institute for Heritage's Zeenat Al Sharjah troupe is one lead); written agreements with a perpetual buyout, and credits by name and emirate | Authenticity and performers' rights (Decree-Law 38/2021) | NCM / production | Synthesized temp, never played to heritage advisers |
+| 38 | Which mix on the night: the full mix, or the restrained mix (no drums, tus, claps or jahla) if the ceremony falls in Ramadan (expected about 8 February to 9 March 2027) or a period of mourning | Propriety | NCM protocol | Full mix; restrained mix delivered |
+| 39 | The leaders' cards' reading time: lengthen all three equally (for example to 15 s each, adding about 10 s) or trim their English | The rule of 3 s plus 0.3 s a word; equal treatment | Protocol office | 11.7 s beats as built |
+| 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

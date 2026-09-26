@@ -1,18 +1,21 @@
 'use strict';
-// A laden crude tanker at an offshore loading buoy off Fujairah, the Hajar behind her. Every size comes from one
-// viewpoint: the eye 12 m up on a small vessel at 25.2262 N, 56.4271 E, looking south-west (bearings 227-242 deg
-// across the plate, 60 px a degree).
+// A laden crude tanker under way in the Sea of Oman off Fujairah, heading south-east (away from the strait), the Hajar
+// behind her. Every size comes from one viewpoint: the eye 12 m up on a small vessel at 25.2262 N, 56.4271 E, looking
+// south-west (bearings 227-242 deg across the plate, 60 px a degree).
 //   The skyline: the true skyline computed from terrain tiles (data/build/rak_skyline.py 25.2262 56.4271 226.5 242.5
 //   --sea --true): every bearing in the frame has UAE ground (Fujairah) as its ridge, 1.3-1.9 deg high, 24-32 km away.
-//   The buoy: a turret-type loading buoy (CALM) 1.8 km off at bearing 240.1 deg (the terminal's published position);
-//   1.91 px a metre at that range. The ship lies to it by a 70 m hawser from her bow, downwind of it (here a light
-//   north-westerly: her bow points into it), and loads through two floating hose strings to her midship manifold.
-//   The ship: a very large crude carrier, 336 m long; laden with some two million barrels she shows about 9 m of hull.
-//   Her waterline lies 0.38 deg (23 px) below eye level. A slight sea: fine wavelets, no whitecaps.
-// No name, no flag, no company livery or logo, no shore tank farm (see TREATMENT.md, Revision 3).
+//   The ship: a very large crude carrier, 336 m long, 1.8 km off (1.91 px a metre), seen nearly broadside. On a
+//   south-easterly course she moves to the left of the frame at 12 knots (6.2 m/s, 11.8 px a second). Laden with some
+//   two million barrels she shows about 9 m of hull; her waterline lies 0.38 deg (23 px) below eye level. A small bow
+//   wave; her wake stays in the water behind her. A slight sea: fine wavelets, no whitecaps.
+// No terminal, no loading buoy, no funnel smoke (off Fujairah in 2026, smoke reads as fire), no name, no flag, no company
+// livery or logo (TREATMENT.md, Revision 3).
 // The inset: the east-coast marine bulletin, its lines drafting themselves (the AI assistant prepares the draft), then
-// signed (a forecaster approves it). No numbers are shown.
-const TK = { eye: 600, px: 1.91, buoyX: 1771 };
+// signed (a forecaster approves it). No numbers are shown. Its chart is the UAE's east coast from the film's own map
+// data (data/uae-map.json: the national map's neutral geometry, pending the FGIC map), from the Oman border at Dibba to
+// the Oman border south of Kalba, with the sea to the east: no Musandam, no strait, no route, no ship marker.
+const TK = { eye: 600, px: 1.91, sternX: 1765, v: 11.8, t0: 1.4, mid: 3.9 }; // t0: the scene clock at the cut (the beat's offset); mid: mid-beat
+const EAST_COAST = [[56.2699, 25.6291], [56.2738, 25.6214], [56.2816, 25.6229], [56.28, 25.6137], [56.2893, 25.6067], [56.3067, 25.6108], [56.3362, 25.6042], [56.3557, 25.5939], [56.3549, 25.5524], [56.3698, 25.5251], [56.3603, 25.4868], [56.364, 25.4201], [56.3585, 25.3774], [56.3479, 25.3746], [56.3572, 25.3496], [56.3667, 25.3491], [56.3665, 25.3592], [56.3752, 25.3481], [56.3812, 25.3249], [56.3758, 25.3148], [56.3647, 25.245], [56.3703, 25.2415], [56.3586, 25.1957], [56.361, 25.0682], [56.3756, 24.9811]]; // arcs 43, 25, 23, 39, 45 of data/uae-map.json, north to south
 scene({
   id: 'tanker',
   init() {
@@ -22,10 +25,10 @@ scene({
     this.ridgeP = pl(this.ridge, false, 900, 0.3);
     this.ridgeFill = new P(this.ridge.concat([[1885, TK.eye + 5], [985, TK.eye + 5]]), true);
     this.shore = pl([[985, TK.eye + 5], [1885, TK.eye + 5]], false, 901, 0.4); // the coast, 6-7 km off, just below eye level
-    // the ship, in metres from her stern (x) and the waterline (y), bow to the right; placed 70 m short of the buoy
-    const L = 336, fb = 9, sx = TK.buoyX - 70 * m - L * m, S = (x, y) => [sx + x * m, yw - y * m];
-    this.sx = sx;
+    // the ship, in metres from her stern (x, forward) and the waterline (y), bow to the LEFT: she steams south-east
+    const L = 336, fb = 9, S = (x, y) => [TK.sternX - x * m, yw - y * m];
     this.hull = new P([S(0, -0.3), S(-1, fb + 0.6), S(4, fb + 1.0), S(298, fb), S(302, fb + 2.4), S(330, fb + 2.9), S(336, fb + 3.2), S(333, 4), S(328, -0.3)], true);
+    this.hullBox = [S(L, 0)[0] - 4, yw - (fb + 4) * m, S(-1, 0)[0] + 4, yw + 2];
     this.deckLine = pl([S(4, fb + 1.0), S(298, fb)], false, 902, 0.2);
     this.focsle = pl([S(302, fb + 2.4), S(330, fb + 2.9)], false, 903, 0.2);
     this.accom = new P([S(12, fb + 1), S(12, fb + 18), S(38, fb + 18), S(38, fb + 1)], true);
@@ -36,7 +39,6 @@ scene({
     this.bridgeWin = new P([S(11, fb + 19.2), S(11, fb + 20.8), S(39, fb + 20.8), S(39, fb + 19.2)], true);
     this.radarMast = [pl([S(24, fb + 21.5), S(24, fb + 30)], false, 915, 0), pl([S(20, fb + 28), S(28, fb + 28)], false, 916, 0)];
     this.funnel = new P([S(3, fb + 1), S(4, fb + 25), S(11, fb + 26), S(12, fb + 1)], true);
-    this.funnelTop = S(7.5, fb + 25.6);
     this.lifeboat = new P([S(-1, fb + 4), S(2, fb + 7.5), S(11, fb + 5), S(8, fb + 1.5)], true);
     this.pipes = pl([S(40, fb + 1.6), S(298, fb + 1.6)], false, 920, 0.15);
     this.catwalk = pl([S(40, fb + 3.2), S(298, fb + 3.2)], false, 921, 0.15);
@@ -45,16 +47,15 @@ scene({
     this.crane = [pl([S(178, fb), S(178, fb + 14)], false, 945, 0), pl([S(178, fb + 13), S(166, fb + 9)], false, 946, 0)];
     this.foremast = pl([S(314, fb + 2.9), S(314, fb + 17)], false, 950, 0);
     this.hatchCovers = []; for (let x = 60; x < 290; x += 23) this.hatchCovers.push(new P([S(x, fb), S(x, fb + 1.1), S(x + 3, fb + 1.1), S(x + 3, fb)], true));
-    this.bow = S(336, fb + 3.2); this.manifoldPt = S(170, fb + 4); this.craneTip = S(166, fb + 9);
-    // the buoy: a 12 m turret buoy, 5 m high, with its turntable and light
-    const bx = TK.buoyX, bw = 6 * m, bh = 4 * m;
-    this.buoy = new P([[bx - bw, yw], [bx - bw, yw - bh * 0.6], [bx + bw, yw - bh * 0.6], [bx + bw, yw]], true);
-    this.turret = new P([[bx - bw * 0.45, yw - bh * 0.6], [bx - bw * 0.45, yw - bh * 1.3], [bx + bw * 0.45, yw - bh * 1.3], [bx + bw * 0.45, yw - bh * 0.6]], true);
-    this.buoyMast = pl([[bx, yw - bh * 1.3], [bx, yw - bh * 2.3]], false, 955, 0);
-    // the hawser, sagging, from the bow to the turntable
-    this.hawser = new P(quad(this.bow, [(this.bow[0] + bx) / 2, yw - 2], [bx - bw * 0.45, yw - bh], 14));
-    // two floating hose strings from the buoy along her side to the manifold, then up to her hose crane
-    this.hoses = [0, 1].map(k => new P(wob(quad([bx - bw, yw - 1 - k], [TK.buoyX - 60 * m, yw + 8 + k * 5], [this.manifoldPt[0] + 8 * m, yw + 2 + k * 2], 20).concat([[this.manifoldPt[0] + 2 * m, yw - 4], [this.craneTip[0] + k * 3, this.craneTip[1] + 6]]), 960 + k, 0.4)));
+    // the bow wave, carried with her: a low crest at the stem and a line of broken water running aft along her side
+    const [bx] = S(L, 0);
+    this.bowWave = [
+      new P(wob(quad([bx + 10, yw + 1.5], [bx + 2, yw - 3.5], [bx - 9, yw + 1.2], 8), 985, 0.3)),
+      new P(wob(quad([bx + 22, yw + 3], [bx + 12, yw - 1.5], [bx - 4, yw + 3.5], 8), 986, 0.3)),
+    ];
+    this.sideFoam = []; for (let k = 0; k < 9; k++) { const x0 = bx + 14 + k * 9 + r() * 5; this.sideFoam.push({ p: new P([[x0, yw + 1.2 + r()], [x0 + 5 + r() * 5, yw + 1.4 + r()]]), a: 0.7 - k * 0.06 }); }
+    // her wake: broken water fixed in the sea behind the stern, revealed as she moves on, fading with its age
+    this.wake = []; for (let k = 0; k < 90; k++) { const x0 = TK.sternX - 40 + r() * 190, y0 = yw + 0.8 + Math.pow(r(), 1.5) * 9; this.wake.push({ x0, p: new P([[x0, y0], [x0 + 5 + r() * 11, y0 + (r() - 0.5) * 0.8]]) }); }
     // the sea: broken strokes closing up toward the land
     this.sea = [];
     for (let row = 0; row < 46; row++) {
@@ -70,13 +71,19 @@ scene({
     // the bulletin inset (upper left of the plate): a sheet with a small chart of the east coast and its lines of text
     this.sheet = new P([[1010, 150], [1300, 150], [1300, 420], [1010, 420]], true);
     this.sheetIn = new P([[1018, 158], [1292, 158], [1292, 412], [1018, 412]], true);
-    const K = 0.9; // the east coast from Dibba to Kalba, simplified from the film's map data (lon/lat to the inset)
-    this.coast = new P([[56.27, 25.62], [56.35, 25.45], [56.36, 25.3], [56.37, 25.12], [56.36, 24.98], [56.38, 24.92]].map(([lo, la]) => [1060 + (lo - 56.0) * 260 * K, 188 + (25.7 - la) * 260]), false);
+    // the chart: north up, true to scale at 25.3 N (352 px a degree of latitude), the coast running the box's full height
+    const k = 228 / (25.6291 - 24.9811), kx = k * Math.cos(25.3 * Math.PI / 180), C = ([lo, la]) => [1075 + (lo - 56.2699) * kx, 172 + (25.6291 - la) * k];
+    this.coastPts = EAST_COAST.map(C);
+    this.coast = new P(this.coastPts, false);
     this.chartBox = new P([[1030, 172], [1160, 172], [1160, 400], [1030, 400]], true);
-    this.textLines = []; for (let k = 0; k < 11; k++) this.textLines.push({ y: 186 + k * 17, w: 70 + (k * 37) % 55 });
+    // the sea to the east of the coast: wavy lines from the shore to the box's edge
+    const coastX = y => { const p = this.coastPts; for (let i = 1; i < p.length; i++) if (p[i][1] >= y) { const u = (y - p[i - 1][1]) / Math.max(1e-6, p[i][1] - p[i - 1][1]); return p[i - 1][0] + u * (p[i][0] - p[i - 1][0]); } return p[p.length - 1][0]; };
+    this.chartSea = []; for (let y = 180; y < 398; y += 15) { const x0 = coastX(y) + 5, pts = []; for (let x = x0; x <= 1155; x += 5) pts.push([x, y + 1.2 * Math.sin((x - x0) * 0.35 + y)]); if (pts.length > 1) this.chartSea.push(new P(pts)); }
+    this.textLines = []; for (let j = 0; j < 11; j++) this.textLines.push({ y: 186 + j * 17, w: 70 + (j * 37) % 55 });
     this.sign = new P(wob([[1200, 390], [1212, 380], [1222, 392], [1232, 377], [1246, 391], [1262, 384], [1280, 386]], 970, 0.6));
   },
   draw(lt) {
+    ctx.save(); ctx.beginPath(); ctx.rect(985, 100, 900, 900); ctx.clip();
     // the Hajar behind Fujairah, far and light
     const mq = easeInOut(prog(lt, 0.2, 1.4));
     mask(this.ridgeFill);
@@ -85,13 +92,13 @@ scene({
     stroke(this.shore, easeOut(prog(lt, 0.6, 1.0)), INK, 1, 0.5);
     const sw = easeOut(prog(lt, 0.3, 1.4));
     this.sea.forEach(w => stroke(w.p, clamp(sw * 1.6 - w.d * 0.6), BLUE, w.w, w.a));
-    // the buoy, its hawser and the hoses
-    const bq = easeOut(prog(lt, 0.7, 0.8));
-    mask([this.buoy, this.turret]); fill(this.buoy, OCHRE, 0.7 * bq); stroke(this.buoy, bq, INK, 1.2); fill(this.turret, INK, 0.2 * bq); stroke(this.turret, bq, INK, 1.1); stroke(this.buoyMast, bq, INK, 1);
-    // the ship
-    const q = easeInOut(prog(lt, 0.5, 1.3)), dq = easeOut(prog(lt, 1.2, 1.0));
+    // her wake, behind wherever her stern is now
+    const dx = -TK.v * (lt - TK.mid), stern = TK.sternX + dx, q = easeInOut(prog(lt, 0.5, 1.3)), dq = easeOut(prog(lt, 1.2, 1.0));
+    this.wake.forEach(w => { const age = w.x0 - stern; if (age > 2) stroke(w.p, q, BLUE, 0.9, 0.55 * clamp(1 - age / 190)); });
+    // the ship, moving left
+    ctx.save(); ctx.translate(dx, 0);
     mask([this.hull, this.accom, this.bridge, this.funnel]);
-    hatch(this.hull, [this.sx - 10, this.yw - 30, TK.buoyX, this.yw + 4], 0.1, 4, q, INK, 1, 0.5, 930);
+    hatch(this.hull, this.hullBox, 0.1, 4, q, INK, 1, 0.5, 930);
     fill(this.hull, INK, 0.25 * q); stroke(this.hull, q, INK, 1.8);
     stroke(this.deckLine, q, INK, 1, 0.7); stroke(this.focsle, q, INK, 1, 0.7);
     stroke(this.pipes, dq, INK, 0.9, 0.7); stroke(this.catwalk, dq, INK, 0.9, 0.7); this.walkLegs.forEach(l => stroke(l, dq, INK, 0.6, 0.5));
@@ -104,19 +111,21 @@ scene({
     this.radarMast.forEach(l => stroke(l, dq, INK, 1.1));
     fill(this.funnel, INK, 0.12 * q); stroke(this.funnel, q, INK, 1.4);
     fill(this.lifeboat, OCHRE, 0.7 * dq); stroke(this.lifeboat, dq, INK, 1);
-    stroke(this.hawser, bq, INK, 1.1, 0.8);
-    this.hoses.forEach(h => stroke(h, easeInOut(prog(lt, 1.4, 1.6)), INK, 2.2, 0.75, [5, 1.5]));
-    // her funnel exhaust, faint, trailing downwind (to the left)
-    const [fx, fy] = this.funnelTop, eq = easeOut(prog(lt, 1.6, 1.2));
-    for (let k = 0; k < 6; k++) { const u = ((lt * 0.35 + k / 6) % 1); stroke(new P(wob([[fx - u * 90, fy - 4 - u * 10], [fx - u * 90 - 26, fy - 7 - u * 12]], 980 + k, 0.8)), eq * (1 - u), SEPIA, 1, 0.25); }
+    // the bow wave and the broken water along her side
+    this.bowWave.forEach(w => stroke(w, dq, BLUE, 1.2, 0.8));
+    this.sideFoam.forEach(f => stroke(f.p, dq, BLUE, 0.9, f.a));
+    ctx.restore();
     // the east-coast bulletin: the draft writes itself line by line, then it is signed
     const iq = easeOut(prog(lt, 0.8, 0.8));
     if (iq > 0) {
       mask(this.sheet); fill(this.sheet, SEPIA, 0.05 * iq); stroke(this.sheet, iq, INK, 1.4); stroke(this.sheetIn, iq, INK, 0.7, 0.6);
-      stroke(this.chartBox, iq, INK, 0.8, 0.6); stroke(this.coast, iq, INK, 1.4, 0.85);
-      for (let k = 0; k < 7; k++) stroke(new P([[1038, 230 + k * 22], [1060 + 30 * Math.sin(k * 1.3 + lt * 0.8), 234 + k * 22]]), iq, BLUE, 0.9, 0.5); // the sea off the coast, lined
-      this.textLines.forEach((l, k) => { const wq = clamp((lt - 1.4 - k * 0.14) / 0.3); if (wq > 0) stroke(new P([[1172, l.y], [1172 + l.w * wq, l.y]]), 1, INK, 1.2, 0.6); });
-      stroke(this.sign, easeInOut(prog(lt, 3.4, 0.7)), BLUE, 1.6, 0.9);
+      stroke(this.chartBox, iq, INK, 0.8, 0.6);
+      this.chartSea.forEach(p => stroke(p, iq, BLUE, 0.9, 0.5));
+      stroke(this.coast, iq, INK, 1.4, 0.85);
+      // the draft writes itself from 0.4 s after the cut; the forecaster signs it 3.4 s in, as the narrator says so
+      this.textLines.forEach((l, j) => { const wq = clamp((lt - TK.t0 - 0.4 - j * 0.16) / 0.3); if (wq > 0) stroke(new P([[1172, l.y], [1172 + l.w * wq, l.y]]), 1, INK, 1.2, 0.6); });
+      stroke(this.sign, easeInOut(prog(lt, TK.t0 + 3.4, 0.7)), BLUE, 1.6, 0.9);
     }
+    ctx.restore();
   },
 });

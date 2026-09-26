@@ -4,35 +4,39 @@
     python3 cuesheet.py cues.json out.csv [fps]
 
 One row per picture cut and per marked moment, with SMPTE timecode at the given frame rate (default 25, the 50 Hz
-house rate). The film runs cue to cue: PART 1 (0:00 to the end of B17) stops on B17's last frame, the applause hold
-(LOOP W, a seamless still of that frame with its music bed) runs until the show caller releases PART 2 (B18 to the
-end), which ends on the stage hold (LOOP A). Timecodes are film time; PART 2's own clip starts at 00:00:00:00.
-The lighting and show-caller teams work from this; the ceremony's running order is theirs.
+house rate). Beat numbers (B01...) are counted from the cut itself, so they stay right when a beat is pulled
+(?pull=tanker). The film runs cue to cue: PART 1 (0:00 to the world beat) stops on the world beat's frame where the
+dissolve into the gauge begins; the applause hold (LOOP W, a seamless still of that frame with its music bed) runs
+until the show caller releases PART 2 (the gauge to the end), which ends on the stage hold (LOOP A). Timecodes are film
+time; PART 2's own clip starts at 00:00:00:00. The lighting and show-caller teams work from this; the ceremony's running
+order is theirs.
 """
 import csv
 import json
 import sys
 
 LABEL = {
-    'suhail': ('B01 Night: Suhail rises over the desert', 'House lights out before GO; black under 1.5 s'),
-    'durour': ('B02 Dawn: the Durour star calendar', 'Warm light cue with the dawn'),
-    'monsoon': ('B03 Ahmed bin Majid and the monsoon', ''),
-    'pearling': ('B04 The named winds; the pearl bank', ''),
-    'falaj': ('B05 Hili falaj, Al Ain; Sheikh Zayed named', ''),
-    'quote-zayed': ('B06 Card: the late Sheikh Zayed', 'Hold light; no movement on stage'),
-    'centre': ('B07 2007: one national center', ''),
-    'nation': ('B08 The seven emirates', ''),
-    'homes': ('B09 April 2024, on the national map', 'Lighting restrained; no colour chase'),
-    'airport': ('B10 Zayed International', ''),
-    'port': ('B11 Jebel Ali', ''),
-    'energy': ('B12 Shams 1', ''),
-    'quote-president': ('B13 Card: H.H. the President', 'Hold light; no movement on stage'),
-    'seeding': ('B14 Rain enhancement, Hajar (Ras Al Khaimah)', ''),
-    'science': ('B15 The science of rain', ''),
-    'quote-mansour': ('B16 Card: H.H. Sheikh Mansour bin Zayed', 'Hold light; no movement on stage'),
-    'world': ('B17 From the skies of the Emirates to the world', 'Applause expected at the end of this beat'),
-    'gauge': ('B18 Twenty years: twenty drops', ''),
-    'finale': ('B19 Night: the same star; title; lockup', ''),
+    'suhail': ('Night: Suhail rises over the desert', 'House lights out before GO; black under 1.5 s'),
+    'durour': ('Dawn: the Durour star calendar', 'Warm light cue with the dawn'),
+    'monsoon': ('Ahmed bin Majid and the monsoon', ''),
+    'pearling': ('The great dive; the nahham', ''),
+    'falaj': ('Hili falaj, Al Ain; Sheikh Zayed named', ''),
+    'quote-zayed': ('Card: the late Sheikh Zayed', 'Hold light; no movement on stage'),
+    'centre': ('2007: one national center', ''),
+    'nation': ('The seven emirates', ''),
+    'homes': ('April 2024, on the national map', 'Lighting restrained; no colour chase'),
+    'airport': ('Zayed International', ''),
+    'rail': ('Etihad Rail near Al Dhaid, Sharjah', ''),
+    'port': ('Jebel Ali', ''),
+    'tanker': ('A laden tanker off Fujairah; the east-coast bulletin', 'Removable module: go/no-go at two weeks and at 72 hours'),
+    'energy': ('Shams 1', ''),
+    'quote-president': ('Card: H.H. the President', 'Hold light; no movement on stage'),
+    'seeding': ('Rain enhancement, Hajar (Ras Al Khaimah)', ''),
+    'science': ('The science of rain', ''),
+    'quote-mansour': ('Card: H.H. Sheikh Mansour bin Zayed', 'Hold light; no movement on stage'),
+    'world': ('From the skies of the Emirates to the world', 'Applause expected at the end of this beat'),
+    'gauge': ('Twenty years: twenty drops', ''),
+    'finale': ('Night: the same star; title; lockup', ''),
 }
 
 
@@ -46,10 +50,11 @@ def main(cues_path, out, fps=25):
     S = {s['id']: s for s in cues['scenes']}
     split = S['gauge']['start'] - S['gauge']['xf'] / 2  # PART 1 ends where the dissolve into B18 begins
     rows = [(0.0, '', 'PART 1 GO', '', '', 'After the anthem and at least 5 s of silence')]
+    B = {s['id']: f'B{i:02d}' for i, s in enumerate(cues['scenes'], 1)}
     for s in cues['scenes']:
         what, note = LABEL.get(s['id'], (s['id'], ''))
-        rows.append((s['start'], s['id'], what, s.get('enter', 'fade'), s.get('xf', 0.5), note))
-    rows.append((split, 'world', 'PART 1 ENDS on B17 frame (name and office on screen)', '', '',
+        rows.append((s['start'], s['id'], f"{B[s['id']]} {what}", s.get('enter', 'fade'), s.get('xf', 0.5), note))
+    rows.append((split, 'world', f"PART 1 ENDS on the {B['world']} frame (office and name on screen)", '', '',
                  'Media server: cut to LOOP W (hold-world.mp4 / hold-world.wav, 12 s seamless) until the room settles'))
     rows.append((split + 0.001, 'gauge', 'PART 2 GO (released by the show caller)', '', '',
                  'Caller releases when applause ends; PART 2 clip starts at 00:00:00:00'))

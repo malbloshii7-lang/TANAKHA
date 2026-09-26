@@ -21,7 +21,8 @@ The Emirati colour follows the music research (UNESCO, DCT Abu Dhabi, the Sharja
     has a traditional link to the area);
   - the pearling beat has a wordless nahham call over the crew's drone two octaves below it, with two groups of
     handclaps and the jahla, the clay water jar the sailors played;
-  - the port has the mirwas and interlocking claps of the Gulf sawt;
+  - the port has the mirwas and interlocking claps of the Gulf sawt; the drums rest under the tanker, where only the
+    jahla and the crew's drone play (no Ayyala under a ship in the 2026 context);
   - the night open, every leader's card and the finale have a lead answered by a group, hummed, without words (only
     the principle of Al Azi and Al Taghrooda, never their melodies). Every card gets exactly the same treatment.
   Left out on purpose: Al Harbiya and Al Razfa (war and victory), Liwa and the zaffa (weddings), the habban, the manior
@@ -378,19 +379,21 @@ def main(cues_path, out_dir):
         'airport': AYYALA,
         'rail': AYYALA + [(i, 'stick', 0.3) for i in (0, 4, 8, 12)],  # the takhamir in steady eighths
         'port': RAS + TAR + TUS + SAWT,  # the sawt's mirwas and claps: the coastal, urban colour
-        'tanker': RAS + TAR + [(0, 'jahla', 0.8), (8, 'jahla', 0.6)],  # calm: the jahla, as in the pearling beat
+        'tanker': [(0, 'jahla', 0.8), (8, 'jahla', 0.6)],  # the drums rest: only the jahla, as in the pearling beat
         'energy': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # the tus shimmer
     }
     for sid, pat in colour.items():
-        play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
-    for sid in ['rail', 'port', 'tanker', 'energy']:
+        if sid in S:  # the tanker beat can be pulled (?pull=tanker)
+            play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
+    for sid in ['rail', 'port', 'energy']:
         stroke(perc, 'tus', st(sid), 0.7)
     sfx.add(A.jet_far(4.5, gain=0.9), w0 + 0.3, 0.8, pan=0.2)
     sfx.add(diesel_far(en('rail') - st('rail') + 0.6, gain=1.0), st('rail') - 0.3, pan=0.25)
-    tk = st('tanker')  # the laden tanker at the buoy: calm sea, the crew's drone again; no horn, nothing that waits
-    sfx.add(A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5), tk - 0.3)
-    music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
-    music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
+    if 'tanker' in S:  # the laden tanker under way: calm sea, the crew's drone again; no horn, nothing that waits
+        tk = st('tanker')
+        sfx.add(A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5), tk - 0.3)
+        music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
+        music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
     sfx.add(A.wind(5.0, gain=0.35, gust=0.12), st('energy'))
     for m in [55, 59, 62]:  # a brass swell on the last chord of the day, into the President's card
         music.add(A.horn(m, 2.6, gain=0.6), d0 + (k - 1) * BAR)
@@ -425,7 +428,7 @@ def main(cues_path, out_dir):
     # Ayyala at forte on the national line (the apex), receding under the office and out before the name
     g0, g1 = st('world'), en('world')
     split = st('gauge') - S['gauge']['xf'] / 2  # the cue-to-cue split: part 1 ends here, on this beat's frame
-    apex = next_bar(g0 + 2.2)  # the national line is on screen from g0 + 2.2
+    apex = g0 + BAR  # the first bar line after the national line comes up (g0 + 2.2), counted from the beat's own start
     office, name = g0 + 8.0, g0 + 9.6
     orch_bloom(g0, music, 1.0, root=41 - 12)
     k, t = 0, g0

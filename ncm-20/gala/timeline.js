@@ -1,5 +1,6 @@
 'use strict';
-// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 and 3): 21 beats, 54 bars at 72 BPM, 3:00.0.
+// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 and 3): 21 beats, 54 bars at 72 BPM, 3:00.0
+// (20 beats and 2:55.0 with the tanker pulled: ?pull=tanker).
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -28,24 +29,29 @@ function monsoonCircle(f) {
 const WORLD_CAM = t => camPath([{ t: 0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 4.0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 },
   { t: 7.5, s: 1.3, px: 1322, py: 428, sx: 470, sy: 430 }, { t: 10.5, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }], t);
 
-// B11 and B13, added in Revision 3. Each claims only what NCM does (research of 25 Sep 2026, fact-checked): no
-// NCM agreement with Etihad Rail or with ADNOC is documented, so the rail beat names NCM's public dust and fog warnings
-// and the tanker beat names the east-coast marine bulletin, which NCM's AI assistant drafts and a forecaster approves.
-// Never "safe passage" or «عبور آمن»: in the 2026 context it would be heard as a security claim.
-// Brand names on screen need their owners' written consent, obtained through NCM:
-const CONSENT = { adnocMurban: false }; // true only with ADNOC's written consent: the tanker's label then names Murban
-const RAIL_BEAT = { id: 'rail', start: at(27), dur: at(1.5), speed: 1, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, at(1.5)),
+// B11 and B13, added in Revision 3. Each claims only what NCM does (research of 25 Sep 2026, fact-checked and read by
+// protocol): no NCM agreement with Etihad Rail or with ADNOC is documented, so the rail beat names NCM's public dust and
+// fog warnings (addressed to the public, never to a railway) and the tanker beat names the east-coast marine bulletin,
+// which NCM's AI assistant drafts and a forecaster approves.
+// Never "safe passage" or «عبور آمن»: in the 2026 Hormuz context it would be heard as a security claim.
+// No company name, livery or product on the tanker (ADNOC ships were being attacked in 2026; Murban is a traded
+// benchmark), and no container train on the Fujairah line (since 20 Sep 2026 it reads as the Hormuz bypass).
+// "Etihad Rail" on screen needs Etihad Rail's written clearance, through NCM; without it, name the national network.
+const RAIL_NAME = { ar: 'قطارات الاتحاد', en: 'ETIHAD RAIL' }; // or { ar: 'شبكة السكك الحديدية الوطنية', en: 'NATIONAL RAIL NETWORK' }
+const RAIL_BEAT = { id: 'rail', start: at(27), dur: at(1.5), speed: 1, offset: 1.0, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, 1.0 + at(1.5)),
   words(t) {
     const f = filmT(this, t), s = this.start;
-    levelB(f, s + 0.5, s + 4.6, 'قطارات الاتحاد · الذيد، الشارقة', 'ETIHAD RAIL · AL DHAID, SHARJAH', { y: 330 });
-    levelA(f, s + 0.9, s + 4.6, 'لكل طريق وسكة حديد', 'FOR EVERY ROAD AND RAILWAY', { y: 520, arSize: 70, enSize: 30 });
+    // every label here is up for at least 3 s plus 0.3 s a word (critique M1), inside the beat's own dissolves
+    levelB(f, s + 0.25, s + 4.75, RAIL_NAME.ar + ' · الذيد، الشارقة', RAIL_NAME.en + ' · AL DHAID, SHARJAH', { y: 330 });
+    levelA(f, s + 0.7, s + 4.75, 'على امتداد البر', 'ACROSS THE LAND', { y: 520 });
   } };
-const TANKER_BEAT = { id: 'tanker', start: at(30), dur: at(1.5), speed: 1, offset: 0.4, xf: 0.5, cam: PLATE_LEFT(1.15, 1.2, 0.4 + at(1.5), 1435, 540),
+// The tanker beat can be pulled at the go/no-go checks (two weeks and 72 hours before the ceremony) with ?pull=tanker;
+// it never goes into a cut-down, a social clip or the international version.
+const TANKER_BEAT = { id: 'tanker', start: at(30), dur: at(1.5), speed: 1, offset: 1.4, xf: 0.5, cam: PLATE_LEFT(1.15, 1.2, 1.4 + at(1.5), 1435, 540),
   words(t) {
     const f = filmT(this, t), s = this.start;
-    if (CONSENT.adnocMurban) levelB(f, s + 0.5, s + 4.6, 'الفجيرة · تحميل خام مربان', 'FUJAIRAH · LOADING MURBAN CRUDE', { y: 330 });
-    else levelB(f, s + 0.5, s + 4.6, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
-    levelA(f, s + 0.9, s + 4.6, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
+    levelB(f, s + 0.3, s + 4.75, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
+    levelA(f, s + 0.5, s + 4.75, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
   } };
 
 const TIMELINE = [
@@ -68,7 +74,7 @@ const TIMELINE = [
       then: [{ t: 6.5 * SP.pearling, s: 0.95, px: 1435, py: 700, sx: 560, sy: 560 }] }),
     words(t) {
       const f = filmT(this, t);
-      levelB(f, 24.6, 28.0, 'الغوص الكبير', 'THE GREAT DIVE', { y: 330 });
+      levelB(f, 23.9, 28.0, 'الغوص الكبير', 'THE GREAT DIVE', { y: 330 });
     } },
   // B05 · The aflaj, and Sheikh Zayed
   { id: 'falaj', start: at(8.5), dur: at(2.5), speed: SP.falaj, offset: 0.5, xf: 0.8,
@@ -106,10 +112,10 @@ const TIMELINE = [
   { id: 'airport', start: at(25.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.933, s + 4.633, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
-      levelA(f, s + 1.7, s + 4.633, 'لكل رحلة', 'FOR EVERY FLIGHT', { y: 520 });
+      levelB(f, s + 0.55, s + 4.75, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
+      levelA(f, s + 0.85, s + 4.75, 'لكل رحلة', 'FOR EVERY FLIGHT', { y: 520 });
     } },
-  // B11 · For every train (Etihad Rail)
+  // B11 · Across the land (Etihad Rail near Al Dhaid, Sharjah)
   RAIL_BEAT,
   // B12 · For every ship
   { id: 'port', start: at(28.5), dur: at(1.5), speed: SP.port, offset: 1.5, xf: 0.5,
@@ -119,15 +125,15 @@ const TIMELINE = [
       levelB(f, s + 0.333, s + 4.633, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
       levelA(f, s + 0.733, s + 4.633, 'لكل سفينة', 'FOR EVERY SHIP', { y: 520 });
     } },
-  // B13 · For every voyage (a laden Murban tanker off Fujairah)
+  // B13 · For the east coast (a laden tanker under way off Fujairah; removable with ?pull=tanker)
   TANKER_BEAT,
   // B14 · For clean energy
   { id: 'energy', start: at(31.5), dur: at(1.5), speed: SP.energy, offset: 1.0, xf: 0.5,
     cam: t => camPath([{ t: 1.0, s: 1.0, px: 1435, py: 620, sx: 560, sy: 560 }, { t: 1.0 + at(1.5) * SP.energy, s: 1.05, px: 1435, py: 540, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.333, s + 4.333, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 330 });
-      levelA(f, s + 0.433, s + 4.333, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
+      levelB(f, s + 0.2, s + 4.4, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 330 });
+      levelA(f, s + 0.433, s + 4.4, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
     } },
   // B15 · Card: HH the President (reported speech, no VO)
   { id: 'quote-president', use: 'quote', quote: 'president', start: at(33), dur: at(3.5), xf: 1.2 },
@@ -163,6 +169,16 @@ const TIMELINE = [
     cam: t => camPath([{ t: 0, s: 1.0, px: 977, py: 698, sx: 977, sy: 698 }, { t: 5.0, s: 1.04, px: 977, py: 698, sx: 977, sy: 698 }], t),
     words(t) { finaleWords(this, filmT(this, t)); } },
 ];
+
+// ?pull=tanker (or any beat ids, comma-separated) takes beats out and closes the cut up behind them: every later beat
+// moves up by the pulled beat's length, and its narration goes with it, so nothing needs re-timing.
+const PULLED = (new URLSearchParams(location.search).get('pull') || '').split(',').filter(Boolean);
+PULLED.forEach(id => {
+  const i = TIMELINE.findIndex(e => e.id === id);
+  if (i < 0) throw new Error(`?pull: there is no beat "${id}"`);
+  const [e] = TIMELINE.splice(i, 1);
+  TIMELINE.forEach(x => { if (x.start > e.start) x.start = +(x.start - e.dur).toFixed(3); });
+});
 
 // a beat's start in film seconds, captured here, before a ?hold empties TIMELINE
 const STARTS = Object.fromEntries(TIMELINE.map(e => [e.id, e.start])), START = id => STARTS[id];
@@ -214,10 +230,10 @@ const VO = [
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
-  { id: 'VO-09', beat: 'airport', in: 1.733, out: 4.133, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
-  { id: 'VO-09r', beat: 'rail', in: 0.3, out: 3.8, ar: 'ولكلِّ طريقٍ وسِكّةِ حديدٍ تحذيراتٌ من الغبارِ والضَّباب،', en: 'for every road and railway, warnings of dust and fog;' },
+  { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
+  { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
-  { id: 'VO-10t', beat: 'tanker', in: 0.2, out: 4.9, ar: 'وللساحلِ الشرقيّ نشرةٌ بحريّةٌ يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبّئ،', en: 'for the east coast, a marine bulletin that AI helps draft and a forecaster approves;' },
+  { id: 'VO-10t', beat: 'tanker', in: 0.3, out: 4.2, ar: 'وللساحلِ الشرقيِّ نشرةٌ يقترحُها الذكاءُ الاصطناعيّ، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, a bulletin that AI drafts and forecasters approve;' },
   { id: 'VO-11', beat: 'energy', in: 0.433, out: 3.733, ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح.', en: 'for clean energy, forecasts of sunshine and wind.' },
   { id: 'VO-12', beat: 'seeding', in: 0.5, out: 7.4, ar: 'وفي أرضٍ يقِلُّ مطرُها عن مِئةِ مِلّيمترٍ في العامِ المُعتاد، سعَينا إلى استمطارِ السَّحاب.', sub: 'وفي أرض يقلّ مطرها عن ' + ltr('100') + ' ملّيمتر في العام المعتاد، سعينا إلى استمطار السحاب.', en: 'In a land with less than 100 millimetres of rain in a typical year, we sought more rain from the clouds.' },
   { id: 'VO-13', beat: 'science', in: 1.333, out: 5.333, ar: 'ثمَّ استثمَرْنا في العلمِ نفسِه، للدُّوَلِ التي تُواجِهُ شُحَّ المياه.', en: 'Then we invested in the science itself, for the countries facing water scarcity.' },
@@ -227,7 +243,9 @@ const VO = [
   { id: 'VO-15b', beat: 'gauge', in: 6.733, out: 8.933, ar: 'عِشرونَ عاماً من رَصْدِ السماء…', en: 'twenty years of watching the sky…' },
   { id: 'VO-16', beat: 'finale', in: 1.667, out: 4.467, ar: 'ليُخطِّطَ الوطنُ لغدِهِ بثِقة.', en: 'so the nation can plan for tomorrow with confidence.' },
 ];
-// narration lines tied to a beat are timed from that beat's start, so the cut can change without retiming them
+// narration lines tied to a beat are timed from that beat's start, so the cut can change without retiming them; a
+// pulled beat's lines go with it
+for (let i = VO.length - 1; i >= 0; i--) if (PULLED.includes(VO[i].beat)) VO.splice(i, 1);
 VO.forEach(v => { if (v.beat) { const s = START(v.beat); v.in = +(s + v.in).toFixed(3); v.out = +(s + v.out).toFixed(3); delete v.beat; } });
 // Subtitles are set without the narrator's vowels: keep the shadda and the tanween on alif, drop the rest.
 // (and the shadda on a sun letter after the article, which plain text never writes: «السّنة» becomes «السنة»).
@@ -236,7 +254,8 @@ const voSubAr = v => v.sub || v.ar.replace(/[\u064C-\u0650\u0652]/g, '').replace
 // The stage holds (?hold=A|B|C|W), each a seamless loop:
 //   A: title and lockup · B: the dedication to the Center's people, with the lockup · C: sky and ring only, dimmed, for
 //   speeches (20 s, the finale's last frame, alive) · W: the applause hold after B17 (12 s, its last frame, still), so
-//   the film runs cue to cue: part 1 ends at 136.667 on B17, W loops under the applause, the caller releases part 2.
+//   the film runs cue to cue: part 1 ends on the world beat as the dissolve into the gauge begins (the split in the
+//   cue sheet), W loops under the applause, the caller releases part 2.
 {
   const q = new URLSearchParams(location.search);
   if (q.has('hold')) {
