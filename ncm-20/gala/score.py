@@ -6,32 +6,38 @@
 It writes 48 kHz 24-bit WAVs:
   mix.wav (-16 LUFS integrated, -1 dBTP, for review and online) and mix-r128.wav (-23 LUFS, for broadcast);
   music.wav, perc.wav and sfx.wav, the stems (perc is the Emirati percussion, kept apart so it can be dropped);
-  mix-restrained.wav, the same score without drums, tus or jahla, for a ceremony held in Ramadan or in a period of
-  mourning (TREATMENT.md §8);
-  hold.wav (a seamless 20 s loop for the stage hold).
+  part1.wav / part2.wav, the mix split at the end of the world beat for the cue-to-cue run;
+  mix-restrained.wav with part1-restrained.wav / part2-restrained.wav, the same score without drums, tus, claps or
+  jahla, for a ceremony held in Ramadan or in a period of mourning (TREATMENT.md §8);
+  hold.wav (a seamless 20 s loop for the stage hold) and hold-world.wav (a seamless 12 s bed for the applause after
+  the world beat, which the show caller releases).
 Every cue is placed from its beat's start in the film's own timeline, so the music stays on the cuts when the film is
 re-cut. It is the temp track for the animatic; the brief asks for an original score, recorded live with UAE troupes.
 
 The Emirati colour follows the music research (UNESCO, DCT Abu Dhabi, the Sharjah Institute for Heritage, New Grove):
   - the drums of Al Ayyala (the ras, three takhamir, the tar frame drum, the tus cymbals) carry the day: the Center,
-    the seven emirates and the rail (lab/bed.py, over the diesel as the locomotive passes). Nights have no drums:
-    voices and strings only;
+    the seven emirates, the working day and the world. Nights have no drums: voices and strings only;
   - the rababa, the Bedouin poet's fiddle, replaces the ney; the oud replaces the qanun (neither the ney nor the qanun
-    has a traditional link to the area); the jahla, the clay water jar the sailors played, is the sea under the dhow;
-  - the night open, the close of the heritage and the finale have a lead answered by a group, hummed, without words
-    (only the principle of Al Azi and Al Taghrooda, never their melodies).
+    has a traditional link to the area);
+  - the pearling beat has a wordless nahham call over the crew's drone two octaves below it, with two groups of
+    handclaps and the jahla, the clay water jar the sailors played;
+  - the port has the mirwas and interlocking claps of the Gulf sawt; the drums rest under the tanker, where only the
+    jahla and the crew's drone play (no Ayyala under a ship in the 2026 context);
+  - the night open, every leader's card and the finale have a lead answered by a group, hummed, without words (only
+    the principle of Al Azi and Al Taghrooda, never their melodies). Every card gets exactly the same treatment.
   Left out on purpose: Al Harbiya and Al Razfa (war and victory), Liwa and the zaffa (weddings), the habban, the manior
   and any anthem, song, poem or nahma text. Every drum pattern here is a programming sketch that fits the verified
   meter and the instruments' roles, not a transcription: the troupe replaces it with its own.
 
 One motif, "Suhail": D, E half-flat, F, G (maqam Bayati on D) in the heritage; tempered D Dorian for the Center;
-a bare D pedal for April 2024, with no Emirati percussion and nothing festive, holding still while the red alert is
-held; a low D for the rail's emergence, the Ayyala at its pass and silence as the camera rises; and D major, with the
-motif as D-E-F#-G on the rababa, for the finale, whose tonic chord is the only full cadence. 72 BPM, one bar = 3.333 s. Nothing imitates a siren, an alert tone, a horn, thunder, a boom or an
+a bare D pedal for April 2024, with no Emirati percussion and nothing festive; F major for the world, whose apex is the
+national line ("from the skies of the Emirates to the world"), never a person's name; the leaders' cards carry the
+motif in full strings, horn and voices, as much weight as any beat; the twenty-year hit on the dominant (A), so it
+opens rather than ends; and D major, with the motif as D-E-F#-G on the rababa, for the finale, whose tonic chord is the
+only full cadence. 72 BPM, one bar = 3.333 s. Nothing imitates a siren, an alert tone, a horn, thunder, a boom or an
 impact, and the rail has no jointed-track clack (Etihad Rail's main line is continuously welded).
 """
 import json
-import os
 import sys
 
 import numpy as np
@@ -251,33 +257,30 @@ def stream(dur):
 
 
 def main(cues_path, out_dir):
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lab'))
-    import bed  # the rail hero's sound, placed from its shot keys (lab/bed.py)
     cues = json.load(open(cues_path))
     DUR = cues['duration'] + 3.5
     music, perc, sfx = A.Bus(DUR), A.Bus(DUR), A.Bus(DUR)
     S = {s['id']: s for s in cues['scenes']}
     st = lambda i: S[i]['start']
     en = lambda i: S[i]['start'] + S[i]['dur']
-    hold_ = -S['suhail']['offset']  # the black sky held before the Suhail scene's own clock begins
+    vo_end = lambda t: max([v['out'] for v in cues['vo'] if v['in'] < t] + [0])  # the narration still running at t
 
-    # Act 1 · B01 · night: the black sky held (wind and the low drone only), then starlight; a hummed lead and its
-    # answer; the rababa states the motif as Suhail clears the dunes; the ring tone. No drums at night.
+    # B01 · night: the drone, wind, starlight; a hummed lead and its answer; the rababa states the motif as Suhail
+    # clears the dunes; the ring tone. No drums at night.
     t_end = en('suhail')
     sfx.add(A.wind(t_end + 3, gain=0.9, gust=0.05), 1.5)
     music.add(A.strings(D2, t_end - 1.0, bright=600, attack=3.5, release=3.0, voices=5), 1.5, 0.85)
-    music.add(A.strings(A2, t_end - 2.0 - hold_, bright=700, attack=4.0, release=3.0, voices=5), 2.5 + hold_, 0.5)
+    music.add(A.strings(A2, t_end - 2.0, bright=700, attack=4.0, release=3.0, voices=5), 2.5, 0.5)
     for k, (dt, m) in enumerate([(2.2, 86), (3.4, 93), (4.9, 88), (6.1, 91), (7.2, 86)]):
-        music.add(A.bell(m, 2.5, gain=0.45), hold_ + dt, pan=0.6 * np.sin(k * 2.1))  # celesta glints on the brightest stars
-    answer(music, st('suhail') + hold_ + 2.9, D3, [A2, D3], gain=0.45, dur=(2.3, 2.6))
-    sm = motif(st('suhail') + hold_ + 8.333, root=D4, n=4)
+        music.add(A.bell(m, 2.5, gain=0.45), dt, pan=0.6 * np.sin(k * 2.1))  # celesta glints on the brightest stars
+    answer(music, st('suhail') + 2.9, D3, [A2, D3], gain=0.45, dur=(2.3, 2.6))
+    sm = motif(st('suhail') + 8.333, root=D4, n=4)
     for j, (t, m, d) in enumerate(sm):
         rab(music, t, m, d * (1.4 if j == len(sm) - 1 else 1.0), gain=0.8, grace=EHF if j == 0 else None)
-    music.add(harmonic(D4 + 24, 0.8), st('suhail') + hold_ + 9.2)
+    music.add(harmonic(D4 + 24, 0.8), st('suhail') + 9.2)
 
-    # B02–B03 · heritage in Bayati: first light chord, the oud's ostinato and motif, one soft tar stroke a bar; the star
-    # and the dhow (the jahla as the sea), then the falaj
-    h0, h1 = st('monsoon'), en('falaj')
+    # B02–B05 · heritage in Bayati: first light chord, the oud's ostinato and motif, one soft tar stroke a bar
+    h0, h1 = st('durour'), en('falaj')
     name_t = st('falaj') + 4.6  # Sheikh Zayed's name in VO-05: the percussion is out before it
     chord(music, [D3, A3, 62, 69], h0 - 1.0, 5.0, gain=0.5, bright=2000, attack=2.5)
     music.add(harmonic(D4 + 12, 0.6), h0)
@@ -293,22 +296,35 @@ def main(cues_path, out_dir):
     chord(music, [D2, D3, A3], h0 + 2.0, h1 - h0 - 1.0, gain=0.3, bright=1200, attack=2.0, release=2.0)
     for (t, m, d) in motif(h0 + BAR, root=D4):
         music.add(A.pluck(m, max(1.2, d + 0.6), bright=0.6), t, 0.7, pan=-0.2)
-    for k, m in enumerate([D4, D4 + 1.5, D4 + 3, D4 + 5, D4 + 7]):  # an oud run into the circle's lock
-        music.add(A.pluck(m, 0.9, bright=0.75), h0 - 0.35 + k * 0.07, 0.4, pan=0.3)
-    for b in (0, 2, 4, 8, 10):  # the monsoon voyage: the jahla's deep stroke as the sea
-        perc.add(A.jahla(0.55), st('monsoon') + 1.4 + b * BEAT, pan=0.15)
-    sfx.add(A.sea(en('monsoon') - st('monsoon') + 1.5, gain=0.8), st('monsoon'))
-    # the falaj, inland and calm: the rababa descends before Sheikh Zayed's name; a chord under the name
+    for tq in [st('monsoon') - 0.35, st('pearling') - 0.35]:  # oud runs into the circle locks
+        for k, m in enumerate([D4, D4 + 1.5, D4 + 3, D4 + 5, D4 + 7]):
+            music.add(A.pluck(m, 0.9, bright=0.75), tq + k * 0.07, 0.4, pan=0.3)
+    # B03 · the monsoon voyage: the jahla's deep stroke as the sea
+    for b in (0, 2, 4):
+        perc.add(A.jahla(0.55), st('monsoon') + b * BEAT, pan=0.15)
+    sfx.add(A.sea(en('pearling') - st('monsoon') + 1.5, gain=0.8), st('monsoon'))
+    # B04 · pearling: the crew's drone on D2, two octaves below the nahham; his wordless call, which rests under the
+    # narration and answers it after; the two clap groups and the jahla; the tus at the cut
+    p0 = st('pearling')
+    music.add(A.lp(A.chant(D2, en('pearling') - p0 + 0.3, men=10, vowel='o'), 700, 2), p0 - 0.2, 0.9)
+    vo_p = vo_end(p0 + 1.5)  # VO-04 ("Sailors knew every wind by name")
+    music.add(nahham([(0, 60), (0.12, 62), (0.5, 62), (0.62, EHF), (0.8, 65), (1.0, EHF), (1.15, 62), (1.5, 62)], 0.8), p0 + 0.12, pan=0.1)
+    music.add(nahham([(0, 65), (0.1, 67), (0.6, 67), (0.75, 65), (0.9, EHF), (1.1, 65), (1.3, EHF), (1.5, 62), (1.8, 62)], 0.8), vo_p + 0.1, pan=0.1)
+    play(perc, SEA, h0 + 3 * BAR, p0, en('pearling') - 0.15, level=0.75)
+    perc.add(A.tus(0.8), p0, pan=0.35)
+    sfx.add(A.wind(3.0, gain=0.5, gust=0.3), p0 + 0.2)
+    # B05 · the falaj, inland and calm: the rababa descends before Sheikh Zayed's name; a chord under the name
     sfx.add(stream(en('falaj') - st('falaj') + 1.0), st('falaj'))
     for j, (iv, bt) in enumerate([(7, 1.5), (5, 1), (3, 1), (1.5, 0.5), (0, 2)]):
         tj = st('falaj') + 0.4 + sum(b for _, b in [(7, 1.5), (5, 1), (3, 1), (1.5, 0.5), (0, 2)][:j]) * BEAT * 0.7
         rab(music, tj, D4 + iv, bt * BEAT * 0.7 * (1.3 if j == 4 else 1.0), gain=0.55, grace=D4 + iv + 2 if j == 0 else None)
     chord(music, [D3, A3, 62, 65], name_t, 4.0, gain=0.38, bright=1500, attack=1.5, release=2.0)
-    answer(music, en('falaj') - 4.2, D3, [A2, D3], gain=0.4, dur=(2.2, 2.6))  # the heritage closes on the night's answer
 
-    # Act 2 · B04–B05 · the Center (D Dorian): the ras player's takhmeera brings the Ayyala drums in, pianissimo, on
-    # the first downbeat after the iris (ras and takhamir only); the seven emirates lit together get one tar and tus
-    # stroke
+    # B06 · the Zayed card, as every leader's card
+    card(music, st('quote-zayed'), en('quote-zayed'), major=False)
+
+    # B07–B08 · the Center (D Dorian): the ras player's takhmeera brings the Ayyala drums in, pianissimo, on the first
+    # downbeat after the iris (ras and takhamir only); the seven emirates lit together get one tar and tus stroke
     c0, c1 = st('centre'), en('nation')
     prog_ = [Dm7, Csus, Gsus, Dm7]
     k, t = 0, c0
@@ -331,26 +347,62 @@ def main(cues_path, out_dir):
     for i, m in enumerate([74, 76, 78, 79, 81, 83, 86]):
         music.add(harmonic(m, 0.7), wash_t + 0.2 + i * 0.14, pan=0.5 * np.sin(i))
 
-    # B06 · April 2024: the pulse stops; a cello pedal on D, one felt-piano note a bar, gentle rain. The red alert is a
-    # held frame, so the music holds too: no new note while the storm's clock is stopped, only the pedal and the rain.
-    # Then warmth toward F under the remembrance. No Emirati percussion, no claps, no voices: nothing festive.
+    # B09 · April 2024: the pulse stops; a cello pedal on D, one felt-piano note a bar, gentle rain; warmth toward F
+    # under the remembrance. No Emirati percussion, no claps, no voices: nothing festive.
     a0, a1 = st('homes'), en('homes')
-    rh0, rh1 = a0 + 7.5, a0 + 12.5  # the held frame (timeline.js RED_HOLD)
     music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.8)
     k, t = 0, a0
     while t < a1 - 0.5:
-        if not (rh0 - 0.2 < t < rh1):
-            music.add(felt([D4, A3, D4 + 3, A3, D4 - 2][k % 5], 0.8), t)
+        music.add(felt([D4, A3, D4 + 3, A3, D4 - 2][k % 5], 0.8), t)
         k, t = k + 1, t + BAR
-    rem = a0 + 17.3  # the remembrance (VO-08c), as the paper warms again
+    rem = a0 + 12.3  # the remembrance (VO-08c), as the paper warms again
     chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
-    sfx.add(A.rain(17.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
+    sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
 
-    # Act 3 · B07 · Etihad Rail in engraved 3D: the bass as the train emerges, the Ayyala over the diesel at the
-    # worm's-eye pass, the last stroke as the camera rises, then silence (lab/bed.py, placed from the shot keys)
-    rail_pass, rail_front = bed.build(perc, music, sfx, st('rail3d'))
+    # B10–B14 · the working day: a warm chord and the oud motif as the sky clears; the drums wait for the remembrance
+    # line to end, then the Ayyala carries the day at mezzo-forte, one colour for each place; a ras stroke and the tus
+    # on every cut; everything is out before the President's card
+    w0, w1 = st('airport'), st('quote-president')
+    chord(music, Dmaj, w0, 2.0, gain=0.38, bright=2000, attack=0.6)
+    for (t, m, d) in motif(w0, root=D4, major=True, n=4, stretch=0.7):
+        music.add(A.pluck(m, 1.3, bright=0.65), t, 0.6)
+    d0, d1 = next_bar(vo_end(w0) + 0.6), w1 - 1.0
+    takhmeera(perc, d0, 'mf')
+    k, t = 0, d0
+    while t < d1:
+        chord(music, [Dmaj, Bm, G, Amaj][k % 4], t, min(BAR, w1 - 0.4 - t) * 1.02, gain=0.34, bright=2600, attack=0.3, release=0.6)
+        for e in range(8):
+            te = t + e * BEAT / 2
+            if te < d1:
+                music.add(A.strings([D3, A3, D4, A3, D3 + 7, A3, D4, A3][e] + (0 if k % 2 == 0 else -2), BEAT * 0.45, bright=2400, attack=0.02, release=0.2, voices=3), te, 0.3)
+        k, t = k + 1, t + BAR
+    colour = {  # each place's drums
+        'airport': AYYALA,
+        'rail': AYYALA + [(i, 'stick', 0.3) for i in (0, 4, 8, 12)],  # the takhamir in steady eighths
+        'port': RAS + TAR + TUS + SAWT,  # the sawt's mirwas and claps: the coastal, urban colour
+        'tanker': [(0, 'jahla', 0.8), (8, 'jahla', 0.6)],  # the drums rest: only the jahla, as in the pearling beat
+        'energy': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # the tus shimmer
+    }
+    for sid, pat in colour.items():
+        if sid in S:  # the tanker beat can be pulled (?pull=tanker)
+            play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
+    for sid in ['rail', 'port', 'energy']:
+        stroke(perc, 'tus', st(sid), 0.7)
+    sfx.add(A.jet_far(4.5, gain=0.9), w0 + 0.3, 0.8, pan=0.2)
+    sfx.add(diesel_far(en('rail') - st('rail') + 0.6, gain=1.0), st('rail') - 0.3, pan=0.25)
+    if 'tanker' in S:  # the laden tanker under way: calm sea, the crew's drone again; no horn, nothing that waits
+        tk = st('tanker')
+        sfx.add(A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5), tk - 0.3)
+        music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
+        music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
+    sfx.add(A.wind(5.0, gain=0.35, gust=0.12), st('energy'))
+    for m in [55, 59, 62]:  # a brass swell on the last chord of the day, into the President's card
+        music.add(A.horn(m, 2.6, gain=0.6), d0 + (k - 1) * BAR)
 
-    # Act 4 · B08–B09 · rain and science: pizzicato with soft, muted mirwas; the oud in tremolo; celesta
+    # B15 · the President's card
+    card(music, st('quote-president'), en('quote-president'))
+
+    # B16–B17 · rain and science: pizzicato with soft, muted mirwas; the oud in tremolo; celesta
     r0, r1 = st('seeding'), en('science')
     k, t = 0, r0
     while t < r1 - 0.1:
@@ -370,14 +422,71 @@ def main(cues_path, out_dir):
     for k in range(6):
         music.add(A.bell(86 + [0, 4, 7, 12, 7, 4][k], 1.2, gain=0.35), st('science') + 0.2 + k * 0.17)  # celesta particles
 
-    # Act 5 · B10 · night over the capital: broad D major, no drums; the rababa carries the motif under the dedication,
-    # the voices answer, the ring closes; the only full cadence at the title; it rings into the hold pad
+    # B18 · Sheikh Mansour's card
+    card(music, st('quote-mansour'), en('quote-mansour'))
+
+    # B19 · the world, in F major: the orchestra, the voices in two answering groups, the motif in the brass; the
+    # Ayyala at forte on the national line (the apex), receding under the office and out before the name
+    g0, g1 = st('world'), en('world')
+    split = st('gauge') - S['gauge']['xf'] / 2  # the cue-to-cue split: part 1 ends here, on this beat's frame
+    apex = g0 + BAR  # the first bar line after the national line comes up (g0 + 2.2), counted from the beat's own start
+    office, name = g0 + 8.0, g0 + 9.6
+    orch_bloom(g0, music, 1.0, root=41 - 12)
+    k, t = 0, g0
+    while t < g1 - 0.1:
+        chord(music, [F, Bb, Dm, C][k % 4], t, BAR * 1.05, gain=0.36, bright=3000, attack=0.3)
+        k, t = k + 1, t + BAR
+    music.add(A.choir(65, g1 - g0 + 2.0, gain=0.4), g0)
+    for (t, m, d) in motif(g0 + 0.5, root=65 - 12, major=True):
+        music.add(A.horn(m, d), t, 0.7)
+    answer(music, apex, 53, [48, 53], gain=0.5, dur=(1.4, 1.5))
+    answer(music, apex + BAR, 53, [48, 57], gain=0.45, dur=(1.4, 1.5))
+    # the full orchestra and voices are some 5 dB louder here than in the working day, so the drums are set higher to sit
+    # about 6 dB under them (measured on the stems), not buried
+    takhmeera(perc, apex, 1.2)
+    play(perc, AYYALA, apex, apex, apex + BAR, 1.2)
+    play(perc, RAS + TAKHAMIR + TAR, apex, apex + BAR, office + 0.4, 0.75)  # receding under the office
+    chord(music, F + [69, 72, 77], apex, 3.4, gain=0.44, bright=3400, attack=0.25, release=2.0)  # the apex
+    for dt in [2.8, 3.6, 4.2, 4.8]:  # the pins (plate-world.js places[].t)
+        music.add(harmonic(77 + 12, 0.6), g0 + dt, pan=0.4)
+    chord(music, F + [69], office, split - office + 1.0, gain=0.3, bright=2400, attack=0.8, release=2.5)  # under the office and name
+    assert office + 0.4 + 1.6 < split, 'a drum would ring across the split'
+
+    # B20 · twenty years: twenty water notes on sixteenths (the jahla doubles a few), a timpani roll, the hit on the
+    # dominant with the ras and the tus; then it recedes to the rababa and the oud
+    t20 = st('gauge') + S['gauge']['t20']
+    dt = S['gauge']['dt']
+    chord(music, [D3, A3, 66], st('gauge'), t20 - st('gauge'), gain=0.26, bright=1400, attack=1.0, release=0.5)
+    scale = [62, 64, 66, 67, 69, 71, 73, 74]
+    for k in range(1, 21):
+        m = scale[(k - 1) % 8] + 12 * ((k - 1) // 8)
+        music.add(water(m + 12, 0.5 + 0.02 * k), t20 - (20 - k) * dt, pan=0.3 * np.sin(k))
+        if k in (5, 10, 15):
+            perc.add(A.jahla(0.35), t20 - (20 - k) * dt, pan=0.1)
+    roll0 = t20 - 2 * BAR / 4
+    for k in range(14):
+        music.add(A.timpani(A2 + 12, 0.15 + 0.04 * k), roll0 + k * (t20 - roll0) / 14)
+    orch_bloom(t20, music, 1.0, root=A2 - 12)
+    chord(music, [A2, A3, 61, 64, 69, 73], t20, 3.3, gain=0.52, bright=3400, attack=0.05, release=2.5)  # on the dominant
+    music.add(A.choir(A3 + 12, 3.5, gain=0.55), t20)
+    stroke(perc, 'ras', t20, LEVEL['f'])
+    stroke(perc, 'tus', t20, LEVEL['f'])
+    for (t, m, d) in motif(t20, root=A3, major=True, stretch=0.5, n=5):
+        music.add(A.horn(m, d), t, 0.75)
+    chord(music, [D3, A3, 62, 66], t20 + 3.5, 2.0, gain=0.25, bright=1300, attack=1.0, release=2.0)  # recedes
+    for j, (m, d) in enumerate([(69, 1.4), (67, 0.7), (66, 1.6)]):
+        rab(music, t20 + 3.0 + [0, 1.4, 2.1][j], m, d, gain=0.5, grace=71 if j == 0 else None)
+    music.add(A.pluck(D4, 1.6, bright=0.5), t20 + 3.5, 0.5, pan=-0.25)
+    music.add(A.pluck(A3, 1.6, bright=0.5), t20 + 4.3, 0.45, pan=-0.25)
+
+    # B21 · night: broad D major, no drums; the rababa carries the motif, the voices answer, the ring closes; the only
+    # full cadence at the title; it rings into the hold pad
     f0, f1 = st('finale'), en('finale')
-    title = f0 + 11.0  # timeline.js FIN.title
+    title = f0 + 5.0  # finaleWords: the title at b + 5
     sfx.add(A.wind(f1 - f0 + 3, gain=0.6, gust=0.05), f0)
     chord(music, [D3, A3, 66, 69], f0, title - f0, gain=0.34, bright=1500, attack=2.0, release=1.2)
     music.add(A.shimmer(f1 - f0 + 2, gain=0.8, base=86), f0)
-    for j, (t, m, d) in enumerate(motif(f0 + 2.0, root=D4, major=True, stretch=1.05)):
+    for j, (t, m, d) in enumerate(motif(f0 + 0.4, root=D4, major=True, stretch=0.9)):
         if t < title - 0.13:
             rab(music, t, m, min(d, title - t), gain=0.75, grace={0: EHF, 4: 71}.get(j))
             music.add(A.strings(m - 12, d, bright=1800, attack=0.4, release=0.8, voices=5), t, 0.25)
@@ -387,13 +496,15 @@ def main(cues_path, out_dir):
     music.add(A.timpani(D2 + 12, 0.45), title)
 
     # detent clicks where one circle locks onto the next (the plates' own rings and the irises)
-    for sid in ['monsoon', 'centre', 'nation', 'science']:
+    for sid in ['monsoon', 'pearling', 'centre', 'nation', 'science', 'world', 'gauge']:
         sfx.add(detent(), st(sid), 0.9)
 
-    # fader rides: the loudness follows the story (the quiet night and heritage, the Center's confidence, the April
-    # drop, the rail at full height, the rain, the night again)
-    ride = rides(cues['scenes'], DUR, {'suhail': -8, 'monsoon': -3, 'falaj': -3, 'centre': -1, 'nation': -1, 'homes': -6,
-                                       'rail3d': 0, 'seeding': -2, 'science': -2, 'finale': -1})
+    # fader rides: the loudness follows the story (quiet night, the Center's confidence, the April drop, the world's
+    # peak); each leader's card at or above the world beat
+    ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
+                                       'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'rail': -1,
+                                       'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0, 'seeding': -2,
+                                       'science': -2, 'quote-mansour': 0, 'world': -3.1, 'gauge': 0.5, 'finale': -1})
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9
@@ -401,33 +512,58 @@ def main(cues_path, out_dir):
     k = int(3.0 * A.SR)
     fade[-k:] = np.linspace(1, 0, k) ** 2
     m, p, f = m * fade, p * fade, f * fade
-    web = deliver(m + p + f, out_dir, '', None)
+    web = deliver(m + p + f, out_dir, '', split)
     g = np.sqrt(np.sum(web ** 2) / max(1e-12, np.sum((m + p + f) ** 2)))  # the stems carry the master's overall gain
     A.write_wav(f'{out_dir}/mix-r128.wav', A.master(m + p + f, target_lufs=-23.0, ceiling_db=-1.0))
     A.write_wav(f'{out_dir}/music.wav', np.clip(m * g, -1, 1))
     A.write_wav(f'{out_dir}/perc.wav', np.clip(p * g, -1, 1))
     A.write_wav(f'{out_dir}/sfx.wav', np.clip(f * g, -1, 1))
-    deliver(m + f, out_dir, '-restrained', None)
+    deliver(m + f, out_dir, '-restrained', split)
     lv = {s['id']: A.lufs(web[:, int(s['start'] * A.SR):int((s['start'] + s['dur']) * A.SR)]) for s in cues['scenes']}
     print('per beat (LUFS):', ', '.join(f'{i} {v:.1f}' for i, v in lv.items()))
-    print(f'rail: engine abeam at {st("rail3d") + rail_pass:.2f} s, front abeam at {st("rail3d") + rail_front:.2f} s (film time)')
+    low = [i for i in lv if i.startswith('quote-') and lv[i] < lv['world']]
+    assert not low, f'precedence: {low} quieter than the world beat ({lv["world"]:.1f} LUFS)'
     hold(out_dir)
+    hold_world(out_dir)
 
 
 def deliver(mix, out_dir, tag, split):
-    """master a mix (-16 LUFS, -1 dBTP) and write it whole, and (given a split) as the two parts of a cue-to-cue run,
-    each part with a short equal-power edge so the media server's crossfade is clean"""
+    """master a mix (-16 LUFS, -1 dBTP) and write it whole and as the two parts of the cue-to-cue run, each part with a
+    short equal-power edge so the media server's crossfade is clean"""
     web = A.master(mix, target_lufs=-16.0, ceiling_db=-1.0)
     A.write_wav(f'{out_dir}/mix{tag}.wav', web)
-    if split:  # a cut with a cue-to-cue break (none in the locked order's cut)
-        n, k = int(round(split * A.SR)), int(0.3 * A.SR)
-        p1, p2 = web[:, :n].copy(), web[:, n:].copy()
-        p1[:, -k:] *= np.cos(np.linspace(0, np.pi / 2, k))
-        p2[:, :k] *= np.sin(np.linspace(0, np.pi / 2, k))
-        A.write_wav(f'{out_dir}/part1{tag}.wav', p1)
-        A.write_wav(f'{out_dir}/part2{tag}.wav', p2)
+    n, k = int(round(split * A.SR)), int(0.3 * A.SR)
+    p1, p2 = web[:, :n].copy(), web[:, n:].copy()
+    p1[:, -k:] *= np.cos(np.linspace(0, np.pi / 2, k))
+    p2[:, :k] *= np.sin(np.linspace(0, np.pi / 2, k))
+    A.write_wav(f'{out_dir}/part1{tag}.wav', p1)
+    A.write_wav(f'{out_dir}/part2{tag}.wav', p2)
     print(f'mix{tag}: {A.lufs(web):.1f} LUFS, {A.true_peak_db(web):.1f} dBTP, {web.shape[1] / A.SR:.1f} s')
     return web
+
+
+def card(bus, t0, t1, major=True):
+    """a leader's card, the same for every card: strings on the tonic, the Suhail motif slowly in the horn, a wordless
+    choir, and a hummed lead answered by the group; no percussion and no solo instrument"""
+    chord(bus, [D2 + 12, A2 + 12, 62, 66 if major else 65, 69], t0, t1 - t0 + 0.8, gain=0.36, bright=2000, attack=1.6, release=1.8)
+    bus.add(A.choir(D3 + 12, t1 - t0 - 0.4, vowel='o', gain=0.4), t0 + 0.4)
+    answer(bus, t0 + 2.0, D3, [A2, D3], gain=0.5, dur=(2.4, 2.8))
+    for (t, m, d) in motif(t0 + 1.0, root=D4 - 12, major=major, stretch=1.3):
+        if t < t1 - 0.6:
+            bus.add(A.horn(m, d, gain=0.8), t, 0.55)
+
+
+def hold_world(out_dir, L=12.0):
+    """the applause bed after the world beat: its closing F major, held and seamless, for the show caller to release.
+    No drums: 12 s is not a whole number of bars, so a pattern would skip at the loop point."""
+    bus = A.Bus(L * 3)
+    for k in range(3):
+        t0 = k * L
+        chord(bus, F + [69], t0 - 2.0, L + 4.0, gain=0.3, bright=2400, attack=2.0, release=2.0)
+        bus.add(A.choir(65, L + 3.0, gain=0.3), t0 - 1.5)
+        bus.add(A.shimmer(L + 4.0, gain=0.5, base=89), t0 - 2.0)
+    x = A.reverb(bus.stereo(), rt60=3.4, wet=0.3)
+    A.write_wav(f'{out_dir}/hold-world.wav', A.master(seamless(x, L), target_lufs=-20.0, ceiling_db=-2.0))
 
 
 def rides(scenes, dur, db, ramp=1.6):

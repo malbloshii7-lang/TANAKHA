@@ -6,7 +6,7 @@ Final treatment by the head of media and PR lead. Draft for NCM and protocol app
 
 | | |
 |---|---|
-| Runtime | **2:55.0** in the locked order (Revision 5: 52.5 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop. Revision 3's cut ran 3:00.0 |
+| Runtime | **3:00.0** (180 s = 54 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop. 2:55.0 with the tanker beat pulled (Revision 3) |
 | Screen | Large LED wall in a dark hall. The event master is 50p, rendered to the wall's native pixel map (3840×2160 if the wall is 16:9) with the LED grade (`?grade=led`) |
 | Sound | 5.1 cinema mix (7.1 if the hall has it), an original score recorded live, and an Arabic voice-over by an Emirati narrator |
 | Language | Arabic leads everywhere: the voice-over, the first and larger line of every text block, the right-hand text column. English comes second |
@@ -14,36 +14,6 @@ Final treatment by the head of media and PR lead. Draft for NCM and protocol app
 | Facts | The anniversary page's source list (`../index.html`, src-1 to src-68), the v3 film README (`../film/README.md`, chapters VI–IX), and the September 2026 research on protocol, quotes, facts and map data. A fact that could not be verified is left out of the film |
 
 This treatment replaces the provisional wording in `timeline.js`. Appendix A says how to build it and Appendix B records how the three draft treatments were merged.
-
-## Revision 5 · 26 September 2026: the locked order (this is the cut that `timeline.js` builds)
-
-The director locked the film to five acts on the thesis "twenty years reading the sky: Suhail's heritage to mastery of
-the storm, as living engravings". Engraved plates and engraved 3D only; one idea a beat; sparse type; the sound follows
-the picture. The runtime is 2:55.0 (52.5 bars at 72 BPM), then the stage hold.
-
-| Act | Beats (bars) | What the viewer gets |
-|---|---|---|
-| 1 · Heritage | Suhail (4.5), with a black sky held for the first bar; the star and the dhow, Ahmed bin Majid (3.5); the Hili falaj (4.5) | The ancestral line: "Long before radar and satellites, the people of this land read the sky… to live." |
-| 2 · The storm | 2007, one national center (2.5); the seven emirates (3.5); April 2024 (8) | The red alert as a held frame: the storm's clock and the camera stop for 5 s while the label reads, and the music holds on its pedal |
-| 3 · The hero | Etihad Rail in engraved 3D (10) | The train emerging from the Hajar on a long lens, with a bass; a worm's-eye pass, with the Ayyala over the diesel; the rise to an epic wide, in silence |
-| 4 · Rain enhancement | Seeding over the Hajar (4.5); one research figure, a droplet growing on a salt nucleus (4.5) | One seeding shot and one research image, not a deck |
-| 5 · The same star | Suhail over the Abu Dhabi skyline, the short dedication, the title and the lockup (7) | The bookend, and the people the film is for |
-
-**Out of this cut:**
-
-- the Durour wheel and the pearling winds;
-- the three leaders' cards (the order says "kill quote walls");
-- the working-day montage: the airport, the 2D rail plate, the port, the tanker and energy;
-- the world beat and its globe;
-- the rain gauge.
-
-The Saadiyat museums and the King Air are deferred until after the export.
-
-**Leaders.** The narration still names the late Sheikh Zayed (who restored the aflaj) and the late Sheikh Khalifa (who
-founded the Center by decree).
-
-**Open decision for NCM and protocol.** No card of H.H. the President appears in this cut. Restoring one whole card
-before the finale is a one-entry change in `timeline.js`, and `score.py` would need its card cue back.
 
 ## Revision 2 · 25 September 2026: after the Arabic edit and the protocol review
 
