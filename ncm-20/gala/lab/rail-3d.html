@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rail 3D Look Test</title>
+<meta name="description" content="A 3D look test for the gala film's Etihad Rail beat: the same researched train, embankment and skyline, in the film's engraved style, filmed with a moving camera." />
+<link href="../fonts/fonts.css" rel="stylesheet" />
+<style>
+  html,body{margin:0;height:100%;background:#14110e}
+  body{display:grid;place-items:center;overflow:hidden}
+  canvas{display:block;width:min(100vw,calc(100vh * 16 / 9));height:auto;aspect-ratio:16/9}
+</style>
+</head>
+<body>
+<canvas id="film" width="1920" height="1080" aria-label="3D look test: Etihad Rail near Al Dhaid"></canvas>
+<script src="../engine.js"></script>
+<script src="../scenes/plate-rail.js"></script>
+<script src="engrave3d.js"></script>
+<script src="rail-3d.js"></script>
+<script src="../start.js"></script>
+</body>
+</html>

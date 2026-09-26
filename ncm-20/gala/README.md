@@ -84,3 +84,16 @@ FILM_QUERY=pull=tanker node render.js film out/part1-pull-4k50.mp4 out/pull/part
 The media server crossfades audio for 0.5 s at each cut to a loop. The temp score is synthesized. The brief in
 `TREATMENT.md` §8 asks for an original score, recorded live, and an Emirati narrator. Until they are recorded, the
 review copy shows the narration as subtitles.
+
+## Lab: a 3D look test (not part of the film)
+
+`lab/rail-3d.html` answers "what would the film look like in 3D?" for one beat. It is the Etihad Rail shot built in
+true 3D from the same research as `scenes/plate-rail.js`: the locomotive, the stone wagons, the embankment with its
+ditch and berm, the fence, the Al Dhaid palms and the computed Hajar skyline. It is filmed with a crane move in the
+film's engraved style. `lab/engrave3d.js` is the small renderer: a pinhole camera, near-plane clipping, back-face
+culling, painter's order, and hatching that follows the light.
+
+```bash
+python3 lab/bed.py out/rail-3d-bed.wav                                   # its 12 s music bed, from score.py's helpers
+FILM_HTML=lab/rail-3d.html node render.js film out/rail-3d.mp4 out/rail-3d-bed.wav --jobs 3
+```
