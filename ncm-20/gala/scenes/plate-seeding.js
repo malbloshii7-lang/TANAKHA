@@ -1,6 +1,69 @@
 'use strict';
 // X · Al Istimtar — seeding the cloud over the Hajar in Ras Al Khaimah: the aircraft level under the cloud base, salt
 // plumes rising into it, droplets gathering, then rain on the foothills
+// The aircraft is NCM's seeding type, a Beechcraft King Air C90: 10.82 m long, 15.32 m span, 4.34 m high on its gear;
+// a low wing with 7 degrees of dihedral, two PT6A turboprops in nacelles ahead of it, a conventional tail, round cabin
+// windows. Hygroscopic flares burn in racks under each wing's trailing edge, outboard of the nacelles. It is built in
+// 3D and engraved as the film's other 3D work is (engrave3d.js), seen from the foothills about 15 degrees below it and
+// to its right, its nose turned 15 degrees toward us; no livery, number or marks.
+// the outline of a convex part on screen: the hull of its projected vertices (monotone chain)
+function hull2(pts) {
+  const s = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  s.forEach(q => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); });
+  s.slice().reverse().forEach(q => { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); });
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+const KING_AIR = (() => {
+  const D7 = Math.tan(7 * Math.PI / 180);
+  // elliptical sections [x, half-width, centre z, half-height] joined into faces (x forward, y to the left, z up; m)
+  const loft = (sections, sides, dy = 0) => {
+    const rings = sections.map(([x, w, zc, h]) => Array.from({ length: sides }, (_, k) => { const a = k / sides * TAU; return [x, dy + w * Math.cos(a), zc + h * Math.sin(a)]; }));
+    const f = [];
+    for (let i = 1; i < rings.length; i++) for (let k = 0; k < sides; k++) { const r0 = rings[i - 1], r1 = rings[i], k2 = (k + 1) % sides; f.push([r0[k], r0[k2], r1[k2], r1[k]]); }
+    f.push(rings[0].slice().reverse(), rings[rings.length - 1]);
+    return f;
+  };
+  const hexa = v => [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]].map(ix => ix.map(i => v[i]));
+  // a thin tapered surface from span y0 to y1: its leading and trailing edges at root and tip, its root height z0, its
+  // dihedral (tangent), its thickness at root and tip (full at the leading edge, half at the trailing edge)
+  const panel = (y0, y1, le0, te0, le1, te1, z0, dih, t0, t1) => {
+    const z1 = z0 + Math.abs(y1 - y0) * dih;
+    const bottom = [[le0, y0, z0 - t0 / 2], [te0, y0, z0 - t0 / 4], [te1, y1, z1 - t1 / 4], [le1, y1, z1 - t1 / 2]];
+    const top = [[le0, y0, z0 + t0 / 2], [te0, y0, z0 + t0 / 4], [te1, y1, z1 + t1 / 4], [le1, y1, z1 + t1 / 2]];
+    return hexa(bottom.concat(top));
+  };
+  const skin = { tone: 0.05, shade: 0.5, lw: 2.2 };
+  const parts = [
+    { n: 'fuselage', smooth: true, f: loft([[5.4, 0.16, 0.46, 0.16], [5.12, 0.4, 0.47, 0.38], [4.5, 0.6, 0.52, 0.58], [3.7, 0.68, 0.58, 0.7], [2.8, 0.72, 0.62, 0.76], [-1.6, 0.72, 0.62, 0.76], [-3.4, 0.5, 0.8, 0.55], [-5.45, 0.16, 1.05, 0.2]], 12), st: { tone: 0.04, shade: 0.55, lw: 2.4 } },
+    { n: 'wingR', f: panel(-0.7, -7.66, 1.4, -0.8, 0.55, -0.55, 0.0, D7, 0.32, 0.12), st: skin },
+    { n: 'wingL', f: panel(0.7, 7.66, 1.4, -0.8, 0.55, -0.55, 0.0, D7, 0.32, 0.12), st: skin },
+    { n: 'tailplaneR', f: panel(-0.2, -2.62, -4.3, -5.45, -4.95, -5.6, 0.95, Math.tan(5 * Math.PI / 180), 0.12, 0.07), st: skin },
+    { n: 'tailplaneL', f: panel(0.2, 2.62, -4.3, -5.45, -4.95, -5.6, 0.95, Math.tan(5 * Math.PI / 180), 0.12, 0.07), st: skin },
+    { n: 'fin', f: hexa([[-3.1, -0.08, 1.2], [-5.4, -0.08, 1.25], [-5.9, -0.05, 3.1], [-4.9, -0.05, 3.1], [-3.1, 0.08, 1.2], [-5.4, 0.08, 1.25], [-5.9, 0.05, 3.1], [-4.9, 0.05, 3.1]]), st: skin },
+  ];
+  [-2.3, 2.3].forEach(y => {
+    const zw = (Math.abs(y) - 0.7) * D7, side = y < 0 ? 'R' : 'L';
+    // the nacelle, slung on the wing, and its propeller (a 2.3 m disc) just ahead of it
+    parts.push({ n: 'nacelle' + side, smooth: true, f: loft([[2.35, 0.3, zw + 0.2, 0.28], [1.2, 0.42, zw + 0.18, 0.42], [-1.1, 0.28, zw + 0.25, 0.25]], 10, y), st: { tone: 0.1, shade: 0.5, lw: 2.0 }, prop: [2.45, y, zw + 0.2] });
+    // the flare rack under the wing's trailing edge, outboard of the nacelle; the flares burn at its rear
+    const yr = Math.sign(y) * 4.8, zr = (4.8 - 0.7) * D7 - 0.1;
+    parts.push({ n: 'rack' + side, f: hexa([[-0.3, yr - 0.6, zr - 0.26], [-0.78, yr - 0.6, zr - 0.26], [-0.78, yr + 0.6, zr - 0.26], [-0.3, yr + 0.6, zr - 0.26], [-0.3, yr - 0.6, zr], [-0.78, yr - 0.6, zr], [-0.78, yr + 0.6, zr], [-0.3, yr + 0.6, zr]]), st: { tone: 0.55, shade: 0.3, lw: 1.6 }, burn: [-0.8, yr, zr - 0.2] });
+  });
+  // the model turned 15 degrees toward the viewer; the fixed view is 100 m to its right and 28 m below
+  const psi = -15 * Math.PI / 180, turn = ([x, y, z]) => [x * Math.cos(psi) - y * Math.sin(psi), x * Math.sin(psi) + y * Math.cos(psi), z];
+  parts.forEach(p => {
+    p.f = p.f.map(f => f.map(turn));
+    if (p.prop) { const [x, y, z] = p.prop; p.disc = Array.from({ length: 37 }, (_, k) => turn([x, y + 1.15 * Math.cos(k / 36 * TAU), z + 1.15 * Math.sin(k / 36 * TAU)])); }
+    if (p.burn) p.burn = turn(p.burn);
+  });
+  // the round cabin windows and the cockpit's side window, on the side toward us
+  const windows = [1.6, 0.7, -0.2, -1.1].map(x => [[x + 0.22, -0.69, 0.74], [x - 0.22, -0.69, 0.74], [x - 0.22, -0.69, 1.0], [x + 0.22, -0.69, 1.0]].map(turn));
+  const cockpit = [[3.45, -0.62, 0.86], [2.85, -0.7, 0.86], [2.85, -0.7, 1.16], [3.3, -0.62, 1.12]].map(turn);
+  const side = turn([0, -1, 0]);
+  const view = () => E3.camera([0, -100, -28], [0, 0, 0.6], 1450);
+  return { parts, windows, cockpit, side, view };
+})();
 scene({
   id: 'seeding', // plate carried over from the v3 film (drawing only; words, timing and camera come from timeline.js)
   start: 78, dur: 8, speed: 11 / 8, num: 'X', name: 'AL ISTIMTAR', ar: 'الاستمطار', readout: '311 MISSIONS · 2022',
@@ -33,6 +96,8 @@ scene({
     for (let i = 0; i < 170; i++) this.drops.push({ x: 1120 + r() * 640, ph: r(), v: 620 + r() * 260, len: 16 + r() * 16, on: 5.0 + (i / 170) * 3.2, a: 0.35 + r() * 0.45 });
     this.flares = [];
     for (let i = 0; i < 90; i++) this.flares.push({ te: 1.6 + i * 0.06, side: i % 2 ? 1 : -1, vy: 40 + r() * 70, vx: -30 + r() * 60, life: 1.8 + r() * 1.2 });
+    KING_AIR.view();
+    this.racks = KING_AIR.parts.filter(p => p.burn).map(p => { const [x, y] = E3.proj(p.burn); return [x - W / 2, y - H / 2]; });
   },
   planeX(lt) { return lerp(930, 1910, prog(lt, 1.4, 6.2)); },
   draw(lt) {
@@ -63,17 +128,26 @@ scene({
       if (age < 0 || age > f.life * 1.6) return;
       const px = this.planeX(f.te);
       if (px < 1110 || px > 1780) return;
-      const u = age / (f.life * 1.6), x = px - 40 + f.vx * age * 0.6, y = 590 + f.side * 26 - f.vy * age * 0.9;
+      const [rx, ry] = this.racks[f.side > 0 ? 0 : 1], u = age / (f.life * 1.6), x = px + rx + f.vx * age * 0.6, y = 590 + ry - f.vy * age * 0.9;
       if (y < 505) return;
       disc(x, y, 1.3, BLUE, 0.45 * (1 - u)); // fine rising salt particles, never puffs (they read as smoke)
     });
-    // the aircraft
+    // the aircraft: its parts far to near, each engraved by the light; the propellers as the discs a camera sees
     const px = this.planeX(lt);
     if (lt > 1.3 && px < 1905) {
-      ctx.save(); ctx.translate(px, 590 + 3 * Math.sin(lt * 2));
-      mask([this.fuse, this.wing, this.wing2, this.fin]);
-      [this.wing2, this.fuse, this.wing, this.fin].forEach(q => stroke(q, 1, INK, 1.8));
-      disc(5, 22, 5, INK, 0.9); disc(5, -16, 4, INK, 0.9);
+      ctx.save(); ctx.translate(px - W / 2, 590 + 3 * Math.sin(lt * 2) - H / 2);
+      KING_AIR.view();
+      const depth = p => E3.depth(E3.centroid(p.f.map(E3.centroid)));
+      KING_AIR.parts.map(p => ({ p, d: depth(p) })).sort((a, b) => b.d - a.d).forEach(({ p }, i) => {
+        // a smooth part (the fuselage, the nacelles) is shaded by its hatching and outlined once, never faceted
+        E3.solid(p.f, p.smooth ? Object.assign({}, p.st, { edges: false }) : p.st, 1300 + i * 40);
+        if (p.smooth) stroke(new P(hull2(p.f.flat().map(E3.proj)), true), 1, INK, 1.6, 0.9);
+        if (p.n === 'fuselage') {
+          KING_AIR.windows.forEach((w, k) => E3.face(w, { n: KING_AIR.side, fillCol: INK, fillA: 0.55, noHatch: true, lw: 1.4, edgeA: 0.7 }, 1500 + k));
+          E3.face(KING_AIR.cockpit, { n: KING_AIR.side, fillCol: INK, fillA: 0.6, noHatch: true, lw: 1.4, edgeA: 0.8 }, 1510);
+        }
+        if (p.disc) E3.line(p.disc, INK, 1.0, 0.4);
+      });
       ctx.restore();
     }
     // rain, thickening as the seeding takes hold

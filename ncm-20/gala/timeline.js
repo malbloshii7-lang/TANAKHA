@@ -1,6 +1,7 @@
 'use strict';
-// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 and 3): 21 beats, 54 bars at 72 BPM, 3:00.0
-// (20 beats and 2:55.0 with the tanker pulled: ?pull=tanker).
+// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2, 3 and 4): 21 beats, 54 bars at 72 BPM, 3:00.0
+// (20 beats and 2:55.0 with the tanker pulled: ?pull=tanker). B09 is the rain over the Saadiyat Cultural District
+// (Revision 4); ?april2024 puts April 2024 on the national map back in its place.
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -54,6 +55,28 @@ const TANKER_BEAT = { id: 'tanker', start: at(30), dur: at(1.5), speed: 1, offse
     levelA(f, s + 0.5, s + 4.75, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
   } };
 
+// B09's two versions. The rain over Saadiyat is natural rain, and the narration claims only NCM's forecasts and early
+// warnings (never that NCM makes rain; no aircraft appears there or anywhere near the April 2024 story).
+const APRIL2024 = new URLSearchParams(location.search).has('april2024');
+const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5), dur: at(5), offset: 12, xf: 1.0,
+    cam: t => camPath([{ t: 12, s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }, { t: 12 + at(5), s: 1.05, px: 900, py: 540, sx: 960, sy: 540 }], t),
+    tint(f) { const s = this.start; return 0.34 * easeInOut(prog(f, s + 0.8, 7.2)) * (1 - easeInOut(prog(f, s + 12.5, 3.5))); },
+    words(t) {
+      const f = filmT(this, t), s = this.start;
+      levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
+      levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
+    } };
+const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(20.5), dur: at(5), xf: 1.0,
+  cam: t => camPath([{ t: 0, s: 1.0, px: 1041, py: 650, sx: 1041, sy: 650 }, { t: at(5), s: 1.05, px: 1041, py: 650, sx: 1041, sy: 650 }], t),
+  words(t) {
+    const f = filmT(this, t), s = this.start;
+    levelB(f, s + 0.7, s + 8.0, 'المنطقة الثقافية في السعديات · أبوظبي', 'SAADIYAT CULTURAL DISTRICT · ABU DHABI', { y: 330 });
+    levelA(f, s + 4.8, s + 12.0, 'قبل المطر', 'BEFORE THE RAIN', { y: 520 });
+    // the plate draws a caption under each museum; they are recorded here for the subtitle files and the script
+    [['متحف جوجنهايم أبوظبي', 'GUGGENHEIM ABU DHABI', 1.6], ['متحف زايد الوطني', 'ZAYED NATIONAL MUSEUM', 2.1], ['متحف اللوفر أبوظبي', 'LOUVRE ABU DHABI', 2.6]]
+      .forEach(([ar, en, t0]) => recText('B', s + t0, s + 15.6, ar, en));
+  } };
+
 const TIMELINE = [
   // B01 · Night: Suhail rises
   { id: 'suhail', start: 0, dur: at(3.5), cam: SUHAIL_CAM,
@@ -99,15 +122,9 @@ const TIMELINE = [
       const f = filmT(this, t), s = this.start;
       levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 520, arSize: 64, enSize: 20 });
     } },
-  // B09 · April 2024
-  { id: 'homes', use: 'nation', storm: true, start: at(20.5), dur: at(5), offset: 12, xf: 1.0,
-    cam: t => camPath([{ t: 12, s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }, { t: 12 + at(5), s: 1.05, px: 900, py: 540, sx: 960, sy: 540 }], t),
-    tint(f) { const s = this.start; return 0.34 * easeInOut(prog(f, s + 0.8, 7.2)) * (1 - easeInOut(prog(f, s + 12.5, 3.5))); },
-    words(t) {
-      const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
-      levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
-    } },
+  // B09 · Before the rain (Revision 4): the Saadiyat Cultural District under a moderate rain; ?april2024 restores the
+  // April 2024 beat on the national map instead (the protocol office decides)
+  APRIL2024 ? APRIL2024_BEAT : RAIN_BEAT,
   // B10 · For every flight
   { id: 'airport', start: at(25.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
     words(t) {
@@ -230,6 +247,8 @@ const VO = [
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
+  { id: 'VO-08r', beat: 'rain', in: 1.0, out: 4.2, ar: 'وحينَ يأتي المطرُ غيثاً على هذهِ الأرض،', en: 'And when rain comes as a blessing to this land,' },
+  { id: 'VO-08s', beat: 'rain', in: 4.6, out: 9.8, ar: 'تسبِقُهُ تنبُّؤاتُ المركزِ وإنذاراتُهُ المبكِّرة، حرصاً على سلامةِ الناس.', en: "the Center's forecasts and early warnings come before it, to keep people safe." },
   { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
@@ -245,7 +264,7 @@ const VO = [
 ];
 // narration lines tied to a beat are timed from that beat's start, so the cut can change without retiming them; a
 // pulled beat's lines go with it
-for (let i = VO.length - 1; i >= 0; i--) if (PULLED.includes(VO[i].beat)) VO.splice(i, 1);
+for (let i = VO.length - 1; i >= 0; i--) if (VO[i].beat && !TIMELINE.some(e => e.id === VO[i].beat)) VO.splice(i, 1);
 VO.forEach(v => { if (v.beat) { const s = START(v.beat); v.in = +(s + v.in).toFixed(3); v.out = +(s + v.out).toFixed(3); delete v.beat; } });
 // Subtitles are set without the narrator's vowels: keep the shadda and the tanween on alif, drop the rest.
 // (and the shadda on a sun letter after the article, which plain text never writes: «السّنة» becomes «السنة»).

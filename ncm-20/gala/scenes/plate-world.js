@@ -14,6 +14,8 @@ scene({
       { ll: [43.3, 68.27], label: 'TURKISTAN REGION, KAZAKHSTAN · 2026', ar: 'إقليم تركستان، كازاخستان · ' + ltr('2026'), t: 3.6 },
       { ll: [33.57, -7.59], label: 'MOROCCO · 2025', ar: 'المغرب · ' + ltr('2025'), t: 4.2 },
       { ll: [31.55, 74.34], label: 'LAHORE, PAKISTAN · 2023', ar: 'لاهور، باكستان · ' + ltr('2023'), t: 4.8 },
+      // Ethiopia (Revision 4): the country named at its capital, with no year and no claim (no drought claim)
+      { ll: [9.03, 38.74], label: 'ETHIOPIA', ar: 'إثيوبيا', t: 5.4 },
     ];
     this.outline = el(this.cx, this.cy, this.R, this.R, 0, TAU, 360, 0.5);
     this.ring = el(this.cx, this.cy, 452, 118, 0, TAU, 361, 0.6, -0.22);

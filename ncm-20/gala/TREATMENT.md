@@ -187,6 +187,49 @@ shaped what is built. **Where this section and anything above disagree, this sec
 
 ---
 
+## Revision 4 · 26 September 2026: the Saadiyat rain, the King Air, Ethiopia
+
+Three changes, at the requester's direction, on the 3:00 cut of Revision 3. A five-act re-cut was tried and withdrawn
+the same day: it lost the film's density, and the requester preferred this cut.
+
+- **B09 · Before the rain.** The Saadiyat Cultural District under natural rain, seen from a boat offshore at
+  24.5445 N, 54.3780 E. Each museum stands at its true bearing and angular size (OSM footprints; the published
+  heights):
+  - the Guggenheim Abu Dhabi (opening 11 December 2026), its cones up to 88 m;
+  - the Zayed National Museum, its wings up to 123 m;
+  - the Louvre Abu Dhabi, its 180 m dome.
+
+  The narration (VO-08r, VO-08s) says only that the Center's forecasts and early warnings come before the rain, for
+  people's safety. It never says NCM makes rain, and no aircraft comes near the beat. April 2024 remains one query away
+  (`?april2024`); **the protocol office chooses** which of the two B09s goes to the ceremony.
+- **B16 · the seeding aircraft** is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
+  dimensions:
+  - 10.82 m long, 15.32 m span;
+  - a low wing with 7 degrees of dihedral;
+  - two PT6A turboprops in nacelles;
+  - a conventional tail.
+
+  The salt plumes rise from the hygroscopic flare racks under its wings. It carries no livery, registration or marks.
+- **B19 · Ethiopia** joins the globe's partners, pinned at Addis Ababa. It is named as a country only, with no year
+  and no drought or outcome claim, because none is verified.
+
+**Music.**
+
+- B09 has no Emirati percussion: a cello pedal, felt-piano drops, and the rababa's Suhail motif as the rain eases,
+  warming to F into the working day.
+- The working day's drums now wait for its own first bar, as they did after April 2024.
+- Ethiopia's pin has its chime.
+- The world beat is ridden 0.3 dB lower, so every leader's card still measures at or above it:
+  - cards: -13.5, -13.8 and -13.5 LUFS;
+  - world: -14.0 LUFS.
+
+**Before the master:**
+
+- match the Guggenheim's cone layout to DCT's photographs, and the Zayed National Museum's four lower wings to
+  Foster + Partners' elevations;
+- the Arabic editor reads VO-08r, VO-08s and the B09 words («قبل المطر», «المنطقة الثقافية في السعديات»);
+- NCM confirms the King Air type for its current seeding fleet.
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*

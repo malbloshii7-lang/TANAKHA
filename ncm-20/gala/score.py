@@ -347,17 +347,37 @@ def main(cues_path, out_dir):
     for i, m in enumerate([74, 76, 78, 79, 81, 83, 86]):
         music.add(harmonic(m, 0.7), wash_t + 0.2 + i * 0.14, pan=0.5 * np.sin(i))
 
-    # B09 · April 2024: the pulse stops; a cello pedal on D, one felt-piano note a bar, gentle rain; warmth toward F
-    # under the remembrance. No Emirati percussion, no claps, no voices: nothing festive.
-    a0, a1 = st('homes'), en('homes')
-    music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.8)
-    k, t = 0, a0
-    while t < a1 - 0.5:
-        music.add(felt([D4, A3, D4 + 3, A3, D4 - 2][k % 5], 0.8), t)
-        k, t = k + 1, t + BAR
-    rem = a0 + 12.3  # the remembrance (VO-08c), as the paper warms again
-    chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
-    sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
+    if 'homes' in S:
+        # B09 · April 2024 (?april2024): the pulse stops; a cello pedal on D, one felt-piano note a bar, gentle rain;
+        # warmth toward F under the remembrance. No Emirati percussion, no claps, no voices: nothing festive.
+        a0, a1 = st('homes'), en('homes')
+        music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.8)
+        k, t = 0, a0
+        while t < a1 - 0.5:
+            music.add(felt([D4, A3, D4 + 3, A3, D4 - 2][k % 5], 0.8), t)
+            k, t = k + 1, t + BAR
+        rem = a0 + 12.3  # the remembrance (VO-08c), as the paper warms again
+        chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
+        sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
+    else:
+        # B09 · Before the rain (Revision 4): the Center's pulse stops for the rain over Saadiyat. A cello pedal on D and
+        # soft strings in D Dorian; the felt piano falls like the first drops, a note a beat; the rababa recalls the
+        # Suhail motif as the rain eases (the plate eases it from 10.5 s), and the harmony warms toward F, the gift of the
+        # rain (غيث), into the working day. No Emirati percussion: the rain is a blessing, not a festival.
+        a0, a1 = st('rain'), en('rain')
+        music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.7)
+        chord(music, Dm7, a0 + 0.4, 10.0, gain=0.28, bright=1500, attack=2.0, release=2.0)
+        drops = [D4 + 7, D4 + 5, D4 + 3, D4, A3, D4 + 3, D4 + 5, D4 + 7, D4 + 10, D4 + 7, D4 + 5, D4 + 3]
+        k, t = 0, a0 + 1.0
+        while t < a0 + 10.5:
+            music.add(felt(drops[k % len(drops)], 0.55), t, pan=0.35 * np.sin(k * 1.7))
+            k, t = k + 1, t + BEAT
+        for j, (t, m, d) in enumerate(motif(a0 + 10.5, root=D4, n=5)):
+            rab(music, t, m, d, gain=0.5, grace=EHF if j == 0 else None)
+        chord(music, F, a0 + 12.0, a1 - a0 - 12.0 + 1.5, gain=0.3, bright=1500, attack=2.0, release=2.0)
+        rain = A.rain(a1 - a0 + 1.0, gain=0.8)
+        rain = rain * np.interp(np.arange(rain.shape[-1]) / A.SR, [0, 1.2, 10.5, 15.5, a1 - a0 + 1.0], [0, 1, 1, 0.4, 0.3])  # (stereo)
+        sfx.add(rain, a0)  # as the picture: light to moderate, easing at the end
 
     # B10–B14 · the working day: a warm chord and the oud motif as the sky clears; the drums wait for the remembrance
     # line to end, then the Ayyala carries the day at mezzo-forte, one colour for each place; a ras stroke and the tus
@@ -366,7 +386,7 @@ def main(cues_path, out_dir):
     chord(music, Dmaj, w0, 2.0, gain=0.38, bright=2000, attack=0.6)
     for (t, m, d) in motif(w0, root=D4, major=True, n=4, stretch=0.7):
         music.add(A.pluck(m, 1.3, bright=0.65), t, 0.6)
-    d0, d1 = next_bar(vo_end(w0) + 0.6), w1 - 1.0
+    d0, d1 = next_bar(max(vo_end(w0) + 0.6, w0)), w1 - 1.0  # never before the working day's own first bar
     takhmeera(perc, d0, 'mf')
     k, t = 0, d0
     while t < d1:
@@ -447,7 +467,7 @@ def main(cues_path, out_dir):
     play(perc, AYYALA, apex, apex, apex + BAR, 1.2)
     play(perc, RAS + TAKHAMIR + TAR, apex, apex + BAR, office + 0.4, 0.75)  # receding under the office
     chord(music, F + [69, 72, 77], apex, 3.4, gain=0.44, bright=3400, attack=0.25, release=2.0)  # the apex
-    for dt in [2.8, 3.6, 4.2, 4.8]:  # the pins (plate-world.js places[].t)
+    for dt in [2.8, 3.6, 4.2, 4.8, 5.4]:  # the pins (plate-world.js places[].t)
         music.add(harmonic(77 + 12, 0.6), g0 + dt, pan=0.4)
     chord(music, F + [69], office, split - office + 1.0, gain=0.3, bright=2400, attack=0.8, release=2.5)  # under the office and name
     assert office + 0.4 + 1.6 < split, 'a drum would ring across the split'
@@ -502,9 +522,9 @@ def main(cues_path, out_dir):
     # fader rides: the loudness follows the story (quiet night, the Center's confidence, the April drop, the world's
     # peak); each leader's card at or above the world beat
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
-                                       'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'rail': -1,
+                                       'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'rain': -5, 'airport': -1, 'rail': -1,
                                        'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0, 'seeding': -2,
-                                       'science': -2, 'quote-mansour': 0, 'world': -3.1, 'gauge': 0.5, 'finale': -1})
+                                       'science': -2, 'quote-mansour': 0, 'world': -3.4, 'gauge': 0.5, 'finale': -1})
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9

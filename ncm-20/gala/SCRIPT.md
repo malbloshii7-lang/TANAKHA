@@ -14,9 +14,8 @@ Runtime 3:00.00. The narrator's copy is fully vowelled; the on-screen text carri
 | VO-05 | B05 | 0:29.00–0:36.60 | ‏وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه. | In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them. |
 | VO-06 | B07 | 0:48.63–0:55.03 | ‏في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد، | In 2007 the nation brought its weather service and atmospheric research together in one national center, |
 | VO-07 | B08 | 0:56.93–1:06.53 | ‏أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع. | which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates. |
-| VO-08a | B09 | 1:09.33–1:15.33 | ‏وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها. | In April 2024 the country saw the heaviest rainfall on record. |
-| VO-08b | B09 | 1:15.53–1:20.73 | ‏وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ. | Two days before, the Center had forecast growing instability; then it issued a red alert. |
-| VO-08c | B09 | 1:20.93–1:25.53 | ‏نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس. | We remember those difficult days, and we honour all who kept watch over people's safety. |
+| VO-08r | B09 | 1:09.33–1:12.53 | ‏وحينَ يأتي المطرُ غيثاً على هذهِ الأرض، | And when rain comes as a blessing to this land, |
+| VO-08s | B09 | 1:12.93–1:18.13 | ‏تسبِقُهُ تنبُّؤاتُ المركزِ وإنذاراتُهُ المبكِّرة، حرصاً على سلامةِ الناس. | the Center's forecasts and early warnings come before it, to keep people safe. |
 | VO-09 | B10 | 1:26.10–1:28.50 | ‏لكلِّ رحلةٍ رصدٌ لا ينقطِع، | For every flight, a watch that never sleeps; |
 | VO-09r | B11 | 1:30.40–1:33.80 | ‏وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب، | across the land, warnings of dust and fog; |
 | VO-10 | B12 | 1:35.43–1:38.13 | ‏ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام، | for every ship, a five-day marine forecast; |
@@ -44,8 +43,11 @@ Runtime 3:00.00. The narrator's copy is fully vowelled; the on-screen text carri
 | B07 | 0:49.23–0:56.23 | B (label) | ‏المرسوم بقانون اتحادي رقم ‎(6)‎ لسنة ‎2007‎ | FEDERAL DECREE-LAW NO. 6 OF 2007 |
 | B07 | 0:52.33–0:56.23 | A (headline) | ‏مركز وطني واحد | ONE NATIONAL CENTER |
 | B08 | 1:03.13–1:07.93 | A (headline) | ‏المرجع الرسمي للطقس | THE OFFICIAL SOURCE OF WEATHER INFORMATION |
-| B09 | 1:09.03–1:15.63 | B (label) | ‏‎16‎ أبريل ‎2024‎<br>‏أغزر أمطار منذ بدء جمع البيانات عام ‎1949‎ | 16 APRIL 2024 · THE HEAVIEST RAINFALL<br>SINCE DATA COLLECTION BEGAN IN 1949 |
-| B09 | 1:15.73–1:20.93 | B (label) | ‏تنبؤات ‎14‎ أبريل · إنذار أحمر ‎16‎ أبريل | FORECASTS 14 APRIL · RED ALERT 16 APRIL |
+| B09 | 1:09.03–1:16.33 | B (label) | ‏المنطقة الثقافية في السعديات · أبوظبي | SAADIYAT CULTURAL DISTRICT · ABU DHABI |
+| B09 | 1:09.93–1:23.93 | B (label) | ‏متحف جوجنهايم أبوظبي | GUGGENHEIM ABU DHABI |
+| B09 | 1:10.43–1:23.93 | B (label) | ‏متحف زايد الوطني | ZAYED NATIONAL MUSEUM |
+| B09 | 1:10.93–1:23.93 | B (label) | ‏متحف اللوفر أبوظبي | LOUVRE ABU DHABI |
+| B09 | 1:13.13–1:20.33 | A (headline) | ‏قبل المطر | BEFORE THE RAIN |
 | B10 | 1:25.55–1:29.75 | B (label) | ‏مطار زايد الدولي · أبوظبي | ZAYED INTERNATIONAL AIRPORT · ABU DHABI |
 | B10 | 1:25.85–1:29.75 | A (headline) | ‏لكل رحلة | FOR EVERY FLIGHT |
 | B11 | 1:30.25–1:34.75 | B (label) | ‏قطارات الاتحاد · الذيد، الشارقة | ETIHAD RAIL · AL DHAID, SHARJAH |
@@ -80,7 +82,7 @@ Runtime 3:00.00. The narrator's copy is fully vowelled; the on-screen text carri
 | B06 | `quote-zayed` | 0:36.67 | 11.67 s | fade (1.2 s) |
 | B07 | `centre` | 0:48.33 | 8.33 s | iris (1.6 s) |
 | B08 | `nation` | 0:56.67 | 11.67 s | iris (1.6 s) |
-| B09 | `homes` | 1:08.33 | 16.67 s | fade (1 s) |
+| B09 | `rain` | 1:08.33 | 16.67 s | fade (1 s) |
 | B10 | `airport` | 1:25.00 | 5.00 s | fade (1 s) |
 | B11 | `rail` | 1:30.00 | 5.00 s | fade (0.5 s) |
 | B12 | `port` | 1:35.00 | 5.00 s | fade (0.5 s) |

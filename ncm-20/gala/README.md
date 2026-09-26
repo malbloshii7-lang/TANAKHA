@@ -20,8 +20,13 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     rings, no point symbols and no trajectories.
   - Abu Musa and the Greater and Lesser Tunb are drawn as UAE territory from neutral data. Musandam and Madha are
     left to Oman.
-  - April 2024 is shown on the national map as a weather chart would show it.
-  - The seeding aircraft works over UAE ground.
+  - B09 is the Saadiyat Cultural District under natural rain: the Guggenheim Abu Dhabi, the Zayed National Museum and
+    the Louvre Abu Dhabi, each at its true bearing and angular size from a boat offshore. The narration claims only
+    NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft comes near it. `?april2024` puts
+    April 2024 back, on the national map, drawn as a weather chart would show it.
+  - The seeding aircraft is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
+    dimensions. It works over UAE ground, burning hygroscopic flares in racks under its wings. It carries no livery.
+  - The globe names Ethiopia among the UAE's rain-enhancement partners: the country only, with no year and no claim.
   - The working day claims only NCM's own products: public dust and fog warnings across the land (the Etihad Rail
     beat), the marine forecast (Jebel Ali) and the east-coast bulletin that NCM's AI assistant drafts and a forecaster
     approves (the tanker beat). Never "safe passage".
@@ -41,7 +46,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 in B09 instead of the Saadiyat rain |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
@@ -89,8 +94,8 @@ review copy shows the narration as subtitles.
 
 `lab/rail-3d.html` builds the Etihad Rail shot in true 3D from the same research as `scenes/plate-rail.js`: the
 locomotive, the stone wagons, the embankment with its ditch and berm, the fence and the Al Dhaid palms. The Hajar
-front is layered by distance from the same terrain as the plate's skyline (`lab/ridges.py`). `lab/engrave3d.js` is
-the small renderer: a pinhole camera, near-plane clipping, back-face culling, painter's order, and hatching that
+front is layered by distance from the same terrain as the plate's skyline (`lab/ridges.py`). `engrave3d.js` is
+the small renderer (the film also uses it, for the seeding aircraft): a pinhole camera, near-plane clipping, back-face culling, painter's order, and hatching that
 follows the light.
 
 `lab/rail-3d-shot.js` holds the camera keys. `lab/bed.py` builds the sound from the same keys: the diesel's level,

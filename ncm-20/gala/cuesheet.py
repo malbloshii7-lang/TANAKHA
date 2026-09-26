@@ -25,6 +25,7 @@ LABEL = {
     'centre': ('2007: one national center', ''),
     'nation': ('The seven emirates', ''),
     'homes': ('April 2024, on the national map', 'Lighting restrained; no colour chase'),
+    'rain': ('Before the rain: the Saadiyat Cultural District', 'Lighting soft and cool; no colour chase'),
     'airport': ('Zayed International', ''),
     'rail': ('Etihad Rail near Al Dhaid, Sharjah', ''),
     'port': ('Jebel Ali', ''),
