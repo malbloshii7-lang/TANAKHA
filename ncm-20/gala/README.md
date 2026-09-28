@@ -78,10 +78,15 @@ node render.js film out/review.mp4 out/mix.wav --jobs 3                         
 # the event master, cue to cue: part 1 ends where the dissolve into the gauge begins ("split", read from the cut)
 node render.js film out/part1-4k50.mp4 out/part1.wav --to split --scale 2 --fps 50 --grade led --jobs 3
 node render.js film out/part2-4k50.mp4 out/part2.wav --from split --afrom 0 --scale 2 --fps 50 --grade led --jobs 3
-# the loops: W under the applause after the world beat (12 s), A/B/C at the end (20 s); each loops seamlessly
-FILM_QUERY=hold=W node render.js film out/hold-world.mp4 out/hold-world.wav --scale 2 --fps 50 --grade led
-FILM_QUERY=hold=A node render.js film out/hold-a.mp4 out/hold.wav --scale 2 --fps 50 --grade led
-FILM_QUERY=hold=A node render.js preview out/safety-slate 0                     # the still for a playback failure
+# the loops: W under the applause after the world beat (12 s), A/B/C at the end (20 s); each loops seamlessly (every
+# motion, and in W the light's drift, is periodic in the loop's length, so the frame at the loop length is the first)
+FILM_QUERY=hold=W node render.js film out/hold-world-4k50.mp4 out/hold-world.wav --scale 2 --fps 50 --grade led --jobs 3
+FILM_QUERY=hold=B node render.js film out/hold-b-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # the dedication (the running order's hold)
+FILM_QUERY=hold=A node render.js film out/hold-a-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # title and lockup
+FILM_QUERY=hold=C node render.js film out/hold-c-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # dimmed, behind speeches
+FILM_QUERY=hold=A node render.js preview out/safety-slate-4k 0 --scale 2 --grade led                         # the still for a playback failure
+# the restrained mix (Ramadan or mourning): the same picture with the restrained audio, no re-render
+$FFMPEG -i out/part1-4k50.mp4 -i out/part1-restrained.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 256k -shortest out/part1-4k50-restrained.mp4
 
 # without the tanker (the go/no-go fallback): the same steps with the query on every render and its own cues
 FILM_QUERY=pull=tanker node render.js cues out/cues-pull.json
