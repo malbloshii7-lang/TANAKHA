@@ -105,6 +105,10 @@ FILM_QUERY=pull=tanker node render.js film out/part1-pull-4k50.mp4 out/pull/part
 FILM_QUERY='hold=W&pull=tanker' node render.js film out/lossless-hold-world-pull.mp4 out/pull/hold-world.wav --scale 2 --fps 50 --grade led --jobs 3 --crf 0 --preset ultrafast --profile high444
 ```
 
+The rendered 4K 50p LED masters of Revision 7 (with the loops, the fallback, the restrained versions, the WAVs, the cue
+sheet, checksums and rejoin scripts) are on the branch `claude/focused-mayer-jogort-masters`; its README gives the
+running order. Delete that branch once they are downloaded: this branch renders them again.
+
 The media server crossfades audio for 0.5 s at each cut to a loop. The temp score is synthesized. The brief in
 `TREATMENT.md` §8 asks for an original score, recorded live, and an Emirati narrator. Until they are recorded, the
 review copy shows the narration as subtitles.
