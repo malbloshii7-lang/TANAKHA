@@ -80,11 +80,13 @@ node render.js film out/part1-4k50.mp4 out/part1.wav --to split --scale 2 --fps 
 node render.js film out/part2-4k50.mp4 out/part2.wav --from split --afrom 0 --scale 2 --fps 50 --grade led --jobs 3
 # the loops: W under the applause after the world beat (12 s, a still frame), A/B/C at the end (20 s). Each loops
 # seamlessly: every motion is periodic in the loop's length and the light over the sheet stands still in a hold. Each is
-# rendered near-lossless in parallel chunks, then encoded once as a single stream with one keyframe (encoded in separate
-# chunks, the paper grain re-quantizes at every join and at the loop point)
+# rendered LOSSLESS in parallel chunks (so the frames pass the chunk joins bit-exact), then encoded once as a single
+# stream with one keyframe at CRF 2 (the loops are mostly still, so about 14 MiB each). Measured on loop B: the seam
+# (last frame back to the first) is 0.005 of a grey level on average, 99% of pixels unchanged; encoded in separate
+# chunks, or from a lossy intermediate, the paper grain and the text edges re-quantize at the loop point
 loop() { # name, hold, audio, frames
-  FILM_QUERY=hold=$2 node render.js film out/inter-$1.mp4 out/$3 --scale 2 --fps 50 --grade led --jobs 3 --crf 6 --preset veryfast
-  $FFMPEG -i out/inter-$1.mp4 -map 0:v -map 0:a -c:v libx264 -preset slow -crf 18 -profile:v high -pix_fmt yuv420p \
+  FILM_QUERY=hold=$2 node render.js film out/lossless-$1.mp4 out/$3 --scale 2 --fps 50 --grade led --jobs 3 --crf 0 --preset ultrafast --profile high444
+  $FFMPEG -i out/lossless-$1.mp4 -map 0:v -map 0:a -c:v libx264 -preset slow -crf 2 -profile:v high -pix_fmt yuv420p \
     -x264-params keyint=$4:min-keyint=$4:scenecut=0 -c:a copy -movflags +faststart out/$1-4k50.mp4
 }
 loop hold-world W hold-world.wav 600

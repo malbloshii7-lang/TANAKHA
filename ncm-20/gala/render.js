@@ -17,8 +17,10 @@ const path = require('path');
 const argv = process.argv.slice(2);
 const opt = (name, dflt) => { const i = argv.indexOf('--' + name); if (i < 0) return dflt; const v = argv[i + 1]; argv.splice(i, 2); return v; };
 const FPS = Number(opt('fps', 30)), SCALE = Number(opt('scale', 1)), JOBS = Number(opt('jobs', 1)), CRF = String(opt('crf', SCALE > 1 ? 18 : 16));
-// --preset: x264's speed preset (a fast one for a near-lossless intermediate); --x264: extra x264 parameters
-const PRESET = String(opt('preset', 'slow')), X264 = opt('x264', null);
+// --preset: x264's speed preset; --x264: extra x264 parameters; --profile: the H.264 profile. A lossless intermediate
+// (for a stage loop, encoded once afterwards) is --crf 0 --preset ultrafast --profile high444: lossless H.264 needs the
+// High 4:4:4 Predictive profile, even in 4:2:0
+const PRESET = String(opt('preset', 'slow')), X264 = opt('x264', null), PROFILE = String(opt('profile', 'high'));
 const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: where to start reading the audio file (default --from, right for a full-length mix); 0 for part2.wav, which starts at the split
 const FF = process.env.FFMPEG || 'ffmpeg';
 const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res, rej) => { const p = spawn(FF, args, { stdio }); p.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))); });
@@ -76,7 +78,7 @@ async function openPage(browser) {
   await Promise.all(parts.map(async part => {
     const page = await openPage(browser);
     const ff = spawn(FF, ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
-      '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, ...(X264 ? ['-x264-params', X264] : []), '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-r', String(FPS), part.file], { stdio: ['pipe', 'inherit', 'inherit'] });
+      '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, ...(X264 ? ['-x264-params', X264] : []), '-profile:v', PROFILE, '-pix_fmt', 'yuv420p', '-r', String(FPS), part.file], { stdio: ['pipe', 'inherit', 'inherit'] });
     const closed = new Promise((res, rej) => ff.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))));
     for (let i = part.a; i < part.b; i++) {
       const buf = await page.frame(i / FPS, 'jpeg');
