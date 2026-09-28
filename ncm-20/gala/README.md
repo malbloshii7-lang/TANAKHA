@@ -11,7 +11,8 @@ and keeps that film's engraved-plate language, rebuilt for the room:
   editions, in the nation's own "we": «عددنا أيام السنة بطلوع سهيل», «وأبحرنا مع رياح الموسم», «ونقرأ السماء لكل
   رحلة» and the rest (Revision 5 in `TREATMENT.md` lists them). Each is fitted to the words column.
 - **Night to night.** The film opens on the real pre-dawn sky over Abu Dhabi as Suhail rises, computed from the Yale
-  Bright Star Catalogue. It turns to parchment at dawn. It ends on the March 2027 night seen from Marina Mall:
+  Bright Star Catalogue, watched by a man and his couched camel on a near dune, in silhouette. It turns to parchment
+  at dawn. It ends on the March 2027 night seen from Marina Mall:
   - Suhail stands 12.2° up in the south, just clear of the Etihad Towers.
   - Emirates Palace lies low to the right.
   - Every building is at its true bearing and angular size.

@@ -73,13 +73,29 @@ scene({
   head: ['WE ASKED', 'THE CLOUDS', 'FOR MORE.'], accent: { 'MORE.': BLUE },
   arHead: 'واستمطرنا السحاب',
   init() {
-    const C = [[1180, 380, 108], [1300, 300, 148], [1452, 262, 162], [1606, 316, 132], [1726, 392, 96], [1392, 402, 118], [1546, 412, 112], [1262, 432, 90], [1660, 448, 70]];
-    this.circles = C.map(([x, y, r], i) => el(x, y, r, r, 0, TAU, 260 + i, 1.2));
-    this.inside = C.map(([x, y, r], i) => el(x, y, r - 2.2, r - 2.2, 0, TAU, 900 + i, 0));
-    this.base = pl([[1138, 505], [1300, 510], [1500, 503], [1700, 508], [1744, 505]], false, 270, 0.8);
-    // a solid band along the base, so the lobes do not leave notches where they meet
-    this.band = new P([[1117, 468], [1700, 468], [1764, 480], [1744, 507], [1138, 507]], true);
-    this.bandEnds = [new P(quad([1117, 468], [1126, 492], [1140, 505], 8)), new P(quad([1764, 480], [1756, 496], [1742, 505], 8))];
+    // the cloud: a cumulus congestus about 5 km off, 3.5 km across, its flat base near 2 km (22 deg up at 18 px a degree)
+    // and its main tower near 5 km. It is built of turrets, drawn from the top down so each lower, nearer one hides the
+    // foot of the one above, and each shaded as the rounded volume it is: an afternoon sun behind the camera and to its
+    // right lights the faces toward us, so every turret's shadow falls on its lower left and the flat base is in shade.
+    // [x, y, radius] in plate coordinates; the base is cut flat at y 505
+    const T = [[1442, 124, 40], [1472, 154, 58], [1398, 172, 54], [1640, 214, 44], [1330, 196, 38], [1562, 186, 40], [1440, 214, 88],
+      [1362, 238, 68], [1522, 240, 70], [1600, 262, 60], [1266, 276, 50], [1400, 318, 98], [1510, 310, 94], [1300, 336, 84],
+      [1182, 322, 42], [1610, 344, 80], [1215, 362, 64], [1690, 384, 56], [1130, 414, 36], [1720, 420, 40], [1255, 440, 80],
+      [1350, 430, 90], [1455, 426, 96], [1560, 430, 90], [1655, 446, 76], [1170, 456, 60], [1730, 466, 50]];
+    const rc = rng(260);
+    // a turret's outline: round, but broken into the small bulges a cumulus turret carries (its cauliflower edge)
+    const puff = (x, y, r, k, n, ph) => new P(Array.from({ length: 96 }, (_, j) => {
+      const a = j / 96 * TAU, q = r * (1 + 0.055 * Math.pow(Math.abs(Math.sin(n * a / 2 + ph)), 0.6) - 0.03) + k;
+      return [x + q * Math.cos(a), y + q * 0.96 * Math.sin(a)];
+    }), true);
+    this.turrets = T.sort((a, b) => a[1] - b[1]).map(([x, y, r], i) => {
+      const lx = x + r * 0.34, ly = y - r * 0.3; // the lit part's centre: toward the sun, up and to the right
+      const n = 2 * Math.round(5 + r / 14 + rc() * 3), ph = rc() * TAU;
+      return { x, y, r, i, edge: puff(x, y, r, 0, n, ph), body: puff(x, y, r, -1.5, n, ph),
+        lit: el(lx, ly, r * 0.98, r * 0.94, 0, TAU, 940 + i, 0), core: el(lx + r * 0.22, ly - r * 0.2, r * 1.02, r * 0.98, 0, TAU, 980 + i, 0),
+        shade: clamp((y - 100) / 400) }; // lower turrets sit deeper in the cloud's own shadow
+    });
+    this.base = pl([[1118, 505], [1300, 507], [1500, 503], [1700, 506], [1752, 505]], false, 270, 0.8);
     // the ground: the real skyline of the Hajar in Ras Al Khaimah, seen from the plain at 25.78 N, 56.02 E looking east
     // (bearings 50-100 deg across the plate, 18 px a degree both ways, so heights are true to the angles). Computed by
     // data/build/rak_skyline.py from SRTM-derived terrain tiles, counting only ground inside the UAE outline, so the
@@ -106,14 +122,31 @@ scene({
     // ground
     mask(this.groundFill); hatch(this.groundFill, [985, 780, 1885, 1012], -1.2, 8, prog(lt, 1.0, 1.6), SEPIA, 0.9, 0.3, 273);
     stroke(this.ground, easeInOut(prog(lt, 0.6, 1.6)), INK, 1.8);
-    // the cloud: outlines, then paper over the inside, then shading below
-    const cp = easeInOut(prog(lt, 0.3, 2.2));
-    ctx.save(); ctx.beginPath(); ctx.rect(1000, 80, 900, 426); ctx.clip();
-    this.circles.forEach((c, i) => stroke(c, clamp(cp * 1.1 - i * 0.02), INK, 2));
-    mask(this.inside.concat([this.band]));
-    hatch(this.circles.concat([this.band]), [1070, 330, 1830, 505], 0.55, 8, prog(lt, 1.6, 1.8), INK, 1, 0.3, 274);
+    // the cloud, engraved turret by turret: paper, then contour hatching in each turret's shadow (a lighter outer band
+    // and a darker core), then its visible edge; last, the flat base in shade, darkening as the seeding takes hold
+    const cp = easeInOut(prog(lt, 0.3, 2.2)), sp = easeOut(prog(lt, 1.0, 1.8)), wet = easeInOut(prog(lt, 3.8, 2.4));
+    ctx.save(); ctx.beginPath(); ctx.rect(1000, 60, 900, 445); ctx.clip();
+    this.turrets.forEach(c => {
+      mask(c.body);
+      const arcs = (outside, gap, a, lw) => {
+        ctx.save();
+        ctx.beginPath(); c.body.trace(ctx, 1); ctx.clip();
+        ctx.beginPath(); ctx.rect(0, 0, 3000, 1200); outside.trace(ctx, 1); ctx.clip('evenodd');
+        ctx.globalAlpha = SA * a * sp; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = lw; ctx.beginPath();
+        for (let rr = c.r * 0.3; rr < c.r * 1.05; rr += gap) { ctx.moveTo(c.x + rr, c.y); ctx.ellipse(c.x, c.y, rr, rr * 0.96, 0, 0, TAU); }
+        ctx.stroke(); ctx.restore();
+      };
+      arcs(c.lit, 3.2, 0.26 + 0.16 * c.shade, 1);
+      arcs(c.core, 2.8, 0.2 + 0.2 * c.shade + 0.1 * wet, 1.1);
+      stroke(c.edge, clamp(cp * 1.15 - c.i * 0.012), INK, 1.5, 0.75);
+    });
     ctx.restore();
-    this.bandEnds.forEach(e => stroke(e, clamp(cp * 1.1 - 0.2), INK, 2));
+    // the base: its shade in horizontal strokes, denser toward the middle and the underside
+    ctx.save(); ctx.beginPath(); this.turrets.forEach(c => { if (c.y + c.r > 470) c.body.trace(ctx, 1); }); ctx.rect(1110, 486, 650, 19); ctx.clip();
+    ctx.beginPath(); ctx.rect(1000, 440, 900, 65); ctx.clip();
+    ctx.globalAlpha = SA * (0.32 + 0.22 * wet) * sp; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 1.1; ctx.beginPath();
+    for (let y = 504; y > 452; y -= 3.4) { const k = (504 - y) / 52, x0 = 1110 + 60 * k * k, x1 = 1760 - 50 * k * k; ctx.moveTo(x0, y); ctx.lineTo(x1, y); }
+    ctx.stroke(); ctx.restore();
     stroke(this.base, easeInOut(prog(lt, 1.2, 1.2)), INK, 1.8);
     // droplets gathering at the cloud base after seeding
     const r = rng(77);

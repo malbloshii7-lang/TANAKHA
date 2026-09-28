@@ -371,6 +371,45 @@ and the build stopped. All three cards now ride 0.5 dB up and the world 0.3 dB d
 - cards −13.5, −14.0 and −14.2 LUFS;
 - world −14.4 LUFS.
 
+## Revision 7 · 28 September 2026: four pictures raised
+
+At the requester's direction ("elevate it"), four of the film's pictures are redrawn. The cut, the words, the
+narration and the score are unchanged: every cue, words block and narration line is identical to Revision 6's.
+
+- **B01 · the people of this land.**
+  - On a near dune, 24 m from the camera, a man in kandura and ghutra stands with his camel stick beside his couched
+    camel, both watching Suhail rise. The narrator says, at that moment, that the people of this land read the sky.
+  - They are silhouettes, with no face. Their edges toward the twilight in the east take a faint rim of light.
+  - They are drawn to one scale from the camera's eye (1.6 m up, 47.7 px a metre at 24 m), so the man is 84 px tall.
+    The crest they stand on is 1.65° above the horizon, so they stand against the sky.
+  - Two ridges of dunes lie between them and the horizon. The near dune's face carries wind ripples, and Suhail rises
+    clear of it to the right.
+  - Low in the sky, Suhail twinkles and shifts colour through the long path of air, as a low star does and as the poets
+    describe it. The flicker is small and slow, never a strobe, and dies away as the star climbs.
+  - The finale answers this opening: the same star over the city twenty years on.
+- **B06, B15, B18 · the leaders' cards.**
+  - All three cards now sit in a framed page: a gold double rule with compass-star corners, never the hizb star.
+  - Behind the words turns a guilloché rosette, the fine interlaced line-work of banknotes and official seals, in the
+    place of the plain rings.
+  - The words are centred in the frame. They are unchanged, and all three cards are treated alike.
+- **B16 · the cloud over the Hajar.**
+  - The cumulus is engraved as the volume it is: a congestus about 3.5 km across with a flat base near 2 km, built of
+    turrets with cauliflower edges.
+  - Each turret is contour-hatched on its shadowed side (the sun is behind the camera, to its right), and the base is
+    in shade.
+  - The base darkens as the seeding takes hold. The King Air works under it, and the droplet the science irises from is
+    where it was.
+- **B20 · twenty years.**
+  - The rain gauge is engraved as glass: walls with their thickness and shading, reflections down the tube and along
+    the funnel's cone, a meniscus on the water, and the base plate it stands on.
+  - The twentieth drop lands in gold. A crown of gold droplets rises into the funnel and falls back, and gold ripples
+    run out to the glass on the hit.
+  - Nothing flashes; the 2027 glint still ramps over 0.6 s.
+
+**Checked.**
+- Every changed beat was looked at in its own frames and at its cuts, ±0.1 s.
+- The line and hatch spacing keeps to the LED rules: at least 1 px and 2.5 px here, 2 px and 5 px on the 4K master.
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*
