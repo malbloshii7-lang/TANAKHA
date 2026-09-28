@@ -6,7 +6,10 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 - **Arabic first.** Every words block leads with Arabic (Noto Kufi Arabic; Amiri for quotations), with English
   second. Latin and number runs inside Arabic are isolated so they cannot reorder. The narrator's copy is fully
-  vowelled; on-screen Arabic is not.
+  vowelled; on-screen Arabic is not, except where a vowel prevents a misreading («مُطِرْنا»).
+- **The first editions' headlines.** The large words on each chapter are the Arabic headlines of the first two
+  editions, in the nation's own "we": «عددنا أيام السنة بطلوع سهيل», «وأبحرنا مع رياح الموسم», «ونقرأ السماء لكل
+  رحلة» and the rest (Revision 5 in `TREATMENT.md` lists them). Each is fitted to the words column.
 - **Night to night.** The film opens on the real pre-dawn sky over Abu Dhabi as Suhail rises, computed from the Yale
   Bright Star Catalogue. It turns to parchment at dawn. It ends on the March 2027 night seen from Marina Mall:
   - Suhail stands 12.2° up in the south, just clear of the Etihad Towers.
@@ -22,8 +25,10 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     left to Oman.
   - After the seeding and the science of rain, the Saadiyat Cultural District under natural rain: the Guggenheim Abu
     Dhabi, the Zayed National Museum and the Louvre Abu Dhabi, each at its true bearing and angular size from a boat
-    offshore. The rain sought over the Hajar arrives as a blessing for the whole country. The narration claims only
-    NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft appears in it.
+    offshore. The rain sought over the Hajar arrives as a blessing for the whole country. It eases, the morning sun
+    breaks through toward its computed place, and the words said after rain appear in the light: «مُطِرْنا بفضلِ
+    اللهِ ورحمتِه» (Sahih al-Bukhari 846, Sahih Muslim 71). The rain is given to God, not to seeding or a star. The
+    narration claims only NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft appears in it.
   - `?april2024` puts April 2024 back after the seven emirates, on the national map, drawn as a weather chart would
     show it, and leaves the Saadiyat rain out. The two never share a cut, so seeding never sits beside the floods.
   - The seeding aircraft is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
@@ -37,7 +42,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     stays out of every cut-down and the international version.
   - "Etihad Rail" on screen needs Etihad Rail's written clearance. Without it, set `RAIL_NAME` in `timeline.js` to
     the national network's name.
-  - `TREATMENT.md` (Revisions 2 and 3, and §11) lists what NCM and the protocol office must still decide.
+  - `TREATMENT.md` (Revisions 2 to 5, and §11) lists what NCM and the protocol office must still decide.
 - **Emirati music.**
   - The temp score draws on the drums of Al Ayyala for the day, the rababa and hummed call-and-answer for the nights
     and the cards, and the nahham's sea songs for the pearling beat.

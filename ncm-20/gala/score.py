@@ -339,8 +339,8 @@ def main(cues_path, out_dir):
     wash_t = st('nation') + 8.3  # the seven emirates washed in gold together, named in constitutional order
     takhmeera(perc, pulse0, 'pp')
     play(perc, RAS + TAKHAMIR, pulse0, pulse0, wash_t - 0.1, 'pp')
-    music.add(A.horn(D4 - 12 + 7, 2.5, gain=0.8), st('centre') + 3.6)  # swell under ONE NATIONAL CENTER
-    music.add(A.horn(D4 - 12 + 2, 2.5, gain=0.6), st('centre') + 3.6)
+    music.add(A.horn(D4 - 12 + 7, 2.5, gain=0.8), st('centre') + 1.7)  # swell under THEN WE BUILT A CENTER TO READ THE SKY
+    music.add(A.horn(D4 - 12 + 2, 2.5, gain=0.6), st('centre') + 1.7)
     chord(music, [D3, A3, 62, 66, 69], wash_t, 3.2, gain=0.3, bright=2200, attack=0.6, release=1.8)
     stroke(perc, 'tar', wash_t, 0.6)
     stroke(perc, 'tus', wash_t, 0.6)
@@ -360,25 +360,27 @@ def main(cues_path, out_dir):
         chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
         sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
     else:
-        # Before the rain (Revision 4), after the seeding and the science: the rain sought over the Hajar arrives over
-        # Saadiyat. A cello pedal on D and soft strings in D Dorian out of the science's pizzicato; the felt piano falls
-        # like the first drops, a note a beat; the rababa recalls the Suhail motif as the rain eases (the plate eases it
-        # from 10.5 s), and the harmony warms toward F, the gift of the rain (غيث), into Sheikh Mansour's card. No
-        # Emirati percussion: the rain is a blessing, not a festival.
+        # B09 · Rain as a mercy (Revisions 4 and 5), after the seeding and the science: the rain sought over the Hajar
+        # arrives over Saadiyat. A cello pedal on D and soft strings in D Dorian out of the science's pizzicato; the felt
+        # piano falls like the first drops, a note a beat, until the rain eases (the plate eases it from 7.8 s, as the sky
+        # clears from the right); the harmony opens to F as the light breaks, and under the words said after rain (from
+        # 10.3 s) the rababa plays a plain phrase falling to F on the bar line, not the Suhail motif: the hadith those
+        # words come from sets thanks to God against crediting rain to the stars. No Emirati percussion: the rain is a
+        # blessing, not a festival.
         a0, a1 = st('rain'), en('rain')
         music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.7)
-        chord(music, Dm7, a0 + 0.4, 10.0, gain=0.28, bright=1500, attack=2.0, release=2.0)
+        chord(music, Dm7, a0 + 0.4, 9.8, gain=0.28, bright=1500, attack=2.0, release=2.0)
         drops = [D4 + 7, D4 + 5, D4 + 3, D4, A3, D4 + 3, D4 + 5, D4 + 7, D4 + 10, D4 + 7, D4 + 5, D4 + 3]
         k, t = 0, a0 + 1.0
-        while t < a0 + 10.5:
+        while t < a0 + 8.6:
             music.add(felt(drops[k % len(drops)], 0.55), t, pan=0.35 * np.sin(k * 1.7))
             k, t = k + 1, t + BEAT
-        for j, (t, m, d) in enumerate(motif(a0 + 10.5, root=D4, n=5)):
-            rab(music, t, m, d, gain=0.5, grace=EHF if j == 0 else None)
-        chord(music, F, a0 + 12.0, a1 - a0 - 12.0 + 1.5, gain=0.3, bright=1500, attack=2.0, release=2.0)
+        chord(music, F, a0 + 11 * BEAT, a1 - a0 - 11 * BEAT + 1.5, gain=0.3, bright=1500, attack=2.4, release=2.0)
+        for j, (b, m, d) in enumerate([(13, 72, 1), (14, 69, 0.5), (14.5, 70, 0.5), (15, 69, 1), (16, 65, 2.5)]):  # C A B♭ A F
+            rab(music, a0 + b * BEAT, m, d * BEAT, gain=0.5, grace=74 if j == 0 else None)
         rain = A.rain(a1 - a0 + 1.0, gain=0.8)
-        rain = rain * np.interp(np.arange(rain.shape[-1]) / A.SR, [0, 1.2, 10.5, 15.5, a1 - a0 + 1.0], [0, 1, 1, 0.4, 0.3])  # (stereo)
-        sfx.add(rain, a0)  # as the picture: light to moderate, easing at the end
+        rain = rain * np.interp(np.arange(rain.shape[-1]) / A.SR, [0, 1.2, 7.8, 12.8, a1 - a0 + 1.0], [0, 1, 1, 0.12, 0.08])  # (stereo)
+        sfx.add(rain, a0)  # as the picture: light to moderate, easing to a last few drops as the sky clears
 
     # B10–B14 · the working day: a warm chord and the oud motif as the sky clears; the drums wait for the remembrance
     # line to end, then the Ayyala carries the day at mezzo-forte, one colour for each place; a ras stroke and the tus

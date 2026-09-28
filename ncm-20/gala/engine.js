@@ -381,11 +381,19 @@ function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSi
   E.forEach((l, i) => small(l, x, ye + i * enSize * 1.5, q2, { size: enSize, ls: 2, align, a: 0.7, weight: 600 }));
   return ye + (E.length - 1) * enSize * 1.5;
 }
-function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSize = 84, enSize = 34, font = F_KUFI } = {}) {
+// maxW fits the column: the widest line of each language sets its size (never larger than arSize and enSize).
+function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSize = 84, enSize = 34, font = F_KUFI, maxW = 0 } = {}) {
   recText('A', tin, tout, ar, en);
   const out = clamp((tout - f) / 0.35), A = [].concat(ar || []), E = [].concat(en || []);
+  if (maxW) {
+    const wA = Math.max(1, ...A.map(l => textWidth(l, `700 ${arSize}px ${font}`, 0, 'rtl', Math.round(arSize * 0.1))));
+    const wE = Math.max(1, ...E.map(l => textWidth(l, `700 ${enSize}px ${F_HEAD}`, 2)));
+    if (wA > maxW) arSize = Math.floor(arSize * maxW / wA);
+    if (wE > maxW) enSize = Math.floor(enSize * maxW / wE);
+  }
   A.forEach((l, i) => arLine(l, x, y + i * arSize * 1.3, tin + i * 0.3, f, { size: arSize, align, out, font }));
-  let ye = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.22;
+  // the English clears the Arabic's deepest descenders (ح ع ي م reach about 0.42 of the size below the line)
+  let ye = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.36;
   E.forEach((l, i) => enLine(l, x, ye + i * enSize * 1.25, tin + 0.3 + A.length * 0.3 + i * 0.15, f, { size: enSize, align, out }));
   return ye + (E.length - 1) * enSize * 1.25;
 }

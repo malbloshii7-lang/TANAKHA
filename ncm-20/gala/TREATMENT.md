@@ -242,6 +242,94 @@ the same day: it lost the film's density, and the requester preferred this cut.
 Foster + Partners' elevations in RIBAJ and DCT's July 2026 photographs). NCM's own Arabic editor should still sign off
 the new lines.
 
+## Revision 5 · 28 September 2026: the first editions' headlines, and rain as a mercy
+
+At the requester's direction, on the Revision 4 cut. Where this section and the body differ, this section stands;
+`SCRIPT.md` is the as-built text with its times.
+
+**The first two editions' Arabic headlines return.** They are the large words (Level A) on their beats, in the nation's
+own "we" over the narrator's story, each with its English:
+
+| Beat | Arabic | English |
+|---|---|---|
+| The Durour wheel | عددنا أيام السنة بطلوع سهيل | WE COUNTED THE YEAR BY A STAR |
+| Ibn Majid and the monsoon | وأبحرنا مع رياح الموسم | WE SAILED BY THE MONSOON |
+| Every wind by name | وعرفنا الرياح بأسمائها | WE KNEW EVERY WIND BY NAME |
+| The aflaj | وأجرينا الماء في الأفلاج عبر الصحراء | WE CARRIED WATER THROUGH THE DESERT |
+| 2007 | ثم أسسنا مركزاً يرصد السماء | THEN WE BUILT A CENTER TO READ THE SKY |
+| For every flight | ونقرأ السماء لكل رحلة | WE READ THE SKY FOR EVERY FLIGHT |
+| For every ship | ونقرأ البحر لكل سفينة | WE READ THE SEA FOR EVERY SHIP |
+| For clean energy | ونتنبأ بسطوع الشمس وهبوب الرياح | WE FORECAST THE SUN AND THE WIND |
+| More rain from the clouds | واستمطرنا السحاب | WE ASKED THE CLOUDS FOR MORE |
+| The science of rain | ودعمنا علوم الاستمطار | WE FUNDED THE SCIENCE OF RAIN |
+
+- **Kept as they were:**
+  - the railway's and the east coast's lines, which carry on the list («على امتداد البر», «للساحل الشرقي»);
+  - «المرجع الرسمي للطقس»;
+  - the national line «من سماء الإمارات إلى العالم», which protocol puts at the film's peak;
+  - the title.
+- **Not used:**
+  - «واليوم نشارك علمنا مع العالم»: the national line takes its place;
+  - «ونسهر على كل بيت»: in the `?april2024` cut the April beat keeps its remembrance with no headline, because over
+    the floods that line would claim an outcome.
+- **Pronoun arc.** The narrator still tells the heritage as "they". The headlines speak as "we" from the first chapter.
+  "We" is the people of this land and the nation, one voice across generations.
+- **Layout.** Each headline is fitted to the 760 px words column: `levelA` fits its widest line with `maxW`. The long
+  lines run over two lines at up to 84 px. The English now clears the Arabic's deepest descenders (ح ع ي).
+- **Two collisions found and fixed:**
+  - the seven emirates' line «المرجع الرسمي للطقس» had run into the Fujairah and Sea of Oman map labels since
+    Revision 2; it now sits in the open paper above them;
+  - the seeding line sits below the King Air's line of flight, which crosses into the words' column by the end of
+    the beat.
+
+**B09 · Rain as a mercy.** «قبل المطر / BEFORE THE RAIN» is gone.
+
+- **The words.** The rain eases, the sky clears toward the sun, and the words said after rain appear in the light:
+  **«مُطِرْنا بفضلِ اللهِ ورحمتِه» / RAIN, BY THE GRACE AND MERCY OF GOD.**
+  - They are the Prophet's words in Sahih al-Bukhari 846 and Sahih Muslim 71, spoken on a morning after a night's rain.
+  - The verb is vowelled so it reads «مُطِرْنا» (we have been given rain), never «مَطَرُنا» (our rain).
+  - The same hadith sets thanks to God against crediting rain to the stars. The film opens on Suhail as a calendar;
+    this beat gives the rain to God, not to a star and not to seeding.
+- **The narration.**
+  - VO-08r: «وحينَ يُنَزِّلُ اللهُ الغيثَ رحمةً على هذهِ الأرض،» / *And when God sends down the rain as a mercy upon
+    this land,*
+  - VO-08s: «يسهرُ المركزُ على سلامةِ الناس، بتنبُّؤاتِهِ وإنذاراتِهِ المبكِّرة.» / *the Center keeps watch over
+    people's safety with its forecasts and early warnings.*
+  - The Center's part is still only its forecasts and warnings. Nothing says it makes rain.
+- **The plate, redrawn.** The museums' verified geometry is unchanged.
+  - **The rain.** The rain cloud's base is engraved in perspective: banks of swelling lines, their undersides in
+    rounded billows, the nearer banks larger and darker. Fine rain falls in two layers. The museums are veiled in it
+    and mirrored in the sea.
+  - **The light.** From 7.6 s the rain band's trailing edge crosses from the right and the rain eases. The morning sun
+    breaks through above the frame's top right; it stands at azimuth 124° and 13.7° up, computed for about 08:15 in
+    late December. Pale shafts fan down, the sea glitters under the sun, and the dome's crown takes the light. The
+    headline arrives at 10.3 s, in the clearing.
+  - **Left out.** There is no rainbow: it would stand opposite the sun, behind the boat. Nothing glows up from the
+    ground, and nothing is orange.
+- **Music.**
+  - The felt-piano drops stop as the rain eases, and the strings open to F with the light.
+  - Under the words, the rababa plays a plain phrase falling to F on the bar line, in place of the Suhail motif,
+    because of the hadith's contrast with crediting the stars.
+  - The horn swell in 2007 moves to its new headline.
+- **Measured.**
+  - Every leader's card is still at or above the world beat: cards −13.5, −14.0 and −13.2 LUFS, world −14.3 LUFS.
+  - Both of the rain beat's dissolves were checked at the cut and 0.1 s either side. No words overlap.
+
+**Reading times (the rule is 3 s plus 0.3 s a word).**
+
+- **Meet the rule:** the rain beat and the headlines on the longer beats.
+- **Short, because a five-second beat leaves at most 4.0–4.3 s between its dissolves:**
+  - monsoon: the English needs 4.5 s and is up 4.3 s;
+  - every wind: the English needs 4.8 s and is up 4.1 s;
+  - flight: the English needs 5.1 s and is up 4.2 s;
+  - ship: the English needs 5.1 s and is up 4.3 s;
+  - energy: the Arabic needs 4.5 s and the English 5.1 s; both are up 4.0 s.
+- Each of these echoes the narration almost word for word.
+- **For decision:** keep them, or give those five beats shorter English lines (for example FOR EVERY FLIGHT).
+
+**Before the master:** NCM's Arabic editor, and a religious adviser, read the new narration and the hadith line,
+including its setting over music.
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*
@@ -353,7 +441,7 @@ How it is built (all implementable in the current engine; see Appendix A):
 | VI · The world | 2:05.0–2:16.7 | B17 | Parchment, the orchestral peak | National pride; applause |
 | VII · Twenty, and night | 2:16.7–2:38.3 | B18–B19 | Golden, then dusk into the night sky | Arrival, gratitude, continuity |
 
-**Pronoun arc.** The heritage is told as "they" (the people of this land). The founding and the services are told as "the Center". From water onward it becomes "we" (the nation). The last line joins them: *so the nation can plan for tomorrow with confidence.*
+**Pronoun arc.** The heritage is told as "they" (the people of this land). The founding and the services are told as "the Center". From water onward it becomes "we" (the nation). The last line joins them: *so the nation can plan for tomorrow with confidence.* (Revision 5: the on-screen headlines speak as "we" from the first chapter; the narrator keeps this arc.)
 
 ### 4.2 Overview
 

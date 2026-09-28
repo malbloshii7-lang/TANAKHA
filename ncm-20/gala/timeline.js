@@ -7,10 +7,13 @@
 // on every plate entry, or the v3 plate's own speed is inherited),
 // offset (enter part-drawn), xf (length of the dissolve into it), enter (fade | dawn | dusk | iris), cam, tint, words.
 // Words use film time f and the in/out times of §7. Level A echoes the narrator; Level B labels place, date, source.
+// Revision 5: Level A carries the first two editions' Arabic headlines again (the nation's own "we", over the
+// narrator's story), each on its beat, and B09's rain ends on the words said after rain: «مُطِرْنا بفضلِ اللهِ ورحمتِه».
 const BAR72 = 60 / 72 * 4;
 const at = bars => +(bars * BAR72).toFixed(3);
 const filmT = (s, t) => s.start + t / (s.speed || 1); // film time from a scene's clock (measured from the cut)
 const COL = { x: 1840 }; // the words column's right edge
+const COLW = 760; // the words column's width: a headline's widest line is fitted to it (levelA maxW)
 CIRCLES.scope = { px: 1430, py: 700, r: 370 };
 CIRCLES.gauge = { px: 1500, py: 150, r: 108 };
 
@@ -70,12 +73,14 @@ const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5
       levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
       levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } };
-const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(35.5), dur: at(5), xf: 1.0,
+const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(35.5), dur: at(5), speed: 1, xf: 1.0,
   cam: t => camPath([{ t: 0, s: 1.0, px: 1041, py: 650, sx: 1041, sy: 650 }, { t: at(5), s: 1.05, px: 1041, py: 650, sx: 1041, sy: 650 }], t),
   words(t) {
     const f = filmT(this, t), s = this.start;
     levelB(f, s + 0.7, s + 8.0, 'المنطقة الثقافية في السعديات · أبوظبي', 'SAADIYAT CULTURAL DISTRICT · ABU DHABI', { y: 330 });
-    levelA(f, s + 4.8, s + 12.0, 'قبل المطر', 'BEFORE THE RAIN', { y: 520 });
+    // as the rain eases and the light breaks: the words said after rain (Sahih al-Bukhari 846, Sahih Muslim 71), vowelled
+    // so the verb reads as passive (we have been given rain), never «مَطَرُنا» (our rain)
+    levelA(f, s + 10.3, s + 16.0, ['مُطِرْنا', 'بفضلِ اللهِ ورحمتِه'], ['RAIN, BY THE GRACE', 'AND MERCY OF GOD'], { y: 400, maxW: COLW });
     // the plate draws a caption under each museum; they are recorded here for the subtitle files and the script
     [['متحف جوجنهايم أبوظبي', 'GUGGENHEIM ABU DHABI', 1.6], ['متحف زايد الوطني', 'ZAYED NATIONAL MUSEUM', 2.1], ['متحف اللوفر أبوظبي', 'LOUVRE ABU DHABI', 2.6]]
       .forEach(([ar, en, t0]) => recText('B', s + t0, s + 15.6, ar, en));
@@ -90,11 +95,15 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t);
       levelB(f, 12.5, 18.0, 'حساب الدرور · ' + ltr('36') + ' دَرّاً × ' + ltr('10') + ' أيام + ' + ltr('5') + ' أيام', 'THE DUROUR CALENDAR · 36 × 10 DAYS + 5 DAYS', { y: 330 });
-      levelA(f, 12.9, 18.0, 'عدّوا أيام السنة', 'THEY COUNTED THE DAYS OF THE YEAR', { y: 520 });
+      levelA(f, 12.9, 18.0, ['عددنا أيام السنة', 'بطلوع سهيل'], 'WE COUNTED THE YEAR BY A STAR', { y: 520, maxW: COLW });
     } },
   // B03 · Ibn Majid and the monsoon
   { id: 'monsoon', start: at(5.5), dur: at(1.5), speed: SP.monsoon, offset: 2.0, xf: 0.8, cam: MONSOON_CAM,
-    words(t) { const f = filmT(this, t); levelB(f, 18.9, 23.2, 'أحمد بن ماجد · جلفار', 'AHMED BIN MAJID · JULFAR', { y: 330 }); } },
+    words(t) {
+      const f = filmT(this, t);
+      levelB(f, 18.9, 23.2, 'أحمد بن ماجد · جلفار', 'AHMED BIN MAJID · JULFAR', { y: 330 });
+      levelA(f, 18.9, 23.2, ['وأبحرنا', 'مع رياح الموسم'], 'WE SAILED BY THE MONSOON', { y: 520, maxW: COLW });
+    } },
   // B04 · Every wind by name
   { id: 'pearling', start: at(7), dur: at(1.5), speed: SP.pearling, offset: 0.8, xf: 0.8,
     cam: lockCam(() => monsoonCircle(at(7)), CIRCLES.pearling, { off: 0.8, settle: 2.0 * SP.pearling,
@@ -102,6 +111,7 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t);
       levelB(f, 23.9, 28.0, 'الغوص الكبير', 'THE GREAT DIVE', { y: 330 });
+      levelA(f, 23.9, 28.0, ['وعرفنا الرياح', 'بأسمائها'], 'WE KNEW EVERY WIND BY NAME', { y: 520, maxW: COLW });
     } },
   // B05 · The aflaj, and Sheikh Zayed
   { id: 'falaj', start: at(8.5), dur: at(2.5), speed: SP.falaj, offset: 0.5, xf: 0.8,
@@ -109,6 +119,7 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t);
       levelB(f, 29.4, 35.5, ['هيلي، العين · العصر الحديدي', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
+      levelA(f, 30.0, 35.9, ['وأجرينا الماء', 'في الأفلاج عبر الصحراء'], ['WE CARRIED WATER', 'THROUGH THE DESERT'], { y: 560, maxW: COLW });
     } },
   // B06 · Card: the Founding Father (no VO)
   { id: 'quote-zayed', use: 'quote', quote: 'zayed', start: at(11), dur: at(3.5), xf: 1.2 },
@@ -117,14 +128,15 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.9, s + 7.9, 'المرسوم بقانون اتحادي رقم ' + ltr('(6)') + ' لسنة ' + ltr('2007'), 'FEDERAL DECREE-LAW NO. 6 OF 2007', { y: 330 });
-      levelA(f, s + 4.0, s + 7.9, 'مركز وطني واحد', 'ONE NATIONAL CENTER', { y: 540, arSize: 96, enSize: 38 });
+      levelA(f, s + 1.6, s + 7.9, ['ثم أسسنا مركزاً', 'يرصد السماء'], ['THEN WE BUILT A CENTER', 'TO READ THE SKY'], { y: 540, maxW: COLW });
     } },
   // B08 · Seven emirates, one official source
   { id: 'nation', start: at(17), dur: at(3.5), xf: 1.6, enter: { type: 'iris', x: 554, y: 689 },
     cam(t) { const [hx, hy] = this.hq.xy; return camPath([{ t: 0, s: 2.2, px: hx, py: hy, sx: 554.4, sy: 688.8 }, { t: 3.67, s: 1.0, px: 960, py: 540, sx: 960, sy: 540 }, { t: at(3.5), s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }], t); },
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 520, arSize: 64, enSize: 20 });
+      // set in the open paper above the Fujairah label and the Sea of Oman (at y 520 it ran into both)
+      levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 300, arSize: 64, enSize: 20 });
     } },
   // B09 · April 2024 on the national map, only with ?april2024 (the protocol office decides)
   ...(APRIL2024 ? [APRIL2024_BEAT] : []),
@@ -133,7 +145,7 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.55, s + 4.75, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
-      levelA(f, s + 0.85, s + 4.75, 'لكل رحلة', 'FOR EVERY FLIGHT', { y: 520 });
+      levelA(f, s + 0.55, s + 4.75, ['ونقرأ السماء', 'لكل رحلة'], 'WE READ THE SKY FOR EVERY FLIGHT', { y: 520, maxW: COLW });
     } },
   // B11 · Across the land (Etihad Rail near Al Dhaid, Sharjah)
   RAIL_BEAT,
@@ -143,7 +155,7 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.333, s + 4.633, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
-      levelA(f, s + 0.733, s + 4.633, 'لكل سفينة', 'FOR EVERY SHIP', { y: 520 });
+      levelA(f, s + 0.433, s + 4.75, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 520, maxW: COLW });
     } },
   // B13 · For the east coast (a laden tanker under way off Fujairah; removable with ?pull=tanker)
   TANKER_BEAT,
@@ -153,7 +165,7 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.2, s + 4.4, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 330 });
-      levelA(f, s + 0.433, s + 4.4, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
+      levelA(f, s + 0.4, s + 4.4, ['ونتنبأ بسطوع الشمس', 'وهبوب الرياح'], 'WE FORECAST THE SUN AND THE WIND', { y: 520, maxW: COLW });
     } },
   // B15 · Card: HH the President (reported speech, no VO)
   { id: 'quote-president', use: 'quote', quote: 'president', start: at(28 + B9), dur: at(3.5), xf: 1.2 },
@@ -162,6 +174,8 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.8, s + 6.3, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
+      // below the King Air's line of flight (screen y about 530-600; its nose reaches x 1120 by s + 6.3)
+      levelA(f, s + 1.2, s + 6.3, 'واستمطرنا السحاب', 'WE ASKED THE CLOUDS FOR MORE', { y: 720, maxW: COLW });
     } },
   // B17 · The science of rain
   { id: 'science', start: at(33.5 + B9), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
@@ -169,8 +183,10 @@ const TIMELINE = [
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
+      levelA(f, s + 1.2, s + 6.2, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
     } },
-  // Before the rain (Revision 4): the Saadiyat Cultural District under natural rain, after the seeding and the science
+  // B09 · Rain as a mercy (Revisions 4 and 5): the Saadiyat Cultural District under natural rain, after the seeding and
+  // the science of rain; the rain eases, the light breaks, and the words give thanks for it
   ...(APRIL2024 ? [] : [RAIN_BEAT]),
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
   { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(40.5), dur: at(3.5), xf: 1.2 },
@@ -252,8 +268,8 @@ const VO = [
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
-  { id: 'VO-08r', beat: 'rain', in: 1.0, out: 4.2, ar: 'وحينَ يأتي المطرُ غيثاً على هذهِ الأرض،', en: 'And when rain comes as a blessing to this land,' },
-  { id: 'VO-08s', beat: 'rain', in: 4.6, out: 9.8, ar: 'تسبِقُهُ تنبُّؤاتُ المركزِ وإنذاراتُهُ المبكِّرة، حرصاً على سلامةِ الناس.', en: "the Center's forecasts and early warnings come before it, to keep people safe." },
+  { id: 'VO-08r', beat: 'rain', in: 1.0, out: 4.6, ar: 'وحينَ يُنَزِّلُ اللهُ الغيثَ رحمةً على هذهِ الأرض،', en: 'And when God sends down the rain as a mercy upon this land,' },
+  { id: 'VO-08s', beat: 'rain', in: 5.0, out: 10.2, ar: 'يسهرُ المركزُ على سلامةِ الناس، بتنبُّؤاتِهِ وإنذاراتِهِ المبكِّرة.', en: "the Center keeps watch over people's safety with its forecasts and early warnings." },
   { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
