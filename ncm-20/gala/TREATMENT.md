@@ -192,16 +192,18 @@ shaped what is built. **Where this section and anything above disagree, this sec
 Three changes, at the requester's direction, on the 3:00 cut of Revision 3. A five-act re-cut was tried and withdrawn
 the same day: it lost the film's density, and the requester preferred this cut.
 
-- **B09 · Before the rain.** The Saadiyat Cultural District under natural rain, seen from a boat offshore at
-  24.5445 N, 54.3780 E. Each museum stands at its true bearing and angular size (OSM footprints; the published
+- **Before the rain, after the seeding and the science** (moved there on 28 September, at the requester's note, so
+  that the rain sought over the Hajar arrives as a blessing for the whole country). The Saadiyat Cultural District
+  under natural rain, seen from a boat offshore at 24.5445 N, 54.3780 E. Each museum stands at its true bearing and angular size (OSM footprints; the published
   heights):
   - the Guggenheim Abu Dhabi (opening 11 December 2026), its cones up to 88 m;
   - the Zayed National Museum, its wings up to 123 m;
   - the Louvre Abu Dhabi, its 180 m dome.
 
   The narration (VO-08r, VO-08s) says only that the Center's forecasts and early warnings come before the rain, for
-  people's safety. It never says NCM makes rain, and no aircraft comes near the beat. April 2024 remains one query away
-  (`?april2024`); **the protocol office chooses** which of the two B09s goes to the ceremony.
+  people's safety. It never says NCM makes rain, and no aircraft appears in it. April 2024 remains one query away
+  (`?april2024`): it returns after the seven emirates and the Saadiyat rain leaves the cut, so the film never sets
+  seeding beside the April 2024 floods. **The protocol office chooses** which of the two goes to the ceremony.
 - **B16 · the seeding aircraft** is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
   dimensions:
   - 10.82 m long, 15.32 m span;
@@ -219,9 +221,9 @@ the same day: it lost the film's density, and the requester preferred this cut.
   warming to F into the working day.
 - The working day's drums now wait for its own first bar, as they did after April 2024.
 - Ethiopia's pin has its chime.
-- The world beat is ridden 0.3 dB lower, so every leader's card still measures at or above it:
-  - cards: -13.5, -13.8 and -13.5 LUFS;
-  - world: -14.0 LUFS.
+- The world beat is ridden lower (-4.0 dB), so every leader's card still measures at or above it in the new order:
+  - cards: -13.7, -14.1 and -14.1 LUFS;
+  - world: -14.3 LUFS.
 
 **Before the master:**
 

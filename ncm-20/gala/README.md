@@ -20,10 +20,12 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     rings, no point symbols and no trajectories.
   - Abu Musa and the Greater and Lesser Tunb are drawn as UAE territory from neutral data. Musandam and Madha are
     left to Oman.
-  - B09 is the Saadiyat Cultural District under natural rain: the Guggenheim Abu Dhabi, the Zayed National Museum and
-    the Louvre Abu Dhabi, each at its true bearing and angular size from a boat offshore. The narration claims only
-    NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft comes near it. `?april2024` puts
-    April 2024 back, on the national map, drawn as a weather chart would show it.
+  - After the seeding and the science of rain, the Saadiyat Cultural District under natural rain: the Guggenheim Abu
+    Dhabi, the Zayed National Museum and the Louvre Abu Dhabi, each at its true bearing and angular size from a boat
+    offshore. The rain sought over the Hajar arrives as a blessing for the whole country. The narration claims only
+    NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft appears in it.
+  - `?april2024` puts April 2024 back after the seven emirates, on the national map, drawn as a weather chart would
+    show it, and leaves the Saadiyat rain out. The two never share a cut, so seeding never sits beside the floods.
   - The seeding aircraft is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
     dimensions. It works over UAE ground, burning hygroscopic flares in racks under its wings. It carries no livery.
   - The globe names Ethiopia among the UAE's rain-enhancement partners: the country only, with no year and no claim.
@@ -46,7 +48,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 in B09 instead of the Saadiyat rain |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 after the seven emirates, instead of the Saadiyat rain after the seeding |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |

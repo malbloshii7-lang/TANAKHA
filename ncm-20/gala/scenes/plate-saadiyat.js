@@ -1,8 +1,9 @@
 'use strict';
-// B09 (Revision 4) · Before the rain: the Saadiyat Cultural District, Abu Dhabi, under a light-to-moderate rain, seen from
-// a boat at sea at 24.5445 N, 54.3780 E (eye 3 m) looking east-south-east: bearings about 97-125 deg across the frame,
-// f = 3850 px, eye level at y 720. Every building stands at its true bearing and angular size (OSM footprints, ODbL;
-// heights from the museums and their architects; research of 26 Sep 2026). From left to right:
+// Before the rain (Revision 4; after the seeding and the science of rain): the Saadiyat Cultural District, Abu Dhabi,
+// under a light-to-moderate rain, seen from a boat at sea at 24.5445 N, 54.3780 E (eye 3 m) looking east-south-east:
+// bearings about 97-125 deg across the frame, f = 3850 px, eye level at y 720. Every building stands at its true
+// bearing and angular size (OSM footprints, ODbL; heights from the museums and their architects; research of 26 Sep
+// 2026). From left to right:
 //   the Guggenheim Abu Dhabi (opens 11 Dec 2026, so open by the ceremony): 2.20 km, bearings 98.3-106.8, ten cones up to
 //   88 m over low galleries; the Zayed National Museum: 3.16 km, bearings 111.2-113.0, five wings, the tallest 123 m, its
 //   mound hidden by the Saadiyat Grove blocks (2.8 km, bearings 107-115); the Louvre Abu Dhabi: 2.39 km, its dome 180 m

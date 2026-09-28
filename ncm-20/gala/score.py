@@ -360,10 +360,11 @@ def main(cues_path, out_dir):
         chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
         sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
     else:
-        # B09 · Before the rain (Revision 4): the Center's pulse stops for the rain over Saadiyat. A cello pedal on D and
-        # soft strings in D Dorian; the felt piano falls like the first drops, a note a beat; the rababa recalls the
-        # Suhail motif as the rain eases (the plate eases it from 10.5 s), and the harmony warms toward F, the gift of the
-        # rain (غيث), into the working day. No Emirati percussion: the rain is a blessing, not a festival.
+        # Before the rain (Revision 4), after the seeding and the science: the rain sought over the Hajar arrives over
+        # Saadiyat. A cello pedal on D and soft strings in D Dorian out of the science's pizzicato; the felt piano falls
+        # like the first drops, a note a beat; the rababa recalls the Suhail motif as the rain eases (the plate eases it
+        # from 10.5 s), and the harmony warms toward F, the gift of the rain (غيث), into Sheikh Mansour's card. No
+        # Emirati percussion: the rain is a blessing, not a festival.
         a0, a1 = st('rain'), en('rain')
         music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.7)
         chord(music, Dm7, a0 + 0.4, 10.0, gain=0.28, bright=1500, attack=2.0, release=2.0)
@@ -524,7 +525,7 @@ def main(cues_path, out_dir):
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
                                        'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'rain': -5, 'airport': -1, 'rail': -1,
                                        'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0, 'seeding': -2,
-                                       'science': -2, 'quote-mansour': 0, 'world': -3.4, 'gauge': 0.5, 'finale': -1})
+                                       'science': -2, 'quote-mansour': 0, 'world': -4.0, 'gauge': 0.5, 'finale': -1})
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9

@@ -38,8 +38,15 @@ const WORLD_CAM = t => camPath([{ t: 0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 
 // No company name, livery or product on the tanker (ADNOC ships were being attacked in 2026; Murban is a traded
 // benchmark), and no container train on the Fujairah line (since 20 Sep 2026 it reads as the Hormuz bypass).
 // "Etihad Rail" on screen needs Etihad Rail's written clearance, through NCM; without it, name the national network.
+// The rain over Saadiyat follows the seeding and the science of rain (the requester, 28 Sep 2026), so the rain sought
+// over the Hajar arrives as a blessing for the whole country. It is natural rain, and the narration claims only NCM's
+// forecasts and early warnings (never that NCM makes rain; no aircraft appears in it). ?april2024 puts April 2024 on
+// the national map back after the seven emirates (B09) and leaves the Saadiyat rain out: the two never share a cut,
+// so the film never sets seeding beside the April 2024 floods.
+const APRIL2024 = new URLSearchParams(location.search).has('april2024');
+const B9 = APRIL2024 ? 5 : 0; // the bars April 2024 takes after the seven emirates, when it is asked for
 const RAIL_NAME = { ar: 'قطارات الاتحاد', en: 'ETIHAD RAIL' }; // or { ar: 'شبكة السكك الحديدية الوطنية', en: 'NATIONAL RAIL NETWORK' }
-const RAIL_BEAT = { id: 'rail', start: at(27), dur: at(1.5), speed: 1, offset: 1.0, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, 1.0 + at(1.5)),
+const RAIL_BEAT = { id: 'rail', start: at(22 + B9), dur: at(1.5), speed: 1, offset: 1.0, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, 1.0 + at(1.5)),
   words(t) {
     const f = filmT(this, t), s = this.start;
     // every label here is up for at least 3 s plus 0.3 s a word (critique M1), inside the beat's own dissolves
@@ -48,16 +55,13 @@ const RAIL_BEAT = { id: 'rail', start: at(27), dur: at(1.5), speed: 1, offset: 1
   } };
 // The tanker beat can be pulled at the go/no-go checks (two weeks and 72 hours before the ceremony) with ?pull=tanker;
 // it never goes into a cut-down, a social clip or the international version.
-const TANKER_BEAT = { id: 'tanker', start: at(30), dur: at(1.5), speed: 1, offset: 1.4, xf: 0.5, cam: PLATE_LEFT(1.15, 1.2, 1.4 + at(1.5), 1435, 540),
+const TANKER_BEAT = { id: 'tanker', start: at(25 + B9), dur: at(1.5), speed: 1, offset: 1.4, xf: 0.5, cam: PLATE_LEFT(1.15, 1.2, 1.4 + at(1.5), 1435, 540),
   words(t) {
     const f = filmT(this, t), s = this.start;
     levelB(f, s + 0.3, s + 4.75, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
     levelA(f, s + 0.5, s + 4.75, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
   } };
 
-// B09's two versions. The rain over Saadiyat is natural rain, and the narration claims only NCM's forecasts and early
-// warnings (never that NCM makes rain; no aircraft appears there or anywhere near the April 2024 story).
-const APRIL2024 = new URLSearchParams(location.search).has('april2024');
 const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5), dur: at(5), offset: 12, xf: 1.0,
     cam: t => camPath([{ t: 12, s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }, { t: 12 + at(5), s: 1.05, px: 900, py: 540, sx: 960, sy: 540 }], t),
     tint(f) { const s = this.start; return 0.34 * easeInOut(prog(f, s + 0.8, 7.2)) * (1 - easeInOut(prog(f, s + 12.5, 3.5))); },
@@ -66,7 +70,7 @@ const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5
       levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
       levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } };
-const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(20.5), dur: at(5), xf: 1.0,
+const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(35.5), dur: at(5), xf: 1.0,
   cam: t => camPath([{ t: 0, s: 1.0, px: 1041, py: 650, sx: 1041, sy: 650 }, { t: at(5), s: 1.05, px: 1041, py: 650, sx: 1041, sy: 650 }], t),
   words(t) {
     const f = filmT(this, t), s = this.start;
@@ -122,11 +126,10 @@ const TIMELINE = [
       const f = filmT(this, t), s = this.start;
       levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 520, arSize: 64, enSize: 20 });
     } },
-  // B09 · Before the rain (Revision 4): the Saadiyat Cultural District under a moderate rain; ?april2024 restores the
-  // April 2024 beat on the national map instead (the protocol office decides)
-  APRIL2024 ? APRIL2024_BEAT : RAIN_BEAT,
+  // B09 · April 2024 on the national map, only with ?april2024 (the protocol office decides)
+  ...(APRIL2024 ? [APRIL2024_BEAT] : []),
   // B10 · For every flight
-  { id: 'airport', start: at(25.5), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
+  { id: 'airport', start: at(20.5 + B9), dur: at(1.5), speed: SP.airport, offset: 1.1, xf: 1.0, cam: PLATE_LEFT(1.0, 1.05, 1.1 + at(1.5)),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.55, s + 4.75, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
@@ -135,7 +138,7 @@ const TIMELINE = [
   // B11 · Across the land (Etihad Rail near Al Dhaid, Sharjah)
   RAIL_BEAT,
   // B12 · For every ship
-  { id: 'port', start: at(28.5), dur: at(1.5), speed: SP.port, offset: 1.5, xf: 0.5,
+  { id: 'port', start: at(23.5 + B9), dur: at(1.5), speed: SP.port, offset: 1.5, xf: 0.5,
     cam: t => camPath([{ t: 1.5, s: 1.0, px: 1400, py: 585, sx: 560, sy: 560 }, { t: 1.5 + at(1.5) * SP.port, s: 1.04, px: 1470, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
@@ -145,7 +148,7 @@ const TIMELINE = [
   // B13 · For the east coast (a laden tanker under way off Fujairah; removable with ?pull=tanker)
   TANKER_BEAT,
   // B14 · For clean energy
-  { id: 'energy', start: at(31.5), dur: at(1.5), speed: SP.energy, offset: 1.0, xf: 0.5,
+  { id: 'energy', start: at(26.5 + B9), dur: at(1.5), speed: SP.energy, offset: 1.0, xf: 0.5,
     cam: t => camPath([{ t: 1.0, s: 1.0, px: 1435, py: 620, sx: 560, sy: 560 }, { t: 1.0 + at(1.5) * SP.energy, s: 1.05, px: 1435, py: 540, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
@@ -153,20 +156,22 @@ const TIMELINE = [
       levelA(f, s + 0.433, s + 4.4, 'للطاقة النظيفة', 'FOR CLEAN ENERGY', { y: 520 });
     } },
   // B15 · Card: HH the President (reported speech, no VO)
-  { id: 'quote-president', use: 'quote', quote: 'president', start: at(33), dur: at(3.5), xf: 1.2 },
+  { id: 'quote-president', use: 'quote', quote: 'president', start: at(28 + B9), dur: at(3.5), xf: 1.2 },
   // B16 · More rain from the clouds
-  { id: 'seeding', start: at(36.5), dur: at(2), speed: SP.seeding, offset: 0.5, xf: 1.2, cam: t => PLATE_LEFT(1.0, 1.06, 0.5 + at(2) * SP.seeding)(t),
+  { id: 'seeding', start: at(31.5 + B9), dur: at(2), speed: SP.seeding, offset: 0.5, xf: 1.2, cam: t => PLATE_LEFT(1.0, 1.06, 0.5 + at(2) * SP.seeding)(t),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.8, s + 6.3, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
     } },
   // B17 · The science of rain
-  { id: 'science', start: at(38.5), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
+  { id: 'science', start: at(33.5 + B9), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
     } },
+  // Before the rain (Revision 4): the Saadiyat Cultural District under natural rain, after the seeding and the science
+  ...(APRIL2024 ? [] : [RAIN_BEAT]),
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
   { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(40.5), dur: at(3.5), xf: 1.2 },
   // B19 · From the skies of the Emirates to the world
