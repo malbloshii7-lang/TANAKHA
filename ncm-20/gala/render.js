@@ -3,7 +3,7 @@
 //   node render.js preview <out-prefix> <seconds...> [--scale 2]          PNG stills at those times
 //   node render.js film <out.mp4> [score.wav] [--scale 2] [--jobs 3]       every frame at 30 fps → H.264 (+ AAC)
 //   node render.js cues <cues.json>                                        the timeline, for score.py and subtitles
-//        [--from S] [--to S] [--afrom S] [--crf 16] [--fps 50] [--grade led]   a time range (--afrom 0 when the audio file starts there); 50 fps; the LED-wall grade
+//        [--from S] [--to S] [--afrom S] [--crf 16] [--fps 50] [--grade led]   a time range (--afrom 0 only when the audio file itself starts at --from, as part2.wav does); 50 fps; the LED-wall grade
 //        --from split / --to split: the cue-to-cue split between part 1 and part 2, read from the cut itself
 //
 // --scale 2 renders a 3840×2160 master. --jobs N renders N contiguous chunks in parallel pages and joins
@@ -17,7 +17,7 @@ const path = require('path');
 const argv = process.argv.slice(2);
 const opt = (name, dflt) => { const i = argv.indexOf('--' + name); if (i < 0) return dflt; const v = argv[i + 1]; argv.splice(i, 2); return v; };
 const FPS = Number(opt('fps', 30)), SCALE = Number(opt('scale', 1)), JOBS = Number(opt('jobs', 1)), CRF = String(opt('crf', SCALE > 1 ? 18 : 16));
-const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: film time where the audio file starts (default --from); 0 for part2.wav
+const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: where to start reading the audio file (default --from, right for a full-length mix); 0 for part2.wav, which starts at the split
 const FF = process.env.FFMPEG || 'ffmpeg';
 const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res, rej) => { const p = spawn(FF, args, { stdio }); p.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))); });
 

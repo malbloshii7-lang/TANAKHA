@@ -315,6 +315,27 @@ own "we" over the narrator's story, each with its English:
   - Every leader's card is still at or above the world beat: cards −13.5, −14.0 and −13.2 LUFS, world −14.3 LUFS.
   - Both of the rain beat's dissolves were checked at the cut and 0.1 s either side. No words overlap.
 
+**Straight after the seeding (28 September, the requester: "still not well positioned").** The order is now:
+
+1. the seeding;
+2. the rain over Saadiyat;
+3. the science of rain;
+4. Sheikh Mansour's card.
+
+The rain had sat after the science of rain, so it did not answer the seeding, and it broke the science's hand-over to
+Sheikh Mansour's card on research.
+
+- **Picture.** The seeded cloud's rain dissolves straight into the rain over Saadiyat. The science of rain irises in
+  from the cloud over Saadiyat, where it used to iris in from the seeded droplet. With `?april2024` the seeding and the
+  science stay together as before.
+- **Sound.** The seeded cloud's rain runs on across the cut into the rain over Saadiyat. The seeding and the science
+  keep their pizzicato and muted mirwas, but each carries its own bars, so no drum plays under the rain.
+- **Protocol.** The rain now follows the seeding directly, which is the impression the requester asked for. Its words
+  give the rain to God, the narration claims only forecasts and warnings, and no aircraft appears in it. **The
+  protocol office should see this order.**
+- **Measured.** Cards −13.5, −13.5 and −13.6 LUFS; world −14.9 LUFS. The three joins were checked at the cut and 0.1 s
+  either side.
+
 **Reading times (the rule is 3 s plus 0.3 s a word).**
 
 - **Meet the rule:** the rain beat and the headlines on the longer beats.

@@ -41,9 +41,10 @@ const WORLD_CAM = t => camPath([{ t: 0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 
 // No company name, livery or product on the tanker (ADNOC ships were being attacked in 2026; Murban is a traded
 // benchmark), and no container train on the Fujairah line (since 20 Sep 2026 it reads as the Hormuz bypass).
 // "Etihad Rail" on screen needs Etihad Rail's written clearance, through NCM; without it, name the national network.
-// The rain over Saadiyat follows the seeding and the science of rain (the requester, 28 Sep 2026), so the rain sought
-// over the Hajar arrives as a blessing for the whole country. It is natural rain, and the narration claims only NCM's
-// forecasts and early warnings (never that NCM makes rain; no aircraft appears in it). ?april2024 puts April 2024 on
+// The rain over Saadiyat follows the seeding directly (the requester, 28 Sep 2026): the rain sought over the Hajar
+// arrives over the capital as a blessing for the whole country, and the science of rain follows it, irising in from
+// the cloud. It is natural rain, its words give it to God, and the narration claims only NCM's forecasts and early
+// warnings (never that NCM makes rain; no aircraft appears in it). ?april2024 puts April 2024 on
 // the national map back after the seven emirates (B09) and leaves the Saadiyat rain out: the two never share a cut,
 // so the film never sets seeding beside the April 2024 floods.
 const APRIL2024 = new URLSearchParams(location.search).has('april2024');
@@ -73,7 +74,7 @@ const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5
       levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
       levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } };
-const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(35.5), dur: at(5), speed: 1, xf: 1.0,
+const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(33.5), dur: at(5), speed: 1, xf: 1.0,
   cam: t => camPath([{ t: 0, s: 1.0, px: 1041, py: 650, sx: 1041, sy: 650 }, { t: at(5), s: 1.05, px: 1041, py: 650, sx: 1041, sy: 650 }], t),
   words(t) {
     const f = filmT(this, t), s = this.start;
@@ -177,17 +178,18 @@ const TIMELINE = [
       // below the King Air's line of flight (screen y about 530-600; its nose reaches x 1120 by s + 6.3)
       levelA(f, s + 1.2, s + 6.3, 'واستمطرنا السحاب', 'WE ASKED THE CLOUDS FOR MORE', { y: 720, maxW: COLW });
     } },
-  // B17 · The science of rain
-  { id: 'science', start: at(33.5 + B9), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
+  // B09 · Rain as a mercy (Revisions 4 and 5): the Saadiyat Cultural District under natural rain, straight after the
+  // seeding; the rain eases, the light breaks, and the words give thanks for it
+  ...(APRIL2024 ? [] : [RAIN_BEAT]),
+  // B17 · The science of rain, at 38.5 bars in either cut (after the rain, or after the seeding when April 2024 takes the
+  // rain's bars); its iris opens from the cloud over Saadiyat, or from the seeded droplet
+  { id: 'science', start: at(38.5), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
       levelA(f, s + 1.2, s + 6.2, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
     } },
-  // B09 · Rain as a mercy (Revisions 4 and 5): the Saadiyat Cultural District under natural rain, after the seeding and
-  // the science of rain; the rain eases, the light breaks, and the words give thanks for it
-  ...(APRIL2024 ? [] : [RAIN_BEAT]),
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
   { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(40.5), dur: at(3.5), xf: 1.2 },
   // B19 · From the skies of the Emirates to the world
