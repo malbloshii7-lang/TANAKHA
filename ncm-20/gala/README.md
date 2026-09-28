@@ -89,7 +89,7 @@ loop() { # name, hold, audio, frames
   $FFMPEG -i out/lossless-$1.mp4 -map 0:v -map 0:a -c:v libx264 -preset slow -crf 2 -profile:v high -pix_fmt yuv420p \
     -x264-params keyint=$4:min-keyint=$4:scenecut=0 -c:a copy -movflags +faststart out/$1-4k50.mp4
 }
-loop hold-world W hold-world.wav 600
+loop hold-world W hold-world.wav 600   # its light stands where the film leaves it at the split, so the cuts in and out match
 loop hold-b B hold.wav 1000   # the dedication (the running order's hold)
 loop hold-a A hold.wav 1000   # title and lockup
 loop hold-c C hold.wav 1000   # dimmed, behind speeches
@@ -101,6 +101,8 @@ $FFMPEG -i out/part1-4k50.mp4 -i out/part1-restrained.wav -map 0:v -map 1:a -c:v
 FILM_QUERY=pull=tanker node render.js cues out/cues-pull.json
 python3 score.py out/cues-pull.json out/pull/
 FILM_QUERY=pull=tanker node render.js film out/part1-pull-4k50.mp4 out/pull/part1.wav --to split --scale 2 --fps 50 --grade led --jobs 3
+# and its own loop W (the split comes 5 s earlier, so the light it holds is a little different); part 2 and loops A/B/C are shared
+FILM_QUERY='hold=W&pull=tanker' node render.js film out/lossless-hold-world-pull.mp4 out/pull/hold-world.wav --scale 2 --fps 50 --grade led --jobs 3 --crf 0 --preset ultrafast --profile high444
 ```
 
 The media server crossfades audio for 0.5 s at each cut to a loop. The temp score is synthesized. The brief in

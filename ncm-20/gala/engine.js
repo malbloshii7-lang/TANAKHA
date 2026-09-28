@@ -659,9 +659,10 @@ function render(t) {
   if (CHROME.corners) corners(1);
   if (CHROME.mark) small('NCM · XX', W - 78, 72, 1, { size: 18, ls: 8, align: 'right', weight: 600, a: 0.85 });
   // in a stage hold the light over the sheet stands still (loop W is a still frame; the night loops have no shafts), so
-  // nothing drifts across the paper and the loop joins without a seam, even after encoding
+  // nothing drifts across the paper and the loop joins without a seam, even after encoding; it stands where the film
+  // leaves it at the cut into the hold (lightT), so the cut matches too
   const loopL = SCENES.length === 1 && SCENES[0].loop;
-  light(loopL ? 0 : t, night);
+  light(loopL ? SCENES[0].lightT || 0 : t, night);
   const fadeIn = FADE_IN ? 1 - easeOut(prog(t, 0, FADE_IN)) : 0, fadeOut = FADE_OUT ? easeInOut(prog(t, DURATION - FADE_OUT, FADE_OUT)) : 0;
   if (GRADE === 'led') {
     ctx.save(); ctx.globalCompositeOperation = 'multiply';
