@@ -281,7 +281,7 @@ const voSubAr = v => v.sub || v.ar.replace(/[\u064C-\u0650\u0652]/g, '').replace
   if (q.has('hold')) {
     const v = (q.get('hold') || 'A').toUpperCase();
     TIMELINE.length = 0; RING.length = 0;
-    if (v === 'W') TIMELINE.push({ id: 'hold-world', use: 'world', start: 0, dur: 12, speed: 1e-9, offset: at(3.5), cam: WORLD_CAM,
+    if (v === 'W') TIMELINE.push({ id: 'hold-world', use: 'world', start: 0, dur: 12, loop: 12, speed: 1e-9, offset: at(3.5), cam: WORLD_CAM,
       words() { worldWords(START('world') + 11.5, Infinity); } });
     else TIMELINE.push({ id: 'hold', use: 'finale', start: 0, dur: 20, hold: true, loop: 20, dim: v === 'C' ? 0.7 : 0,
       cam: () => ({ s: 1.04, px: 977, py: 698, sx: 977, sy: 698 }),
