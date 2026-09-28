@@ -1,0 +1,28 @@
+cue,film timecode (25 fps),seconds,part 2 timecode,scene,picture,transition,dissolve (s),house / lighting / media note
+1,00:00:00:00,0.000,,,PART 1 GO,,,After the anthem and at least 5 s of silence
+2,00:00:00:00,0.000,,suhail,B01 Night: Suhail rises over the desert,fade,0.5,House lights out before GO; black under 1.5 s
+3,00:00:11:17,11.667,,durour,B02 Dawn: the Durour star calendar,dawn,2.8,Warm light cue with the dawn
+4,00:00:18:08,18.333,,monsoon,B03 Ahmed bin Majid and the monsoon,fade,0.8,
+5,00:00:23:08,23.333,,pearling,B04 The great dive; the nahham,fade,0.8,
+6,00:00:28:08,28.333,,falaj,"B05 Hili falaj, Al Ain; Sheikh Zayed named",fade,0.8,
+7,00:00:36:17,36.667,,quote-zayed,B06 Card: the late Sheikh Zayed,fade,1.2,Hold light; no movement on stage
+8,00:00:48:08,48.333,,centre,B07 2007: then we built a center to read the sky,iris,1.6,
+9,00:00:56:17,56.667,,nation,B08 The seven emirates,iris,1.6,
+10,00:01:08:08,68.333,,airport,B09 Zayed International,fade,1,
+11,00:01:13:08,73.333,,rail,"B10 Etihad Rail near Al Dhaid, Sharjah",fade,0.5,
+12,00:01:18:08,78.333,,port,B11 Jebel Ali,fade,0.5,
+13,00:01:23:08,83.333,,tanker,B12 A laden tanker off Fujairah; the east-coast bulletin,fade,0.5,Removable module: go/no-go at two weeks and at 72 hours
+14,00:01:28:08,88.333,,energy,B13 Shams 1,fade,0.5,
+15,00:01:33:08,93.333,,quote-president,B14 Card: H.H. the President,fade,1.2,Hold light; no movement on stage
+16,00:01:45:00,105.000,,seeding,"B15 Rain enhancement, Hajar (Ras Al Khaimah)",fade,1.2,
+17,00:01:51:17,111.667,,science,B16 The science of rain,iris,1.2,
+18,00:01:58:08,118.333,,quote-mansour,B17 Card: H.H. Sheikh Mansour bin Zayed,fade,1.2,Hold light; no movement on stage
+19,00:02:10:00,130.000,,world,B18 From the skies of the Emirates to the world,iris,1.4,Applause expected at the end of this beat
+20,00:02:21:17,141.667,,world,PART 1 ENDS on the B18 frame (office and name on screen),,,"Media server: cut to LOOP W (hold-world.mp4 / hold-world.wav, 12 s seamless) until the room settles"
+21,00:02:21:17,141.668,00:00:00:00,gauge,PART 2 GO (released by the show caller),,,Caller releases when applause ends; PART 2 clip starts at 00:00:00:00
+22,00:02:22:04,142.167,00:00:00:12,gauge,B19 Twenty years: twenty drops,fade,1,
+23,00:02:28:08,148.334,00:00:06:17,gauge,The twentieth drop lands on 2027 (the hit),,,"GO: warm-gold stage wash, 4 s"
+24,00:02:33:08,153.333,00:00:11:17,finale,B20 Night: the same star; title; lockup,dusk,3,
+25,00:02:43:08,163.333,00:00:21:17,end,PART 2 ends on the night sky; roll LOOP A,,,Media server: LOOP A (title) or B (dedication); LOOP C (dimmed) behind speeches; fade LOOP audio before the MC speaks
+
+,,,,safety,"SAFETY SLATE (safety-slate.png): the title frame, on its own media-server layer",,,Switch to it at once if playback fails

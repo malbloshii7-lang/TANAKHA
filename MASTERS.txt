@@ -1,0 +1,54 @@
+READING THE SKY · GALA EDITION · 4K 50p LED-WALL MASTERS
+National Center of Meteorology, 20th anniversary ceremony (March 2027)
+Rendered 28 September 2026 from Revision 7 (code: branch claude/focused-mayer-jogort, commit 09ef507)
+
+STATUS
+Technical masters for LED calibration, media-server programming, playback tests and the tech rehearsal.
+- The score is the synthesized temp score.
+- The narration is not recorded yet, so these files carry no narration.
+- The final ceremony masters follow once the score and narration are recorded. TREATMENT.md §10 specifies them:
+  ProRes, and HAP for the media server, at the wall's native pixel map.
+
+VIDEO (every file)
+3840 x 2160, 50 fps progressive, H.264 High, 4:2:0.
+LED grade: the parchment at about two-thirds of the web grade's luminance, with a deeper vignette. It is a starting
+point, to be calibrated with a meter at the tech rehearsal. It looks dim on a phone or a monitor.
+Audio in each MP4 is AAC 48 kHz stereo. The WAVs in audio/ (48 kHz, 24-bit) are for the sound desk.
+
+RUNNING ORDER (cue to cue)
+1. part1-4k50.mp4           2:21.66   7,083 frames   GO -> the split, where the dissolve into the twenty drops begins
+2. hold-world-4k50.mp4      0:12.00     600 frames   LOOP W under the applause: a still frame of the world beat
+3. part2-4k50.mp4           0:21.68   1,084 frames   on the caller's cue: the twenty drops -> title and lockup
+4. hold-b-4k50.mp4          0:20.00   1,000 frames   LOOP B, the running order's hold: the dedication and the lockup
+   hold-a-4k50.mp4          0:20.00   1,000 frames   LOOP A: title and lockup
+   hold-c-4k50.mp4          0:20.00   1,000 frames   LOOP C: dimmed sky and ring, behind speeches
+Safety: safety-slate-4k.png (loop A's frame) for a playback failure.
+Show control: show/cuesheet.csv (25 fps timecode, cue to cue). Side screens: show/*.srt.
+
+FALLBACK WITHOUT THE TANKER (decided at the go/no-go checks)
+part1-pull-4k50.mp4 (2:16.66, 6,833 frames), then hold-world-pull-4k50.mp4. Its split comes 5 s earlier, so its loop W
+holds slightly different light. Part 2 and loops A, B and C are the same.
+
+RAMADAN OR MOURNING
+The *-restrained.mp4 files carry the same picture with the restrained mix (no drums, tus, claps or jahla). Their WAVs
+are in audio/. Ramadan 1448 is expected around 8 February to 9 March 2027 (astronomical estimate; the dates follow the
+moon sighting), so a ceremony in early March 2027 may fall within it.
+
+MEASURED (on the encoded files)
+- Every loop's last frame runs into its first like two neighbouring frames: a mean difference of 0.005 grey levels or
+  less, with 99% of pixels unchanged. Loop W is a still frame: 0.0003.
+- Loop W matches the film at both of its cuts. Part 1's last frame -> loop W: 0.335; loop W -> part 2's first frame:
+  0.280. That is the floor between any two separately encoded files: part 1 -> part 2 directly is 0.349.
+- Exact frame counts, 50 fps, and audio matched to picture in every file.
+- Loudness: part 1 -16.4 LUFS, part 2 -14.0, loop W -20.0, loops A/B/C -24.0.
+
+AUDIO NOTES
+- The media server crossfades the audio for 0.5 s at each cut to a loop.
+- part2.wav carries the final chord's 3.5 s ring-out beyond the picture. The MP4 ends with its picture.
+
+PICTURE SAFETY
+No full-frame flashes, no full-frame red, no strobing. The twentieth drop's gold glint ramps over 0.6 s. Run the
+Harding (ITU-R BT.1702) test on the final master before sign-off.
+
+CHECKSUMS
+MANIFEST.sha256 (SHA-256 of every file here). Check with: sha256sum -c MANIFEST.sha256
