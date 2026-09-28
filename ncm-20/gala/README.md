@@ -78,12 +78,19 @@ node render.js film out/review.mp4 out/mix.wav --jobs 3                         
 # the event master, cue to cue: part 1 ends where the dissolve into the gauge begins ("split", read from the cut)
 node render.js film out/part1-4k50.mp4 out/part1.wav --to split --scale 2 --fps 50 --grade led --jobs 3
 node render.js film out/part2-4k50.mp4 out/part2.wav --from split --afrom 0 --scale 2 --fps 50 --grade led --jobs 3
-# the loops: W under the applause after the world beat (12 s), A/B/C at the end (20 s); each loops seamlessly (every
-# motion, and in W the light's drift, is periodic in the loop's length, so the frame at the loop length is the first)
-FILM_QUERY=hold=W node render.js film out/hold-world-4k50.mp4 out/hold-world.wav --scale 2 --fps 50 --grade led --jobs 3
-FILM_QUERY=hold=B node render.js film out/hold-b-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # the dedication (the running order's hold)
-FILM_QUERY=hold=A node render.js film out/hold-a-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # title and lockup
-FILM_QUERY=hold=C node render.js film out/hold-c-4k50.mp4 out/hold.wav --scale 2 --fps 50 --grade led --jobs 3   # dimmed, behind speeches
+# the loops: W under the applause after the world beat (12 s, a still frame), A/B/C at the end (20 s). Each loops
+# seamlessly: every motion is periodic in the loop's length and the light over the sheet stands still in a hold. Each is
+# rendered near-lossless in parallel chunks, then encoded once as a single stream with one keyframe (encoded in separate
+# chunks, the paper grain re-quantizes at every join and at the loop point)
+loop() { # name, hold, audio, frames
+  FILM_QUERY=hold=$2 node render.js film out/inter-$1.mp4 out/$3 --scale 2 --fps 50 --grade led --jobs 3 --crf 6 --preset veryfast
+  $FFMPEG -i out/inter-$1.mp4 -map 0:v -map 0:a -c:v libx264 -preset slow -crf 18 -profile:v high -pix_fmt yuv420p \
+    -x264-params keyint=$4:min-keyint=$4:scenecut=0 -c:a copy -movflags +faststart out/$1-4k50.mp4
+}
+loop hold-world W hold-world.wav 600
+loop hold-b B hold.wav 1000   # the dedication (the running order's hold)
+loop hold-a A hold.wav 1000   # title and lockup
+loop hold-c C hold.wav 1000   # dimmed, behind speeches
 FILM_QUERY=hold=A node render.js preview out/safety-slate-4k 0 --scale 2 --grade led                         # the still for a playback failure
 # the restrained mix (Ramadan or mourning): the same picture with the restrained audio, no re-render
 $FFMPEG -i out/part1-4k50.mp4 -i out/part1-restrained.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 256k -shortest out/part1-4k50-restrained.mp4
