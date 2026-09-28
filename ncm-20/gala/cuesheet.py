@@ -25,7 +25,6 @@ LABEL = {
     'centre': ('2007: then we built a center to read the sky', ''),
     'nation': ('The seven emirates', ''),
     'homes': ('April 2024, on the national map', 'Lighting restrained; no colour chase'),
-    'rain': ('Rain as a mercy: the Saadiyat Cultural District', 'Lighting soft and cool; warm, pale lift as the light breaks at 7.6 s; no colour chase'),
     'airport': ('Zayed International', ''),
     'rail': ('Etihad Rail near Al Dhaid, Sharjah', ''),
     'port': ('Jebel Ali', ''),

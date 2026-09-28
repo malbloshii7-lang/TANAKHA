@@ -6,7 +6,7 @@ Final treatment by the head of media and PR lead. Draft for NCM and protocol app
 
 | | |
 |---|---|
-| Runtime | **3:00.0** (180 s = 54 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop. 2:55.0 with the tanker beat pulled (Revision 3) |
+| Runtime | **2:43.3** (163.3 s = 49 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop (Revision 6). 3:00.0 with April 2024 (`?april2024`); 2:38.3 with the tanker beat pulled |
 | Screen | Large LED wall in a dark hall. The event master is 50p, rendered to the wall's native pixel map (3840×2160 if the wall is 16:9) with the LED grade (`?grade=led`) |
 | Sound | 5.1 cinema mix (7.1 if the hall has it), an original score recorded live, and an Arabic voice-over by an Emirati narrator |
 | Language | Arabic leads everywhere: the voice-over, the first and larger line of every text block, the right-hand text column. English comes second |
@@ -350,6 +350,26 @@ Sheikh Mansour's card on research.
 
 **Before the master:** NCM's Arabic editor, and a religious adviser, read the new narration and the hadith line,
 including its setting over music.
+
+## Revision 6 · 28 September 2026: the Saadiyat rain taken out
+
+At the requester's direction ("not feeling it"), the rain over the Saadiyat Cultural District leaves the film, with
+everything that belonged to it:
+
+- its words («مُطِرْنا بفضلِ اللهِ ورحمتِه»), its two narration lines (VO-08r, VO-08s), the museum captions;
+- its music (the felt-piano drops, the rababa's phrase into F) and its rain;
+- the plate (`scenes/plate-saadiyat.js`). It stays in the history, at commit 5d9f4aa.
+
+**The cut closes up.** The beats after the seeding move 5 bars earlier, and the film runs **2:43.3** (49 bars).
+- The seeding and the science of rain run together again: the science irises in from the seeded droplet, and one
+  passage of pizzicato and muted mirwas carries both, as in Revision 3.
+- `?april2024` puts April 2024 back after the seven emirates and brings the film to 3:00.0 (the protocol office
+  decides). `?pull=tanker` gives 2:38.3.
+
+**Measured.** Without the rain beat, the President's and Sheikh Mansour's cards measured quieter than the world beat,
+and the build stopped. All three cards now ride 0.5 dB up and the world 0.3 dB down:
+- cards −13.5, −14.0 and −14.2 LUFS;
+- world −14.4 LUFS.
 
 ## 1. Purpose and audience
 

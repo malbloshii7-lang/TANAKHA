@@ -359,29 +359,6 @@ def main(cues_path, out_dir):
         rem = a0 + 12.3  # the remembrance (VO-08c), as the paper warms again
         chord(music, F, rem, a1 - rem + 1.5, gain=0.33, bright=1400, attack=2.0, release=2.0)
         sfx.add(A.rain(12.0, gain=0.9), a0 + 1.0)  # under the band of cloud crossing the map; it clears by the remembrance
-    else:
-        # B09 · Rain as a mercy (Revisions 4 and 5), straight after the seeding: the rain sought over the Hajar arrives
-        # over Saadiyat, the seeded cloud's rain running on across the cut. A cello pedal on D and soft strings in D
-        # Dorian out of the seeding's pizzicato; the felt piano falls like the first drops, a note a beat, until the rain
-        # eases (the plate eases it from 7.8 s, as the sky clears from the right); the harmony opens to F as the light
-        # breaks, and under the words said after rain (from 10.3 s) the rababa plays a plain phrase falling to F on the
-        # bar line, not the Suhail motif: the hadith those words come from sets thanks to God against crediting rain to
-        # the stars. No Emirati percussion: the rain is a blessing, not a festival.
-        a0, a1 = st('rain'), en('rain')
-        music.add(A.strings(D2 + 12, a1 - a0, bright=700, attack=1.5, release=2.5, voices=5), a0, 0.7)
-        chord(music, Dm7, a0 + 0.4, 9.8, gain=0.28, bright=1500, attack=2.0, release=2.0)
-        drops = [D4 + 7, D4 + 5, D4 + 3, D4, A3, D4 + 3, D4 + 5, D4 + 7, D4 + 10, D4 + 7, D4 + 5, D4 + 3]
-        k, t = 0, a0 + 1.0
-        while t < a0 + 8.6:
-            music.add(felt(drops[k % len(drops)], 0.55), t, pan=0.35 * np.sin(k * 1.7))
-            k, t = k + 1, t + BEAT
-        chord(music, F, a0 + 11 * BEAT, a1 - a0 - 11 * BEAT + 1.5, gain=0.3, bright=1500, attack=2.4, release=2.0)
-        for j, (b, m, d) in enumerate([(13, 72, 1), (14, 69, 0.5), (14.5, 70, 0.5), (15, 69, 1), (16, 65, 2.5)]):  # C A B♭ A F
-            rab(music, a0 + b * BEAT, m, d * BEAT, gain=0.5, grace=74 if j == 0 else None)
-        pre = 1.0 if abs(a0 - en('seeding')) < 0.01 else 0.0  # straight after the seeding, the rain comes in under the cut
-        rain = A.rain(a1 - a0 + 1.0 + pre, gain=0.8)
-        rain = rain * np.interp(np.arange(rain.shape[-1]) / A.SR - pre, [-pre, 1.2, 7.8, 12.8, a1 - a0 + 1.0], [0, 1, 1, 0.12, 0.08])  # (stereo)
-        sfx.add(rain, a0 - pre)  # as the picture: light to moderate, easing to a last few drops as the sky clears
 
     # B10–B14 · the working day: a warm chord and the oud motif as the sky clears; the drums wait for the remembrance
     # line to end, then the Ayyala carries the day at mezzo-forte, one colour for each place; a ras stroke and the tus
@@ -427,29 +404,23 @@ def main(cues_path, out_dir):
     card(music, st('quote-president'), en('quote-president'))
 
     # B16–B17 · the seeding and the science of rain: pizzicato with soft, muted mirwas; the oud in tremolo under the
-    # science; celesta. In the default cut the rain over Saadiyat comes between them and has no drums, so each beat
-    # carries its own bars; with ?april2024 the science follows the seeding and they run on as one passage.
-    r0 = st('seeding')
-    spans = [(r0, en('seeding')), (st('science'), en('science'))]
-    if abs(spans[1][0] - spans[0][1]) < 0.01:
-        spans = [(r0, spans[1][1])]
-    for b0, b1 in spans:
-        k, t = 0, b0
-        while t < b1 - 0.1:
-            chord(music, [[D3, A3, 64, 69], [43, 55, 62, 69]][k % 2], t, BAR * 1.05, gain=0.3, bright=2300, attack=0.7)
-            for e in range(8):
-                te = t + e * BEAT / 2
-                if te < b1:
-                    music.add(A.pizz([D3, A3, D4, A3][e % 4], 0.5), te, 0.5)
-                    if t >= st('science') - 0.1:
-                        m = [62, 66, 69, 74, 69, 66, 64, 66][e]
-                        for q in (0, 0.5):
-                            music.add(A.pluck(m, 0.6, bright=0.6), te + q * BEAT / 2, 0.22, pan=0.4 * np.sin(e))
-            k, t = k + 1, t + BAR
-        play(perc, [(4, 'muted', 0.5), (12, 'muted', 0.5), (14, 'muted', 0.3)], b0, b0 + 0.5, b1 - 0.8, 'mp')
+    # science; celesta
+    r0, r1 = st('seeding'), en('science')
+    k, t = 0, r0
+    while t < r1 - 0.1:
+        chord(music, [[D3, A3, 64, 69], [43, 55, 62, 69]][k % 2], t, BAR * 1.05, gain=0.3, bright=2300, attack=0.7)
+        for e in range(8):
+            te = t + e * BEAT / 2
+            if te < r1:
+                music.add(A.pizz([D3, A3, D4, A3][e % 4], 0.5), te, 0.5)
+                if t >= st('science') - 0.1:
+                    m = [62, 66, 69, 74, 69, 66, 64, 66][e]
+                    for q in (0, 0.5):
+                        music.add(A.pluck(m, 0.6, bright=0.6), te + q * BEAT / 2, 0.22, pan=0.4 * np.sin(e))
+        k, t = k + 1, t + BAR
+    play(perc, [(4, 'muted', 0.5), (12, 'muted', 0.5), (14, 'muted', 0.3)], r0, r0 + 0.5, r1 - 0.8, 'mp')
     sfx.add(turboprop_far(6.0, gain=0.9), r0 + 0.4, pan=-0.1)  # the seeding aircraft, distant, held near the screen
-    # the rain from the seeded cloud; straight before the rain over Saadiyat it runs on across the cut into it
-    sfx.add(A.rain(4.4 if 'rain' in S and abs(st('rain') - en('seeding')) < 0.01 else 3.0, gain=0.4), r0 + 3.6)
+    sfx.add(A.rain(3.0, gain=0.4), r0 + 3.6)  # the rain from the seeded cloud
     for k in range(6):
         music.add(A.bell(86 + [0, 4, 7, 12, 7, 4][k], 1.2, gain=0.35), st('science') + 0.2 + k * 0.17)  # celesta particles
 
@@ -533,9 +504,9 @@ def main(cues_path, out_dir):
     # fader rides: the loudness follows the story (quiet night, the Center's confidence, the April drop, the world's
     # peak); each leader's card at or above the world beat
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
-                                       'quote-zayed': 0, 'centre': -1, 'nation': -1, 'homes': -6, 'rain': -5, 'airport': -1, 'rail': -1,
-                                       'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0, 'seeding': -2,
-                                       'science': -2, 'quote-mansour': 0, 'world': -4.0, 'gauge': 0.5, 'finale': -1})
+                                       'quote-zayed': 0.5, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'rail': -1,
+                                       'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0.5, 'seeding': -2,
+                                       'science': -2, 'quote-mansour': 0.5, 'world': -4.3, 'gauge': 0.5, 'finale': -1})
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9

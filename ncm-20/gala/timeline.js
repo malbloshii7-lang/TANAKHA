@@ -1,14 +1,14 @@
 'use strict';
-// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2, 3 and 4): 21 beats, 54 bars at 72 BPM, 3:00.0
-// (20 beats and 2:55.0 with the tanker pulled: ?pull=tanker). B09 is the rain over the Saadiyat Cultural District
-// (Revision 4); ?april2024 puts April 2024 on the national map back in its place.
+// The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 to 6): 20 beats, 49 bars at 72 BPM, 2:43.3
+// (19 beats and 2:38.3 with the tanker pulled: ?pull=tanker). ?april2024 puts April 2024 on the national map back
+// after the seven emirates (B09): 21 beats, 54 bars, 3:00.0.
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
 // offset (enter part-drawn), xf (length of the dissolve into it), enter (fade | dawn | dusk | iris), cam, tint, words.
 // Words use film time f and the in/out times of §7. Level A echoes the narrator; Level B labels place, date, source.
 // Revision 5: Level A carries the first two editions' Arabic headlines again (the nation's own "we", over the
-// narrator's story), each on its beat, and B09's rain ends on the words said after rain: «مُطِرْنا بفضلِ اللهِ ورحمتِه».
+// narrator's story), each on its beat.
 const BAR72 = 60 / 72 * 4;
 const at = bars => +(bars * BAR72).toFixed(3);
 const filmT = (s, t) => s.start + t / (s.speed || 1); // film time from a scene's clock (measured from the cut)
@@ -41,12 +41,9 @@ const WORLD_CAM = t => camPath([{ t: 0, s: 1.0, px: 1435, py: 585, sx: 560, sy: 
 // No company name, livery or product on the tanker (ADNOC ships were being attacked in 2026; Murban is a traded
 // benchmark), and no container train on the Fujairah line (since 20 Sep 2026 it reads as the Hormuz bypass).
 // "Etihad Rail" on screen needs Etihad Rail's written clearance, through NCM; without it, name the national network.
-// The rain over Saadiyat follows the seeding directly (the requester, 28 Sep 2026): the rain sought over the Hajar
-// arrives over the capital as a blessing for the whole country, and the science of rain follows it, irising in from
-// the cloud. It is natural rain, its words give it to God, and the narration claims only NCM's forecasts and early
-// warnings (never that NCM makes rain; no aircraft appears in it). ?april2024 puts April 2024 on
-// the national map back after the seven emirates (B09) and leaves the Saadiyat rain out: the two never share a cut,
-// so the film never sets seeding beside the April 2024 floods.
+// ?april2024 puts April 2024 on the national map back after the seven emirates (B09); the protocol office decides.
+// Every later beat moves 5 bars on, so the seeding stays six beats away from the floods. (The rain over the Saadiyat
+// Cultural District, Revisions 4 and 5, was taken out on 28 Sep 2026 at the requester's direction.)
 const APRIL2024 = new URLSearchParams(location.search).has('april2024');
 const B9 = APRIL2024 ? 5 : 0; // the bars April 2024 takes after the seven emirates, when it is asked for
 const RAIL_NAME = { ar: 'قطارات الاتحاد', en: 'ETIHAD RAIL' }; // or { ar: 'شبكة السكك الحديدية الوطنية', en: 'NATIONAL RAIL NETWORK' }
@@ -74,19 +71,6 @@ const APRIL2024_BEAT = { id: 'homes', use: 'nation', storm: true, start: at(20.5
       levelB(f, s + 0.7, s + 7.3, [ltr('16') + ' أبريل ' + ltr('2024'), 'أغزر أمطار منذ بدء جمع البيانات عام ' + ltr('1949')], ['16 APRIL 2024 · THE HEAVIEST RAINFALL', 'SINCE DATA COLLECTION BEGAN IN 1949'], { y: 640 });
       levelB(f, s + 7.4, s + 12.6, 'تنبؤات ' + ltr('14') + ' أبريل · إنذار أحمر ' + ltr('16') + ' أبريل', 'FORECASTS 14 APRIL · RED ALERT 16 APRIL', { y: 640 });
     } };
-const RAIN_BEAT = { id: 'rain', use: 'saadiyat', start: at(33.5), dur: at(5), speed: 1, xf: 1.0,
-  cam: t => camPath([{ t: 0, s: 1.0, px: 1041, py: 650, sx: 1041, sy: 650 }, { t: at(5), s: 1.05, px: 1041, py: 650, sx: 1041, sy: 650 }], t),
-  words(t) {
-    const f = filmT(this, t), s = this.start;
-    levelB(f, s + 0.7, s + 8.0, 'المنطقة الثقافية في السعديات · أبوظبي', 'SAADIYAT CULTURAL DISTRICT · ABU DHABI', { y: 330 });
-    // as the rain eases and the light breaks: the words said after rain (Sahih al-Bukhari 846, Sahih Muslim 71), vowelled
-    // so the verb reads as passive (we have been given rain), never «مَطَرُنا» (our rain)
-    levelA(f, s + 10.3, s + 16.0, ['مُطِرْنا', 'بفضلِ اللهِ ورحمتِه'], ['RAIN, BY THE GRACE', 'AND MERCY OF GOD'], { y: 400, maxW: COLW });
-    // the plate draws a caption under each museum; they are recorded here for the subtitle files and the script
-    [['متحف جوجنهايم أبوظبي', 'GUGGENHEIM ABU DHABI', 1.6], ['متحف زايد الوطني', 'ZAYED NATIONAL MUSEUM', 2.1], ['متحف اللوفر أبوظبي', 'LOUVRE ABU DHABI', 2.6]]
-      .forEach(([ar, en, t0]) => recText('B', s + t0, s + 15.6, ar, en));
-  } };
-
 const TIMELINE = [
   // B01 · Night: Suhail rises
   { id: 'suhail', start: 0, dur: at(3.5), cam: SUHAIL_CAM,
@@ -178,12 +162,8 @@ const TIMELINE = [
       // below the King Air's line of flight (screen y about 530-600; its nose reaches x 1120 by s + 6.3)
       levelA(f, s + 1.2, s + 6.3, 'واستمطرنا السحاب', 'WE ASKED THE CLOUDS FOR MORE', { y: 720, maxW: COLW });
     } },
-  // B09 · Rain as a mercy (Revisions 4 and 5): the Saadiyat Cultural District under natural rain, straight after the
-  // seeding; the rain eases, the light breaks, and the words give thanks for it
-  ...(APRIL2024 ? [] : [RAIN_BEAT]),
-  // B17 · The science of rain, at 38.5 bars in either cut (after the rain, or after the seeding when April 2024 takes the
-  // rain's bars); its iris opens from the cloud over Saadiyat, or from the seeded droplet
-  { id: 'science', start: at(38.5), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
+  // B17 · The science of rain: its iris opens from the seeded droplet
+  { id: 'science', start: at(33.5 + B9), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
@@ -191,12 +171,12 @@ const TIMELINE = [
       levelA(f, s + 1.2, s + 6.2, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
     } },
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
-  { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(40.5), dur: at(3.5), xf: 1.2 },
+  { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(35.5 + B9), dur: at(3.5), xf: 1.2 },
   // B19 · From the skies of the Emirates to the world
-  { id: 'world', start: at(44), dur: at(3.5) + 0.5, speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
+  { id: 'world', start: at(39 + B9), dur: at(3.5) + 0.5, speed: 1, xf: 1.4, enter: { type: 'iris', x: 555, y: 535 }, cam: WORLD_CAM,
     words(t) { worldWords(filmT(this, t)); } },
   // B20 · Twenty years
-  { id: 'gauge', start: at(47.5) + 0.5, dur: at(3.5) - 0.5, speed: 1, xf: 1.0, t20: 6.167, dt: 60 / 72 / 4, // 0.5 s after the split (where its dissolve begins); the 20th drop lands 6.167 s after its start
+  { id: 'gauge', start: at(42.5 + B9) + 0.5, dur: at(3.5) - 0.5, speed: 1, xf: 1.0, t20: 6.167, dt: 60 / 72 / 4, // 0.5 s after the split (where its dissolve begins); the 20th drop lands 6.167 s after its start
     cam: lockCam(() => { const c = WORLD_CAM(at(3.5)); return { sx: c.sx + (1430 - c.px) * c.s, sy: c.sy + (560 - c.py) * c.s, R: 318 * c.s }; }, CIRCLES.gauge,
       { settle: 1.833, py: 610, then: [{ t: at(3.5), s: 1.0, px: 1435, py: 610, sx: 560, sy: 560 }] }),
     words(t) {
@@ -205,7 +185,7 @@ const TIMELINE = [
       levelA(f, s + 6.333, s + 9.933, 'عشرون عاماً', 'TWENTY YEARS', { y: 580, arSize: 120, enSize: 44 });
     } },
   // B21 · Night: the same star; title; lockup
-  { id: 'finale', start: at(51), dur: at(3), xf: 3.0, enter: { type: 'dusk' },
+  { id: 'finale', start: at(46 + B9), dur: at(3), xf: 3.0, enter: { type: 'dusk' },
     cam: t => camPath([{ t: 0, s: 1.0, px: 977, py: 698, sx: 977, sy: 698 }, { t: 5.0, s: 1.04, px: 977, py: 698, sx: 977, sy: 698 }], t),
     words(t) { finaleWords(this, filmT(this, t)); } },
 ];
@@ -270,8 +250,6 @@ const VO = [
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
-  { id: 'VO-08r', beat: 'rain', in: 1.0, out: 4.6, ar: 'وحينَ يُنَزِّلُ اللهُ الغيثَ رحمةً على هذهِ الأرض،', en: 'And when God sends down the rain as a mercy upon this land,' },
-  { id: 'VO-08s', beat: 'rain', in: 5.0, out: 10.2, ar: 'يسهرُ المركزُ على سلامةِ الناس، بتنبُّؤاتِهِ وإنذاراتِهِ المبكِّرة.', en: "the Center keeps watch over people's safety with its forecasts and early warnings." },
   { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },

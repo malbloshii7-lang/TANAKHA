@@ -6,7 +6,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 - **Arabic first.** Every words block leads with Arabic (Noto Kufi Arabic; Amiri for quotations), with English
   second. Latin and number runs inside Arabic are isolated so they cannot reorder. The narrator's copy is fully
-  vowelled; on-screen Arabic is not, except where a vowel prevents a misreading («مُطِرْنا»).
+  vowelled; on-screen Arabic is not.
 - **The first editions' headlines.** The large words on each chapter are the Arabic headlines of the first two
   editions, in the nation's own "we": «عددنا أيام السنة بطلوع سهيل», «وأبحرنا مع رياح الموسم», «ونقرأ السماء لكل
   رحلة» and the rest (Revision 5 in `TREATMENT.md` lists them). Each is fitted to the words column.
@@ -23,14 +23,9 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     rings, no point symbols and no trajectories.
   - Abu Musa and the Greater and Lesser Tunb are drawn as UAE territory from neutral data. Musandam and Madha are
     left to Oman.
-  - Straight after the seeding, the Saadiyat Cultural District under natural rain: the Guggenheim Abu
-    Dhabi, the Zayed National Museum and the Louvre Abu Dhabi, each at its true bearing and angular size from a boat
-    offshore. The rain sought over the Hajar arrives as a blessing for the whole country. It eases, the morning sun
-    breaks through toward its computed place, and the words said after rain appear in the light: «مُطِرْنا بفضلِ
-    اللهِ ورحمتِه» (Sahih al-Bukhari 846, Sahih Muslim 71). The rain is given to God, not to seeding or a star. The
-    narration claims only NCM's forecasts and early warnings, never that NCM makes rain, and no aircraft appears in it.
-  - `?april2024` puts April 2024 back after the seven emirates, on the national map, drawn as a weather chart would
-    show it, and leaves the Saadiyat rain out. The two never share a cut, so seeding never sits beside the floods.
+  - The film runs 2:43.3. `?april2024` puts April 2024 back after the seven emirates, on the national map, drawn as a
+    weather chart would show it, and runs 3:00.0; the protocol office decides. The seeding stays six beats away from
+    the floods.
   - The seeding aircraft is NCM's type, a Beechcraft King Air C90, built in engraved 3D from its published
     dimensions. It works over UAE ground, burning hygroscopic flares in racks under its wings. It carries no livery.
   - The globe names Ethiopia among the UAE's rain-enhancement partners: the country only, with no year and no claim.
@@ -53,7 +48,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 after the seven emirates, instead of the Saadiyat rain after the seeding (the seeding and the science then run together) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 after the seven emirates (3:00.0) |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
