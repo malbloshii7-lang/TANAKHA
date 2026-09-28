@@ -10,8 +10,12 @@
 //   across, the crown 40 m and the rim about 18 m above the sea, over its low white galleries; the Abrahamic Family House
 //   (three equal cubes, no symbols) behind the Louvre's left side; the Natural History Museum and the Saadiyat end of the
 //   Sheikh Khalifa Bridge at the right edge.
-//   Still to match before the master: the Guggenheim's cone layout (DCT's photographs) and the four lower wings of the
-//   Zayed National Museum (Foster + Partners' elevations); only the 88 m and the 123 m are published.
+//   Checked 28 Sep 2026: ten cones as built, nine clad in stainless-steel mesh and one in onyx and glass (drawn here as
+//   the warm translucent one at the centre, where the 2013 design put its stone cone above the atrium), up to 88 m (DCT,
+//   28 Jul 2026); the museum's five wings 83-123 m above the sea datum, on a 30 m mound (DCT; Foster + Partners); the
+//   three museums' bearings and distances agree with their OSM outlines within 0.3 deg and 20 m.
+//   Still to match before the master: which cone and which wing stands where, left to right (no published text gives
+//   it; RIBAJ prints Foster + Partners' elevations of the wings, and DCT's July 2026 photographs show the cones).
 // The rain is natural and even across the whole district: no single shaft over one building, no lightning, no aircraft,
 // no dark columns, nothing orange (in March 2026 drones struck the naval base 1.4 km from the Louvre, and news footage
 // showed smoke beside the museum's wings). It stays light enough for the museums to read at 2-3 km, and eases at the end.
@@ -39,7 +43,7 @@ scene({
       const tx = bx + (by - top) * Math.tan(t), ty = top, rim = [];
       for (let j = 0; j <= 16; j++) { const u = Math.PI * j / 16; rim.push([tx + rw * Math.cos(u) * Math.cos(t), ty + rw * Math.sin(u) * 0.06 + rw * Math.cos(u) * Math.sin(t)]); }
       const body = [[bx - bw, by]].concat(rim.slice().reverse()).concat([[bx + bw, by]]);
-      return { body: new P(body, true), mouth: new P(rim), dark: i === 3 };
+      return { body: new P(body, true), mouth: new P(rim), onyx: i === 5 };
     });
     // the Zayed National Museum: five wings rising from behind the Saadiyat Grove blocks, each its own height and lean
     const dZ = 3160, cZ = svX(112.2), mZ = k(dZ);
@@ -108,7 +112,13 @@ scene({
     hatch(this.dome, [1380, 650, 1730, 700], 0.52, 3.0, bq, INK, 0.6, 0.24, 443);
     hatch(this.dome, [1380, 650, 1730, 700], -0.52, 3.0, bq, INK, 0.6, 0.2, 444); // the lattice of its eight layers, as texture
     stroke(this.domeArc, bq, INK, 1.4, 0.9); stroke(this.rim, bq, INK, 1.6, 0.9); stroke(this.platform, bq, INK, 0.9, 0.6);
-    this.gCones.forEach(c => { mask(c.body); hatch(c.body, [60, 540, 720, 720], c.dark ? 0.4 : 1.5, c.dark ? 2.4 : 3.8, bq, INK, 0.6, c.dark ? 0.36 : 0.2, 446); stroke(c.body, bq, INK, 1.0, 0.8); stroke(c.mouth, bq, INK, 1.1, 0.85); });
+    // nine cones clad in stainless-steel mesh (a fine cross-hatch), one in onyx and glass (a warm translucent wash)
+    this.gCones.forEach(c => {
+      mask(c.body);
+      if (c.onyx) { fill(c.body, OCHRE, 0.3 * bq); hatch(c.body, [60, 540, 720, 720], 1.5, 5.0, bq, SEPIA, 0.5, 0.18, 447); }
+      else { hatch(c.body, [60, 540, 720, 720], 1.5, 3.8, bq, INK, 0.6, 0.2, 446); hatch(c.body, [60, 540, 720, 720], 0.35, 4.6, bq, INK, 0.45, 0.12, 448); }
+      stroke(c.body, bq, INK, 1.0, 0.8); stroke(c.mouth, bq, INK, 1.1, 0.85);
+    });
     this.gBlocks.forEach(b => { mask(b); hatch(b, [60, 650, 700, 725], 0, 3.2, bq, SEPIA, 0.6, 0.22, 445); stroke(b, bq, INK, 0.8, 0.6); });
     this.nhm.forEach(n => { mask(n); stroke(n, bq, INK, 0.7, 0.35); });
     stroke(this.bridge, bq, INK, 1.0, 0.35);

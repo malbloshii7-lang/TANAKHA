@@ -1,9 +1,11 @@
 'use strict';
 // X · Al Istimtar — seeding the cloud over the Hajar in Ras Al Khaimah: the aircraft level under the cloud base, salt
 // plumes rising into it, droplets gathering, then rain on the foothills
-// The aircraft is NCM's seeding type, a Beechcraft King Air C90: 10.82 m long, 15.32 m span, 4.34 m high on its gear;
+// The aircraft is NCM's seeding type, a Beechcraft King Air C90 (four C90GTi, based across the country: NCM, 2024, and
+// UAEREP; the GTi has no factory winglets): 10.82 m long, 15.32 m span, 4.34 m high on its gear;
 // a low wing with 7 degrees of dihedral, two PT6A turboprops in nacelles ahead of it, a conventional tail, round cabin
-// windows. Hygroscopic flares burn in racks under each wing's trailing edge, outboard of the nacelles. It is built in
+// windows. Hygroscopic flares (24 a side, burning two to three minutes each) sit in racks under each wing's trailing
+// edge, outboard of the nacelles, where burn-in-place racks are usually mounted. It is built in
 // 3D and engraved as the film's other 3D work is (engrave3d.js), seen from the foothills about 15 degrees below it and
 // to its right, its nose turned 15 degrees toward us; no livery, number or marks.
 // the outline of a convex part on screen: the hull of its projected vertices (monotone chain)

@@ -225,12 +225,22 @@ the same day: it lost the film's density, and the requester preferred this cut.
   - cards: -13.7, -14.1 and -14.1 LUFS;
   - world: -14.3 LUFS.
 
-**Before the master:**
+**Checked on 28 September:**
 
-- match the Guggenheim's cone layout to DCT's photographs, and the Zayed National Museum's four lower wings to
-  Foster + Partners' elevations;
-- the Arabic editor reads VO-08r, VO-08s and the B09 words («قبل المطر», «المنطقة الثقافية في السعديات»);
-- NCM confirms the King Air type for its current seeding fleet.
+- The Guggenheim has ten cones as built: nine clad in stainless-steel mesh and one in onyx and glass, up to 88 m (DCT,
+  28 July 2026). The drawing now shows the onyx cone warm and translucent, the others as mesh.
+- The Zayed National Museum's five wings stand 83-123 m above the sea datum, on a 30 m mound (DCT; Foster +
+  Partners).
+- The three museums' bearings and distances agree with their OSM outlines within 0.3 degrees and 20 m.
+- NCM flies four Beechcraft King Air C90GTi for seeding (NCM, 2024; UAEREP), with hygroscopic flares on both wings.
+  The drawn type is right.
+- Ethiopia: "The NCM has worked with Mauritania, Pakistan and Ethiopia" (AGBI, 5 February 2025). No agreement, year or
+  scope is published, so the pin names the country only.
+- The Arabic of VO-08r, VO-08s and the beat's words was read against official usage and grammar and stands.
+
+**Before the master:** which cone and which wing stands where, left to right (no published text gives it; match
+Foster + Partners' elevations in RIBAJ and DCT's July 2026 photographs). NCM's own Arabic editor should still sign off
+the new lines.
 
 ## 1. Purpose and audience
 
