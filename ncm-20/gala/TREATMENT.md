@@ -410,6 +410,75 @@ narration and the score are unchanged: every cue, words block and narration line
 - Every changed beat was looked at in its own frames and at its cuts, ±0.1 s.
 - The line and hatch spacing keeps to the LED rules: at least 1 px and 2.5 px here, 2 px and 5 px on the 4K master.
 
+## Revision 8 · 29 September 2026: frame QA and colour-true masters
+
+At the requester's direction ("sharpen it"), the approved cut is checked frame by frame and its masters are rendered
+again. The cut, the words, the narration and the score are unchanged: every beat's start and length, every words
+block, every narration line and every cue is identical to Revision 7's.
+
+**How it was checked.**
+- Five reviewers looked at every cut ±0.1 s, every dissolve's midpoint and every beat's last frame against A.3 and the
+  known-mistakes log.
+- A second reviewer re-rendered each finding at 4K and tried to refute it. 20 of the 37 findings held, and all 20 are
+  fixed.
+- Frames outside the fixed moments are pixel-identical to Revision 7's (60 of 109 frames, sampled every 1.5 s).
+
+**What changed on screen.**
+- **Readings.**
+  - The radar masts on the port and the tanker are A-frames. A post with a crossbar read as a Latin cross.
+  - The runway's edge lights burn steady, and the red chase is gone (§9.5).
+- **Words over line-work.**
+  - The world headline, the science programme's label and Abu Dhabi's name each sit on a paper patch cut to their
+    measured ink, so no line runs through a letter.
+  - ETHIOPIA keeps one side of its pin instead of jumping across it mid-shot.
+  - SEA OF OMAN sits off the Omani coast.
+  - The Hajar label clears the peak.
+  - The nation headline's English clears the final ي.
+- **Plates entering on blank paper.**
+  - The Centre, the nation map and the falaj each start later in their own time, with their cameras moved to match,
+    so they arrive drawn. Every frame after each dissolve is as before.
+  - The HQ star grows inside the iris.
+  - The world globe and the gauge's rim are drawn through their irises, so the "limb to rim" match reads.
+- **Paper and physics.**
+  - The pearling boat and the falaj cuts fade with their shapes. Before, they punched holes in the sea and ground lines.
+  - The monsoon's rudder and sternpost reach the keel's depth.
+  - The King Air flies in and out along one straight line. Before, it appeared and vanished mid-frame.
+  - The rail skyline covers the whole pan, bearings 70° to 165°. It is recomputed from the terrain by
+    `data/build/rak_skyline.py`, which reproduces the stored 70° to 114.8° exactly.
+- **The holds.**
+  - Loops A and B start from the finale's last phase and keep the SUHAIL label. The cut from the film into loop A now
+    changes less than one frame step inside the film does (a mean of 0.013 against 0.019 grey levels).
+  - The film at the split is identical to loop W's first frame.
+
+**Colour.**
+- Revision 7's masters were encoded with the BT.601 matrix and carried no colour tags. Media servers and UHD players
+  decode untagged UHD as BT.709, so the parchment played warm (red +1.9, blue −0.7 levels).
+- Every frame had also passed through JPEG.
+- Frames are now captured losslessly and encoded BT.709, limited range, with the primaries, transfer and matrix
+  tagged. On the parchment the mean cast is now about 0, and the error is 1.32 levels (it was 2.06).
+
+**New deliverables.** `masters.sh` builds every master, then `qc/deliver.sh` builds these:
+- SMPTE LTC at 25 fps for part 1, part 1 without the tanker, and part 2 (§10 A.2). Each is read back against the cue
+  sheet.
+- WebVTT of every subtitle file, and EBU-STL of the English, with a reading-speed report.
+- The show caller's 1080p50 reference (§10 A.3), with timecode, the cue and its note, and STANDBY then GO for every cue.
+- `QC.md`, `qc-report.json` and `QC.html`, covering:
+  - frame counts, colour tags and keyframes;
+  - loudness and true peak;
+  - the loop seams and the cuts;
+  - a photosensitivity pre-check on the ITU-R BT.1702 model;
+  - checksums.
+  The pre-check is not the certified test that §9.6 asks for.
+
+**Recorded, not changed.**
+- The §5 pin row now matches the build, which played in Revision 7. It reads GENEVA (the words name the WMO),
+  TURKISTAN REGION, KAZAKHSTAN · 2026 and ETHIOPIA (Revision 4). The build is the approved wording.
+- Reading speed (row 39) on the side screens. Each card's subtitle holds 10.4 s.
+  - H.H. Sheikh Mansour's card in English is 378 characters with its full attribution: 36 a second, 11 rows at 42
+    characters. The quote alone reads at 14 a second.
+  - The English narration peaks at 22 characters a second (VO cue 17).
+  - `qc/subs.py` reports this only. Nothing is re-timed or re-worded.
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*
@@ -893,7 +962,7 @@ Level A echoes the voice; Level B is a label; "Card" marks leadership text. Ever
 | 113.4–116.3 | B | 17 مشروعاً بحثياً في ست دورات · 2016–2026 | 17 RESEARCH PROJECTS IN SIX CYCLES · 2016–2026 | src-40, src-54 |
 | 117.3–124.4 | Card | عن برنامج الإمارات لبحوث علوم الاستمطار · «اليوم، أصبح البرنامج منصة عالمية تجمع العقول، وتنتج حلولاً نوعية تعزز الأمن المائي، وتمهّد لمستقبل أكثر استدامة» · سمو الشيخ منصور بن زايد آل نهيان · نائب رئيس الدولة، نائب رئيس مجلس الوزراء، رئيس ديوان الرئاسة · مايو 2026 | ON THE UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · "Today, the programme has become a global platform that brings minds together and produces distinctive solutions that strengthen water security and pave the way for a more sustainable future." · HIS HIGHNESS SHEIKH MANSOUR BIN ZAYED AL NAHYAN · VICE PRESIDENT, DEPUTY PRIME MINISTER AND CHAIRMAN OF THE PRESIDENTIAL COURT · MAY 2026 · TRANSLATED FROM THE ARABIC | src-59 |
 | 127.2–130.4 | A (big) | من سماء الإمارات إلى العالم | FROM THE SKIES OF THE EMIRATES TO THE WORLD | VO-14a |
-| 127.8–136.3 | B (pins) | جنيف · تركستان، كازاخستان · 2026 · المغرب · 2025 · لاهور، باكستان · 2023 | GENEVA · WMO · TURKISTAN, KAZAKHSTAN · 2026 · MOROCCO · 2025 · LAHORE, PAKISTAN · 2023 | src-62, src-63, src-64 |
+| 127.8–136.3 | B (pins) | جنيف · إقليم تركستان، كازاخستان · 2026 · المغرب · 2025 · لاهور، باكستان · 2023 · إثيوبيا | GENEVA · TURKISTAN REGION, KAZAKHSTAN · 2026 · MOROCCO · 2025 · LAHORE, PAKISTAN · 2023 · ETHIOPIA | src-62, src-63, src-64 |
 | 130.8–136.3 | B | رئاسة المنظمة العالمية للأرصاد الجوية · 2023–2027 | PRESIDENCY OF THE WORLD METEOROLOGICAL ORGANIZATION · 2023–2027 | src-43 |
 | 134.8–136.3 | B | معالي الدكتور عبدالله أحمد المندوس | HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS | src-43; decree, 15 Apr 2026 |
 | 137.0–146.6 | B (gauge) | 2007 · 2012 · 2017 · 2022 · 2027 | 2007 · 2012 · 2017 · 2022 · 2027 | src-20 |

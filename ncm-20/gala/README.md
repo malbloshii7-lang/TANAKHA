@@ -55,7 +55,9 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
 | `data/` | The star catalogue, the UAE map (`build/` has its build scripts, a check image and `rak_skyline.py` for the seeding skyline), the verified quotes |
 | `fonts/` | The typefaces, self-hosted, with their SIL Open Font Licences. A render stops if any face fails to load |
-| `render.js` | Renders stills, the film (in parallel chunks; 4K, 50 fps and the LED grade are options) and the cue list with every words block |
+| `render.js` | Renders stills, the film (in parallel chunks; 4K, 50 fps and the LED grade are options) and the cue list with every words block. Frames are captured losslessly (`--capture png`, the default at `--scale 2`) and encoded BT.709, limited range, tagged |
+| `masters.sh` | Builds every 4K 50p LED master: parts 1 and 2, the no-tanker part 1, the five loops, the safety slate, the restrained versions |
+| `qc/` | The show deliverables and the checks, run by `qc/deliver.sh`: LTC (`ltc.py`), WebVTT and EBU-STL (`subs.py`), the show caller's reference (`caller_ref.py`), `masters_qc.py` → `QC.md` and `qc-report.json` (with `pse.py`, a BT.1702-model photosensitivity pre-check, and `mp4info.py`), and `dossier.py` → `QC.html` |
 | `audio.py`, `score.py` | The synthesized temp score, placed from the timeline: stems (music, Emirati percussion, sfx), the mixes (with a restrained mix without percussion), the stage loop and the applause bed. The build fails if any leader's card measures quieter than the world beat |
 | `subtitles.py` | On-screen text and narration as Arabic and English SRT files |
 | `cuesheet.py` | The show-control cue sheet (cue to cue, with SMPTE timecode) |
@@ -75,6 +77,14 @@ python3 script.py out/cues.json SCRIPT.md             # the as-built script for 
 
 FILM_QUERY='vo&tc' node render.js film out/review-vo.mp4 out/mix.wav --jobs 3   # review copy: scratch narration, timecode
 node render.js film out/review.mp4 out/mix.wav --jobs 3                         # clean 1080p 30 fps
+
+# every master in one go (about 2.7 hours at --jobs 3), then the show deliverables, the QC report and its page
+sh masters.sh out/audio out/masters                   # gathers the WAVs from out/ and out/pull/ if out/audio has none
+sh qc/deliver.sh out/masters out                      # out/ holds cuesheet.csv and the four SRT files
+python3 qc/dossier.py out/masters out/masters/QC.html --source "$(git rev-parse --short HEAD)" --rendered "$(date +'%-d %B %Y')"
+
+# the same, step by step. Every film is encoded BT.709, limited range, and tagged so: an untagged UHD file is decoded
+# as BT.709 by media servers, and a BT.601 one then plays warm
 # the event master, cue to cue: part 1 ends where the dissolve into the gauge begins ("split", read from the cut)
 node render.js film out/part1-4k50.mp4 out/part1.wav --to split --scale 2 --fps 50 --grade led --jobs 3
 node render.js film out/part2-4k50.mp4 out/part2.wav --from split --afrom 0 --scale 2 --fps 50 --grade led --jobs 3
@@ -87,6 +97,7 @@ node render.js film out/part2-4k50.mp4 out/part2.wav --from split --afrom 0 --sc
 loop() { # name, hold, audio, frames
   FILM_QUERY=hold=$2 node render.js film out/lossless-$1.mp4 out/$3 --scale 2 --fps 50 --grade led --jobs 3 --crf 0 --preset ultrafast --profile high444
   $FFMPEG -i out/lossless-$1.mp4 -map 0:v -map 0:a -c:v libx264 -preset slow -crf 2 -profile:v high -pix_fmt yuv420p \
+    -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
     -x264-params keyint=$4:min-keyint=$4:scenecut=0 -c:a copy -movflags +faststart out/$1-4k50.mp4
 }
 loop hold-world W hold-world.wav 600   # its light stands where the film leaves it at the split, so the cuts in and out match
@@ -105,8 +116,8 @@ FILM_QUERY=pull=tanker node render.js film out/part1-pull-4k50.mp4 out/pull/part
 FILM_QUERY='hold=W&pull=tanker' node render.js film out/lossless-hold-world-pull.mp4 out/pull/hold-world.wav --scale 2 --fps 50 --grade led --jobs 3 --crf 0 --preset ultrafast --profile high444
 ```
 
-The rendered 4K 50p LED masters of Revision 7 (with the loops, the fallback, the restrained versions, the WAVs, the cue
-sheet, checksums and rejoin scripts) are on the branch `claude/focused-mayer-jogort-masters`; its README gives the
+The rendered 4K 50p LED masters of Revision 8 (with the loops, the fallback, the restrained versions, the WAVs, the cue
+sheet, LTC, subtitles, the show caller's reference, the QC report, checksums and rejoin scripts) are on the branch `claude/focused-mayer-jogort-masters`; its README gives the
 running order. Delete that branch once they are downloaded: this branch renders them again.
 
 The media server crossfades audio for 0.5 s at each cut to a loop. The temp score is synthesized. The brief in
