@@ -70,10 +70,12 @@ scene({
     const nq = easeOut(prog(t, 2.6, 1.0));
     smallAr('الخليج العربي', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1], nq, { size: 26, align: 'center', a: 0.45, font: F_NASKH, weight: 400 });
     small('ARABIAN GULF', pr([53.1, 25.35])[0], pr([53.1, 25.35])[1] + 26, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
-    smallAr('بحر عُمان', pr([56.95, 24.45])[0], pr([56.95, 24.45])[1], nq, { size: 22, align: 'center', a: 0.4, font: F_NASKH, weight: 400 });
-    small('SEA OF OMAN', pr([56.95, 24.45])[0], pr([56.95, 24.45])[1] + 22, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
+    // in open water, clear of the Batinah coast and the Fujairah label
+    smallAr('بحر عُمان', pr([57.15, 24.6])[0], pr([57.15, 24.6])[1], nq, { size: 22, align: 'center', a: 0.4, font: F_NASKH, weight: 400 });
+    small('SEA OF OMAN', pr([57.15, 24.6])[0], pr([57.15, 24.6])[1] + 22, nq, { size: 12, ls: 5, align: 'center', a: 0.4 });
     // the Center's headquarters: a small gold star
-    const hq = easeOut(prog(t, 3.0, 0.8)), [hx, hy] = this.hq.xy;
+    // the star grows inside the opening iris, at the scope's point (the nation entry's offset is 1.6)
+    const hq = easeOut(prog(t, 0.8, 0.8)), [hx, hy] = this.hq.xy;
     // the seven emirates, washed in gold together and named in constitutional order
     const wq = easeInOut(prog(t, this.washT, 1.6));
     if (wq > 0) this.land.forEach(e => e.polys.forEach(p => fill(p, GOLD, 0.2 * wq)));

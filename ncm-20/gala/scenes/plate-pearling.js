@@ -88,14 +88,15 @@ scene({
     ctx.save(); const local = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 100, 900, 712); ctx.clip(); ctx.setTransform(local);
     const cq = easeOut(prog(lt, 3.2, 0.6)); // the nakhoda aft, the haulers at the rail; the bulwark hides their legs
     if (cq > 0) this.bCrew.forEach(([x, y]) => { disc(x, y - 22, 3.6 * cq, INK, 0.85); stroke(new P([[x - 4.5, y - 15], [x, y - 17.5], [x + 4.5, y - 15]]), cq, INK, 2.2, 0.85); stroke(new P([[x, y - 17], [x, y - 6]]), cq, INK, 2.8, 0.85); });
-    mask(this.boat); hatch(this.boat, [-130, -60, 135, 20], 0.3, 6, bp, INK, 1, 0.4, 146); stroke(this.boat, bp, INK, 2);
+    // the hull's paper comes in with its outline, so the sea line is never cut before the boat is there
+    mask(this.boat, bp); hatch(this.boat, [-130, -60, 135, 20], 0.3, 6, bp, INK, 1, 0.4, 146); stroke(this.boat, bp, INK, 2);
     this.bSeams.forEach((q, k) => stroke(q, prog(lt, 2.0 + k * 0.2, 0.9), INK, 0.9, 0.6));
     stroke(this.bRail, bp, INK, 1.3, 0.8); stroke(this.stemHead, bp, INK, 2.2);
     this.poop.forEach(q => stroke(q, prog(lt, 2.4, 0.6), INK, 1.2, 0.8));
     ctx.restore();
     // below the waterline the sea is drawn in section, so the submerged hull (~1.2 m draft) shows through the water, paler
     ctx.save(); const local2 = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 812, 900, 60); ctx.clip(); ctx.setTransform(local2);
-    mask(this.boat); fill(this.boat, BLUE, 0.1 * bp); stroke(this.boat, bp, INK, 1.4, 0.45);
+    mask(this.boat, bp); fill(this.boat, BLUE, 0.1 * bp); stroke(this.boat, bp, INK, 1.4, 0.45);
     ctx.restore();
     stroke(this.boatMast, prog(lt, 2.4, 0.7), INK, 2.2); stroke(this.mizzen, prog(lt, 2.5, 0.6), INK, 1.8);
     const aq = easeOut(prog(lt, 2.8, 0.7)); // the sail spread as an awning

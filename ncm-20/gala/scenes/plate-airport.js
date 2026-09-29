@@ -63,11 +63,10 @@ scene({
     this.edges.forEach((e, i) => stroke(e, easeOut(prog(lt, 0.3 + i * 0.1, 1.1)), INK, 2.2));
     this.dashes.forEach((d, i) => stroke(d.p, prog(lt, 0.6 + i * 0.045, 0.25), INK, 3.4 / (1 + K * d.z) + 0.5, 0.85));
     this.keys.forEach((k, i) => fill(k, INK, 0.78 * easeOut(prog(lt, 1.0 + (i % 6) * 0.05, 0.4))));
-    // edge lights, with a strobe racing toward the far end
-    const race = (lt * 1.8) % 1;
+    // edge lights, steady as runway edge lights burn (no red, no chase: TREATMENT §9.5 has no red flashing)
     this.lights.forEach(l => {
-      const on = easeOut(prog(lt, 1.1 + l.z * 0.035, 0.3)), hot = Math.abs(race - l.z / 24) < 0.035;
-      disc(l.x, l.y, l.r * on * (hot ? 1.5 : 1), hot ? RED : OCHRE, 0.95);
+      const on = easeOut(prog(lt, 1.1 + l.z * 0.035, 0.3));
+      disc(l.x, l.y, l.r * on, OCHRE, 0.95);
     });
     // Terminal A and the crescent tower, true size, on the horizon
     const tq = easeOut(prog(lt, 0.6, 1.4));

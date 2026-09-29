@@ -35,7 +35,8 @@ scene({
     this.accom = new P([[1098, 730], [1098, 632], [1168, 632], [1168, 730]], true);
     this.decks = []; for (let y = 642; y < 730; y += 11) this.decks.push(ln(1101, y, 1165, y, 547 + y, 0.1));
     this.bridge = new P([[1092, 632], [1092, 614], [1176, 614], [1176, 632]], true);
-    this.mast = [ln(1134, 614, 1134, 590, 590, 0), ln(1122, 596, 1146, 596, 591, 0)];
+    // an A-frame radar mast with the scanner bar at its apex (a post with a crossbar read as a Latin cross)
+    this.mast = [ln(1128, 614, 1134, 592, 590, 0), ln(1140, 614, 1134, 592, 591, 0), ln(1126, 590, 1148, 590, 592, 0)];
     this.funnel = new P([[1076, 730], [1076, 646], [1094, 640], [1096, 730]], true);
     const r = rng(47), cols = [RED, BLUE, OCHRE, SEPIA, BLUE, RED, INK, '#7A8C6A'];
     this.bays = [];

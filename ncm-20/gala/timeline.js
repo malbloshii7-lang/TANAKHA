@@ -99,8 +99,10 @@ const TIMELINE = [
       levelA(f, 23.9, 28.0, ['وعرفنا الرياح', 'بأسمائها'], 'WE KNEW EVERY WIND BY NAME', { y: 520, maxW: COLW });
     } },
   // B05 · The aflaj, and Sheikh Zayed
-  { id: 'falaj', start: at(8.5), dur: at(2.5), speed: SP.falaj, offset: 0.5, xf: 0.8,
-    cam: t => camPath([{ t: 0, s: 1.04, px: 1300, py: 640, sx: 560, sy: 560 }, { t: 0.5 + at(2.5) * SP.falaj, s: 1.10, px: 1560, py: 660, sx: 560, sy: 560 }], t),
+  // offset 1.8 (was 0.5): the horizon and ground are inked through the dissolve; both camera keys moved by +1.3, so the
+  // camera is unchanged in film time (the plate's last event starts at scene 7.4, so nothing new comes in)
+  { id: 'falaj', start: at(8.5), dur: at(2.5), speed: SP.falaj, offset: 1.8, xf: 0.8,
+    cam: t => camPath([{ t: 1.3, s: 1.04, px: 1300, py: 640, sx: 560, sy: 560 }, { t: 1.8 + at(2.5) * SP.falaj, s: 1.10, px: 1560, py: 660, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t);
       levelB(f, 29.4, 35.5, ['هيلي، العين · العصر الحديدي', 'قائمة التراث العالمي لليونسكو، ' + ltr('2011')], ['HILI, AL AIN · IRON AGE', 'UNESCO WORLD HERITAGE LIST, 2011'], { y: 330 });
@@ -109,19 +111,23 @@ const TIMELINE = [
   // B06 · Card: the Founding Father (no VO)
   { id: 'quote-zayed', use: 'quote', quote: 'zayed', start: at(11), dur: at(3.5), xf: 1.2 },
   // B07 · 2007: one national center
-  { id: 'centre', start: at(14.5), dur: at(2.5), speed: SP.centre, xf: 1.6, enter: { type: 'iris', x: 555, y: 675 }, cam: PLATE_LEFT(1.0, 1.12, at(2.5) * SP.centre),
+  // offset 2.0: the iris opens onto the scope's rings, not blank paper (the plate is whole by scene 3.5; after that only the
+  // sweep turns, so the offset brings in nothing new); the camera is shifted by the same amount, so it is unchanged in film time
+  { id: 'centre', start: at(14.5), dur: at(2.5), speed: SP.centre, offset: 2.0, xf: 1.6, enter: { type: 'iris', x: 555, y: 675 }, cam: t => PLATE_LEFT(1.0, 1.12, at(2.5) * SP.centre)(t - 2.0),
     words(t) {
       const f = filmT(this, t), s = this.start;
       levelB(f, s + 0.9, s + 7.9, 'المرسوم بقانون اتحادي رقم ' + ltr('(6)') + ' لسنة ' + ltr('2007'), 'FEDERAL DECREE-LAW NO. 6 OF 2007', { y: 330 });
       levelA(f, s + 1.6, s + 7.9, ['ثم أسسنا مركزاً', 'يرصد السماء'], ['THEN WE BUILT A CENTER', 'TO READ THE SKY'], { y: 540, maxW: COLW });
     } },
   // B08 · Seven emirates, one official source
-  { id: 'nation', start: at(17), dur: at(3.5), xf: 1.6, enter: { type: 'iris', x: 554, y: 689 },
-    cam(t) { const [hx, hy] = this.hq.xy; return camPath([{ t: 0, s: 2.2, px: hx, py: hy, sx: 554.4, sy: 688.8 }, { t: 3.67, s: 1.0, px: 960, py: 540, sx: 960, sy: 540 }, { t: at(3.5), s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }], t); },
+  // offset 1.6: the iris opens onto the map part-drawn, the HQ star at the scope's point; the camera and the gold wash
+  // (washT, which score.py's cue follows) keep their film times
+  { id: 'nation', start: at(17), dur: at(3.5), offset: 1.6, washT: 8.3 + 1.6, xf: 1.6, enter: { type: 'iris', x: 554, y: 689 },
+    cam(t) { const [hx, hy] = this.hq.xy; return camPath([{ t: 0, s: 2.2, px: hx, py: hy, sx: 554.4, sy: 688.8 }, { t: 3.67, s: 1.0, px: 960, py: 540, sx: 960, sy: 540 }, { t: at(3.5), s: 1.02, px: 960, py: 540, sx: 960, sy: 540 }], t - 1.6); },
     words(t) {
       const f = filmT(this, t), s = this.start;
       // set in the open paper above the Fujairah label and the Sea of Oman (at y 520 it ran into both)
-      levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 300, arSize: 64, enSize: 20 });
+      levelA(f, s + 6.467, s + 11.267, 'المرجع الرسمي للطقس', 'THE OFFICIAL SOURCE OF WEATHER INFORMATION', { y: 300, arSize: 64, enSize: 20, enGap: 10 }); // the final ي of «الرسمي» reaches the English otherwise
     } },
   // B09 · April 2024 on the national map, only with ?april2024 (the protocol office decides)
   ...(APRIL2024 ? [APRIL2024_BEAT] : []),
@@ -167,7 +173,7 @@ const TIMELINE = [
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
       const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17 });
+      levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17, patch: true }); // on paper: the pull-out sweeps FIG. II's rules and droplets under it
       levelA(f, s + 1.2, s + 6.2, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
     } },
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
@@ -207,7 +213,8 @@ const STARTS = Object.fromEntries(TIMELINE.map(e => [e.id, e.start])), START = i
 function worldWords(f, out = START('world') + 12.1) {
   const s = START('world');
   // set below the pins (their labels reach x ~1350 at y 400-560 while the camera pushes toward Geneva)
-  levelA(f, s + 2.2, s + 7.9, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32 });
+  // on paper: the camera's push toward Geneva carries the limb, the night hatching and the ring under these lines
+  levelA(f, s + 2.2, s + 7.9, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32, patch: true });
   levelB(f, s + 8.0, out, 'رئاسة المنظمة العالمية للأرصاد الجوية · ' + ltr('2023–2027'), ['PRESIDENCY OF THE WORLD METEOROLOGICAL', 'ORGANIZATION · 2023–2027'], { y: 640, arSize: 28, enSize: 17 });
   levelB(f, s + 9.6, out, 'معالي الدكتور عبدالله أحمد المندوس', 'HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS', { y: 790, arSize: 28, enSize: 16 });
 }
@@ -215,7 +222,8 @@ function worldWords(f, out = START('world') + 12.1) {
 // the title and the lockup over the night (also the stage hold's frame)
 function finaleWords(s, f, { title = true, lockup = true, dedication = false } = {}) {
   const hold = !!s.hold, b = START('finale');
-  if (s.suhailXY && !hold) { const c = s.cam(f - s.start), x = c.sx + (s.suhailXY[0] - c.px) * c.s, y = c.sy + (s.suhailXY[1] - c.py) * c.s; levelB(f, b + 2.867, 1e9, 'سهيل', 'SUHAIL', { x: x + 70, y: y + 8, align: 'left', arSize: 30, enSize: 15 }); }
+  // the star's name stays in the holds too: the film ends with it up, so a cut to loop A or B must not drop it
+  if (s.suhailXY) { const c = s.cam(f - s.start), x = c.sx + (s.suhailXY[0] - c.px) * c.s, y = c.sy + (s.suhailXY[1] - c.py) * c.s; levelB(hold ? 9 : f, hold ? 0 : b + 2.867, 1e9, 'سهيل', 'SUHAIL', { x: x + 70, y: y + 8, align: 'left', arSize: 30, enSize: 15 }); }
   if (TEXT_REC && !hold) { recText('title', b + 5, b + 10, ['عشرون عاماً في قراءة السماء'], ['TWENTY YEARS OF READING THE SKY']); recText('lockup', b + 6.667, b + 10, ['المركز الوطني للأرصاد', ltr('2007–2027')], ['NATIONAL CENTER OF METEOROLOGY', '2007–2027']); }
   if (title) { arLine('عشرون عاماً في قراءة السماء', 960, 240, hold ? -9 : b + 5, hold ? 9 : f, { size: 88, align: 'center', dur: 1.6 }); enLine('TWENTY YEARS OF READING THE SKY', 960, 312, hold ? -9 : b + 5.667, hold ? 9 : f, { size: 32, align: 'center', ls: 5 }); }
   if (dedication) { levelB(9, 0, 1e9, ['إلى المتنبئين الجويين والراصدين وعلماء الزلازل، والطيارين والمهندسين والعلماء،', 'وكل العاملين في المركز الوطني للأرصاد'], ['TO THE FORECASTERS, OBSERVERS, SEISMOLOGISTS, PILOTS, ENGINEERS AND SCIENTISTS,', 'AND EVERYONE WHO SERVES AT THE NATIONAL CENTER OF METEOROLOGY'], { x: 960, y: 200, align: 'center', arSize: 40, enSize: 18, gap: 36 }); }
@@ -283,10 +291,12 @@ const voSubAr = v => v.sub || v.ar.replace(/[\u064C-\u0650\u0652]/g, '').replace
     // the split (part 1 cuts to loop W there, and loop W to part 2): loop W holds the light where the film has it at that
     // moment, so both cuts match frame for frame (with ?pull=tanker the split, and so loop W's light, comes 5 s earlier)
     const g = TIMELINE.find(e => e.id === 'gauge'), split = g ? g.start - (g.xf ?? XF) / 2 : 0;
+    // the finale's scene clock when the film ends: holds A and B start from that phase, so each is the film's next frame
+    const fin = TIMELINE.find(e => e.id === 'finale'), finaleEnd = fin ? fin.dur * (fin.speed || 1) : 0;
     TIMELINE.length = 0; RING.length = 0;
     if (v === 'W') TIMELINE.push({ id: 'hold-world', use: 'world', start: 0, dur: 12, loop: 12, lightT: split, speed: 1e-9, offset: at(3.5), cam: WORLD_CAM,
       words() { worldWords(START('world') + 11.5, Infinity); } });
-    else TIMELINE.push({ id: 'hold', use: 'finale', start: 0, dur: 20, hold: true, loop: 20, dim: v === 'C' ? 0.7 : 0,
+    else TIMELINE.push({ id: 'hold', use: 'finale', start: 0, dur: 20, hold: true, loop: 20, endT: finaleEnd, dim: v === 'C' ? 0.7 : 0,
       cam: () => ({ s: 1.04, px: 977, py: 698, sx: 977, sy: 698 }),
       words() { if (v !== 'C') finaleWords(this, 0, { title: v === 'A', lockup: true, dedication: v === 'B' }); } });
     FADE_IN = 0; FADE_OUT = 0;

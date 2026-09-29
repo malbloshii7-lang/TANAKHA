@@ -117,7 +117,10 @@ scene({
     KING_AIR.view();
     this.racks = KING_AIR.parts.filter(p => p.burn).map(p => { const [x, y] = E3.proj(p.burn); return [x - W / 2, y - H / 2]; });
   },
-  planeX(lt) { return lerp(930, 1910, prog(lt, 1.4, 6.2)); },
+  // one straight, steady line of flight (980 plate px in 6.2 s from lt 1.4), continued before and after: under the gala
+  // camera plate x 930 is already on screen and 1905 is mid-frame, so the aircraft flies in from off the left edge and
+  // keeps flying until the iris into the science covers it (the v3 plate's frame ran only from 930 to 1905)
+  planeX(lt) { return 930 + (lt - 1.4) * (980 / 6.2); },
   draw(lt) {
     // ground
     mask(this.groundFill); hatch(this.groundFill, [985, 780, 1885, 1012], -1.2, 8, prog(lt, 1.0, 1.6), SEPIA, 0.9, 0.3, 273);
@@ -169,7 +172,7 @@ scene({
     });
     // the aircraft: its parts far to near, each engraved by the light; the propellers as the discs a camera sees
     const px = this.planeX(lt);
-    if (lt > 1.3 && px < 1905) {
+    if (px > 500 && px < 3100) {
       ctx.save(); ctx.translate(px - W / 2, 590 + 3 * Math.sin(lt * 2) - H / 2);
       KING_AIR.view();
       const depth = p => E3.depth(E3.centroid(p.f.map(E3.centroid)));

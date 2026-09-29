@@ -15,7 +15,7 @@ scene({
       { ll: [33.57, -7.59], label: 'MOROCCO · 2025', ar: 'المغرب · ' + ltr('2025'), t: 4.2 },
       { ll: [31.55, 74.34], label: 'LAHORE, PAKISTAN · 2023', ar: 'لاهور، باكستان · ' + ltr('2023'), t: 4.8 },
       // Ethiopia (Revision 4): the country named at its capital, with no year and no claim (no drought claim)
-      { ll: [9.03, 38.74], label: 'ETHIOPIA', ar: 'إثيوبيا', t: 5.4 },
+      { ll: [9.03, 38.74], label: 'ETHIOPIA', ar: 'إثيوبيا', t: 5.4, side: 'right' },
     ];
     this.outline = el(this.cx, this.cy, this.R, this.R, 0, TAU, 360, 0.5);
     this.ring = el(this.cx, this.cy, 452, 118, 0, TAU, 361, 0.6, -0.22);
@@ -58,7 +58,8 @@ scene({
   draw(lt) {
     const { cx, cy, R } = this, lat0 = 24, lon0 = 46.5 - lt * 1.1; // west to east: the centre longitude falls (38.25 at the 7.5 s close-up)
     const P2 = (lat, lon, lift = 1) => { const [x, y, v] = ortho(lat, lon, lat0, lon0, R * lift); return [cx + x, cy - y, v]; };
-    const op = easeInOut(prog(lt, 0.3, 1.4));
+    // the outline and the graticule start before the cut, so the iris opens onto the globe rather than blank paper
+    const op = easeInOut(prog(lt, -1.1, 1.4));
     const rp = easeInOut(prog(lt, 1.0, 2.0)), sf = (lt * 0.045) % 1;
     const sat = () => { const [sx, sy] = this.ring.at(sf); disc(sx, sy, 5, INK, 0.9); disc(sx, sy, 2.5, OCHRE, 1); };
     stroke(this.ringBack, clamp(rp * 2 - 1), SEPIA, 1.2, 0.65);
@@ -66,7 +67,7 @@ scene({
     mask(new P(this.outline.pts, true));
     stroke(this.outline, op, INK, 2.2);
     // graticule every 15°
-    const gp = easeOut(prog(lt, 0.9, 1.6));
+    const gp = easeOut(prog(lt, -0.5, 1.6));
     if (gp > 0) {
       ctx.save(); ctx.globalAlpha = SA * 0.45 * gp; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 0.9; ctx.beginPath();
       const run = pts => { let on = false; pts.forEach(([x, y, v]) => { if (v > 0.02) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; }); };
@@ -89,18 +90,24 @@ scene({
     const [hx, hy] = P2(...this.home);
     const hp = easeOut(prog(lt, 2.0, 0.6));
     ornament(hx, hy, 11 * hp, 1);
-    smallAr('أبوظبي', hx - 18, hy + 36, hp, { size: 30, align: 'right', weight: 700, a: 0.9 });
-    small('ABU DHABI', hx - 18, hy + 66, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });
     // partners are pins, not trajectories: one quiet, dotted thread runs only to Geneva, the seat of the WMO
     const a = toVec(...this.home);
     // paper patches under every pin label first, so the limb, the night hatching and the ring never run through a name
+    // Abu Dhabi's label gets its patch too (it was the only label without one), and is drawn over the pin patches below
+    if (hp > 0) {
+      const w = Math.max(textWidth('أبوظبي', `700 30px ${F_KUFI}`, 0, 'rtl'), textWidth('ABU DHABI', `600 14px ${F_MONO}`, 2)) + 12;
+      ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * hp; ctx.fillStyle = PAPER_PAT;
+      ctx.fillRect(hx - 18 - w + 6, hy + 8, w, 66); ctx.restore();
+    }
     this.places.forEach(pl => {
       const [ex, ey, vis] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t, 0.8));
       if (vis <= 0.02 || lq <= 0) return;
-      const lx = ex > cx ? ex + 14 : ex - 14, w = Math.max(textWidth(pl.ar, `700 28px ${F_KUFI}`, 0, 'rtl'), textWidth(pl.label, `600 14px ${F_MONO}`, 2) + 2 * pl.label.length) + 8;
+      const right = pl.side ? pl.side === 'right' : ex > cx, lx = right ? ex + 14 : ex - 14, w = Math.max(textWidth(pl.ar, `700 28px ${F_KUFI}`, 0, 'rtl'), textWidth(pl.label, `600 14px ${F_MONO}`, 2) + 2 * pl.label.length) + 8;
       ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * lq; ctx.fillStyle = PAPER_PAT;
-      ctx.fillRect(ex > cx ? lx - 4 : lx - w + 4, ey - 24, w, 64); ctx.restore();
+      ctx.fillRect(right ? lx - 4 : lx - w + 4, ey - 24, w, 64); ctx.restore();
     });
+    smallAr('أبوظبي', hx - 18, hy + 36, hp, { size: 30, align: 'right', weight: 700, a: 0.9 });
+    small('ABU DHABI', hx - 18, hy + 66, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });
     this.places.forEach((pl, k) => {
       const [ex, ey, vis] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t, 0.8));
       if (vis <= 0.02 || lq <= 0) return;
@@ -114,7 +121,7 @@ scene({
         stroke(new P(pts), 1, BLUE, 1.4, 0.7 * easeInOut(prog(lt, pl.t - 0.6, 1.6)), [3, 5]); // on the surface, faded in whole
       }
       stroke(el(ex, ey, 7 * lq, 7 * lq, 0, TAU, 380 + k, 0), 1, INK, 1.2, 0.8); disc(ex, ey, 3 * lq, k ? INK : BLUE, 0.9);
-      const lx = ex > cx ? ex + 14 : ex - 14, al = ex > cx ? 'left' : 'right';
+      const right = pl.side ? pl.side === 'right' : ex > cx, lx = right ? ex + 14 : ex - 14, al = right ? 'left' : 'right';
       smallAr(pl.ar, lx, ey + 8, lq, { size: 28, align: al, weight: 700, a: 0.88 });
       if (pl.ar2) smallAr(pl.ar2, lx, ey + 36, lq, { size: 19, align: al, weight: 600, a: 0.8 });
       small(pl.label, lx, ey + (pl.ar2 ? 56 : 34), lq, { size: 14, ls: 2, align: al, weight: 600, a: 0.7 });

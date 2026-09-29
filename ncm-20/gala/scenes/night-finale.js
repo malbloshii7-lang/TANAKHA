@@ -48,7 +48,8 @@ scene({
   J(t) { return jdUTC(2027, 3, 15, 15.75 + 0.5 * clamp(this.hold ? 1 : t / (this.dur * (this.speed || 1)))); },
   // In the stage hold (hold: true, loop: seconds) the sky stands still, everything is fully drawn, and every
   // motion is periodic in the loop length, so the rendered loop joins seamlessly.
-  tw(t, ph, rate) { return this.hold ? Math.sin(TAU * Math.round(rate * this.loop / TAU) * t / this.loop + ph) : Math.sin(t * rate + ph); },
+  // in a hold every twinkle is periodic in the loop, and starts from its phase at the film's last frame (endT)
+  tw(t, ph, rate) { return this.hold ? Math.sin(TAU * Math.round(rate * this.loop / TAU) * t / this.loop + ph + rate * (this.endT || 0)) : Math.sin(t * rate + ph); },
   draw(t0) {
     const t = this.hold ? 99 : t0, J = this.J(t), fade = easeOut(prog(t, 0.3, 2.5));
     this.stars.forEach(s => {
@@ -75,7 +76,7 @@ scene({
       const rp = this.hold ? 1 : easeInOut(prog(t, this.ringT - 1.6, 1.6)); // closes at ringT
       if (rp > 0) { stroke(el(hx, hy, 46, 46, -Math.PI / 2, -Math.PI / 2 + TAU * rp, 780, 0.4), 1, GOLD, 1.6, 0.8); stroke(el(hx, hy, 54, 54, -Math.PI / 2, -Math.PI / 2 - TAU * rp, 781, 0.4), 1, GOLD, 0.8, 0.5); }
       // the outer ring keeps turning, slowly, like the sky (one turn per loop in the hold)
-      if (rp >= 1) { const turn = this.hold ? TAU * t0 / this.loop : t0 * 0.12; stroke(el(hx, hy, 62, 62, turn, turn + TAU, 782, 0), 1, GOLD, 0.8, 0.35, [2, 7], 0); }
+      if (rp >= 1) { const turn = this.hold ? (this.endT || 0) * 0.12 + TAU * t0 / this.loop : t0 * 0.12; stroke(el(hx, hy, 62, 62, turn, turn + TAU, 782, 0), 1, GOLD, 0.8, 0.35, [2, 7], 0); }
     }
     // the city glow on the horizon, then the Corniche in silhouette with its windows lit
     ctx.save(); ctx.globalCompositeOperation = 'screen';

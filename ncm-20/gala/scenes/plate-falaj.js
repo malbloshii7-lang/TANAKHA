@@ -82,8 +82,9 @@ scene({
     hatch(this.hafeetFill, [1440, 436, 1880, HZ], -1.25, 8, fq, SEPIA, 0.8, 0.24, 249); stroke(this.hafeet, fq, INK, 1.3, 0.7);
     this.strata.forEach(q => stroke(q, fq, INK, 0.7, 0.3));
     const jl = easeOut(prog(lt, 3.0, 0.8));
-    smallAr('جبال الحجر', 1164, 462, jl, { size: 26, align: 'center', a: 0.7, weight: 600 });
-    small('HAJAR MOUNTAINS', 1164, 486, jl, { size: 15, ls: 3, align: 'center', a: 0.6, weight: 600 });
+    // clear of the highest peak (1136, 486)
+    smallAr('جبال الحجر', 1164, 450, jl, { size: 26, align: 'center', a: 0.7, weight: 600 });
+    small('HAJAR MOUNTAINS', 1164, 474, jl, { size: 15, ls: 3, align: 'center', a: 0.6, weight: 600 });
     smallAr('جبل حفيت', 1590, 404, jl, { size: 30, align: 'center', a: 0.8, weight: 700 });
     small('JEBEL HAFEET', 1590, 428, jl, { size: 16, ls: 3, align: 'center', a: 0.7, weight: 600 });
     // the ground in section, the water table and the wet alluvium below it
@@ -95,17 +96,18 @@ scene({
     stroke(this.watertable, easeInOut(prog(lt, 1.6, 1.4)), BLUE, 1.4, 0.6, [10, 7], 0);
     // the gallery and its shafts
     const gq = easeInOut(prog(lt, 2.0, 1.6));
-    mask(this.galCut); stroke(this.galFloor, gq, INK, 1.4, 0.85); stroke(this.galRoof, gq, INK, 1.4, 0.85); stroke(this.galEnd, gq, INK, 1.2, 0.8);
+    // each cut's paper comes in with its own lines, so the ground is never opened before the structure is drawn
+    mask(this.galCut, gq); stroke(this.galFloor, gq, INK, 1.4, 0.85); stroke(this.galRoof, gq, INK, 1.4, 0.85); stroke(this.galEnd, gq, INK, 1.2, 0.8);
     this.gShafts.forEach((sh, k) => {
       const q = easeOut(prog(lt, 2.4 + k * 0.14, 0.6));
       if (q <= 0) return;
-      mask(sh.cut); stroke(sh.l, q, INK, 1.2, 0.85); stroke(sh.r, q, INK, 1.2, 0.85); stroke(sh.collar, q, INK, 1.4, 0.85);
+      mask(sh.cut, q); stroke(sh.l, q, INK, 1.2, 0.85); stroke(sh.r, q, INK, 1.2, 0.85); stroke(sh.collar, q, INK, 1.4, 0.85);
     });
     // cut-and-cover, then the open channel
     const cq = easeOut(prog(lt, 3.2, 0.8));
     this.slabs.forEach(sl => { fill(sl, SEPIA, 0.55 * cq); stroke(sl, cq, INK, 0.9, 0.8); });
     const oq = easeOut(prog(lt, 3.8, 0.8));
-    mask(this.openCut); stroke(this.open, oq, INK, 1.2, 0.8); this.openSides.forEach(q => stroke(q, oq, INK, 1, 0.7));
+    mask(this.openCut, oq); stroke(this.open, oq, INK, 1.2, 0.8); this.openSides.forEach(q => stroke(q, oq, INK, 1, 0.7));
     // water: drained from the wet ground into the gallery, carried down to the oasis
     const wq = easeInOut(prog(lt, 3.4, 2.4));
     stroke(new P([[1122, yg(1122) - 4], [1535, yg(1535) - 4]]), wq, BLUE, 4, 0.75, [14, 8], -lt * 34);

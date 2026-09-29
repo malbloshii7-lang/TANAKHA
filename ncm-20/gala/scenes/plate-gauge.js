@@ -52,7 +52,9 @@ scene({
     for (let x = 1453; x < 1467; x += 3) { ctx.moveTo(x, 228); ctx.lineTo(x, 982); } // the tube's shaded edges
     for (let x = 1536; x < 1548; x += 3) { ctx.moveTo(x, 228); ctx.lineTo(x, 982); }
     ctx.stroke(); ctx.restore();
-    stroke(this.rim, gp, INK, 2.4); stroke(el(1500, 150, 101, 13, 0, TAU, 405, 0.2), gp, INK, 1, 0.6); // the rim's thickness
+    // the rim is whole from the dissolve's first frame: the globe's limb dissolves into it (the circle lock, B18); the rest
+    // of the gauge draws on as before
+    stroke(this.rim, 1, INK, 2.4); stroke(el(1500, 150, 101, 13, 0, TAU, 405, 0.2), 1, INK, 1, 0.6); // the rim's thickness
     this.funnel.forEach(f => stroke(f, gp, INK, 2));
     stroke(this.tube, tp, INK, 2.2);
     stroke(new P([[1456, 228], [1456, 980]]), tp, INK, 0.9, 0.5); stroke(new P([[1544, 228], [1544, 980]]), tp, INK, 0.9, 0.5); // the walls' inner faces

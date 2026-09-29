@@ -151,10 +151,12 @@ function setTheme(night) {
   ({ INK, RED, BLUE, OCHRE, SEPIA, BLEND } = night ? NIGHT : DAY);
   IS_NIGHT = !!night; PAPER_PAT = night ? NIGHT_PAT : DAY_PAT;
 }
-function mask(paths) { // repaint paper over paths (hides lines behind a shape)
+// a: how far the shape that owns the mask has drawn on (a mask at full strength before its shape exists punches a hole)
+function mask(paths, a = 1) { // repaint paper over paths (hides lines behind a shape)
+  if (a <= 0) return;
   ctx.save();
   PAPER_PAT.setTransform(ctx.getTransform().inverse());
-  ctx.globalAlpha = SA; ctx.fillStyle = PAPER_PAT;
+  ctx.globalAlpha = SA * Math.min(1, a); ctx.fillStyle = PAPER_PAT;
   ctx.beginPath(); (Array.isArray(paths) ? paths : [paths]).forEach(q => q.trace(ctx, 1)); ctx.fill();
   ctx.restore();
 }
@@ -372,17 +374,37 @@ const textIn = (f, tin, tout, fi = 0.5, fo = 0.35) => easeOut(prog(f, tin, fi)) 
 // Every words block can be recorded with its film times (TEXT_REC), so the subtitle files come from the build itself.
 let TEXT_REC = null;
 const recText = (level, tin, tout, ar, en) => { if (TEXT_REC) TEXT_REC.push({ level, tin, tout, ar: [].concat(ar || []), en: [].concat(en || []) }); };
-function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = Math.ceil(arSize * 0.48 + enSize * 0.72) + 6 } = {}) {
+// patch: paper behind each line, for words set over moving line-work (the pin labels' remedy, used where a camera
+// move or a passing panel would otherwise run engraving through the words). Boxes follow the text's own metrics.
+function wordPatch(boxes, p) {
+  if (p <= 0 || !boxes.length) return;
+  ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * p; ctx.fillStyle = PAPER_PAT;
+  boxes.forEach(([x0, y0, w, h]) => ctx.fillRect(x0, y0, w, h));
+  ctx.restore();
+}
+// the ink box of a line as it will be drawn (the glyphs' own extent, not the font size), with a small margin, so a patch
+// never reaches a neighbouring label
+function inkBox(text, x, y, font, ls, dir, align, ws = 0, pad = 4) {
+  ctx.save(); setText(font, ls, dir, align); ctx.wordSpacing = ws + 'px';
+  const m = ctx.measureText(text); ctx.restore();
+  return [x - m.actualBoundingBoxLeft - pad, y - m.actualBoundingBoxAscent - pad, m.actualBoundingBoxLeft + m.actualBoundingBoxRight + 2 * pad, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + 2 * pad];
+}
+function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = Math.ceil(arSize * 0.48 + enSize * 0.72) + 6, patch = false } = {}) {
   recText('B', tin, tout, ar, en);
   const q = textIn(f, tin, tout), q2 = textIn(f, tin + 0.15, tout);
   const A = [].concat(ar || []), E = [].concat(en || []);
+  if (patch) {
+    const ye0 = y + (A.length - 1) * arSize * 1.32 + gap;
+    wordPatch([...A.map((l, i) => inkBox(l, x, y + i * arSize * 1.32, `600 ${arSize}px ${F_KUFI}`, 0, 'rtl', align)),
+      ...E.map((l, i) => inkBox(l, x, ye0 + i * enSize * 1.5, `600 ${enSize}px ${F_MONO}`, 2, 'ltr', align))], q);
+  }
   A.forEach((l, i) => smallAr(l, x, y + i * arSize * 1.32, q, { size: arSize, align, a: 0.85, weight: 600 }));
   let ye = y + (A.length - 1) * arSize * 1.32 + gap;
   E.forEach((l, i) => small(l, x, ye + i * enSize * 1.5, q2, { size: enSize, ls: 2, align, a: 0.7, weight: 600 }));
   return ye + (E.length - 1) * enSize * 1.5;
 }
 // maxW fits the column: the widest line of each language sets its size (never larger than arSize and enSize).
-function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSize = 84, enSize = 34, font = F_KUFI, maxW = 0 } = {}) {
+function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSize = 84, enSize = 34, font = F_KUFI, maxW = 0, patch = false, enGap = 0 } = {}) {
   recText('A', tin, tout, ar, en);
   const out = clamp((tout - f) / 0.35), A = [].concat(ar || []), E = [].concat(en || []);
   if (maxW) {
@@ -391,9 +413,15 @@ function levelA(f, tin, tout, ar, en, { x = 1840, y = 520, align = 'right', arSi
     if (wA > maxW) arSize = Math.floor(arSize * maxW / wA);
     if (wE > maxW) enSize = Math.floor(enSize * maxW / wE);
   }
+  if (patch) {
+    const ye0 = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.36 + enGap;
+    wordPatch([...A.map((l, i) => inkBox(l, x, y + i * arSize * 1.3, `700 ${arSize}px ${font}`, 0, 'rtl', align, Math.round(arSize * 0.1))),
+      ...E.map((l, i) => inkBox(l, x, ye0 + i * enSize * 1.25, `700 ${enSize}px ${F_HEAD}`, 2, 'ltr', align))], easeOut(prog(f, tin, 0.5)) * out);
+  }
   A.forEach((l, i) => arLine(l, x, y + i * arSize * 1.3, tin + i * 0.3, f, { size: arSize, align, out, font }));
   // the English clears the Arabic's deepest descenders (ح ع ي م reach about 0.42 of the size below the line)
-  let ye = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.36;
+  // enGap: extra room where a line's final ي or its dots reach deeper than the allowance
+  let ye = y + (A.length - 1) * arSize * 1.3 + enSize * 1.25 + arSize * 0.36 + enGap;
   E.forEach((l, i) => enLine(l, x, ye + i * enSize * 1.25, tin + 0.3 + A.length * 0.3 + i * 0.15, f, { size: enSize, align, out }));
   return ye + (E.length - 1) * enSize * 1.25;
 }

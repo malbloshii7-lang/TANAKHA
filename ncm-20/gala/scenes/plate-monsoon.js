@@ -23,17 +23,17 @@ scene({
     // aft-pointing tiller; through-beam ends on the side; one forward-raked mast; a four-sided palm-mat sail on an
     // oblique yard no longer than the hull (luff about 3/4 of the leech). Local coordinates: bow right, waterline y = 28.
     const sheer = cubic([-156, -58], [-90, -22], [80, -20], [162, -46], 36);
-    const keel = [[112, 40]].concat(quad([112, 40], [0, 44], [-112, 42], 14).slice(1), quad([-112, 42], [-140, 40], [-148, 20], 8).slice(1));
+    const keel = [[112, 40]].concat(quad([112, 40], [0, 44], [-112, 42], 14).slice(1), quad([-112, 42], [-140, 42], [-148, 40], 8).slice(1)); // the sternpost's foot at keel depth, below the waterline (y 28)
     this.hull = new P(wob(sheer.concat(keel), 41, 0.45), true);
     const keelX = keel.slice().reverse();
-    const lower = x => (x > 112 ? 40 - 1.72 * (x - 112) : x < -148 ? 20 + 9.75 * (x + 148) : yOn(keelX, x));
+    const lower = x => (x > 112 ? 40 - 1.72 * (x - 112) : x < -148 ? 40 + 12.25 * (x + 148) : yOn(keelX, x));
     this.seams = [0.26, 0.5, 0.74].map(f => { const pts = []; for (let x = -154; x <= 160; x += 6) { const ys = yOn(sheer, x); pts.push([x, ys + f * (lower(x) - ys)]); } return pts; });
     this.seamP = this.seams.map((pts, k) => new P(wob(pts, 60 + k, 0.3)));
     this.beams = [-110, -64, -18, 28, 74, 118].map(x => [x, yOn(sheer, x) + 14]); // through-beam ends
     this.stemHead = ln(162, -46, 172, -63, 48, 0.2);
     this.sternHead = ln(-156, -58, -158, -72, 49, 0.2);
     this.rail = new P(wob(cubic([-153, -50], [-90, -15], [80, -13], [158, -39], 30), 42, 0.3));
-    this.rudder = new P([[-154, -40], [-176, -36], [-170, 34], [-148, 22]], true); // central rudder hung on the sternpost
+    this.rudder = new P([[-154, -40], [-176, -36], [-170, 44], [-148, 42]], true); // central rudder hung on the sternpost, down to keel depth (the sea hides what is below the waterline)
     this.rudderStock = ln(-155, -40, -158, -66, 50, 0.2);
     this.tiller = ln(-157, -64, -198, -58, 57, 0.2); // aft-pointing tiller, worked by lines
     this.tillerLines = [ln(-198, -58, -128, -44, 58, 0.3), ln(-198, -58, -112, -40, 59, 0.3)];

@@ -37,7 +37,8 @@ scene({
     for (let d = 0; d < 5; d++) for (let k = 0; k < 7; k++) this.windows.push(new P([S(15 + k * 3.1, fb + 2.6 + d * 3.3), S(16.6 + k * 3.1, fb + 2.6 + d * 3.3), S(16.6 + k * 3.1, fb + 3.9 + d * 3.3), S(15 + k * 3.1, fb + 3.9 + d * 3.3)], true));
     this.bridge = new P([S(10, fb + 18), S(10, fb + 21.5), S(40, fb + 21.5), S(40, fb + 18)], true);
     this.bridgeWin = new P([S(11, fb + 19.2), S(11, fb + 20.8), S(39, fb + 20.8), S(39, fb + 19.2)], true);
-    this.radarMast = [pl([S(24, fb + 21.5), S(24, fb + 30)], false, 915, 0), pl([S(20, fb + 28), S(28, fb + 28)], false, 916, 0)];
+    // an A-frame radar mast of the same height, the scanner bar on top (a post with a crossbar read as a Latin cross)
+    this.radarMast = [pl([S(21, fb + 21.5), S(24, fb + 29.5)], false, 915, 0), pl([S(27, fb + 21.5), S(24, fb + 29.5)], false, 917, 0), pl([S(19, fb + 30), S(29, fb + 30)], false, 916, 0)];
     this.funnel = new P([S(3, fb + 1), S(4, fb + 25), S(11, fb + 26), S(12, fb + 1)], true);
     this.lifeboat = new P([S(-1, fb + 4), S(2, fb + 7.5), S(11, fb + 5), S(8, fb + 1.5)], true);
     this.pipes = pl([S(40, fb + 1.6), S(298, fb + 1.6)], false, 920, 0.15);
