@@ -509,6 +509,8 @@ How it is built (all implementable in the current engine; see Appendix A):
 
 ## 4. Structure with timecodes
 
+> **Superseded by the revisions above and by `SCRIPT.md`** (the beats and times as built, under "Beats"). The film as built runs 2:43.3 in 20 beats. This section records the original plan.
+
 ### 4.1 Movements
 
 | Movement | Time | Beats | Light | The room should feel |

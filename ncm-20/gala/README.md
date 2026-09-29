@@ -49,7 +49,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:55) · `?april2024` April 2024 after the seven emirates (3:00.0) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
