@@ -1,0 +1,218 @@
+{
+ "on-screen-ar.srt": {
+  "cues": 36,
+  "written": [
+   "on-screen-ar.vtt"
+  ],
+  "reading_speed_flags": [
+   {
+    "cue": 10,
+    "seconds": 10.42,
+    "chars": 192,
+    "cps": 18.4,
+    "rows_at_42": 7
+   },
+   {
+    "cue": 24,
+    "seconds": 10.42,
+    "chars": 184,
+    "cps": 17.7,
+    "rows_at_42": 6
+   },
+   {
+    "cue": 29,
+    "seconds": 10.42,
+    "chars": 278,
+    "cps": 26.7,
+    "rows_at_42": 10
+   },
+   {
+    "cue": 33,
+    "seconds": 6.8,
+    "chars": 77,
+    "cps": 11.3,
+    "rows_at_42": 3
+   }
+  ]
+ },
+ "on-screen-en.srt": {
+  "cues": 36,
+  "written": [
+   "on-screen-en.vtt",
+   "on-screen-en.stl (42 TTI blocks)"
+  ],
+  "reading_speed_flags": [
+   {
+    "cue": 10,
+    "seconds": 10.42,
+    "chars": 245,
+    "cps": 23.5,
+    "rows_at_42": 8
+   },
+   {
+    "cue": 24,
+    "seconds": 10.42,
+    "chars": 180,
+    "cps": 17.3,
+    "rows_at_42": 6
+   },
+   {
+    "cue": 29,
+    "seconds": 10.42,
+    "chars": 378,
+    "cps": 36.3,
+    "rows_at_42": 11
+   },
+   {
+    "cue": 33,
+    "seconds": 6.8,
+    "chars": 85,
+    "cps": 12.5,
+    "rows_at_42": 3
+   }
+  ]
+ },
+ "vo-ar.srt": {
+  "cues": 19,
+  "written": [
+   "vo-ar.vtt"
+  ],
+  "reading_speed_flags": [
+   {
+    "cue": 5,
+    "seconds": 7.6,
+    "chars": 99,
+    "cps": 13.0,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 7,
+    "seconds": 9.6,
+    "chars": 139,
+    "cps": 14.5,
+    "rows_at_42": 4
+   },
+   {
+    "cue": 11,
+    "seconds": 3.9,
+    "chars": 68,
+    "cps": 17.4,
+    "rows_at_42": 2
+   },
+   {
+    "cue": 16,
+    "seconds": 7.6,
+    "chars": 118,
+    "cps": 15.5,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 17,
+    "seconds": 3.9,
+    "chars": 82,
+    "cps": 21.0,
+    "rows_at_42": 2
+   }
+  ]
+ },
+ "vo-en.srt": {
+  "cues": 19,
+  "written": [
+   "vo-en.vtt",
+   "vo-en.stl (22 TTI blocks)"
+  ],
+  "reading_speed_flags": [
+   {
+    "cue": 2,
+    "seconds": 5.5,
+    "chars": 108,
+    "cps": 19.6,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 3,
+    "seconds": 5.6,
+    "chars": 105,
+    "cps": 18.8,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 5,
+    "seconds": 7.6,
+    "chars": 138,
+    "cps": 18.2,
+    "rows_at_42": 4
+   },
+   {
+    "cue": 6,
+    "seconds": 6.4,
+    "chars": 104,
+    "cps": 16.2,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 7,
+    "seconds": 9.6,
+    "chars": 163,
+    "cps": 17.0,
+    "rows_at_42": 4
+   },
+   {
+    "cue": 8,
+    "seconds": 2.4,
+    "chars": 44,
+    "cps": 18.3,
+    "rows_at_42": 2
+   },
+   {
+    "cue": 11,
+    "seconds": 3.9,
+    "chars": 70,
+    "cps": 17.9,
+    "rows_at_42": 2
+   },
+   {
+    "cue": 13,
+    "seconds": 6.9,
+    "chars": 104,
+    "cps": 15.1,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 14,
+    "seconds": 4.0,
+    "chars": 80,
+    "cps": 20.0,
+    "rows_at_42": 2
+   },
+   {
+    "cue": 15,
+    "seconds": 3.2,
+    "chars": 55,
+    "cps": 17.2,
+    "rows_at_42": 2
+   },
+   {
+    "cue": 16,
+    "seconds": 7.6,
+    "chars": 118,
+    "cps": 15.5,
+    "rows_at_42": 4
+   },
+   {
+    "cue": 17,
+    "seconds": 3.9,
+    "chars": 86,
+    "cps": 22.1,
+    "rows_at_42": 3
+   },
+   {
+    "cue": 19,
+    "seconds": 2.8,
+    "chars": 52,
+    "cps": 18.6,
+    "rows_at_42": 2
+   }
+  ]
+ }
+}
