@@ -7,9 +7,9 @@
 #
 #   sh qc/deliver.sh <masters dir> <dir with cuesheet.csv and the *.srt files>
 set -eu
-cd "$(dirname "$0")"
-M=$(cd "$1" && pwd)
+M=$(cd "$1" && pwd) # resolve the arguments before moving into qc/
 S=$(cd "$2" && pwd)
+cd "$(dirname "$0")"
 mkdir -p "$M/show/ltc" "$M/show/subtitles" "$M/show/caller"
 
 for p in part1 part1-pull part2; do
