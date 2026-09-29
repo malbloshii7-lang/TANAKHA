@@ -202,8 +202,8 @@ to the wall's measured white). Ticks mark the cues. Use it to plan the wall's le
 <p>Mean absolute difference in 8-bit levels between the two frames that meet, from accurately decoded frames. A loop's seam
 should be no larger than a neighbouring frame step. The films are encoded at CRF 18 with a keyframe every 5 s, and each
 keyframe re-codes the paper grain: the steps across part 1's last three keyframes are listed, with the step before each.
-The cuts into and out of loop W, and from part 2 into loop A, should be no larger than that refresh and the floor between
-two separately encoded files. The cut into loop B is larger by design, because the title gives way to the dedication; a
+The cuts into and out of loop W, and from part 2 into loop A, should be about the size of that refresh and below the floor
+between two separately encoded files. The cut into loop B is larger by design, because the title gives way to the dedication; a
 0.5 s dissolve on the media server softens it if a hard change is not wanted.</p>
 <div class="scroll"><table><thead><tr><th>Where</th><th>Luma</th><th>RGB</th><th>RGB p99</th><th>Unchanged</th></tr></thead><tbody>{srows}</tbody></table></div>
 
