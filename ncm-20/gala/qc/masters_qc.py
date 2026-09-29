@@ -5,8 +5,8 @@ For every MP4: resolution, frame rate, exact frame count against the running ord
 limited range), keyframes (a loop must be one stream with one keyframe), audio format and its duration against the
 picture, and EBU R128 loudness with true peak. For every WAV: loudness and true peak. Seams, from accurately decoded
 frames (BT.709, full-chroma interpolation): each loop's last frame back to its first, and the cuts part 1 -> loop W ->
-part 2 (and for the fallback) and part 2 -> loops A and B, each set beside a neighbouring-frame step and the floor
-between two separately encoded files. The photosensitivity pre-check (qc/pse.py) runs on every MP4. SHA-256 of every file.
+part 2 (and for the fallback) and part 2 -> loops A and B, each set beside a neighbouring-frame step, the floor
+between two separately encoded files, and the film's own keyframe refresh. The photosensitivity pre-check (qc/pse.py) runs on every MP4. SHA-256 of every file.
 
     python3 qc/masters_qc.py <masters dir> [--no-pse]
 """
@@ -66,6 +66,14 @@ def rgb_frames(path, first=None, last=None, w=3840, h=2160):
     raw = subprocess.run(args, capture_output=True, check=True).stdout
     frames = np.frombuffer(raw, np.uint8).reshape(-1, h, w, 3)
     return frames[-last:] if last else frames
+
+
+def rgb_range(path, n0, n, w=3840, h=2160):
+    """Decode frames n0 .. n0+n-1 (0-based)."""
+    args = [FF, '-v', 'error', '-i', str(path), '-map', '0:v:0', '-vf', f'select=between(n\\,{n0}\\,{n0 + n - 1}),{DEC}',
+            '-vsync', '0', '-frames:v', str(n), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+    raw = subprocess.run(args, capture_output=True, check=True).stdout
+    return np.frombuffer(raw, np.uint8).reshape(-1, h, w, 3)
 
 
 def diff(a, b):
@@ -133,6 +141,13 @@ def run(masters, do_pse=True):
         for h in ('hold-a-4k50.mp4', 'hold-b-4k50.mp4'):
             if (m / h).exists():
                 rep['seams'][f'part2-4k50.mp4 last -> {h} first'] = diff(t2[-1], rgb_frames(m / h, first=1)[0])
+    p1 = m / 'part1-4k50.mp4'
+    if p1.exists():  # the film's own keyframe refresh (every 5 s): each keyframe re-codes the paper grain, the yardstick for a cut
+        v = next(t for t in mp4info(str(p1))['tracks'] if t.get('handler') == 'vide')
+        for k in [s - 1 for s in v['sync_samples']][-3:]:
+            f = rgb_range(p1, k - 2, 3)
+            rep['seams'][f'part1-4k50.mp4 across its keyframe at frame {k}'] = diff(f[1], f[2])
+            rep['seams'][f'part1-4k50.mp4 the step before it (frame {k - 2} -> {k - 1})'] = diff(f[0], f[1])
 
     for f in sorted((m / 'audio').glob('*.wav')):
         rep['wav'][f.name] = {**loudness(f), 'sha256': sha256(f)}
