@@ -5,8 +5,8 @@ For every MP4: resolution, frame rate, exact frame count against the running ord
 limited range), keyframes (a loop must be one stream with one keyframe), audio format and its duration against the
 picture, and EBU R128 loudness with true peak. For every WAV: loudness and true peak. Seams, from accurately decoded
 frames (BT.709, full-chroma interpolation): each loop's last frame back to its first, and the cuts part 1 -> loop W ->
-part 2 (and for the fallback), each set beside a neighbouring-frame step and the floor between two separately encoded
-files. The photosensitivity pre-check (qc/pse.py) runs on every MP4. SHA-256 of every file.
+part 2 (and for the fallback) and part 2 -> loops A and B, each set beside a neighbouring-frame step and the floor
+between two separately encoded files. The photosensitivity pre-check (qc/pse.py) runs on every MP4. SHA-256 of every file.
 
     python3 qc/masters_qc.py <masters dir> [--no-pse]
 """
@@ -126,6 +126,13 @@ def run(masters, do_pse=True):
             rep['seams'][f'{p1} last -> {w} first'] = diff(e1, w0)
             rep['seams'][f'{w} last -> {p2} first'] = diff(w1, s2)
             rep['seams'][f'floor: {p1} last -> {p2} first (two separate encodes)'] = diff(e1, s2)
+    if (m / 'part2-4k50.mp4').exists():  # the film's end into the closing holds: A is its next frame; B swaps the title
+        # for the dedication by design (and C, dimmed, is not measured)
+        t2 = rgb_frames(m / 'part2-4k50.mp4', last=2)
+        rep['seams']['part2-4k50.mp4 neighbouring step (second-last -> last)'] = diff(t2[-2], t2[-1])
+        for h in ('hold-a-4k50.mp4', 'hold-b-4k50.mp4'):
+            if (m / h).exists():
+                rep['seams'][f'part2-4k50.mp4 last -> {h} first'] = diff(t2[-1], rgb_frames(m / h, first=1)[0])
 
     for f in sorted((m / 'audio').glob('*.wav')):
         rep['wav'][f.name] = {**loudness(f), 'sha256': sha256(f)}
