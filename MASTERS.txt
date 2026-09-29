@@ -1,16 +1,25 @@
 READING THE SKY · GALA EDITION · 4K 50p LED-WALL MASTERS
 National Center of Meteorology, 20th anniversary ceremony (March 2027)
-Rendered 28 September 2026 from Revision 7 (code: branch claude/focused-mayer-jogort, commit 09ef507)
+Rendered 29 September 2026 from Revision 8 (code: branch claude/focused-mayer-jogort, commit e346263)
 
 STATUS
 Technical masters for LED calibration, media-server programming, playback tests and the tech rehearsal.
 - The score is the synthesized temp score.
 - The narration is not recorded yet, so these files carry no narration.
 - The final ceremony masters follow once the score and narration are recorded. TREATMENT.md §10 specifies them:
-  ProRes, and HAP for the media server, at the wall's native pixel map.
+  ProRes, and HAP for the media server, at the wall's native pixel map. Make those from a lossless render
+  (render.js --crf 0 --profile high444), never by transcoding these H.264 files.
+
+REVISION 8 (against Revision 7)
+- Picture: 20 frame-QA fixes (TREATMENT.md Revision 8). The cut, the words, the narration and the score are unchanged.
+- Colour: BT.709 matrix, limited range, tagged (primaries, transfer, matrix), from frames captured losslessly.
+  Revision 7 used the BT.601 matrix untagged and JPEG-captured frames. Decoded as BT.709, as a media server does, its
+  parchment played warm (red +1.9, blue -0.7 levels; error 2.06).
+  Here, frame 1500 of part 1 against its lossless render has a cast under 0.15 levels and an error of 1.02 (p99 5).
+- New: show/ltc, show/subtitles, show/caller, QC.html, QC.md, qc-report.json.
 
 VIDEO (every file)
-3840 x 2160, 50 fps progressive, H.264 High, 4:2:0.
+3840 x 2160, 50 fps progressive, H.264 High, 4:2:0, BT.709 limited range (tagged).
 LED grade: the parchment at about two-thirds of the web grade's luminance, with a deeper vignette. It is a starting
 point, to be calibrated with a meter at the tech rehearsal. It looks dim on a phone or a monitor.
 Audio in each MP4 is AAC 48 kHz stereo. The WAVs in audio/ (48 kHz, 24-bit) are for the sound desk.
@@ -20,10 +29,24 @@ RUNNING ORDER (cue to cue)
 2. hold-world-4k50.mp4      0:12.00     600 frames   LOOP W under the applause: a still frame of the world beat
 3. part2-4k50.mp4           0:21.68   1,084 frames   on the caller's cue: the twenty drops -> title and lockup
 4. hold-b-4k50.mp4          0:20.00   1,000 frames   LOOP B, the running order's hold: the dedication and the lockup
-   hold-a-4k50.mp4          0:20.00   1,000 frames   LOOP A: title and lockup
+   hold-a-4k50.mp4          0:20.00   1,000 frames   LOOP A: title and lockup (the film's next frame)
    hold-c-4k50.mp4          0:20.00   1,000 frames   LOOP C: dimmed sky and ring, behind speeches
 Safety: safety-slate-4k.png (loop A's frame) for a playback failure.
-Show control: show/cuesheet.csv (25 fps timecode, cue to cue). Side screens: show/*.srt.
+
+SHOW CONTROL AND SIDE SCREENS (show/)
+cuesheet.csv                 25 fps timecode, cue to cue (unchanged from Revision 7)
+ltc/ltc-part1-25fps.wav      SMPTE LTC, 25 fps, from 00:00:00:00, 48 kHz 16-bit mono, -10 dBFS; 3,542 frames
+ltc/ltc-part1-pull-25fps.wav the same for the fallback part 1; 3,417 frames
+ltc/ltc-part2-25fps.wav      the same for part 2, which has its own timecode from the caller's release; 542 frames
+                             Each was decoded back frame by frame: no discontinuity.
+caller/caller-reference-1080p50.mp4       the show caller's reference: part 1 -> loop W once -> part 2 -> loop B once.
+caller/caller-reference-pull-1080p50.mp4  the same without the tanker. Each shows the picture above a band with the
+                             timecode, the cue and its note, STANDBY five seconds before each cue and GO on it.
+*.srt                        the four subtitle files (unchanged from Revision 7)
+subtitles/*.vtt              WebVTT of all four; subtitles/*.stl: EBU-STL (Tech 3264, 25 fps) of the two English files
+subtitles/subtitles-report.json  cues that read faster than 17 characters a second or wrap past two 42-character rows.
+                             The densest is H.H. Sheikh Mansour's card in English: 36 a second counting the full
+                             attribution, 14 for the quote alone (TREATMENT.md §11 row 39). Nothing is re-timed.
 
 FALLBACK WITHOUT THE TANKER (decided at the go/no-go checks)
 part1-pull-4k50.mp4 (2:16.66, 6,833 frames), then hold-world-pull-4k50.mp4. Its split comes 5 s earlier, so its loop W
@@ -34,21 +57,29 @@ The *-restrained.mp4 files carry the same picture with the restrained mix (no dr
 are in audio/. Ramadan 1448 is expected around 8 February to 9 March 2027 (astronomical estimate; the dates follow the
 moon sighting), so a ceremony in early March 2027 may fall within it.
 
-MEASURED (on the encoded files)
-- Every loop's last frame runs into its first like two neighbouring frames: a mean difference of 0.005 grey levels or
-  less, with 99% of pixels unchanged. Loop W is a still frame: 0.0003.
-- Loop W matches the film at both of its cuts. Part 1's last frame -> loop W: 0.335; loop W -> part 2's first frame:
-  0.280. That is the floor between any two separately encoded files: part 1 -> part 2 directly is 0.349.
-- Exact frame counts, 50 fps, and audio matched to picture in every file.
+MEASURED (on the encoded files; QC.md has every figure)
+- Exact frame counts, 50 fps, BT.709 colour tags and audio matched to picture in every file.
+- Every loop is one stream with one keyframe. Its last frame runs into its first like two neighbouring frames: a mean
+  difference of 0.007 grey levels or less, with at least 99.2% of pixels unchanged. Loop W is a still frame: 0.0001.
+- The films are encoded at CRF 18 with a keyframe every 5 s. Each keyframe re-codes the paper grain: 0.86 to 1.08 in
+  still passages. The cuts are that size, and below the floor between two separate encodes (part 1 -> part 2):
+    part 1 -> loop W 0.95, loop W -> part 2 1.06 (floor 1.20);
+    fallback part 1 -> its loop W 0.94, its loop W -> part 2 1.14 (floor 1.24);
+    part 2 -> loop A 0.53.
+- Part 2 -> loop B: 4.57, by design. The title gives way to the dedication. A 0.5 s dissolve on the media server
+  softens it if a hard change is not wanted.
 - Loudness: part 1 -16.4 LUFS, part 2 -14.0, loop W -20.0, loops A/B/C -24.0.
+- True peak: part 2's AAC reaches -0.8 dBTP (its WAV -1.1), part 1's -1.3. The recorded score should leave 1.5 dB
+  of headroom so that the encoded files also stay under -1 dBTP.
 
 AUDIO NOTES
 - The media server crossfades the audio for 0.5 s at each cut to a loop.
 - part2.wav carries the final chord's 3.5 s ring-out beyond the picture. The MP4 ends with its picture.
 
 PICTURE SAFETY
-No full-frame flashes, no full-frame red, no strobing. The twentieth drop's gold glint ramps over 0.6 s. Run the
-Harding (ITU-R BT.1702) test on the final master before sign-off.
+No full-frame flashes, no full-frame red, no strobing. The twentieth drop's gold glint ramps over 0.6 s. The
+photosensitivity pre-check (ITU-R BT.1702 model) passes on every picture: no flash, the largest concurrent change 4.4%
+of the screen. It is not the certified test: run the Harding (ITU-R BT.1702) test on the final master before sign-off.
 
 CHECKSUMS
 MANIFEST.sha256 (SHA-256 of every file here). Check with: sha256sum -c MANIFEST.sha256
