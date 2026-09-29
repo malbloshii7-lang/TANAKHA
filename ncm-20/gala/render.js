@@ -9,6 +9,11 @@
 // --scale 2 renders a 3840×2160 master. --jobs N renders N contiguous chunks in parallel pages and joins
 // them without re-encoding. Needs Playwright (NODE_PATH may point at a global install) and an ffmpeg with
 // libx264: set FFMPEG, e.g. to imageio-ffmpeg's bundled binary.
+//
+// Colour: every film is encoded with the BT.709 matrix, limited range, and tagged BT.709 (primaries, transfer and
+// matrix), because players and media servers decode untagged HD and UHD video as BT.709. --capture png (the default at
+// --scale 2, so for every master) takes each frame losslessly; --capture jpeg (the default at --scale 1) is faster for
+// review copies, and its frames are converted from JPEG's full-range BT.601 to BT.709.
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const fs = require('fs');
@@ -21,6 +26,15 @@ const FPS = Number(opt('fps', 30)), SCALE = Number(opt('scale', 1)), JOBS = Numb
 // (for a stage loop, encoded once afterwards) is --crf 0 --preset ultrafast --profile high444: lossless H.264 needs the
 // High 4:4:4 Predictive profile, even in 4:2:0
 const PRESET = String(opt('preset', 'slow')), X264 = opt('x264', null), PROFILE = String(opt('profile', 'high'));
+// --capture: how each frame leaves the browser (png is lossless; jpeg is quality 95 and faster)
+const CAPTURE = String(opt('capture', SCALE > 1 ? 'png' : 'jpeg'));
+if (!['png', 'jpeg'].includes(CAPTURE)) { console.error('--capture must be png or jpeg'); process.exit(2); }
+// the lossless intermediate keeps full chroma (4:4:4); every other file is 4:2:0
+const PIX_FMT = PROFILE === 'high444' ? 'yuv444p' : 'yuv420p';
+// RGB (PNG) or full-range BT.601 YCbCr (JPEG) in; BT.709 limited range out, with the tags that say so
+const COLOUR_IN = CAPTURE === 'png' ? [] : ['in_color_matrix=bt601', 'in_range=pc'];
+const COLOUR_VF = `scale=${[...COLOUR_IN, 'out_color_matrix=bt709', 'out_range=tv', 'flags=accurate_rnd+full_chroma_int'].join(':')},format=${PIX_FMT}`;
+const COLOUR_TAGS = ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv'];
 const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: where to start reading the audio file (default --from, right for a full-length mix); 0 for part2.wav, which starts at the split
 const FF = process.env.FFMPEG || 'ffmpeg';
 const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res, rej) => { const p = spawn(FF, args, { stdio }); p.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))); });
@@ -34,7 +48,15 @@ async function openPage(browser) {
   await page.goto('file://' + path.resolve(__dirname, process.env.FILM_HTML || 'film.html') + `?capture&scale=${SCALE}&grade=${GRADE}` + (process.env.FILM_QUERY ? '&' + process.env.FILM_QUERY : ''), { waitUntil: 'networkidle' });
   await page.evaluate(() => window.__ready);
   const clip = { x: 0, y: 0, width: 1920, height: 1080 };
-  page.frame = (t, type) => page.evaluate(t => window.__render(t), t).then(() => page.screenshot({ clip, type, ...(type === 'jpeg' ? { quality: 95 } : {}) }));
+  // PNG goes straight through the DevTools protocol with Chrome's fast PNG encoder: the same pixels as
+  // page.screenshot (checked bit for bit at 4K), in about a third of the time
+  const cdp = await context.newCDPSession(page);
+  page.frame = async (t, type) => {
+    await page.evaluate(t => window.__render(t), t);
+    if (type !== 'png') return page.screenshot({ clip, type, quality: 95 });
+    const shot = await cdp.send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: true, clip: { ...clip, scale: SCALE }, captureBeyondViewport: false });
+    return Buffer.from(shot.data, 'base64');
+  };
   return page;
 }
 
@@ -77,11 +99,11 @@ async function openPage(browser) {
   let done = 0;
   await Promise.all(parts.map(async part => {
     const page = await openPage(browser);
-    const ff = spawn(FF, ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
-      '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, ...(X264 ? ['-x264-params', X264] : []), '-profile:v', PROFILE, '-pix_fmt', 'yuv420p', '-r', String(FPS), part.file], { stdio: ['pipe', 'inherit', 'inherit'] });
+    const ff = spawn(FF, ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-c:v', CAPTURE === 'png' ? 'png' : 'mjpeg', '-framerate', String(FPS), '-i', '-',
+      '-vf', COLOUR_VF, '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, ...(X264 ? ['-x264-params', X264] : []), '-profile:v', PROFILE, '-pix_fmt', PIX_FMT, ...COLOUR_TAGS, '-r', String(FPS), part.file], { stdio: ['pipe', 'inherit', 'inherit'] });
     const closed = new Promise((res, rej) => ff.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))));
     for (let i = part.a; i < part.b; i++) {
-      const buf = await page.frame(i / FPS, 'jpeg');
+      const buf = await page.frame(i / FPS, CAPTURE);
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
       if (++done % 150 === 0) console.log(`frame ${done}/${n}  ${((Date.now() - started) / 1000).toFixed(0)}s`);
     }
