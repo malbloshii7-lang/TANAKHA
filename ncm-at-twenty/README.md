@@ -36,7 +36,8 @@ never cited, so the numbered list always matches what the page relies on.
 - Removed: the "not an official NCM publication" line, the passage on scientific
   unknowns, and the network counts dated 2021.
 - Heritage is condensed into four short entries plus a timeline that runs from 1934.
-- Fixed: the Arabic text had described Dr Al Mandous as DG "آنذاك" (at the time).
+- Fixed: the Arabic text had described Dr Al Mandous as DG "آنذاك" (at the time). He is addressed as
+  «معالي» / H.E. throughout: he has held ministerial rank since the federal decree of 15 April 2026.
 - Footnote numbers now sit at the end of each block instead of mid-sentence.
 - The attendance of H.H. is deliberately not announced on the page, because it is
   shared by public link.
