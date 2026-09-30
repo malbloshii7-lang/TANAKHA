@@ -2,20 +2,24 @@
 // Revision 11 · the clean-energy record (B14b, after Shams 1): Al Dhafra Solar PV, Abu Dhabi, at the end of the day.
 // 2 GW in a single phase (inaugurated 16 November 2023; at its inauguration the world's largest single-site solar
 // plant): almost 4 million bifacial modules on single-axis trackers over more than 20 km² of desert, 35 km from the city.
-// True 3D (engrave3d.js), metres: x east, y north, z up, the sand at z 0. The eye stands on an east-west service road
-// inside the plant, looks south-south-west down an aisle between two rows, and cranes up from 2.9 m to 10.5 m, so the rows
-// open out to the horizon; a pyranometer on its post by the road (NCM forecasts the sun for solar plants).
+// True 3D (engrave3d.js), metres: x east, y north, z up, the sand at z 0. The eye stands in an aisle of a northern block,
+// 4 m from the east-west service road, and looks south-south-west over the road down the aisles; it cranes up from 2.9 m
+// to 10.5 m and draws back 6 m, turning 3.5° toward the sun, so the rows open out to the horizon (f 580 px: 84° across the
+// picture box). A pyranometer stands on its post at the road's edge (NCM forecasts the sun for solar plants).
 //   modules: a 2023 bifacial module is about 2.28 × 1.13 m; two deep in portrait, a strip 4.6 m across; 56 modules
 //   along a tracker (four strings of 28), about 65 m; three trackers end to end make a block, 10 m service roads
 //   between blocks, a wider north-south road every 36 rows; the torque tube (the axis, north-south) 2.5 m up on piles
-//   about 8 m apart, the drive at the middle pile; rows 10.5 m apart (the sources give no pitch: a plausible one).
-//   inverter/transformer stations stand in the roads (one per ~200 × 190 m, about 20 per km², as a 2 GW plant needs).
+//   about 8 m apart, the drive at the middle pile; rows 10.5 m apart (the sources give no pitch: a plausible one, a
+//   ground-cover ratio of 0.44). Inverter/transformer stations stand in the roads about 200 × 190 m apart (about 4 MW
+//   each over 20 km²; the sources give no layout: a plausible spacing).
 //   tracking: a tracker follows the sun up to about ±60°; at a low sun it backtracks (turns back toward flat so no row
-//   shades the next, the standard on flat ground), so at this hour the rows lean west by 24° going to 17°, computed
-//   from the sun below, and the shade of each row just meets the next: the aisles lie in shade, and the sun reaches
-//   the sand in the roads and through the gaps between trackers, in long shadows.
-//   sun: 16 November (the plant's inauguration date) at 24.2° N, altitude 14.5° sinking to 11°, azimuth 241-243°.
-//   The disc is drawn about four times its true size (0.53°, 3 px through this lens), as an engraver would, so it reads.
+//   shades the next, the standard on flat ground). At this hour true tracking would ask 73-77° west, beyond the limit,
+//   so the rows lean west by 25° going to 18° (computed each frame from the sun below), and the shade of each row just
+//   meets the next: the aisles lie in shade, and the sun reaches the sand in the roads and between trackers, in long
+//   shadows.
+//   sun: 16 November (the plant's inauguration date) at 24.2° N, altitude 15.2° sinking to 11.5°, azimuth 241-243°
+//   (77 and 59 minutes before sunset). The disc is drawn at 24 px, about four and a half times its true 0.53°
+//   (5 px through this lens), so it reads; it enters where the Shams 1 plate's sun stands at the dissolve's midpoint.
 scene({
   id: 'solar',
   start: 0, dur: 5,
@@ -54,6 +58,7 @@ scene({
     this.ripples = Array.from({ length: 900 }, () => [r(), r(), r()]);
     this.gravel = Array.from({ length: 1400 }, () => [r(), r()]);
     this.stip = Array.from({ length: 5000 }, () => [r(), r(), r()]);
+    this.near = Array.from({ length: 1400 }, () => [r(), r(), r()]);
     this.dunes = Array.from({ length: 500 }, () => [r(), r(), r()]);
   },
   // this frame's sun (16 November at 24.2° N: its azimuth from its altitude) and the trackers' tilt
@@ -145,20 +150,23 @@ scene({
     const m = front ? this.T.n : this.T.nb, vm = E3.dot(v, m), cosi = clamp(-vm), F = 0.04 + 0.96 * Math.pow(1 - cosi, 5);
     const r = [v[0] - 2 * vm * m[0], v[1] - 2 * vm * m[1], v[2] - 2 * vm * m[2]];
     const B = F * this.skyLum(r) + (1 - F) * (front ? 0.12 : 0.2);
-    return { tone: clamp(0.92 - B, 0.1, 0.86), col: this.mix(front ? HUE.deep : HUE.steel, this.skyCol(r), clamp(0.12 + F * 1.6)), F };
+    // the tone as the eye reads it (lightness goes as about the square root of the light)
+    return { tone: clamp(1.02 - 1.05 * Math.sqrt(B), 0.1, 0.8), col: this.mix(front ? HUE.deep : HUE.steel, this.skyCol(r), clamp(0.1 + 1.2 * Math.pow(F, 0.7))), F };
   },
-  // colour: the evening sky warming low toward the sun, the sand
+  // colour: the evening sky warming low toward the sun, the sand (all inside the picture box)
   under(lt) {
     this.frame(lt);
     const q = easeInOut(prog(lt, 0, 0.8)), w = easeInOut(clamp((lt - 0.2) / 6)), B = R11.BOX, hy = this.hy;
-    washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.46], [0.55, HUE.sky, 0.3], [0.85, HUE.dawn, 0.18 + 0.1 * w], [1, HUE.rose, 0.3 + 0.12 * w]], 0, q);
-    if (this.sp) {
-      const [sx, sy] = this.sp, R = 300;
-      ctx.save(); const g = ctx.createRadialGradient(sx, sy, 10, sx, sy, R);
-      g.addColorStop(0, `rgba(242,163,107,${0.5 + 0.15 * w})`); g.addColorStop(0.5, `rgba(242,163,107,${0.18 + 0.08 * w})`); g.addColorStop(1, 'rgba(242,163,107,0)');
-      ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(sx - R, sy - R, 2 * R, 2 * R); ctx.restore();
-    }
-    washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.dune, 0.42 + 0.08 * w], [0.12, HUE.sand, 0.36], [1, HUE.sand, 0.3 + 0.06 * w]], 0, q);
+    R11.clipped(() => {
+      washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.46], [0.55, HUE.sky, 0.3], [0.85, HUE.dawn, 0.18 + 0.1 * w], [1, HUE.rose, 0.3 + 0.12 * w]], 0, q);
+      if (this.sp) {
+        const [sx, sy] = this.sp, R = 300;
+        ctx.save(); const g = ctx.createRadialGradient(sx, sy, 10, sx, sy, R);
+        g.addColorStop(0, `rgba(242,163,107,${0.5 + 0.15 * w})`); g.addColorStop(0.5, `rgba(242,163,107,${0.18 + 0.08 * w})`); g.addColorStop(1, 'rgba(242,163,107,0)');
+        ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(sx - R, sy - R, 2 * R, 2 * R); ctx.restore();
+      }
+      washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.dune, 0.42 + 0.08 * w], [0.12, HUE.sand, 0.36], [1, HUE.sand, 0.3 + 0.06 * w]], 0, q);
+    });
   },
   draw(lt) {
     const s = this.sun(lt);
@@ -284,6 +292,14 @@ scene({
       if (d > 1 && d < 80) segs.push([[x, y, 0], [x + l, y + 0.2 * (c - 0.5), 0], 0.45 * R11.air(d, 50)]);
     });
     this.gravel.forEach(([a, b]) => { const x = C[0] - 45 + a * 90, y = -2.6 + b * 5.2, d = E3.depth([x, y, 0]); if (d > 1) dots.push([[x, y, 0], [x + 0.05, y, 0], 0.6 * R11.air(d, 60)]); });
+    // near the eye: wind ripples (crests north-east to south-west, across the north-westerly) and grit
+    this.near.forEach(([a, b, c]) => {
+      const x = -14 + a * 30, y = -6 + b * 22, d = E3.depth([x, y, 0]);
+      if (d < 1.2 || d > 40) return;
+      const l = 0.25 + 0.5 * c, al = (0.25 + 0.3 * c) * clamp((40 - d) / 25);
+      if (c < 0.7) segs.push([[x, y, 0], [x + l * 0.7, y - l * 0.7, 0], al]);
+      else dots.push([[x, y, 0], [x + 0.03, y, 0], al + 0.2]);
+    });
     E3.segments(dots, INK, 1.2);
     E3.segments(segs, INK, 0.8);
     this.tracks.forEach(t => E3.line(t, INK, 0.9, 0.3));
@@ -344,10 +360,15 @@ scene({
       if (p[0] < B[0] - 30 || p[0] > B[2] + 30 || p[1] < B[1] || p[1] > B[3] + 30) return;
       items.push({ key: Math.abs(st.x - C[0]), d, draw: () => this.station(st, d, i) });
     });
-    // the far field first
+    // the far field first: there the glass is seen at a grazing angle and holds the low sky (in colour, the rows take
+    // its warm light, a band that fades out where the rows come near enough to show their own tone)
+    if (OPT.colour) {
+      const gy = E3.proj([C[0] + 900 * cam.F[0], C[1] + 900 * cam.F[1], 0])[1], g = this.glass([C[0] + 1500 * cam.F[0], C[1] + 1500 * cam.F[1], this.HUB], true);
+      washFade([B[0], this.hy, B[2], gy], [[0, g.col, 0.5], [0.45, HUE.dawn, 0.28], [1, HUE.dawn, 0]], 0, 1);
+    }
     bands.forEach((segs, i) => {
       if (!segs.length) return;
-      ctx.save(); ctx.globalAlpha = SA * (i + 0.5) / 9; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.8; ctx.lineCap = 'round';
+      ctx.save(); ctx.globalAlpha = SA * (i + 0.5) / 9 * (OPT.colour ? 0.8 : 1); ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.8; ctx.lineCap = 'round';
       ctx.beginPath(); segs.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); }); ctx.stroke(); ctx.restore();
     });
     // then every nearer thing: rows further from the eye (across the rows) first; along a row, the far end first

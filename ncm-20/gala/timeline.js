@@ -244,7 +244,7 @@ function REV11_BEATS() {
         words(t) {
           const f = filmT(this, t), s = this.start;
           levelA(f, s + 0.4, s + 4.75, ['ونقرأ السماء', 'لكل رحلة'], 'WE READ THE SKY FOR EVERY FLIGHT', { y: 520, maxW: COLW });
-          levelB(f, s + 1.0, s + 4.75, 'رصد جوي للطيران على مدار الساعة', '24-HOUR AVIATION WEATHER WATCH', { y: 700 });
+          levelB(f, s + 1.0, s + 4.75, 'رصد جوي للطيران على مدار الساعة', '24-HOUR AVIATION WEATHER WATCH', { y: 790 });
         } },
       // B12 · Jebel Ali in its might (2.5 bars; was 1.5): the long container quay under a line of ship-to-shore cranes,
       // ultra-large ships berthed nose to tail, the yard behind; the camera rises along the line. Its figure is the port's
@@ -254,7 +254,7 @@ function REV11_BEATS() {
           const f = filmT(this, t), s = this.start;
           levelB(f, s + 0.333, s + 7.6, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
           levelA(f, s + 0.9, s + 7.6, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 520, maxW: COLW });
-          levelB(f, s + 3.2, s + 7.6, ltr('15.6') + ' مليون حاوية نمطية مُناوَلة في ' + ltr('2025'), '15.6 MILLION TEU HANDLED IN 2025', { y: 700 });
+          levelB(f, s + 3.2, s + 7.6, ltr('15.6') + ' مليون حاوية نمطية مُناوَلة في ' + ltr('2025'), '15.6 MILLION TEU HANDLED IN 2025', { y: 790 });
         } },
       // B14 · Shams 1 (the plate stays, 1.5 bars): its label gains the operator's own record, with its year (Shams Power:
       // "the first operational utility-scale CSP plant in the MENA region"; inaugurated 17 March 2013)
@@ -264,7 +264,7 @@ function REV11_BEATS() {
           const f = filmT(this, t), s = this.start;
           levelB(f, s + 0.2, s + 4.4, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 330 });
           levelA(f, s + 0.4, s + 4.4, ['ونتنبأ بسطوع الشمس', 'وهبوب الرياح'], 'WE FORECAST THE SUN AND THE WIND', { y: 520, maxW: COLW });
-          levelB(f, s + 1.4, s + 4.4, 'أول محطة للطاقة الشمسية المركّزة في المنطقة · ' + ltr('2013'), "THE REGION'S FIRST UTILITY-SCALE CSP PLANT · 2013", { y: 700 });
+          levelB(f, s + 1.4, s + 4.4, ['أول محطة للطاقة الشمسية المركّزة', 'في المنطقة · ' + ltr('2013')], ["THE REGION'S FIRST UTILITY-SCALE", 'CSP PLANT · 2013'], { y: 790 });
         } },
       // B13 · the east coast with its jetty (2 bars; was 1.5): an oil terminal's jetty off Fujairah, a tanker alongside
       // on the loading platform's arms, the Hajar close behind; calm water, no smoke, no flare, bow to the south (away
@@ -292,9 +292,9 @@ function REV11_BEATS() {
       world: [{ id: 'watch', use: 'watch', bars: 2.5, speed: 1, offset: 0.4, xf: 1.2, cam: R11.CAM,
         words(t) {
           const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.6, s + 7.6, 'المركز الوطني للأرصاد · غرفة العمليات', 'NATIONAL CENTER OF METEOROLOGY · OPERATIONS CENTRE', { y: 330 });
+          levelB(f, s + 0.6, s + 7.6, 'المركز الوطني للأرصاد · غرفة العمليات', ['NATIONAL CENTER OF METEOROLOGY', 'OPERATIONS CENTRE'], { y: 330 });
           levelA(f, s + 1.4, s + 7.6, ['نرصد السماء', 'على مدار الساعة'], 'WE WATCH THE SKY AROUND THE CLOCK', { y: 520, maxW: COLW });
-          levelB(f, s + 3.4, s + 7.6, 'حاسوب فائق · ' + ltr('2.8') + ' بيتافلوب · ' + ltr('2021'), 'SUPERCOMPUTER · 2.8 PETAFLOPS THEORETICAL PEAK · 2021', { y: 700 });
+          levelB(f, s + 3.4, s + 7.6, 'حاسوب فائق · ' + ltr('2.8') + ' بيتافلوب · ' + ltr('2021'), 'SUPERCOMPUTER · 2.8 PETAFLOPS PEAK · 2021', { y: 790 });
         } }],
     },
     after: {
@@ -302,7 +302,7 @@ function REV11_BEATS() {
       energy: [{ id: 'solar', use: 'solar', bars: 1.5, speed: 1, offset: 0.6, xf: 0.8, cam: R11.CAM,
         words(t) {
           const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.5, s + 4.75, ['محطة الظفرة للطاقة الشمسية · ' + ltr('2') + ' غيغاواط · ' + ltr('2023'), 'أكبر محطة شمسية في موقع واحد في العالم عند تدشينها'], ['AL DHAFRA SOLAR PV · 2 GW · 2023', "THE WORLD'S LARGEST SINGLE-SITE SOLAR PLANT AT ITS INAUGURATION"], { y: 330, enSize: 17 });
+          levelB(f, s + 0.5, s + 4.75, ['الظفرة للطاقة الشمسية · ' + ltr('2') + ' غيغاواط · ' + ltr('2023'), 'الأكبر عالمياً في موقع واحد عند تدشينها'], ['AL DHAFRA SOLAR PV · 2 GW · 2023', "THE WORLD'S LARGEST SINGLE-SITE AT ITS OPENING"], { y: 330, enSize: 17 });
           levelA(f, s + 1.8, s + 4.75, ['أول دولة في المنطقة', 'تلتزم بالحياد المناخي'], ["THE REGION'S FIRST", 'NET-ZERO PLEDGE'], { y: 600, maxW: COLW });
         } }],
     },

@@ -148,6 +148,7 @@ const AUH = (() => {
       if (E3.dot(n, E3.sub(E3.centroid(f), cs)) < 0) n = [-n[0], -n[1], -n[2]];
       let s = Object.assign({}, st, { n });
       if (warm && OPT.colour) { const lit = E3.dot(n, sun); s.fillCol = lit > 0.25 ? warm : st.fillCol; s.fillA = lit > 0.25 ? (st.warmA ?? 0.3) * Math.min(1, lit * 1.6) + 0.08 : st.fillA; }
+      if (st.inkFill && !OPT.colour) { const dk = clamp((st.tone || 0) + (st.shade ?? 0.6) * (1 - Math.max(0, E3.dot(n, sun)))); s.fillCol = INK; s.fillA = st.inkFill * dk * dk; }
       if (sil) { s.edges = false; info.push({ f, n, front: E3.dot(n, E3.sub(C, E3.centroid(f))) > 0 }); }
       E3.face(f, s, seed + i * 13);
     });
@@ -186,7 +187,7 @@ const AUH = (() => {
     const tw = pts => pts.map(pose.toW);
     const hx = pose.toW([1, 0, 0]), h0 = pose.toW([0, 0, 0]), along = [hx[0] - h0[0], hx[1] - h0[1], hx[2] - h0[2]];
     const base = { lw: o.lw ?? 1.2, edgeA: 0.85 * a, hdir: along, fillCol: o.fill ?? null, fillA: o.fillA ?? 0.25, warmA: o.warmA };
-    const skin = Object.assign({}, base, { tone: o.tone ?? 0.02, shade: o.shade ?? 0.5 });
+    const skin = Object.assign({}, base, { tone: o.tone ?? 0.02, shade: o.shade ?? 0.5, inkFill: o.inkFill || 0 });
     const seed = ac.seed || 1;
     const gearDraw = g => {
       if (!g) return;
@@ -241,7 +242,7 @@ const AUH = (() => {
     for (let i = 0; i < NA; i++) for (let j = 0; j + 1 < rings.length; j++) {
       const t0 = i / NA * TAU, t1 = (i + 1) / NA * TAU, q = [hubPt(t0, rings[j]), hubPt(t1, rings[j]), hubPt(t1, rings[j + 1]), hubPt(t0, rings[j + 1])];
       const pts = (j === 0 ? [q[0], q[2], q[3]] : q).map(([a, b]) => TL(a, b, hRoof(a, b)));
-      out.push({ pts, st: { tone: .03, shade: .38, hdir: E3.sub(TL(1, 0), TL(0, 0)), lw: 1, kind: 'roof' }, seed: 7000 + i * 7 + j, inside: add(cen(pts), [0, 0, -20]) });
+      out.push({ pts, st: { tone: .08, shade: .42, hdir: E3.sub(TL(1, 0), TL(0, 0)), lw: 1, kind: 'roof' }, seed: 7000 + i * 7 + j, inside: add(cen(pts), [0, 0, -20]) });
     }
     // the hub's walls: the 50 m glazed landside facade (facing 306°) and the airside walls between the piers
     for (let i = 0; i < NA; i++) {
@@ -249,7 +250,7 @@ const AUH = (() => {
       if (armAng.some(g => Math.abs(Math.atan2(Math.sin(tm - g), Math.cos(tm - g))) < 16 * D)) continue;
       const [a0, b0] = hubPt(t0, 1), [a1, b1] = hubPt(t1, 1), land = Math.cos(tm) > .55;
       const pts = [TL(a0, b0, 0), TL(a1, b1, 0), TL(a1, b1, hRoof(a1, b1)), TL(a0, b0, hRoof(a0, b0))];
-      out.push({ pts, st: { tone: land ? .34 : .22, shade: .3, hdir: [0, 0, 1], lw: 1, kind: land ? 'glass' : 'wall' }, seed: 7600 + i, inside: TL(hub.ca, 0, cen(pts)[2]) });
+      out.push({ pts, st: { tone: .36, shade: .3, hdir: [0, 0, 1], lw: 1, kind: 'glass' }, seed: 7600 + i, inside: TL(hub.ca, 0, cen(pts)[2]) });
     }
     // the four piers: 62 m wide at the eaves, glazing canted outward, the roof in waves ~68 m long, out to 500 m
     const piers = [];
@@ -292,13 +293,14 @@ const AUH = (() => {
   }
   // Terminal A into a painter's list: every face (no facet edges) and every line segment at its own depth
   function terminalItems(list, term, ink, o = {}) {
+    if (location.search.includes('noterm')) return;
     const k = o.k ?? 2400;
     term.faces.forEach(fc => {
       const c = E3.centroid(fc.pts), d = E3.depth(c);
       if (d < 5) return;
       list.push({ d, draw: () => {
         const a = R11.air(d, k) * ink, glass = fc.st.kind === 'glass';
-        const st = Object.assign({}, fc.st, { edges: false, noHatch: o.noHatch && !glass, fillCol: OPT.colour ? (glass ? HUE.deep : '#EFE7D8') : null, fillA: glass ? 0.24 : 0.3 });
+        const st = Object.assign({}, fc.st, { edges: false, noHatch: o.noHatch && !glass, fillCol: OPT.colour ? (glass ? HUE.deep : '#EFE7D8') : null, fillA: glass ? 0.24 : 0.3, inkFill: glass ? (o.inkFill ?? 0.18) : 0 });
         solid([fc.pts], st, fc.seed, fc.st.kind === 'roof' ? o.warm : null, fc.inside);
       } });
     });
@@ -341,7 +343,7 @@ const AUH = (() => {
     return { blade, base, cab, roof, floor, edges, TP };
   }
   function drawTower(tw, a, warm, tone = .1) {
-    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22 };
+    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22, inkFill: .3 };
     solid(tw.base, Object.assign({}, st, { tone: .12 }), 9100, warm);
     const info = [], C = E3.cam().C;
     tw.blade.map((b, i) => ({ b, i, d: E3.depth(E3.centroid(b.f)) })).sort((p, q) => q.d - p.d).forEach(({ b, i }) => {
@@ -365,6 +367,7 @@ const AUH = (() => {
   // right of the axis, t: depth), in long flat lenses, never in blobs.
   let FOG_CV, FOG;
   function fogLayer(list, o) {
+    if (location.search.includes('nofog')) return;
     const cam = E3.cam(), B = R11.BOX, { C, F, U, f, cx, cy } = cam;
     const dirZ = sy => F[2] - U[2] * (sy - cy) / f;
     const yh = cy + f * F[2] / U[2];
@@ -379,7 +382,7 @@ const AUH = (() => {
     const oo = Object.assign({}, o, { amt: o.amt * sl.amt });
     let y = Math.max(B[1], yh + 0.5);
     while (y < B[3]) {
-      const hgt = clamp(1.2 + (y - yh) * 0.028, 1.2, 10), y1 = Math.min(B[3], y + hgt), ym = (y + y1) / 2, dz = dirZ(ym);
+      const hgt = clamp(1.5 + (y - yh) * 0.032, 1.5, 11), y1 = Math.min(B[3], y + hgt), ym = (y + y1) / 2, dz = dirZ(ym);
       if (dz < -1e-6 && C[2] > sl.z1) {
         const t = (sl.z1 - C[2]) / dz, L = (sl.z1 - sl.z0) / -dz, a0 = 1 - Math.exp(-3 * L / sl.V);
         const tf = dirZ(y) < -1e-6 ? (sl.z1 - C[2]) / dirZ(y) : 1e9, tn = (sl.z1 - C[2]) / dirZ(y1);
@@ -394,30 +397,38 @@ const AUH = (() => {
     }
     });
   }
+  // a colour from gradient stops [[offset, '#rrggbb', alpha]...] at offset u, as [r, g, b, a]
+  function stopAt(stops, u) {
+    const hex = c => { const n = parseInt(c.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+    if (u <= stops[0][0]) return [...hex(stops[0][1]), stops[0][2]];
+    for (let i = 1; i < stops.length; i++) if (u <= stops[i][0]) { const a = stops[i - 1], b = stops[i], k = (u - a[0]) / ((b[0] - a[0]) || 1), ca = hex(a[1]), cb = hex(b[1]); return [0, 1, 2].map(q => Math.round(ca[q] + (cb[q] - ca[q]) * k)).concat([a[2] + (b[2] - a[2]) * k]); }
+    const l = stops[stops.length - 1]; return [...hex(l[1]), l[2]];
+  }
   function fogBand(o, ya, yb, t, a0, strokes, rows = []) {
     const B = R11.BOX, cam = E3.cam(), f = cam.f, cx = cam.cx;
-    const stops = [];
-    const N = 28;
-    for (let i = 0; i <= N; i++) { const x = B[0] + (B[2] - B[0]) * i / N, l = (x - cx) / f * t; stops.push([i / N, clamp(a0 * (o.dens ? o.dens(l, t) : 1) * o.amt)]); }
-    if (stops.every(s => s[1] < 0.004)) return;
-    if (!FOG_CV) { FOG_CV = document.createElement('canvas'); FOG_CV.width = W * SCALE; FOG_CV.height = H * SCALE; FOG = FOG_CV.getContext('2d'); }
-    const m = ctx.getTransform(), g = FOG;
-    const bx0 = Math.max(0, Math.floor(m.a * B[0] + m.e)), bx1 = Math.min(W * SCALE, Math.ceil(m.a * B[2] + m.e));
-    const by0 = Math.max(0, Math.floor(m.d * ya + m.f)), by1 = Math.min(H * SCALE, Math.ceil(m.d * yb + m.f));
-    if (by1 <= by0 || bx1 <= bx0) return;
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(bx0, by0, bx1 - bx0, by1 - by0); g.setTransform(m);
-    PAPER_PAT.setTransform(m.inverse()); g.fillStyle = PAPER_PAT; g.globalCompositeOperation = 'source-over'; g.fillRect(B[0], ya, B[2] - B[0], yb - ya);
-    if (o.tint) { // a colour in the fog: cool away from the sun, warm toward it
-      const tg = g.createLinearGradient(B[0], 0, B[2], 0);
-      o.tint(t).forEach(([off, col, al]) => { const n = parseInt(col.slice(1), 16); tg.addColorStop(clamp(off), `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${al})`); });
-      g.globalCompositeOperation = 'multiply'; g.fillStyle = tg; g.fillRect(B[0], ya, B[2] - B[0], yb - ya);
+    // runs of equal density across the row (22 px cells, the density in steps of 1/40), each laid as paper at that
+    // density, and in colour tinted by the fog's colour there
+    const CW = 22, runs = [];
+    for (let x = B[0]; x < B[2]; x += CW) {
+      const l = (x + CW / 2 - cx) / f * t, al = Math.round(clamp(a0 * (o.dens ? o.dens(l, t) : 1) * o.amt) * 40) / 40, x1 = Math.min(B[2], x + CW);
+      const last = runs[runs.length - 1];
+      if (last && last.a === al) last.x1 = x1; else runs.push({ x0: x, x1, a: al });
     }
-    const ag = g.createLinearGradient(B[0], 0, B[2], 0);
-    stops.forEach(([off, al]) => ag.addColorStop(off, `rgba(0,0,0,${al})`));
-    g.globalCompositeOperation = 'destination-in'; g.fillStyle = ag; g.fillRect(B[0], ya, B[2] - B[0], yb - ya);
-    g.restore();
-    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'source-over';
-    ctx.drawImage(FOG_CV, bx0, by0, bx1 - bx0, by1 - by0, bx0, by0, bx1 - bx0, by1 - by0); ctx.restore();
+    ctx.save();
+    PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.fillStyle = PAPER_PAT; ctx.globalCompositeOperation = 'source-over';
+    runs.forEach(r => { if (r.a < 0.004) return; ctx.globalAlpha = SA * r.a; ctx.fillRect(r.x0, ya, r.x1 - r.x0, yb - ya); });
+    if (o.tint) {
+      const stops = o.tint(t);
+      ctx.globalCompositeOperation = 'multiply';
+      runs.forEach(r => {
+        if (r.a < 0.004) return;
+        for (let x = r.x0; x < r.x1; x += 44) {
+          const x1 = Math.min(r.x1, x + 44), c = stopAt(stops, ((x + x1) / 2 - B[0]) / (B[2] - B[0]));
+          ctx.globalAlpha = SA * r.a * c[3]; ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; ctx.fillRect(x, ya, x1 - x, yb - ya);
+        }
+      });
+    }
+    ctx.restore();
     // light horizontal hatching on the rows in this band, in flat bands and lenses (o.rule gives each dash its weight)
     if (rows.length && o.rule) {
       const segs = [[], [], [], []];
@@ -470,13 +481,32 @@ const AUH = (() => {
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply';
     ctx.drawImage(UN_CV, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0); ctx.restore();
   }
+  // the air: thin sheets of haze at several depths, each a veil of paper (warm in colour) strongest along the horizon,
+  // so that everything beyond a sheet pales a little more (and the sky whitens toward the horizon)
+  function hazeItems(list, depths, { hy, up = 220, down = 70, a = 0.14, tint = null } = {}) {
+    if (location.search.includes('nohaze')) return;
+    const B = R11.BOX;
+    depths.forEach(d => list.push({ d, draw: () => {
+      if (!FOG_CV) { FOG_CV = document.createElement('canvas'); FOG_CV.width = W * SCALE; FOG_CV.height = H * SCALE; FOG = FOG_CV.getContext('2d'); }
+      const m = ctx.getTransform(), g = FOG, y0 = Math.max(B[1], hy - up), y1 = Math.min(B[3], hy + down);
+      if (y1 <= y0) return;
+      const bx0 = Math.max(0, Math.floor(m.a * B[0] + m.e)), bx1 = Math.min(W * SCALE, Math.ceil(m.a * B[2] + m.e)), by0 = Math.max(0, Math.floor(m.d * y0 + m.f)), by1 = Math.min(H * SCALE, Math.ceil(m.d * y1 + m.f));
+      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(bx0, by0, bx1 - bx0, by1 - by0); g.setTransform(m);
+      PAPER_PAT.setTransform(m.inverse()); g.fillStyle = PAPER_PAT; g.globalCompositeOperation = 'source-over'; g.fillRect(B[0], y0, B[2] - B[0], y1 - y0);
+      if (tint) { const n = parseInt(tint[0].slice(1), 16); g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${tint[1]})`; g.fillRect(B[0], y0, B[2] - B[0], y1 - y0); }
+      const vg = g.createLinearGradient(0, y0, 0, y1), k = (hy - y0) / (y1 - y0);
+      vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(clamp(k * 0.55), `rgba(0,0,0,${a * 0.35})`); vg.addColorStop(clamp(k), `rgba(0,0,0,${a})`); vg.addColorStop(1, `rgba(0,0,0,${a * 0.5})`);
+      g.globalCompositeOperation = 'destination-in'; g.fillStyle = vg; g.fillRect(B[0], y0, B[2] - B[0], y1 - y0); g.restore();
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA; ctx.drawImage(FOG_CV, bx0, by0, bx1 - bx0, by1 - by0, bx0, by0, bx1 - bx0, by1 - by0); ctx.restore();
+    } }));
+  }
   // smooth noise from a few long sines (deterministic, no texture needed)
   const noise = (x, y, s = 0) => 0.5 + 0.28 * Math.sin(x * 0.9 + y * 0.31 + s) * Math.cos(y * 0.73 - x * 0.2 + 1.7 * s) + 0.22 * Math.sin(x * 2.3 - y * 1.1 + 2.1 + s * 0.7);
 
   /* ---------- the engraved sky: horizontal rules, open where the light is ---------- */
-  function skyRules(hy, glow, { top = R11.BOX[1], step = 4.6, amax = 0.3, col = INK, lw = 0.75 } = {}) {
+  function skyRules(hy, glow, { top = R11.BOX[1], step = 4.6, step0 = null, amax = 0.3, col = INK, lw = 0.75 } = {}) {
     const B = R11.BOX, bands = [[], [], [], [], []];
-    for (let y = top + 2; y < hy - 1; y += step) {
+    for (let y = top + 2; y < hy - 1; y += step0 ? lerp(step0, step, clamp((y - top) / (hy - top))) : step) {
       for (let x = B[0]; x < B[2]; x += 11) {
         const al = amax * glow(x + 5.5, y);
         if (al > 0.012) bands[Math.min(4, Math.floor(al / amax * 5))].push([x, y]);
@@ -508,7 +538,7 @@ const AUH = (() => {
     ctx.globalAlpha = SA * a; ctx.beginPath(); byA.forEach(([s, r]) => { ctx.moveTo(s[0] + r, s[1]); ctx.arc(s[0], s[1], r, 0, TAU); }); ctx.fill();
     ctx.restore();
   }
-  return { terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES };
+  return { hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES };
 })();
 
 /* ==========================================================================================================
@@ -557,7 +587,7 @@ scene({
     for (let o = 112; o <= 330; o += 7.5) this.slabs.push([at(300, o), at(760, o), 0.5]);
     // grain on the apron near the eye (it shows through the thin fog)
     this.grain = [];
-    for (let i = 0; i < 900; i++) { const s = 200 + r() * 700, o = 20 + r() * 420; this.grain.push([at(s, o), r()]); }
+    for (let i = 0; i < 1100; i++) { const s = 420 + r() * 300, o = 100 + r() * 220; this.grain.push([at(s, o), r()]); }
     // the fog's strokes, laid out from the eye in the middle of the pan, wide enough for all of it
     this.view(3.3);
     this.fogSk = AUH.fogStrokes(2200, 4401, { t0: 60, t1: 5000, half: 0.95, len: 70, jit: 0.15 });
@@ -569,7 +599,7 @@ scene({
     const u = easeInOut(clamp((lt - 0.7) / 5.2)), A = AUH.TA;
     const s = lerp(580, 574, u), o = lerp(160, 166, u), z = lerp(40, 43, u);
     const cu = A[0] + 0.7071 * s - 0.7071 * o, cv = A[1] - 0.7071 * s - 0.7071 * o;
-    const f = 1050, hyT = 450, pitch = -Math.atan((562 - hyT) / f), a = lerp(69, 93, u), ax = AUH.dirAz(a), far = 5000;
+    const f = 1050, hyT = lerp(450, 575, easeInOut(clamp((lt - 1.6) / 4.2))), pitch = -Math.atan((562 - hyT) / f), a = lerp(69, 93, u), ax = AUH.dirAz(a), far = 5000;
     const C = AUH.W3(cu, cv, z), L = AUH.W3(cu + far * ax[0] * Math.cos(pitch), cv + far * ax[1] * Math.cos(pitch), z + far * Math.sin(pitch));
     this.ax = a;
     return E3.camera(C, L, f, 560, 562);
@@ -600,54 +630,57 @@ scene({
       AUH.skyRules(hy, (x, y) => {
         const dx = (x - sx) / 1.3, dy = y - sy, rr = Math.hypot(dx, dy), g = Math.exp(-rr / 140) + 0.6 * Math.exp(-rr / 430);
         const up = clamp((hy - y) / (hy - B[1])), haze = clamp((hy - y) / 70);
-        return ink * clamp((0.3 + 0.7 * up) * (1 - clamp(g)) * (0.3 + 0.7 * haze)) * (OPT.colour ? 0.4 : 1);
-      }, { amax: 0.36, step: 4.4 });
+        return ink * clamp((0.22 + 0.78 * up) * (1 - clamp(g)) * (0.25 + 0.75 * haze)) * (OPT.colour ? 0.45 : 1);
+      }, { amax: 0.55, step: 5.6, step0: 2.9, lw: 0.8 });
       // the sun, just clear of the horizon: an open disc of paper, its rim barely drawn
       const sr = this.view(lt).f * Math.tan(0.265 * AUH.D); this.frame(lt);
       mask(el(sx, sy, sr, sr, 0, TAU, 601, 0), 0.9 * ink);
-      if (OPT.colour) disc(sx, sy, sr, HUE.gold, 0.25 * ink, 'multiply');
+      if (OPT.colour) { AUH.radialWash(sx, sy, 90, [[0, '#FFFFFF', 0], [0.12, HUE.gold, 0.5], [0.4, HUE.dawn, 0.25], [1, HUE.dawn, 0]], ink); disc(sx, sy, sr, HUE.gold, 0.3 * ink, 'multiply'); }
       stroke(el(sx, sy, sr, sr, 0, TAU, 602, 0.1), ink, OPT.colour ? HUE.dune : OCHRE, 0.9, 0.5);
       stroke(new P([[B[0], hy], [B[2], hy]]), ink, INK, 0.7, 0.25);
       // the apron (seen only through the fog): its lines and grain
       E3.segments(this.slabs.map(m => [m[0], m[1], 0.16 * ink]), INK, 0.5);
       E3.segments(this.marks.map(m => [m[0], m[1], 0.75 * ink]), OPT.colour ? HUE.gold : OCHRE, 1.6);
-      E3.segments(this.grain.map(([p, k]) => [p, [p[0] + 1.5 + 3 * k, p[1] + 1, 0.05], (0.2 + 0.25 * k) * ink]), INK, 0.8);
+      E3.segments(this.grain.map(([p, k]) => [p, [p[0] + 0.6 + 1.2 * k, p[1] + 0.3, 0.05], (0.2 + 0.3 * k) * ink]), INK, 0.8);
       // the painter's list: the terminal's faces, the aircraft, the tower, the jet bridges and the fog's bands
       const list = [];
       const tw = this.tower, dT = R11.dep(AUH.W3(AUH.TWR[0], AUH.TWR[1], 40));
-      list.push({ d: dT, draw: () => AUH.drawTower(tw, R11.air(dT, 2600) * ink, OPT.colour ? HUE.dawn : null, 0.3) });
+      list.push({ d: dT, draw: () => AUH.drawTower(tw, R11.air(dT, 3400) * ink, OPT.colour ? HUE.dawn : null, 0.36) });
       AUH.terminalItems(list, this.term, ink, { warm: OPT.colour ? HUE.dawn : null });
       this.planes.forEach(p => {
         const k = AUH.TYPES[p.type], c = p.pose.toW([k.fus[0][0] * 0.2 + k.fus[11][0] * 0.8, 0, 0]), d = R11.dep(c);
-        list.push({ d, draw: () => AUH.drawPlane(p, { air: R11.air(d, 2400) * ink, lw: 1.1, fill: OPT.colour ? '#EEE8DC' : null, fillA: 0.35, warm: OPT.colour ? HUE.dawn : null, shade: 0.45 }) });
+        list.push({ d, draw: () => AUH.drawPlane(p, { air: R11.air(d, 2400) * ink, lw: 1.2, fill: OPT.colour ? '#E4E0DA' : null, fillA: 0.35, warm: OPT.colour ? HUE.dawn : null, tone: 0.14, shade: 0.5, inkFill: 0.2 }) });
       });
       this.bridges.forEach(b => list.push({ d: R11.dep(b.b), draw: () => R11.member(b.a, b.b, 3.4, 0.7 * ink) }));
       // the fog: dense to 9 m at first, settling to 7.2 m, under a soft top (two thin veils over it); visibility in it
       // 110 m, clearing to 240 m; it slides east at ~3 m/s
-      const hF = lerp(9, 7.2, w), V = lerp(75, 210, w), slide = 3.2 * (lt - 0.8);
+      const hF = lerp(9, 7.2, w), V = lerp(42, 170, w), slide = 3.2 * (lt - 0.8);
       const sxn = clamp((sx - B[0]) / (B[2] - B[0]), -0.5, 1.6);
       AUH.fogLayer(list, {
-        h: hF, V, amt: 0.97 * ink, strokes: this.fogSk, veils: [[0, 1.4, 60, 0.55], [1.4, 3, 90, 0.35]],
+        h: hF, V, amt: 0.97 * ink, strokes: this.fogSk, veils: [[0, 2.2, 70, 0.5]],
         dens: (l, t) => {
           const near = clamp((380 - t) / 300), n = AUH.noise((l + slide) / 60, t / 14, 0.3);
           return 1 - (0.2 + 0.5 * w) * near * AUH.smooth(clamp((n - 0.4) * 2.2));
         },
         tint: OPT.colour ? t => {
           const far = clamp(1 - t / 2000);
-          return [[0, HUE.rose, 0.16 + 0.06 * far], [clamp(sxn - 0.55), HUE.rose, 0.16], [clamp(sxn - 0.2), HUE.dawn, 0.2], [clamp(sxn), HUE.gold, 0.3], [1, HUE.gold, 0.24]];
+          return [[0, HUE.cloud, 0.2 + 0.08 * far], [clamp(sxn - 0.6), HUE.rose, 0.2], [clamp(sxn - 0.25), HUE.dawn, 0.26], [clamp(sxn), HUE.gold, 0.4], [1, HUE.gold, 0.32]];
         } : null,
         grain: (x, y, l, t, k) => {
           const toSun = Math.exp(-Math.abs(x - sx) / 200), horizon = clamp((y - hy) / 26), lens = AUH.smooth(clamp((AUH.noise((l + slide) / 55, t / 26, 1.3) - 0.45) * 2));
           return (0.15 + 0.35 * k) * lens * (1 - 0.85 * toSun) * horizon;
         },
+        // long flat swells on the fog's top: hatched in their troughs, open on their crests, fading toward the sun
         rule: (x, y, l, t) => {
-          const toSun = Math.exp(-Math.abs(x - sx) / 240), horizon = clamp((y - hy) / 14);
-          const band = AUH.smooth(clamp((AUH.noise(t / 150, (l + slide * 0.6) / 700, 0.7) - 0.34) * 2.4)), lens = 0.55 + 0.45 * AUH.noise((l + slide) / 90, t / 40, 2.9);
+          const toSun = Math.exp(-Math.abs(x - sx) / 260), horizon = clamp((y - hy) / 10);
+          const swell = 0.5 + 0.5 * Math.sin(TAU * t / 90 + 2.2 * AUH.noise((l + slide) / 260, t / 380, 0.7));
+          const band = AUH.smooth(clamp((swell - 0.42) * 2.4)), lens = 0.45 + 0.55 * AUH.smooth(clamp((AUH.noise((l + slide) / 110, t / 60, 2.9) - 0.25) * 1.8));
           return band * lens * (1 - 0.8 * toSun) * horizon;
         },
-        ruleA: OPT.colour ? 0.26 : 0.34, ruleW: 0.7,
+        ruleA: OPT.colour ? 0.3 : 0.4, ruleW: 0.75,
         lineCol: OPT.colour ? '#8A7F92' : SEPIA, lw: 0.75,
       });
+      AUH.hazeItems(list, [800, 1400, 2100], { hy, up: 70, down: 50, a: 0.16 * ink, tint: OPT.colour ? [HUE.dawn, 0.35] : null });
       R11.paint(list);
       if (typeof DEBUG_AUH !== 'undefined' || location.search.includes('dbg')) {
         const mk = (p, c) => { const q = E3.proj(p); disc(q[0], q[1], 6, c, 1, 'source-over'); };
@@ -813,6 +846,7 @@ scene({
         grain: (x, y, l, t, k) => clamp((y - hy) / 24) * (0.2 + 0.5 * k),
         lineCol: OPT.colour ? HUE.steel : SEPIA, lw: 0.8,
       });
+      AUH.hazeItems(list, [900, 1500, 2200, 3100, 4200], { hy, up: 200, down: 90, a: 0.13 * ink, tint: OPT.colour ? [HUE.sand, 0.2] : null });
       R11.paint(list);
     });
     E3.sunAt();
