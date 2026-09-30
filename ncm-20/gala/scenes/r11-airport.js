@@ -342,8 +342,8 @@ const AUH = (() => {
     const edges = { outer: Array.from({ length: 25 }, (_, i) => { const [p, z] = outer(i / 24); return TP(p, 0, z); }), inner: Array.from({ length: 25 }, (_, i) => { const [p, z] = inner(i / 24); return TP(p, 0, z); }) };
     return { blade, base, cab, roof, floor, edges, TP };
   }
-  function drawTower(tw, a, warm, tone = .1) {
-    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22, inkFill: .3 };
+  function drawTower(tw, a, warm, tone = .1, inkFill = .3) {
+    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22 + .2 * tone, inkFill };
     solid(tw.base, Object.assign({}, st, { tone: .12 }), 9100, warm);
     const info = [], C = E3.cam().C;
     tw.blade.map((b, i) => ({ b, i, d: E3.depth(E3.centroid(b.f)) })).sort((p, q) => q.d - p.d).forEach(({ b, i }) => {
@@ -628,9 +628,9 @@ scene({
       const B = R11.BOX, hy = this.hy, [sx, sy] = this.sunXY, w = easeInOut(clamp((lt - 0.8) / 5)), ink = easeOut(prog(lt, 0.55, 0.8));
       // the sky's engraved rules: close overhead and away from the sun, open around it and along the horizon
       AUH.skyRules(hy, (x, y) => {
-        const dx = (x - sx) / 1.3, dy = y - sy, rr = Math.hypot(dx, dy), g = Math.exp(-rr / 140) + 0.6 * Math.exp(-rr / 430);
-        const up = clamp((hy - y) / (hy - B[1])), haze = clamp((hy - y) / 70);
-        return ink * clamp((0.22 + 0.78 * up) * (1 - clamp(g)) * (0.25 + 0.75 * haze)) * (OPT.colour ? 0.45 : 1);
+        const dx = (x - sx) / 1.25, dy = (y - sy) * 1.15, rr = Math.hypot(dx, dy), g = AUH.smooth(clamp(1 - (rr - 14) / 150)) + 0.35 * Math.exp(-rr / 420);
+        const up = clamp((hy - y) / (hy - B[1])), haze = clamp((hy - y) / 30);
+        return ink * clamp((0.34 + 0.66 * up) * (1 - clamp(g)) * (0.4 + 0.6 * haze)) * (OPT.colour ? 0.45 : 1);
       }, { amax: 0.55, step: 5.6, step0: 2.9, lw: 0.8 });
       // the sun, just clear of the horizon: an open disc of paper, its rim barely drawn
       const sr = this.view(lt).f * Math.tan(0.265 * AUH.D); this.frame(lt);
@@ -639,13 +639,15 @@ scene({
       stroke(el(sx, sy, sr, sr, 0, TAU, 602, 0.1), ink, OPT.colour ? HUE.dune : OCHRE, 0.9, 0.5);
       stroke(new P([[B[0], hy], [B[2], hy]]), ink, INK, 0.7, 0.25);
       // the apron (seen only through the fog): its lines and grain
-      E3.segments(this.slabs.map(m => [m[0], m[1], 0.16 * ink]), INK, 0.5);
-      E3.segments(this.marks.map(m => [m[0], m[1], 0.75 * ink]), OPT.colour ? HUE.gold : OCHRE, 1.6);
-      E3.segments(this.grain.map(([p, k]) => [p, [p[0] + 0.6 + 1.2 * k, p[1] + 0.3, 0.05], (0.2 + 0.3 * k) * ink]), INK, 0.8);
+      // (the apron is under the fog: its lines come up only as the fog thins)
+      const show = ink * (0.25 + 0.75 * w * w);
+      E3.segments(this.slabs.map(m => [m[0], m[1], 0.16 * show]), INK, 0.5);
+      E3.segments(this.marks.map(m => [m[0], m[1], 0.7 * show]), OPT.colour ? HUE.gold : OCHRE, 1.5);
+      E3.segments(this.grain.map(([p, k]) => [p, [p[0] + 0.6 + 1.2 * k, p[1] + 0.3, 0.05], (0.2 + 0.3 * k) * show]), INK, 0.8);
       // the painter's list: the terminal's faces, the aircraft, the tower, the jet bridges and the fog's bands
       const list = [];
       const tw = this.tower, dT = R11.dep(AUH.W3(AUH.TWR[0], AUH.TWR[1], 40));
-      list.push({ d: dT, draw: () => AUH.drawTower(tw, R11.air(dT, 3400) * ink, OPT.colour ? HUE.dawn : null, 0.36) });
+      list.push({ d: dT, draw: () => AUH.drawTower(tw, R11.air(dT, 3400) * ink, OPT.colour ? HUE.dawn : null, 0.45, 0.5) });
       AUH.terminalItems(list, this.term, ink, { warm: OPT.colour ? HUE.dawn : null });
       this.planes.forEach(p => {
         const k = AUH.TYPES[p.type], c = p.pose.toW([k.fus[0][0] * 0.2 + k.fus[11][0] * 0.8, 0, 0]), d = R11.dep(c);
@@ -654,7 +656,7 @@ scene({
       this.bridges.forEach(b => list.push({ d: R11.dep(b.b), draw: () => R11.member(b.a, b.b, 3.4, 0.7 * ink) }));
       // the fog: dense to 9 m at first, settling to 7.2 m, under a soft top (two thin veils over it); visibility in it
       // 110 m, clearing to 240 m; it slides east at ~3 m/s
-      const hF = lerp(9, 7.2, w), V = lerp(42, 170, w), slide = 3.2 * (lt - 0.8);
+      const hF = lerp(9, 7.2, w), V = lerp(36, 160, w * w), slide = 3.2 * (lt - 0.8);
       const sxn = clamp((sx - B[0]) / (B[2] - B[0]), -0.5, 1.6);
       AUH.fogLayer(list, {
         h: hF, V, amt: 0.97 * ink, strokes: this.fogSk, veils: [[0, 2.2, 70, 0.5]],
@@ -674,10 +676,10 @@ scene({
         rule: (x, y, l, t) => {
           const toSun = Math.exp(-Math.abs(x - sx) / 260), horizon = clamp((y - hy) / 10);
           const swell = 0.5 + 0.5 * Math.sin(TAU * t / 90 + 2.2 * AUH.noise((l + slide) / 260, t / 380, 0.7));
-          const band = AUH.smooth(clamp((swell - 0.42) * 2.4)), lens = 0.45 + 0.55 * AUH.smooth(clamp((AUH.noise((l + slide) / 110, t / 60, 2.9) - 0.25) * 1.8));
+          const band = AUH.smooth(clamp((swell - 0.5) * 3)), lens = 0.35 + 0.65 * AUH.smooth(clamp((AUH.noise((l + slide) / 110, t / 60, 2.9) - 0.25) * 1.8));
           return band * lens * (1 - 0.8 * toSun) * horizon;
         },
-        ruleA: OPT.colour ? 0.3 : 0.4, ruleW: 0.75,
+        ruleA: OPT.colour ? 0.36 : 0.5, ruleW: 0.8,
         lineCol: OPT.colour ? '#8A7F92' : SEPIA, lw: 0.75,
       });
       AUH.hazeItems(list, [800, 1400, 2100], { hy, up: 70, down: 50, a: 0.16 * ink, tint: OPT.colour ? [HUE.dawn, 0.35] : null });
