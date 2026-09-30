@@ -49,7 +49,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) · `?heritage` the Emirati crafts and skills (Revision 10, a draft) |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
@@ -78,6 +78,7 @@ python3 script.py out/cues.json SCRIPT.md             # the as-built script for 
 FILM_QUERY='vo&tc' node render.js film out/review-vo.mp4 out/mix.wav --jobs 3   # review copy: scratch narration, timecode
 node render.js film out/review.mp4 out/mix.wav --jobs 3                         # clean 1080p 30 fps
 FILM_QUERY='vo&colour&fadeout=2.5' node render.js film out/review-colour.mp4 out/mix.wav --jobs 3   # the colour pass (Revision 9), narration as subtitles
+FILM_QUERY='vo&colour&heritage&fadeout=2.5' node render.js film out/review-heritage.mp4 out/mix.wav --jobs 3   # with the Emirati touches (Revision 10)
 
 # every master in one go (about 2.7 hours at --jobs 3), then the show deliverables, the QC report and its page
 sh masters.sh out/audio out/masters                   # gathers the WAVs from out/ and out/pull/ if out/audio has none

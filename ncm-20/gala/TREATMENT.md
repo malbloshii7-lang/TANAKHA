@@ -530,6 +530,96 @@ are rendered again with it (row 41).
 - **Gauge:** the sky clearing behind the glass after the shower, and the water column in blue.
 
 
+## Revision 10 · 30 September 2026: Emirati crafts and skills (a draft for approval)
+
+The requester asked to be surprised with "UAE touch skills" in the film: its crafts and traditional know-how. The
+touches are behind a switch, `?heritage`, which works with or without `?colour`. Without it, the film is the approved
+Revision 8: 20 stills, one from every beat, are identical to the pixel. No touch adds a word on screen.
+
+**How they were chosen.**
+- Four researchers checked 22 candidates against sources: weaving; land and nature; the sea and the city; the
+  sky lore.
+- A judge chose six that are true to their place and period and visible at true scale.
+- Ten independent reviewers then tried to refute them, two per touch, one reading for culture and truth and one for
+  picture craft.
+- One touch was dropped, and the rest were corrected as recorded below.
+
+**The touches.**
+- **Monsoon (B03): the compass card as «الدِّيرة».**
+  - This is the Gulf seafarers' compass (Juma bin Thalith, «رجال الغوص واللؤلؤ», KHDA and the Emirates Diving
+    Association, reviewed in Al Bayan, 28 Feb 2010).
+  - Its card carries the 32 akhnan, named for the risings and settings of stars as Ibn Majid records them.
+  - The marks, unlabelled:
+    - a small ink star at north, «الياه» (al-Jah, the Pole Star);
+    - an empty ring at south, «القطب», where no star stands;
+    - one gold star at SSE (157.5 deg), Suhail's rising, the star the film opened on. From here Suhail itself rises
+      at about 151-152 deg (computed).
+  - The card holds still with north up, as a compass card does. The isba' scale's star is ink: Ibn Majid measured
+    the Pole Star.
+- **Pearling (B04): the nahham.** A fifth figure stands forward of the mainmast: the boat's song leader, whose call
+  the score carries.
+  - He stands still like the crew. No gesture is drawn or claimed; a hand to the ear would read as the call to
+    prayer.
+  - He stands or falls with the call (row 37).
+- **The three leaders' cards: Al Sadu's al-hubub.**
+  - Each rule becomes a strip of al-hubub, "the grains": small grains on a paper ground between two edge lines,
+    woven outward from the star.
+  - The design is described by DCT Abu Dhabi as "long, usually white strips with points like crop grains". Al Sadu,
+    the traditional weaving skills of the UAE's Bedouin women, is UNESCO element 02223, on the Representative List
+    since December 2025 (WAM, 17 Dec 2025).
+  - In colour every other grain takes the Hajar rust, standing in for Sadu's red yarn.
+  - The code is the same for all three cards.
+- **Rail (B11): the ghaf.**
+  - Seven ghaf trees, the national tree, stand on the plain near Al Dhaid, drawn from the plate's own perspective.
+    They are 6.5-7 m tall, bare to the camels' browse line at 3.2 m, with a rounded crown whose lower edge is a
+    ragged weeping hem.
+  - The browse line and the stands' densities at Dhaid (29.4 trees a hectare on gravel, 93.7 on sand) are from
+    Gallacher and El-Keblawy (2016). The places are composed, not surveyed, and the plain is drawn far sparser than
+    a stand.
+  - No tree stands behind the train's roofline or under the far palm grove.
+- **Finale (B20): al-Shi'ra above Suhail.**
+  - As the gold ring closes, the computed sky puts Sirius straight above Suhail. Ibrahim Al Jarwan notes that
+    al-Shi'ra and Suhail stand one above the other over the southern horizon after sunset as spring arrives, about
+    20 March (WAM, 4 Aug 2020).
+  - A soft halo on Sirius, from the ring's close, lets the eye find the pair. It is drawn only if the computed sky
+    aligns them to within 1 deg at that moment, so the ceremony date decides it (row 1). It eases to half by the
+    film's end, which the stage holds keep.
+  - There is no line and no label.
+
+**Dropped or rejected, with the reason.**
+- The palm-mat sail as Emirati khoos. It was built, then dropped on review: nothing showed on screen, and the sources
+  for palm-mat sails are Red Sea and East African (doum palm), not Gulf.
+- A falcon at the man's wrist in the opening. On 24 August a falconer's bird is in its moult, and the falcon is the
+  form of the federal emblem.
+- Sadu saddle bags on the camel: invisible in a pre-dawn silhouette. The camel's saddle (shdad): the sources conflict
+  on its profile.
+- A date-harvest climber at the falaj: he would be on screen while the narrator names Sheikh Zayed (the likeness
+  rule).
+- A dhow at the Marina in the finale: not reliably in that water on the evening.
+- A barjeel: no beat's place and period allows one.
+- A dallah and finjan at the Center: its story link is hospitality, not reading the sky, and it can read as a coffee
+  break.
+- Re-grading the isba' to Suhail, and animating the Suhaili wind from the star. The second would read as the star
+  bringing the wind (the anwa').
+
+**Words, off screen only.** Each needs a native Arabic edit and protocol's approval before it is used.
+- For the MC or the programme:
+  - «في أمسيات مارس تتعامد الشِّعرى وسهيل على الأفق الجنوبي مع قدوم الربيع.»
+  - "On March evenings al-Shi'ra and Suhail stand one above the other over the southern horizon as spring arrives."
+  - Describe the pair only as a marker of time, never as bringing or governing the season.
+- For the programme: "The cards' borders follow al-hubub, a design of Emirati Al Sadu, now on UNESCO's Representative
+  List."
+- Do not call Al Talli or Al Sadu "urgent safeguarding": Talli is on the Representative List (2022), and Sadu moved to
+  it in December 2025.
+
+**Checked.**
+- Every touch was rendered at 1080p and 4K, in the plain and colour looks.
+- LED rules: lines are 1 px or more, and parallel lines at least 2.5 px apart at 1080p.
+- Nothing pops or flashes.
+- The film's last frame still opens stage hold A exactly.
+- Without the switch, all 20 beat stills are identical to Revision 8.
+
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*
@@ -1437,6 +1527,7 @@ Every number on screen, its qualifier and its source:
 | 39 | The leaders' cards' reading time: lengthen all three equally (for example to 15 s each, adding about 10 s) or trim their English | The rule of 3 s plus 0.3 s a word; equal treatment | Protocol office | 11.7 s beats as built |
 | 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
 | 41 | **The colour pass (Revision 9, `?colour`):** adopt it for the ceremony masters, and if so as drafted or more restrained. Management asked for the film to be "More colorful" | The look of the whole film in the hall; the LED grade is calibrated on the wall with it | Requester and NCM | The approved Revision 8 look; the colour pass is delivered as a subtitled review copy |
+| 42 | **The Emirati crafts and skills (Revision 10, `?heritage`):** adopt them for the ceremony masters, all or some (the «الدِّيرة» card, the nahham, Al Sadu on the cards, the ghaf, al-Shi'ra above Suhail) | Heritage shown before the Vice President must be true and dignified; the cards carry the leaders' words | Requester, NCM, the cultural adviser (row 37) and the protocol office | The approved Revision 8 look; the touches are delivered in a subtitled review copy |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`
