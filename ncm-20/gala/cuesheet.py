@@ -38,6 +38,16 @@ LABEL = {
     'gauge': ('Twenty years: twenty drops', ''),
     'finale': ('Night: the same star; title; lockup', ''),
 }
+# Revision 11 (?rev11): its new beats, and the beats whose picture it changes (detected by the watch beat in the cues)
+LABEL11 = {
+    'centre': ('2007: the founding decree as an engraved charter; the Center\'s instruments', 'Hold light while the charter is on screen'),
+    'airport-dawn': ('Zayed International at dawn: fog on the airfield', ''),
+    'airport': ('Zayed International: the arrival on runway 31L', ''),
+    'port': ('Jebel Ali: the container quay', ''),
+    'tanker': ('Fujairah: the VLCC jetty; the east-coast bulletin', 'Removable module: go/no-go at two weeks and at 72 hours'),
+    'solar': ('Al Dhafra Solar PV at sunset', ''),
+    'watch': ('NCM Operations Centre; the satellite disc becomes the globe', ''),
+}
 
 
 def smpte(t, fps):
@@ -52,8 +62,9 @@ def main(cues_path, out, fps=25):
     split = S['gauge']['start'] - S['gauge']['xf'] / 2 if parts else None  # PART 1 ends where the dissolve into the gauge begins
     rows = [(0.0, '', 'PART 1 GO' if parts else 'GO', '', '', 'After the anthem and at least 5 s of silence')]
     B = {s['id']: f'B{i:02d}' for i, s in enumerate(cues['scenes'], 1)}
+    lab = dict(LABEL, **LABEL11) if 'watch' in S else LABEL
     for s in cues['scenes']:
-        what, note = LABEL.get(s['id'], (s['id'], ''))
+        what, note = lab.get(s['id'], (s['id'], ''))
         rows.append((s['start'], s['id'], f"{B[s['id']]} {what}", s.get('enter', 'fade'), s.get('xf', 0.5), note))
     if parts:
         rows.append((split, 'world', f"PART 1 ENDS on the {B['world']} frame (office and name on screen)", '', '',

@@ -20,11 +20,18 @@ const E3 = (() => {
     return norm(n);
   }
   let CAM = null;
-  // the late-afternoon sun in the south-west, 30 degrees up
-  const SUN = norm([Math.cos(Math.PI / 6) * Math.sin(235 * Math.PI / 180), Math.cos(Math.PI / 6) * Math.cos(235 * Math.PI / 180), Math.sin(Math.PI / 6)]);
-  function camera(C, look, f) {
+  // the late-afternoon sun in the south-west, 30 degrees up (a scene may set its own hour with sunAt, then restore it)
+  const SUN0 = norm([Math.cos(Math.PI / 6) * Math.sin(235 * Math.PI / 180), Math.cos(Math.PI / 6) * Math.cos(235 * Math.PI / 180), Math.sin(Math.PI / 6)]);
+  let SUN = SUN0;
+  // azimuth (degrees from north, clockwise) and altitude (degrees); sunAt() with no arguments restores the default
+  function sunAt(az, alt) {
+    SUN = az === undefined ? SUN0 : norm([Math.cos(alt * Math.PI / 180) * Math.sin(az * Math.PI / 180), Math.cos(alt * Math.PI / 180) * Math.cos(az * Math.PI / 180), Math.sin(alt * Math.PI / 180)]);
+    return SUN;
+  }
+  // cx, cy: where the view axis lands on the canvas (the centre unless a plate sits to one side)
+  function camera(C, look, f, cx = W / 2, cy = H / 2) {
     const F = norm(sub(look, C)), R = norm(cross(F, [0, 0, 1])), U = cross(R, F);
-    CAM = { C, F, R, U, f, cx: W / 2, cy: H / 2, near: 0.5 };
+    CAM = { C, F, R, U, f, cx, cy, near: 0.5 };
     return CAM;
   }
   const depth = p => dot(sub(p, CAM.C), CAM.F);
@@ -115,5 +122,5 @@ const E3 = (() => {
       ctx.beginPath(); segs.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); }); ctx.stroke(); ctx.restore();
     });
   }
-  return { camera, cam: () => CAM, depth, proj, projDir, face, solid, box, frustum, line, runs, segments, clipSeg, centroid, dot, sub, SUN };
+  return { camera, cam: () => CAM, depth, proj, projDir, face, solid, box, frustum, line, runs, segments, clipSeg, centroid, dot, sub, SUN: SUN0, sunAt, sun: () => SUN };
 })();

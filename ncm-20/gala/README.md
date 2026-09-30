@@ -36,6 +36,10 @@ and keeps that film's engraved-plate language, rebuilt for the room:
   - The tanker is unbranded and under way, heading away from the strait. She carries no ADNOC name, livery or Murban
     label, and there is no terminal or smoke. The beat can be pulled at the go/no-go checks with `?pull=tanker`, and it
     stays out of every cut-down and the international version.
+  - Revision 11 (`?rev11`) puts her alongside the Port of Fujairah's VLCC jetty, at the requester's direction: the jetty,
+    the breakwater, the sea and the Hajar only. There is no tank farm, manifold, buoy, smoke, glow or backlight (the
+    oil zone was struck in March and May 2026), and her bow points south, away from the strait. The go/no-go checks
+    and `?pull=tanker` apply to it as before.
   - "Etihad Rail" on screen needs Etihad Rail's written clearance. Without it, set `RAIL_NAME` in `timeline.js` to
     the national network's name.
   - `TREATMENT.md` (Revisions 2 to 5, and §11) lists what NCM and the protocol office must still decide.
@@ -49,10 +53,10 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) · `?heritage` the Emirati crafts and skills (Revision 10, a draft) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) · `?heritage` the Emirati crafts and skills (Revision 10, a draft) · `?rev11` the founding decree, the working day in full and the Center's watch (Revision 11, a draft: 3:10.0) |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
-| `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new |
+| `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new. `r11-*.js` are Revision 11's plates (only with `?rev11`): `r11-founding.js` (the decree's charter and the Center's instruments), `r11-airport.js` (dawn fog at Zayed International, the arrival), `r11-jebelali.js` (the container quay), `r11-jetty.js` (Fujairah's VLCC jetty), `r11-solar.js` (Al Dhafra Solar PV), `r11-watch.js` (the Operations Centre); `r11-kit.js` holds their shared helpers. All but the founding and the watch are drawn in true 3D with `engrave3d.js` |
 | `data/` | The star catalogue, the UAE map (`build/` has its build scripts, a check image and `rak_skyline.py` for the seeding skyline), the verified quotes |
 | `fonts/` | The typefaces, self-hosted, with their SIL Open Font Licences. A render stops if any face fails to load |
 | `render.js` | Renders stills, the film (in parallel chunks; 4K, 50 fps and the LED grade are options) and the cue list with every words block. Frames are captured losslessly (`--capture png`, the default at `--scale 2`) and encoded BT.709, limited range, tagged |
@@ -79,6 +83,9 @@ FILM_QUERY='vo&tc' node render.js film out/review-vo.mp4 out/mix.wav --jobs 3   
 node render.js film out/review.mp4 out/mix.wav --jobs 3                         # clean 1080p 30 fps
 FILM_QUERY='vo&colour&fadeout=2.5' node render.js film out/review-colour.mp4 out/mix.wav --jobs 3   # the colour pass (Revision 9), narration as subtitles
 FILM_QUERY='vo&colour&heritage&fadeout=2.5' node render.js film out/review-heritage.mp4 out/mix.wav --jobs 3   # with the Emirati touches (Revision 10)
+# Revision 11 (?rev11) has its own cut, so its own cues and score: every query that changes the cut goes on each step
+FILM_QUERY=rev11 node render.js cues out/r11/cues.json && python3 score.py out/r11/cues.json out/r11/
+FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix.wav --jobs 3
 
 # every master in one go (about 2.7 hours at --jobs 3), then the show deliverables, the QC report and its page
 sh masters.sh out/audio out/masters                   # gathers the WAVs from out/ and out/pull/ if out/audio has none

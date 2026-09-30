@@ -264,6 +264,7 @@ def main(cues_path, out_dir):
     st = lambda i: S[i]['start']
     en = lambda i: S[i]['start'] + S[i]['dur']
     vo_end = lambda t: max([v['out'] for v in cues['vo'] if v['in'] < t] + [0])  # the narration still running at t
+    R11 = 'watch' in S  # Revision 11 (?rev11): its new beats are in the cue list
 
     # B01 · night: the drone, wind, starlight; a hummed lead and its answer; the rababa states the motif as Suhail
     # clears the dunes; the ring tone. No drums at night.
@@ -326,8 +327,18 @@ def main(cues_path, out_dir):
     # B07–B08 · the Center (D Dorian): the ras player's takhmeera brings the Ayyala drums in, pianissimo, on the first
     # downbeat after the iris (ras and takhamir only); the seven emirates lit together get one tar and tus stroke
     c0, c1 = st('centre'), en('nation')
+    # Revision 11: the founding decree's charter holds the screen for its first 5.4 s: a held chord, the voices and the
+    # horn's motif, no pulse; the pulse enters as the charter settles over the Center's instruments
+    charter = 5.4 if R11 else 0.0
+    if R11:
+        chord(music, [D2 + 12, A2 + 12, 62, 65, 69], c0, charter + 1.5, gain=0.34, bright=1600, attack=1.4, release=2.0)
+        music.add(A.choir(D3 + 12, charter + 0.6, vowel='o', gain=0.4), c0 + 0.6)
+        for (t, m, d) in motif(c0 + 1.0, root=D4 - 12, stretch=1.2):
+            if t < c0 + charter - 0.3:
+                music.add(A.horn(m, d, gain=0.75), t, 0.55)
+        music.add(harmonic(D4 + 24, 0.7), c0 + 0.9)  # as the decree's title inks in
     prog_ = [Dm7, Csus, Gsus, Dm7]
-    k, t = 0, c0
+    k, t = 0, (next_bar(c0 + charter) if R11 else c0)
     while t < c1 - 0.1:
         chord(music, prog_[k % 4], t, BAR * 1.05, gain=0.3, bright=1900 + 150 * k, attack=0.5, release=1.0)
         for e in range(8):
@@ -335,12 +346,13 @@ def main(cues_path, out_dir):
             if te < c1:
                 music.add(A.pizz([D3, A3, D3 + 12, A3][e % 4] + (-2 if k % 4 == 1 else 0), 0.5), te, 0.5, pan=0.3 * np.sin(e))
         k, t = k + 1, t + BAR
-    pulse0 = next_bar(c0 + 0.8)  # after the iris has settled
+    pulse0 = next_bar(c0 + 0.8 + charter)  # after the iris has settled (Revision 11: after the charter)
     wash_t = st('nation') + 8.3  # the seven emirates washed in gold together, named in constitutional order
     takhmeera(perc, pulse0, 'pp')
     play(perc, RAS + TAKHAMIR, pulse0, pulse0, wash_t - 0.1, 'pp')
-    music.add(A.horn(D4 - 12 + 7, 2.5, gain=0.8), st('centre') + 1.7)  # swell under THEN WE BUILT A CENTER TO READ THE SKY
-    music.add(A.horn(D4 - 12 + 2, 2.5, gain=0.6), st('centre') + 1.7)
+    hw = 7.8 if R11 else 1.7  # the headline's time in its beat
+    music.add(A.horn(D4 - 12 + 7, 2.5, gain=0.8), st('centre') + hw)  # swell under THEN WE BUILT A CENTER TO READ THE SKY
+    music.add(A.horn(D4 - 12 + 2, 2.5, gain=0.6), st('centre') + hw)
     chord(music, [D3, A3, 62, 66, 69], wash_t, 3.2, gain=0.3, bright=2200, attack=0.6, release=1.8)
     stroke(perc, 'tar', wash_t, 0.6)
     stroke(perc, 'tus', wash_t, 0.6)
@@ -363,11 +375,13 @@ def main(cues_path, out_dir):
     # B10–B14 · the working day: a warm chord and the oud motif as the sky clears; the drums wait for the remembrance
     # line to end, then the Ayyala carries the day at mezzo-forte, one colour for each place; a ras stroke and the tus
     # on every cut; everything is out before the President's card
-    w0, w1 = st('airport'), st('quote-president')
-    chord(music, Dmaj, w0, 2.0, gain=0.38, bright=2000, attack=0.6)
-    for (t, m, d) in motif(w0, root=D4, major=True, n=4, stretch=0.7):
+    # Revision 11: the working day opens on the dawn shot (a longer warm chord and the oud, slower); the drive begins with
+    # the arrival
+    w0, w1 = st('airport-dawn' if R11 else 'airport'), st('quote-president')
+    chord(music, Dmaj, w0, 4.5 if R11 else 2.0, gain=0.38, bright=2000, attack=1.5 if R11 else 0.6)
+    for (t, m, d) in motif(w0 + (0.8 if R11 else 0), root=D4, major=True, n=4, stretch=1.1 if R11 else 0.7):
         music.add(A.pluck(m, 1.3, bright=0.65), t, 0.6)
-    d0, d1 = next_bar(max(vo_end(w0) + 0.6, w0)), w1 - 1.0  # never before the working day's own first bar
+    d0, d1 = next_bar(max(vo_end(w0) + 0.6, st('airport') if R11 else w0)), w1 - 1.0  # never before the working day's own first bar
     takhmeera(perc, d0, 'mf')
     k, t = 0, d0
     while t < d1:
@@ -383,13 +397,17 @@ def main(cues_path, out_dir):
         'port': RAS + TAR + TUS + SAWT,  # the sawt's mirwas and claps: the coastal, urban colour
         'tanker': [(0, 'jahla', 0.8), (8, 'jahla', 0.6)],  # the drums rest: only the jahla, as in the pearling beat
         'energy': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # the tus shimmer
+        'solar': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # Revision 11: the same colour into the evening
     }
     for sid, pat in colour.items():
         if sid in S:  # the tanker beat can be pulled (?pull=tanker)
             play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
-    for sid in ['rail', 'port', 'energy']:
+    for sid in ['rail', 'port', 'energy'] + (['solar'] if R11 else []):
         stroke(perc, 'tus', st(sid), 0.7)
-    sfx.add(A.jet_far(4.5, gain=0.9), w0 + 0.3, 0.8, pan=0.2)
+    sfx.add(A.jet_far(4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
+    if R11:
+        sfx.add(A.wind(5.0, gain=0.25, gust=0.04), w0)  # the still air of a fog morning
+        sfx.add(A.wind(5.0, gain=0.3, gust=0.08), st('solar'))
     sfx.add(diesel_far(en('rail') - st('rail') + 0.6, gain=1.0), st('rail') - 0.3, pan=0.25)
     if 'tanker' in S:  # the laden tanker under way: calm sea, the crew's drone again; no horn, nothing that waits
         tk = st('tanker')
@@ -426,6 +444,26 @@ def main(cues_path, out_dir):
 
     # B18 · Sheikh Mansour's card
     card(music, st('quote-mansour'), en('quote-mansour'))
+
+    if R11:
+        # B18b · the Center's watch (Revision 11): the pulse of the Center's own beat returns, pizzicato in eighths under a
+        # low string pedal, the harmony walking D minor - B flat - C (the world's dominant), the strings rising to its
+        # landing; no drums (the Ayyala waits for the national line)
+        a0, a1 = st('watch'), st('world')
+        k, t = 0, a0
+        for ch in [Dm7, [34, 41, 58, 62, 65], [36, 43, 60, 64, 67]]:
+            if t >= a1 - 0.1:
+                break
+            chord(music, ch, t, min(BAR * 1.05, a1 - t + 0.4), gain=0.28 + 0.03 * k, bright=1800 + 300 * k, attack=0.4, release=0.6)
+            for e in range(8):
+                te = t + e * BEAT / 2
+                if te < a1 - 0.05:
+                    music.add(A.pizz([ch[0] + 12, ch[1] + 12, ch[0] + 24, ch[1] + 12][e % 4], 0.45 + 0.05 * k), te, 0.5, pan=0.3 * np.sin(e))
+            k, t = k + 1, t + BAR
+        music.add(A.strings(D2 + 12, a1 - a0, bright=900, attack=1.2, release=0.8, voices=5), a0, 0.5)
+        music.add(A.strings(60, a1 - a0 - 1.0, bright=2400, attack=a1 - a0 - 2.0, release=0.6, voices=5), a0 + 1.0, 0.35)  # the rise
+        for dt in [0.9, 3.2]:
+            music.add(harmonic(D4 + 24, 0.5), a0 + dt, pan=-0.3)  # a glint of the Center's motif on the screens
 
     # B19 · the world, in F major: the orchestra, the voices in two answering groups, the motif in the brass; the
     # Ayyala at forte on the national line (the apex), receding under the office and out before the name
@@ -506,7 +544,8 @@ def main(cues_path, out_dir):
     ride = rides(cues['scenes'], DUR, {'suhail': -8, 'durour': -3, 'monsoon': -3, 'pearling': -3, 'falaj': -3,
                                        'quote-zayed': 0.5, 'centre': -1, 'nation': -1, 'homes': -6, 'airport': -1, 'rail': -1,
                                        'port': -1, 'tanker': -2, 'energy': -0.5, 'quote-president': 0.5, 'seeding': -2,
-                                       'science': -2, 'quote-mansour': 0.5, 'world': -4.3, 'gauge': 0.5, 'finale': -1})
+                                       'science': -2, 'quote-mansour': 0.5, 'world': -4.3, 'gauge': 0.5, 'finale': -1,
+                                       'airport-dawn': -2, 'solar': -0.5, 'watch': -2})  # Revision 11's new beats
     m = A.reverb(music.stereo() * ride, rt60=3.4, wet=0.3)
     p = A.reverb(A.hp(perc.stereo() * ride, 40, 2), rt60=1.8, wet=0.18)  # the drums outdoors: a shorter room; no sub
     f = A.reverb(sfx.stereo(), rt60=1.6, wet=0.12) * 0.9
