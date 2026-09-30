@@ -734,16 +734,21 @@ scene({
     this.twy = [q(-80, 3950, 198.5, 221.5), q(-34, -11, 30, 205)];
     this.exitL = [W3(1330, 22, 0.02), W3(1530, 200, 0.02)];
     this.far = q(-200, 4100, 1970, 2030);
-    // the runway's instruments: RVR sensors (twin heads on 2.5 m masts) 120 m left of the centreline, a 10 m cup
-    // anemometer mast 300 m in, 150 m right; a met enclosure 350 m off the centreline
-    this.rvr = [385, 1520, 2620, 3760].map(u => ({ u, v: -120 }));
-    this.anemo = { u: 300, v: 150 };
+    // the runway's instruments: RVR sensors (twin heads on 2.5 m masts) 120 m right of the centreline (the midfield
+    // side), a 10 m cup anemometer mast 300 m in, 165 m right; a met enclosure 350 m off the centreline
+    this.rvr = [385, 1520, 2620, 3760].map(u => ({ u, v: 120 }));
+    this.anemo = { u: 300, v: 165 };
     this.enclosure = { u: 1150, v: 350 };
     // sand grain on the field
     this.grain = [];
     for (let i = 0; i < 6500; i++) { const u = -330 + Math.pow(r(), 1.5) * 4400, v = -420 + r() * 1400; if (Math.abs(v) < 40 || Math.abs(v - 210) < 16) continue; this.grain.push([u, v, r()]); }
     this.view(0.6);
     this.fogSk = AUH.fogStrokes(1800, 5501, { t0: 60, t1: 4500, half: 0.45, len: 60 });
+    // the sand's engraved grain: short strokes spread evenly over the picture (evenly in 1/depth), off the pavement
+    const onPave = (u, v) => (u > -62 && u < rw.L + 2 && Math.abs(v) < 39) || (u > -82 && u < 3952 && Math.abs(v - 210) < 14) || (u > -36 && u < -9 && v > 28 && v < 207) || (u > -205 && Math.abs(v - 2000) < 34);
+    this.sandSk = AUH.fogStrokes(9000, 6601, { t0: 70, t1: 3800, half: 0.6, len: 22, jit: 0.3 }).filter(([a]) => !onPave(a[1], a[0])).map(([a, b, k]) => [[a[0], a[1], 0], [b[0], b[1], 0], k]);
+    // the maintenance track beside the approach lights (two sandy ruts, 9 m left of the light line)
+    this.track = [-6.5, -8.5].map(v => [W3(-920, v - 3, 0), W3(-60, v - 3, 0)]);
   },
   // the aircraft's path: 105 m per second of film (70 m/s × 1.5); on the glide path until 60 m past the threshold, then
   // a flare that sets it toward the touchdown zone ~450 m in
@@ -788,6 +793,8 @@ scene({
       stroke(new P([[B[0], hy], [B[2], hy]]), ink, INK, 0.8, 0.35);
       // the ground: sand grain lying on the field, the paved surfaces, their markings
       E3.segments(this.grain.map(([u, v, k]) => [W3(u, v, 0), W3(u + 1.5 + 4 * k, v + 0.5, 0), (OPT.colour ? 0.25 + 0.4 * k : 0.4 + 0.5 * k) * ink]), OPT.colour ? HUE.dune : SEPIA, OPT.colour ? 0.9 : 1.1);
+      E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.14 + 0.3 * k : 0.2 + 0.4 * k) * ink]), OPT.colour ? HUE.hill : SEPIA, 0.85);
+      this.track.forEach(t => E3.line(t, OPT.colour ? HUE.hill : SEPIA, 1, 0.4 * ink));
       const along = [0, 1, 0];
       const pave = (pts, tone, seed, col, fa = 0.42) => E3.face(pts, { n: [0, 0, 1], tone, shade: 0, hdir: along, fillCol: OPT.colour ? col : null, fillA: fa, lw: 0.9, edgeA: 0.5 * ink }, seed);
       pave(this.far, 0.3, 501, HUE.steel);
@@ -847,9 +854,9 @@ scene({
   },
   // an RVR sensor: a 2.5 m mast with a cross-arm and two heads facing each other
   rvrSensor(s, a) {
-    const W3 = AUH.W3, d = R11.dep(W3(s.u, s.v, 1)), al = R11.air(d, 2600) * a;
-    R11.member(W3(s.u, s.v, 0), W3(s.u, s.v, 2.5), 1.3, 0.9 * al);
-    R11.member(W3(s.u - 0.9, s.v, 2.4), W3(s.u + 0.9, s.v, 2.4), 1.3, 0.9 * al);
+    const W3 = AUH.W3, d = R11.dep(W3(s.u, s.v, 1)), al = R11.air(d, 2600) * a, lw = clamp(1.3 * 260 / d, 0.8, 2);
+    E3.line([W3(s.u, s.v, 0), W3(s.u, s.v, 2.5)], INK, lw, 0.9 * al);
+    E3.line([W3(s.u - 0.9, s.v, 2.4), W3(s.u + 0.9, s.v, 2.4)], INK, lw, 0.9 * al);
     E3.solid(E3.box(s.v - 0.2, s.v + 0.2, s.u - 1.3, s.u - 0.7, 1.9, 2.4), { tone: .3, shade: .4, lw: .9, edgeA: .9 * al }, 1);
     E3.solid(E3.box(s.v - 0.2, s.v + 0.2, s.u + 0.7, s.u + 1.3, 1.9, 2.4), { tone: .3, shade: .4, lw: .9, edgeA: .9 * al }, 2);
     E3.solid(E3.box(s.v - 0.35, s.v + 0.35, s.u - 0.35, s.u + 0.35, 0.9, 1.4), { tone: .1, shade: .4, lw: .9, edgeA: .9 * al }, 3);
@@ -857,7 +864,7 @@ scene({
   // a cup anemometer and wind vane on a 10 m mast
   anemometer(s, a, lt) {
     const W3 = AUH.W3, d = R11.dep(W3(s.u, s.v, 5)), al = R11.air(d, 2600) * a;
-    R11.member(W3(s.u, s.v, 0), W3(s.u, s.v, 10), 1.4, 0.9 * al);
+    E3.line([W3(s.u, s.v, 0), W3(s.u, s.v, 10)], INK, clamp(1.4 * 260 / d, 0.8, 2), 0.9 * al);
     R11.member(W3(s.u - 0.9, s.v, 10), W3(s.u + 0.9, s.v, 10), 1.2, 0.9 * al);
     const spin = lt * 9;
     for (let k = 0; k < 3; k++) { const g = spin + k * TAU / 3; R11.member(W3(s.u - 0.9, s.v, 10.3), W3(s.u - 0.9 + 0.45 * Math.cos(g), s.v + 0.45 * Math.sin(g), 10.3), 1, 0.8 * al); }
