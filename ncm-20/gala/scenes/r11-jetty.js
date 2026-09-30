@@ -49,7 +49,18 @@ const JT = (() => {
     }
     return { c0: R.c0, az0: R.az0, daz: R.daz, shore, foot, layers };
   }
-  return { L, LB, UH, VH, up, along, across, COAST, hull2, inPoly, bbOf, paperLine, ranges };
+  // many short world segments in one stroke per alpha step (as E3.segments, in finer steps, so strokes whose tone the
+  // swell moves change by little from frame to frame)
+  function segs(list, col, lw, nb = 12) {
+    const bands = Array.from({ length: nb }, () => []);
+    list.forEach(([a, b, al]) => { if (al <= 0.02) return; const s = E3.clipSeg(a, b); if (s) bands[Math.min(nb - 1, Math.floor(al * nb))].push(s); });
+    bands.forEach((g, k) => {
+      if (!g.length) return;
+      ctx.save(); ctx.globalAlpha = SA * (k + 0.5) / nb; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round';
+      ctx.beginPath(); g.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); }); ctx.stroke(); ctx.restore();
+    });
+  }
+  return { L, LB, UH, VH, up, along, across, COAST, hull2, inPoly, bbOf, paperLine, ranges, segs };
 })();
 scene({
   id: 'jetty',
@@ -330,9 +341,9 @@ scene({
     });
     if (OPT.colour) { shade.forEach(q => wash(new P(q.p, true), HUE.deep, 0.2)); refl.forEach(q => wash(new P(q.p, true), HUE.deep, 0.16)); }
     if (!OPT.colour) { base.forEach(q => { q[2] = Math.min(1, q[2] * 1.3); }); calm.forEach(q => { q[2] *= 1.3; }); }
-    E3.segments(base, OPT.colour ? HUE.deep : BLUE, 1);
-    E3.segments(calm, OPT.colour ? HUE.deep : BLUE, 0.8);
-    E3.segments(dark, INK, 1.1);
+    JT.segs(base, OPT.colour ? HUE.deep : BLUE, 1);
+    JT.segs(calm, OPT.colour ? HUE.deep : BLUE, 0.8);
+    JT.segs(dark, INK, 1.1);
   },
   // shadows the morning sun throws on the water (away from it, to the west-north-west): each convex solid's corners
   // carried down the sun's rays to the sea
