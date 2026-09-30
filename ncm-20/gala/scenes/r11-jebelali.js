@@ -30,12 +30,18 @@ scene({
     this.ships = [[-120, 400, -1], [320, 400, 1], [770, 366, -1], [1190, 400, 1]].map(([x0, L, bow], i) => this.ship(x0, L, bow, r, i));
     // the cranes: six or seven working each ship over its bays (never over the deckhouse or the funnel), idle ones with the
     // boom raised between the berths, and the line running on beyond the last ship
+    // (a working crane is kept out of the eye's line to each deckhouse and funnel, so no boom crosses in front of them)
     this.cranes = [];
+    const cam0 = this.view(5.2), C0 = cam0.C, zB = this.ZT - 2;
+    const occ = (x, y, z) => { const t = (zB - z) / (C0[2] - z); return x + t * (C0[0] - x); };
     [6, 7, 6, 6].forEach((n, i) => {
       const s = this.ships[i], nb = s.bays.length, used = [];
+      const keep = [occ(s.X(s.sb), s.YC, s.D + 38), occ(s.X(s.sb), s.YC + 15, s.D + 38), occ(s.X(s.sf), s.YC, s.D + 36)];
+      const ok = j => !used.some(u => Math.abs(s.bays[u].xc - s.bays[j].xc) < 42) && !keep.some(x => Math.abs(s.bays[j].xc - x) < 15);
       for (let k = 0; k < n; k++) {
-        let j = Math.round((k + 0.5) * nb / n - 0.5);
-        while (used.some(u => Math.abs(s.bays[u].xc - s.bays[j].xc) < 40) && j < nb - 1) j++;
+        const j0 = (k + 0.5) * nb / n - 0.5, order = s.bays.map((b, j) => j).sort((p, q) => Math.abs(p - j0) - Math.abs(q - j0));
+        const j = order.find(ok);
+        if (j === undefined) continue;
         used.push(j);
         const b = s.bays[j], row = k % 2 === 0 ? 0 : Math.floor(r() * 18);
         this.cranes.push({ x: b.xc, raised: false, ship: s, bay: b, row, ph: (k * 0.37 + i * 0.21 + r() * 0.12) % 1 });
@@ -55,15 +61,15 @@ scene({
     this.sheds = [];
     for (let k = 0; k < 60; k++) { const x0 = -500 + (k % 30) * 150 + r() * 50, y0 = 520 + Math.floor(k / 30) * 260 + r() * 120; this.sheds.push({ x0, x1: x0 + 60 + r() * 70, y0, y1: y0 + 40 + r() * 60, z1: 10 + r() * 10 }); }
     // a harbour tug transiting the basin toward the eye, and a pilot boat crossing further out
-    this.tugs = [{ x: 470, y: -168, head: Math.PI + 0.03, v: 4.2, L: 32, B: 12 }, { x: 980, y: -330, head: 0.35, v: 6, L: 17, B: 5.2, pilot: true }];
+    this.tugs = [{ x: 115, y: -152, head: Math.PI + 0.1, v: 4, L: 32, B: 12 }, { x: 335, y: -212, head: 0.22, v: 5, L: 17, B: 5.2, pilot: true }];
     // the harbour: fixed marks on the water, laid out once from the camera at mid-beat (rows closing up toward the far water),
     // over more than the picture so the rise never runs out of them, then projected every frame
     const cam = this.view(5.2), hz = E3.projDir([cam.F[0], cam.F[1], 0])[1];
     this.sea = [];
     for (let y = hz + 1.4; y < 1560;) {
-      const f = clamp((y - hz) / 800), gap = 1.7 + 6.4 * Math.pow(f, 0.9);
+      const f = clamp((y - hz) / 800), gap = 1.5 + 5.2 * Math.pow(f, 0.9);
       for (let x = -360 + r() * 20; x < 1480;) {
-        const len = 5 + r() * (8 + 30 * f), g = 3 + r() * (10 + 14 * f), xm = x + len / 2;
+        const len = 5 + r() * (10 + 34 * f), g = 3 + r() * (8 + 8 * f), xm = x + len / 2;
         const d = [0, 1, 2].map(i => cam.F[i] + cam.R[i] * (xm - cam.cx) / cam.f - cam.U[i] * (y - cam.cy) / cam.f);
         if (d[2] < -1e-4) {
           const t = -cam.C[2] / d[2], p = [cam.C[0] + d[0] * t, cam.C[1] + d[1] * t], dep = t * (d[0] * cam.F[0] + d[1] * cam.F[1] + d[2] * cam.F[2]);
@@ -120,7 +126,7 @@ scene({
     // the deckhouse: the house to D+37, the wheelhouse on it to D+41, its wings the full beam; a mast over it
     s.house = s.box(sb - 7, sb + 7, -13, 13, D, D + 37);
     s.wheel = s.box(sb - 6, sb + 6.5, -15.5, 15.5, D + 37, D + 41);
-    s.wings = s.box(sb + 2, sb + 6.5, -30.4, 30.4, D + 38, D + 40.6);
+    s.wings = [s.box(sb + 2, sb + 6.5, 15.5, 30.4, D + 38, D + 40.6), s.box(sb + 2, sb + 6.5, -30.4, -15.5, D + 38, D + 40.6)]; // landward, seaward
     s.mast = [s.P(sb - 1, 0, D + 41), s.P(sb - 1, 0, D + 49)];
     // the engine casing to D+34, the funnel on it to D+40
     s.casing = s.box(sf - 10, sf + 10, -11, 11, D, D + 34);
@@ -174,8 +180,10 @@ scene({
   // over the quay, down to a truck in the lane under the portal, release, up again
   move(c, lt) {
     const { QZ, ZT, YLANE } = this, ph = (((lt - 0.9) / this.CYC + c.ph) % 1 + 1) % 1;
-    const yPick = c.ship.YC - 29.28 + 1.22 + 2.44 * c.row;
-    const cell = c.bay.cells.find(q => yPick - c.ship.YC >= q.wa - 0.01 && yPick - c.ship.YC <= q.wb + 0.01) || c.bay.cells[0];
+    // (the row is kept inside the stacks this bay carries, so the spreader always lands on a box)
+    const wMin = Math.min(...c.bay.cells.map(q => q.wa)), wMax = Math.max(...c.bay.cells.map(q => q.wb));
+    const w = clamp(-29.28 + 1.22 + 2.44 * c.row, wMin + 1.22, wMax - 1.22), yPick = c.ship.YC + w;
+    const cell = c.bay.cells.find(q => w >= q.wa - 0.01 && w <= q.wb + 0.01) || c.bay.cells[0];
     const zPick = cell.z1, zTr = QZ + 63, zTruck = QZ + 4.1;
     const seg = (a, b) => easeInOut(prog(ph, a, b - a));
     let y = YLANE, z = zTr;
@@ -195,7 +203,7 @@ scene({
   // this frame's camera, and where the horizon and the quay edge fall on screen (the washes and the water follow them)
   frame(lt) {
     const cam = this.view(lt), B = R11.BOX;
-    this.cam = cam;
+    this.ec = cam;
     this.hz = E3.projDir([cam.F[0], cam.F[1], 0])[1];
     const qa = E3.proj([cam.C[0] + 60, 0, 0]), qb = E3.proj([60000, 0, 0]), la = E3.proj([cam.C[0] + 60, 0, this.QZ]), lb = E3.proj([60000, 0, this.QZ]);
     const ext = (a, b, X) => [X, b[1] + (a[1] - b[1]) * (X - b[0]) / (a[0] - b[0])];
@@ -207,18 +215,21 @@ scene({
   under(lt) {
     this.frame(lt);
     const hy = this.hz, B = R11.BOX;
-    washFade([B[0], B[1] - 60, B[2], hy + 2], [[0, HUE.sky, 0.56], [0.6, HUE.sky, 0.36], [1, HUE.sky, 0.12]], 0, 1);
-    washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sand, 0.16], [0.4, HUE.sand, 0.24], [1, HUE.sand, 0.3]], 0, 1, this.land);
+    // (every wash stays inside the picture box)
+    ctx.save(); ctx.beginPath(); R11.boxPath().trace(ctx, 1); ctx.clip();
+    washFade([B[0], B[1], B[2], hy + 2], [[0, HUE.sky, 0.56], [0.6, HUE.sky, 0.36], [1, HUE.sky, 0.12]], 0, 1);
+    washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sand, 0.06], [0.35, HUE.sand, 0.11], [1, HUE.sand, 0.16]], 0, 1, this.land);
     washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sea, 0.3], [0.3, HUE.sea, 0.46], [1, HUE.deep, 0.58]], 0, 1, this.water);
+    ctx.restore();
   },
   // high over the harbour off the first ship's bow, looking along the line and down about 20-24 degrees; over the beat the
   // eye rises from 150 to 220 m (always well above the booms) and draws back a little, so the yard opens out behind
   view(lt) {
     const q = clamp((lt - 0.6) / 9.2), u = 0.6 * q + 0.4 * easeInOut(q);
-    const X = lerp(-390, -330, u), Y = lerp(-235, -300, u), Z = lerp(150, 220, u);
-    const hd = lerp(22.5, 24, u) * Math.PI / 180, pt = lerp(20, 24, u) * Math.PI / 180;
+    const X = lerp(-330, -300, u), Y = lerp(-215, -300, u), Z = lerp(150, 220, u);
+    const hd = lerp(25.5, 26.5, u) * Math.PI / 180, pt = lerp(21.5, 25, u) * Math.PI / 180;
     const F = [Math.cos(pt) * Math.cos(hd), Math.cos(pt) * Math.sin(hd), -Math.sin(pt)];
-    return E3.camera([X, Y, Z], [X + F[0] * 100, Y + F[1] * 100, Z + F[2] * 100], 1000, 560, 640);
+    return E3.camera([X, Y, Z], [X + F[0] * 100, Y + F[1] * 100, Z + F[2] * 100], 1000, 530, lerp(640, 620, u));
   },
   draw(lt) {
     const QZ = this.QZ;
@@ -240,7 +251,7 @@ scene({
         const d = R11.dep([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, QZ]);
         L1.push({ d, draw: () => R11.faded(ink(b.x0) * 0.85, () => {
           const a = R11.air(d, 1800);
-          E3.solid(E3.box(b.x0, b.x1, b.y0, b.y1, QZ, QZ + b.z1), { tone: 0.05, shade: 0.45, lw: 0.8, edgeA: 0.6 * a, noHatch: d > 1600, fillCol: OPT.colour ? HUE.sand : SEPIA, fillA: OPT.colour ? 0.22 : 0.08 }, 3000 + k);
+          E3.solid(E3.box(b.x0, b.x1, b.y0, b.y1, QZ, QZ + b.z1), { tone: 0.05, shade: 0.45, lw: 0.8, edgeA: 0.6 * a, noHatch: d > 1600, fillCol: OPT.colour ? HUE.steel : SEPIA, fillA: OPT.colour ? 0.16 : 0.08 }, 3000 + k);
         }) });
       });
       this.yard.forEach((b, k) => {
@@ -281,9 +292,9 @@ scene({
   // the ground beyond the yard and the sheds, flat to the horizon: long light rulings, closing up with distance
   drawFarLand(lt) {
     const segs = [];
-    for (let y = 520; y < 9000; y *= 1.075) {
+    for (let y = 520; y < 16000; y *= 1.075) {
       const al = 0.08 + 0.2 * R11.air(R11.dep([900, y, 0]), 3000);
-      segs.push([[-800, y, 0], [7000, y, 0], al]);
+      segs.push([[-800, y, 0], [30000, y, 0], al]);
     }
     E3.segments(segs, SEPIA, 0.6);
   },
@@ -292,7 +303,8 @@ scene({
   drawSea(lt) {
     const R0 = this.R0, shade = this.shadowPolys(), refl = this.reflPolys();
     const inAny = (p, list) => list.some(q => p[0] >= q.bb[0] && p[0] <= q.bb[2] && p[1] >= q.bb[1] && p[1] <= q.bb[3] && this.inPoly(p[0], p[1], q.p));
-    const wk = TAU / 60, dir = [Math.sin(250 * Math.PI / 180), Math.cos(250 * Math.PI / 180)], om = TAU / 6.2;
+    const wk = TAU / 70, dir = [Math.sin(250 * Math.PI / 180), Math.cos(250 * Math.PI / 180)], om = TAU / 6.2;
+    const wk2 = TAU / 23, dir2 = [Math.sin(205 * Math.PI / 180), Math.cos(205 * Math.PI / 180)], om2 = TAU / 3.4;
     const base = [], dark = [], q = easeInOut(prog(lt, 0.2, 1.0)), hz = this.hz;
     this.sea.forEach(([x, y, h, ph, dist]) => {
       const c = E3.proj([x, y, 0]);
@@ -300,14 +312,15 @@ scene({
       const d = E3.depth([x, y, 0]);
       if (d < 60) return;
       const a0 = [x - R0[0] * h, y - R0[1] * h, 0], b0 = [x + R0[0] * h, y + R0[1] * h, 0];
-      const sw = 0.5 + 0.5 * Math.cos(wk * (dir[0] * x + dir[1] * y) - om * lt + ph * 1.3);
-      const al = q * (0.18 + 0.82 * Math.exp(-d / 900)) * (0.45 + 0.55 * sw) * (0.8 + 0.35 * ph);
+      const sw = 0.5 + 0.5 * Math.cos(wk * (dir[0] * x + dir[1] * y) - om * lt + ph * 1.3), sw2 = 0.5 + 0.5 * Math.cos(wk2 * (dir2[0] * x + dir2[1] * y) - om2 * lt + ph * 2.1);
+      const near = clamp((c[1] - hz) / (1080 - hz));
+      const al = q * (0.14 + 0.5 * Math.exp(-d / 900) + 0.45 * near * near) * (0.3 + 0.7 * Math.pow(sw, 1.5)) * (0.7 + 0.3 * sw2) * (0.75 + 0.45 * ph);
       if (inAny(c, shade)) { dark.push([a0, b0, Math.min(1, al * 1.2 + 0.4 * q)]); return; }
       if (inAny(c, refl)) { dark.push([a0, b0, Math.min(1, al * 1.1 + 0.3 * q)]); return; }
       base.push([a0, b0, al]);
     });
     if (OPT.colour) { shade.forEach(o => wash(new P(o.p, true), HUE.deep, 0.22 * q)); refl.forEach(o => wash(new P(o.p, true), HUE.deep, 0.16 * q)); }
-    else { base.forEach(o => { o[2] = Math.min(1, o[2] * 1.25); }); }
+    else { base.forEach(o => { o[2] = Math.min(1, o[2] * 1.9); }); dark.forEach(o => { o[2] = Math.min(1, o[2] * 1.3); }); }
     this.segs(base, OPT.colour ? HUE.deep : BLUE, 1);
     this.segs(dark, INK, 1.05);
   },
@@ -347,7 +360,7 @@ scene({
     this.ships.forEach(s => {
       const pts = s.dk.concat(s.wl).map(sh);
       s.bays.forEach(b => b.cells.forEach(c => { [b.xa, b.xb].forEach(x => [c.wa, c.wb].forEach(w => pts.push(sh([x, s.YC + w, c.z1])))); }));
-      [s.house, s.wings, s.casing, s.funnel].forEach(f => f[1].forEach(p => pts.push(sh(p))));
+      [s.house, s.wings[0], s.wings[1], s.casing, s.funnel].forEach(f => f[1].forEach(p => pts.push(sh(p))));
       out.push(this.poly(this.hull2(pts)));
     });
     return out;
@@ -355,26 +368,29 @@ scene({
   // the quay: its face and deck edge along the whole line, the fenders, the crane rails and the lanes on the apron
   drawQuay(lt) {
     const QZ = this.QZ, x0 = -900, x1 = 9000;
-    E3.face([[x0, 0, 0], [x1, 0, 0], [x1, 0, QZ], [x0, 0, QZ]], { n: [0, -1, 0], tone: 0.3, shade: 0.35, hdir: [0, 0, 1], lw: 1.2, fillCol: OPT.colour ? '#CFC6B3' : null, fillA: 0.4 }, 3900);
-    E3.line([[x0, 0, QZ], [x1, 0, QZ]], INK, 1.5, 0.85);
-    E3.line([[x0, 0, 0], [x1, 0, 0]], INK, 1.0, 0.6);
-    const segs = [];
-    [this.YW, this.YL].forEach(y => segs.push([[x0, y - 0.8, QZ], [x1, y - 0.8, QZ], 0.5], [[x0, y + 0.8, QZ], [x1, y + 0.8, QZ], 0.5]));
-    [10.5, 16.5, 22.5, 28.5, 62, 70].forEach(y => segs.push([[x0, y, QZ], [x1, y, QZ], 0.22]));
-    for (let x = x0; x < 3000; x += 16) segs.push([[x, -0.05, QZ - 0.3], [x, -0.05, 0.6], 0.55]); // the fenders on the face
+    // (in lengths, each lighter and finer with its distance, so the far quay does not close up into a bar)
+    const segs = [], edge = [], xs = [x0, -300, 0, 300, 600, 900, 1200, 1600, 2000, 2600, 3400, 4400, 6000, x1];
+    for (let i = 0; i < xs.length - 1; i++) {
+      const a = xs[i], b = xs[i + 1], dd = R11.dep([(a + b) / 2, 0, QZ]), al = R11.air(dd, 1500);
+      E3.face([[a, 0, 0], [b, 0, 0], [b, 0, QZ], [a, 0, QZ]], { n: [0, -1, 0], tone: 0.3, shade: 0.35, hdir: [0, 0, 1], edges: false, noHatch: dd > 1400, fillCol: OPT.colour ? '#CFC6B3' : INK, fillA: OPT.colour ? 0.4 : 0.06 }, 3900 + i);
+      edge.push([[a, 0, QZ], [b, 0, QZ], 0.95 * al], [[a, 0, 0], [b, 0, 0], 0.6 * al]);
+      [this.YW, this.YL].forEach(y => segs.push([[a, y - 0.8, QZ], [b, y - 0.8, QZ], 0.5 * al], [[a, y + 0.8, QZ], [b, y + 0.8, QZ], 0.5 * al]));
+      [10.5, 16.5, 22.5, 28.5, 62, 70].forEach(y => segs.push([[a, y, QZ], [b, y, QZ], 0.22 * al]));
+    }
+    for (let x = x0; x < 1800; x += 16) segs.push([[x, -0.05, QZ - 0.3], [x, -0.05, 0.6], 0.5 * R11.air(R11.dep([x, 0, 2]), 1200)]); // the fenders on the face
+    this.segs(edge, INK, 1.3);
     E3.segments(segs, INK, 0.8);
   },
   // a yard block: its runs of boxes far to near, the rows and the box ends on the faces toward the eye, its gantry
   drawBlock(b, d, k) {
     const QZ = this.QZ, a = R11.air(d, 2200), near = d < 1100;
-    const cols = OPT.colour ? [HUE.steel, HUE.sea, HUE.sand, HUE.steel, HUE.cloud, SEPIA] : [OCHRE, BLUE, SEPIA, INK, BLUE, SEPIA];
     const g0 = b.gx, zz = QZ + 24;
     // the gantry's legs on the far rail first
     [g0 - 5, g0 + 5].forEach(x => R11.member([x, b.y1 + 3, QZ], [x, b.y1 + 3, zz], 1, 0.6 * a));
     const segs = (d < 2000 ? b.segs : [{ x0: b.x0, x1: b.x1, z1: QZ + 2.59 * 5.5, col: b.segs[0].col }]).slice().sort((p, q) => R11.dep([q.x0, b.y0, QZ]) - R11.dep([p.x0, b.y0, QZ]));
     segs.forEach((s, i) => {
-      const cc = cols[Math.floor(s.col * cols.length)];
-      E3.solid(E3.box(s.x0, s.x1, b.y0, b.y1, QZ, s.z1), { tone: 0.05, shade: 0.5, lw: 0.9, edgeA: 0.75 * a, fillCol: cc, fillA: (OPT.colour ? 0.34 : 0.14) * (0.5 + 0.5 * a), noHatch: !near }, 3100 + k * 11 + i);
+      const [cc, ck] = this.boxCol(s.col);
+      E3.solid(E3.box(s.x0, s.x1, b.y0, b.y1, QZ, s.z1), { tone: 0.05, shade: 0.5, lw: 0.9, edgeA: 0.75 * a, fillCol: cc, fillA: (OPT.colour ? 0.34 : 0.14) * ck * (0.5 + 0.5 * a), noHatch: !near }, 3100 + k * 11 + i);
       if (d < 1600) {
         const L = [];
         for (let z = QZ + 2.59; z < s.z1 - 0.1; z += 2.59) L.push([[s.x0, b.y0 - 0.02, z], [s.x1, b.y0 - 0.02, z], 0.4 * a]);
@@ -421,18 +437,24 @@ scene({
   },
   drawTrolley(c, mv, d) {
     const zT = this.ZT, a = R11.air(d, 2600), x = c.x;
-    E3.solid(E3.box(x - 3.6, x + 3.6, mv.y - 3, mv.y + 3, zT, zT + 2.4), { tone: 0.2, shade: 0.45, lw: 0.9, edgeA: 0.85 * a, noHatch: true, fillCol: OPT.colour ? HUE.steel : SEPIA, fillA: 0.4 }, 4500 + c.i);
+    E3.solid(E3.box(x - 3.6, x + 3.6, mv.y - 3, mv.y + 3, zT, zT + 2.4), { tone: 0.2, shade: 0.45, lw: 0.9, edgeA: 0.9 * a, noHatch: true, fillCol: OPT.colour ? HUE.deep : INK, fillA: OPT.colour ? 0.45 : 0.3 }, 4500 + c.i);
   },
   // the hoist ropes from the trolley, the spreader, and the box on it
   drawHoist(c, mv, d) {
     const a = R11.air(d, 2600), x = c.x, y = mv.y, z = mv.z, zT = this.ZT;
-    [[-1.6, -1], [1.6, -1], [-1.6, 1], [1.6, 1]].forEach(([dx, dy]) => E3.line([[x + dx, y + dy * 0.8, zT], [x + dx * 3.4, y + dy * 0.9, z + 0.9]], INK, clamp(0.7 * 260 / d, 0.35, 1), 0.75 * a));
+    [[-1.6, -1], [1.6, -1], [-1.6, 1], [1.6, 1]].forEach(([dx, dy]) => E3.line([[x + dx, y + dy * 0.8, zT], [x + dx * 3.4, y + dy * 0.9, z + 0.9]], INK, clamp(0.9 * 260 / d, 0.6, 1.1), 0.85 * a));
     E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.25, y + 1.25, z, z + 0.9), { tone: 0.3, shade: 0.4, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: OCHRE, fillA: 0.5 }, 4550 + c.i);
     if (mv.load) this.drawBox(x, y, z, mv.col, a, 4600 + c.i);
   },
+  // a box's colour and how strongly it is laid: plain boxes, no liveries; steel, sea and cloud greys-blues, sepia, a few in
+  // sand laid lighter (ochre, blue, sepia and ink in the default look). Never red
+  boxCol(col) {
+    const k = Math.floor(col * 6);
+    return OPT.colour ? [[HUE.steel, 1], [HUE.sea, 0.9], [HUE.cloud, 1], [HUE.steel, 1], [SEPIA, 0.7], [HUE.sand, 0.55]][k] : [[OCHRE, 1], [BLUE, 1], [SEPIA, 1], [INK, 0.8], [BLUE, 1], [SEPIA, 1]][k];
+  },
   drawBox(x, y, z, col, a, seed) {
-    const cc = (OPT.colour ? [HUE.steel, HUE.sea, HUE.sand, HUE.steel, HUE.cloud, SEPIA] : [OCHRE, BLUE, SEPIA, INK, BLUE, SEPIA])[Math.floor(col * 6)];
-    E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.22, y + 1.22, z - 2.59, z), { tone: 0.08, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: cc, fillA: OPT.colour ? 0.6 : 0.35 }, seed);
+    const [cc, ck] = this.boxCol(col);
+    E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.22, y + 1.22, z - 2.59, z), { tone: 0.08, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: cc, fillA: (OPT.colour ? 0.6 : 0.35) * ck }, seed);
   },
   // a terminal tractor and its chassis in the lane under the portal
   drawTruck(t, d, c) {
@@ -445,19 +467,19 @@ scene({
     });
   },
   drawShip(s, lt, dS) {
-    const D = s.D, a = R11.air(dS, 2600), C = this.cam.C;
-    const hullSt = { tone: 0.5, shade: 0.42, lw: 1.4, edges: false, fillCol: OPT.colour ? '#3E4751' : INK, fillA: OPT.colour ? 0.5 : 0.07, hdir: [1, 0, 0] };
+    const D = s.D, a = R11.air(dS, 2600), C = this.ec.C;
+    const hullSt = { tone: OPT.colour ? 0.6 : 0.86, shade: 0.3, lw: 1.4, edges: false, fillCol: OPT.colour ? '#3E4751' : INK, fillA: OPT.colour ? 0.64 : 0.3, hdir: [1, 0, 0] };
     const vis = s.hull.map((f, i) => { const c = E3.centroid(f), n = s.hn[i]; return n[0] * (C[0] - c[0]) + n[1] * (C[1] - c[1]) + n[2] * (C[2] - c[2]) > 0; });
     s.hull.forEach((f, i) => { if (vis[i]) E3.face(f, Object.assign({}, hullSt, { n: s.hn[i] }), 5000 + s.idx * 97 + i); });
     // the boot-top: the lower 3 m of each face, in the hull's darker tone
-    s.boot.forEach((f, i) => { if (vis[i]) E3.face(f, { n: s.hn[i], tone: 0.88, shade: 0.12, edges: false, hdir: [1, 0, 0], fillCol: OPT.colour ? '#1E242B' : INK, fillA: OPT.colour ? 0.6 : 0.3 }, 5100 + s.idx * 97 + i); });
+    s.boot.forEach((f, i) => { if (vis[i]) E3.face(f, { n: s.hn[i], tone: 0.95, shade: 0.05, edges: false, hdir: [1, 0, 0], fillCol: OPT.colour ? '#1E242B' : INK, fillA: OPT.colour ? 0.72 : 0.42 }, 5100 + s.idx * 97 + i); });
     // her outline: the waterline and the deck edge along the faces toward the eye, the stem and the stern's edges where
     // the side turns away
     const n = s.wl.length, lw = clamp(1.5 * 420 / dS, 0.6, 1.5);
     for (let i = 0; i < n; i++) if (vis[i]) {
       const j = (i + 1) % n;
       E3.line([s.wl[i], s.wl[j]], INK, lw, 0.85 * a); E3.line([s.dk[i], s.dk[j]], INK, lw, 0.9 * a);
-      E3.line([[s.wl[i][0], s.wl[i][1], 3], [s.wl[j][0], s.wl[j][1], 3]].map((p, k) => { const q = s.boot[i][3 - k]; return [q[0], q[1], 3]; }), INK, lw * 0.5, 0.5 * a);
+      E3.line([s.boot[i][3], s.boot[i][2]], INK, lw * 0.5, 0.5 * a);
       if (!vis[(i + n - 1) % n]) E3.line([s.wl[i], s.dk[i]], INK, lw, 0.9 * a);
       if (!vis[j]) E3.line([s.wl[j], s.dk[j]], INK, lw, 0.9 * a);
     }
@@ -470,25 +492,48 @@ scene({
     items.push({ d: ctr(s.house), draw: () => {
       E3.solid(s.house, white, 5800 + s.idx * 10);
       this.windows(s, s.house, D + 13, D + 36, 3.1, 1.5, a);
+      // the landward wing behind the wheelhouse, the seaward one in front of it
+      E3.solid(s.wings[0], white, 5802 + s.idx * 10);
       E3.solid(s.wheel, white, 5801 + s.idx * 10);
-      E3.solid(s.wings, white, 5802 + s.idx * 10);
       this.windows(s, s.wheel, D + 38.2, D + 40.3, 9, 1.3, a, true);
-      this.windows(s, s.wings, D + 38.7, D + 40.1, 9, 1.4, a, true);
+      E3.solid(s.wings[1], white, 5803 + s.idx * 10);
+      this.windows(s, s.wings[1], D + 38.7, D + 40.1, 9, 1.4, a, true);
       R11.member(s.mast[0], s.mast[1], 1.2, 0.85);
       const m = s.mast[1]; R11.member([m[0], m[1] - 3, m[2] - 2], [m[0], m[1] + 3, m[2] - 2], 0.9, 0.8);
     } });
     items.push({ d: ctr(s.casing), draw: () => {
       E3.solid(s.casing, Object.assign({}, white, { tone: 0.08 }), 5803 + s.idx * 10);
       E3.solid(s.funnel, { tone: 0.3, shade: 0.4, lw: 1.2, edgeA: 0.9 * a, fillCol: OPT.colour ? HUE.steel : null, fillA: 0.45 }, 5804 + s.idx * 10);
-      const f = s.funnel[1], top = f.map(p => p[2]);
-      E3.face(f, { n: [0, 0, 1], fillCol: INK, fillA: 0.5, noHatch: true, edges: false }, 5805 + s.idx * 10);
+      E3.face(s.funnel[1], { n: [0, 0, 1], fillCol: INK, fillA: 0.5, noHatch: true, edges: false }, 5805 + s.idx * 10);
     } });
     items.push({ d: ctr(s.bwater), draw: () => { E3.solid(s.bwater, Object.assign({}, white, { tone: 0.1 }), 5806 + s.idx * 10); R11.member(s.fmast[0], s.fmast[1], 1, 0.8); } });
     items.sort((p, q) => q.d - p.d).forEach(it => it.draw());
+    this.boomShadows(s, a);
+  },
+  // the shadows the lowered booms working her throw across her stacks (laid on the stacks' mean top), so each boom reads
+  // as crossing the deck under it
+  boomShadows(s, a) {
+    const S = E3.sun(), zs = s.D + 1 + 2.59 * 9, zb = this.ZT - 4, kx = -S[0] / S[2] * (zb - zs), ky = -S[1] / S[2] * (zb - zs);
+    const deck = s.dk.map(p => E3.proj([p[0], p[1], zs])), bb = [Math.min(...deck.map(q => q[0])), Math.min(...deck.map(q => q[1])), Math.max(...deck.map(q => q[0])), Math.max(...deck.map(q => q[1]))];
+    const polys = [];
+    this.cranes.forEach(c => {
+      if (c.raised || c.ship !== s) return;
+      const w = 3.2, q = [[c.x - w, this.YW], [c.x + w, this.YW], [c.x + w * 0.75, this.YW - this.REACH], [c.x - w * 0.75, this.YW - this.REACH]];
+      polys.push(new P(q.map(([x, y]) => E3.proj([x + kx, y + ky, zs])), true));
+    });
+    if (!polys.length) return;
+    ctx.save(); ctx.beginPath(); new P(deck, true).trace(ctx, 1); ctx.clip();
+    polys.forEach((sp, i) => {
+      const q = sp.pts, pb = [Math.min(...q.map(v => v[0])), Math.min(...q.map(v => v[1])), Math.max(...q.map(v => v[0])), Math.max(...q.map(v => v[1]))];
+      const ang = Math.atan2(q[2][1] - q[1][1], q[2][0] - q[1][0]) + Math.PI / 2 - 0.35;
+      if (OPT.colour) wash(sp, HUE.deep, 0.3 * a); else fill(sp, INK, 0.1 * a);
+      hatch(sp, pb, ang, 1.9, 1, INK, 0.6, 0.4 * a, 5950 + s.idx * 20 + i);
+    });
+    ctx.restore();
   },
   // dark window bands on the faces of a block that turn toward the eye
   windows(s, f, z0, z1, pitch, h, a, band) {
-    const xs = f[0].map(p => p[0]), ys = f[0].map(p => p[1]), X0 = Math.min(...xs), X1 = Math.max(...xs), Y0 = Math.min(...ys), Y1 = Math.max(...ys), C = this.cam.C;
+    const xs = f[0].map(p => p[0]), ys = f[0].map(p => p[1]), X0 = Math.min(...xs), X1 = Math.max(...xs), Y0 = Math.min(...ys), Y1 = Math.max(...ys), C = this.ec.C;
     const st = { fillCol: INK, fillA: 0.55, noHatch: true, edges: false };
     for (let z = z0; z < z1 - h + 0.01; z += pitch) {
       // the ends (toward the eye along x) and the seaward side
@@ -501,9 +546,9 @@ scene({
   // one stack of boxes on a bay: its box, the tiers on the outboard face, the row and tier lines on the end toward the eye
   cell(s, b, c, ci, a, dS, seed) {
     const D = s.D, y0 = s.YC + c.wa, y1 = s.YC + c.wb, near = dS < 1100;
-    const cc = (OPT.colour ? [HUE.steel, HUE.sea, HUE.sand, HUE.steel, HUE.cloud, SEPIA] : [OCHRE, BLUE, SEPIA, INK, BLUE, SEPIA])[Math.floor(c.col * 6)];
-    E3.solid(E3.box(b.xa, b.xb, y0, y1, D + 1, c.z1), { tone: 0.05, shade: 0.45, lw: 0.9, edgeA: 0.78 * a, fillCol: cc, fillA: OPT.colour ? 0.44 : 0.2, noHatch: !near }, seed);
-    const L = [], xe = this.cam.C[0] < b.xa ? b.xa - 0.02 : b.xb + 0.02;
+    const [cc, ck] = this.boxCol(c.col);
+    E3.solid(E3.box(b.xa, b.xb, y0, y1, D + 1, c.z1), { tone: 0.05, shade: 0.45, lw: 0.9, edgeA: 0.78 * a, fillCol: cc, fillA: (OPT.colour ? 0.44 : 0.22) * ck, noHatch: !near }, seed);
+    const L = [], xe = this.ec.C[0] < b.xa ? b.xa - 0.02 : b.xb + 0.02;
     for (let z = D + 1 + 2.59; z < c.z1 - 0.1; z += 2.59) {
       if (ci === 0) L.push([[b.xa, y0 - 0.02, z], [b.xb, y0 - 0.02, z], 0.5 * a]);
       if (near) L.push([[xe, y0, z], [xe, y1, z], 0.4 * a]);
@@ -518,12 +563,19 @@ scene({
   drawTug(t, p, lt, k) {
     const c = Math.cos(t.head), s = Math.sin(t.head), P = (u, v, z) => [p[0] + u * c - v * s, p[1] + u * s + v * c, z];
     const L = t.L / 2, B = t.B / 2, d = R11.dep([p[0], p[1], 2]), a = R11.air(d, 2600);
-    // the wake: a V of short crests from her stern and a trail of broken water in her track
-    const w = [];
-    for (let j = 1; j < 26; j++) {
-      const u = -L - j * 3.2, sp = j * 3.2 * 0.36;
-      [-1, 1].forEach(sg => w.push([P(u, sg * (B * 0.6 + sp), 0), P(u - 2.4, sg * (B * 0.6 + sp + 1.2), 0), 0.55 - j * 0.02]));
-      if (j < 16) w.push([P(u, (j % 3 - 1) * 1.2, 0), P(u - 2, (j % 3 - 1) * 1.2, 0), 0.45 - j * 0.025]);
+    // the wake: feathered crests along the two arms of the V (19.5 degrees either side of her track), each crest a short
+    // stroke turned out from the arm, and broken water in her track close astern; all fading as they spread
+    const w = [], ext = t.pilot ? 42 : 80, st = t.pilot ? 3.2 : 4.5, cl = t.pilot ? 1.8 : 3;
+    for (let rho = st; rho < ext; rho += st) {
+      const f = 1 - rho / ext, u0 = -L - rho * Math.cos(0.34), v0 = rho * Math.sin(0.34) + B * 0.5;
+      [-1, 1].forEach(sg => {
+        const ang = Math.PI - sg * 0.95, du = Math.cos(ang) * cl / 2, dv = Math.sin(ang) * cl / 2 * sg;
+        w.push([P(u0 - du, sg * v0 - dv * sg, 0), P(u0 + du, sg * v0 + dv * sg, 0), 0.75 * f]);
+      });
+    }
+    for (let j = 0; j < (t.pilot ? 7 : 12); j++) {
+      const u = -L - 1.5 - j * 2.6, hw = (t.pilot ? 1.2 : 2.2) * (1 + j * 0.08), o = ((j * 7) % 5 - 2) * 0.4;
+      w.push([P(u, -hw + o, 0), P(u - 0.6, hw + o, 0), 0.55 * (1 - j / 13)]);
     }
     E3.segments(w, OPT.colour ? HUE.deep : BLUE, 1);
     // the hull: sheer rising to the bow, the stern low
@@ -535,7 +587,10 @@ scene({
     E3.solid(sides.concat([hi]), hs, 5600 + k * 20);
     // the fender round her bow, a dark band at the sheer
     const fb = plan.slice(2, 7).map(([u, v]) => P(u, v * 1.02, sheer(u) - 0.3)), fl = plan.slice(2, 7).map(([u, v]) => P(u, v * 1.02, sheer(u) - 1.2));
-    for (let i = 0; i < fb.length - 1; i++) E3.face([fl[i], fl[i + 1], fb[i + 1], fb[i]], { fillCol: INK, fillA: 0.55, noHatch: true, edges: false }, 5620 + k * 20 + i);
+    for (let i = 0; i < fb.length - 1; i++) {
+      const m = E3.centroid([fl[i], fl[i + 1]]), nh = Math.hypot(m[0] - p[0], m[1] - p[1]) || 1;
+      E3.face([fl[i], fl[i + 1], fb[i + 1], fb[i]], { n: [(m[0] - p[0]) / nh, (m[1] - p[1]) / nh, 0], fillCol: INK, fillA: 0.55, noHatch: true, edges: false }, 5620 + k * 20 + i);
+    }
     // the house and the wheelhouse on it, turned with the hull and inside her beam, windows all round the wheelhouse
     const hb = (u0, u1, v0, v1, z0, z1) => { const q = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]]; const b0 = q.map(([u, v]) => P(u, v, z0)), b1 = q.map(([u, v]) => P(u, v, z1)); return [b0, b1].concat([0, 1, 2, 3].map(i => [b0[i], b0[(i + 1) % 4], b1[(i + 1) % 4], b1[i]])); };
     const white = { tone: 0.02, shade: 0.42, lw: 1, edgeA: 0.9 * a, fillCol: OPT.colour ? '#F1EBDD' : null, fillA: 0.6 };

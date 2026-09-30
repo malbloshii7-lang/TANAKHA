@@ -59,7 +59,10 @@ scene({
     const { cx, cy, R } = this, lat0 = 24, lon0 = 46.5 - lt * 1.1; // west to east: the centre longitude falls (38.25 at the 7.5 s close-up)
     const P2 = (lat, lon, lift = 1) => { const [x, y, v] = ortho(lat, lon, lat0, lon0, R * lift); return [cx + x, cy - y, v]; };
     // the outline and the graticule start before the cut, so the iris opens onto the globe rather than blank paper
-    const op = easeInOut(prog(lt, -1.1, 1.4));
+    // Revision 11 (?rev11): the globe follows the watch's satellite disc by a dissolve, so it is fully inked from the
+    // dissolve's first frame (the disc and the globe are one object, not two drawings crossing)
+    const R11W = typeof REV11 !== 'undefined' && REV11;
+    const op = easeInOut(prog(lt, R11W ? -2.2 : -1.1, 1.4));
     const rp = easeInOut(prog(lt, 1.0, 2.0)), sf = (lt * 0.045) % 1;
     const sat = () => { const [sx, sy] = this.ring.at(sf); disc(sx, sy, 5, INK, 0.9); disc(sx, sy, 2.5, OCHRE, 1); };
     const ringCol = OPT.colour ? GOLD : SEPIA;
@@ -99,7 +102,9 @@ scene({
     if (lt > 3 && sf < 0.5) sat();
     // home and arcs
     const [hx, hy] = P2(...this.home);
-    const hp = easeOut(prog(lt, 2.0, 0.6));
+    // Revision 11 (?rev11): the watch's disc dissolves into this globe, so Abu Dhabi's star is already there (the gold UAE
+    // must never leave the globe empty, while the narration names the Emirates)
+    const hp = easeOut(prog(lt, R11W ? -0.7 : 2.0, 0.6));
     ornament(hx, hy, 11 * hp, 1);
     // partners are pins, not trajectories: one quiet, dotted thread runs only to Geneva, the seat of the WMO
     const a = toVec(...this.home);
