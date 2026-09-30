@@ -63,7 +63,7 @@ scene({
   },
   // this frame's sun (16 November at 24.2° N: its azimuth from its altitude) and the trackers' tilt
   sun(lt) {
-    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6)), alt = lerp(15.2, 11.5, u) * D, lat = 24.2 * D, dec = -18.8 * D;
+    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6.8)), alt = lerp(15.2, 11.5, u) * D, lat = 24.2 * D, dec = -18.8 * D;
     const az = TAU - Math.acos((Math.sin(dec) - Math.sin(alt) * Math.sin(lat)) / (Math.cos(alt) * Math.cos(lat)));
     const s = [Math.cos(alt) * Math.sin(az), Math.cos(alt) * Math.cos(az), Math.sin(alt)];
     // backtracking: the true-tracking angle in the plane across the rows, turned back until the rows just clear
@@ -78,7 +78,7 @@ scene({
   view(lt) {
     // in the aisle among the northern block's rows, eye height 2.9 m, looking out over the road to the southern
     // blocks; it rises to 10.5 m and draws back north along the aisle, with a slight turn toward the sun
-    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6));
+    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6.8));
     const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 212.3, u) * D, pt = lerp(2.0, 10.5, u) * D;
     return E3.camera(C, [C[0] + 100 * Math.cos(pt) * Math.sin(az), C[1] + 100 * Math.cos(pt) * Math.cos(az), C[2] - 100 * Math.sin(pt)], 580, 540, 560);
   },
@@ -156,7 +156,7 @@ scene({
   // colour: the evening sky warming low toward the sun, the sand (all inside the picture box)
   under(lt) {
     this.frame(lt);
-    const q = easeInOut(prog(lt, 0, 0.8)), w = easeInOut(clamp((lt - 0.2) / 6)), B = R11.BOX, hy = this.hy;
+    const q = easeInOut(prog(lt, 0, 0.8)), w = easeInOut(clamp((lt - 0.2) / 6.8)), B = R11.BOX, hy = this.hy;
     R11.clipped(() => {
       washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.46], [0.55, HUE.sky, 0.3], [0.85, HUE.dawn, 0.18 + 0.1 * w], [1, HUE.rose, 0.3 + 0.12 * w]], 0, q);
       if (this.sp) {
@@ -197,12 +197,14 @@ scene({
       ctx.save(); ctx.globalAlpha = SA * 0.62 * i / NB; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.75; ctx.lineCap = 'butt';
       ctx.beginPath(); segs.forEach(([x0, y, x1]) => { ctx.moveTo(x0, y); ctx.lineTo(x1, y); }); ctx.stroke(); ctx.restore();
     });
-    // the sun: a plain disc, low in the south-west
+    // the sun, low in the south-west: the lightest thing in the frame (a paper-cream core laid over the sky, a warm
+    // edge, a soft paper glow round it) and no ink outline, so it reads as light, never as a ring or a target
     if (sp) {
       const [sx, sy] = sp, R = 12;
-      mask(el(sx, sy, R + 3, R + 3, 0, TAU, 1161, 0));
-      disc(sx, sy, R, OPT.colour ? '#F4C77E' : OCHRE, OPT.colour ? 0.9 : 0.55);
-      stroke(el(sx, sy, R, R, 0, TAU, 1162, 0), 1, INK, 1.1, 0.7);
+      mask(el(sx, sy, R + 12, R + 12, 0, TAU, 1161, 0), 0.5);
+      mask(el(sx, sy, R + 5, R + 5, 0, TAU, 1163, 0), 0.85);
+      disc(sx, sy, R, OPT.colour ? '#FFF3D6' : '#FBF4E4', 0.96, 'source-over');
+      stroke(el(sx, sy, R, R, 0, TAU, 1162, 0), 1, OPT.colour ? '#E8A45C' : OCHRE, 1.8, 0.4);
     }
     stroke(new P([[B[0], hy], [B[2], hy]]), 1, INK, 1, 0.45);
   },

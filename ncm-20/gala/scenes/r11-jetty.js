@@ -184,20 +184,10 @@ scene({
       y += gap * (0.8 + 0.4 * r());
     }
     this.R0 = [cam.R[0], cam.R[1]];
-    // the inset: the bulletin sheet in the picture's upper left, its chart of the east coast true to scale at 25.3 N
+    // the inset: the bulletin sheet in the picture's upper left
     const X0 = 64, Y0 = 72;
     this.sheet = new P([[X0, Y0], [X0 + 318, Y0], [X0 + 318, Y0 + 296], [X0, Y0 + 296]], true);
     this.sheetIn = new P([[X0 + 8, Y0 + 8], [X0 + 310, Y0 + 8], [X0 + 310, Y0 + 288], [X0 + 8, Y0 + 288]], true);
-    const k = 250 / (25.6291 - 24.9811), kx = k * Math.cos(25.3 * Math.PI / 180), C = ([lo, la]) => [X0 + 74 + (lo - 56.2699) * kx, Y0 + 24 + (25.6291 - la) * k];
-    this.coastPts = JT.COAST.map(C); this.coast = new P(this.coastPts, false);
-    const cx0 = X0 + 22, cx1 = X0 + 150;
-    this.chartBox = new P([[cx0, Y0 + 24], [cx1, Y0 + 24], [cx1, Y0 + 274], [cx0, Y0 + 274]], true);
-    const cp = this.coastPts, cyN = cp[0][1], cyS = cp[cp.length - 1][1];
-    this.chartSeaA = new P(cp.concat([[cx1, cyS], [cx1, cyN]]), true);
-    this.chartLandA = new P(cp.concat([[cx0, cyS], [cx0, cyN]]), true);
-    const coastX = yy => { for (let i = 1; i < cp.length; i++) if (cp[i][1] >= yy) { const u = (yy - cp[i - 1][1]) / Math.max(1e-6, cp[i][1] - cp[i - 1][1]); return cp[i - 1][0] + u * (cp[i][0] - cp[i - 1][0]); } return cp[cp.length - 1][0]; };
-    this.chartSea = []; for (let yy = Y0 + 32; yy < Y0 + 272; yy += 15) { const x0 = coastX(yy) + 5, pts = []; for (let x = x0; x <= cx1 - 5; x += 5) pts.push([x, yy + 1.2 * Math.sin((x - x0) * 0.35 + yy)]); if (pts.length > 1) this.chartSea.push(new P(pts)); }
-    this.textLines = []; for (let j = 0; j < 11; j++) this.textLines.push({ y: Y0 + 40 + j * 18, w: 74 + (j * 37) % 58, x: X0 + 166 });
     this.sign = new P(wob([[X0 + 196, Y0 + 268], [X0 + 208, Y0 + 258], [X0 + 218, Y0 + 270], [X0 + 228, Y0 + 255], [X0 + 242, Y0 + 269], [X0 + 258, Y0 + 262], [X0 + 278, Y0 + 264]], 970, 0.6));
   },
   // is a point of the sea plane short of the shore (the computed coast along its bearing from the ranges' eye)
@@ -236,13 +226,13 @@ scene({
       lever: W([u, vR - 1.3, zP + 1.0]), lever2: W([u, apex[1] - 1.3, apex[2] + 1.0]), cw2: W([u, vR - 1.9, zP - 1.8]),
       cw: JT.LB(u - 0.8, u + 0.8, tail[1] - 1.1, tail[1] + 1.1, tail[2] - 0.9, tail[2] + 0.9), cwb: JT.LB(u - 0.6, u + 0.6, vR - 2.6, vR - 1.2, zP - 2.6, zP - 1.2) };
   },
-  // this frame's camera: a long lens (f 4700 px, a 12.8 deg field across the picture) from the sea south-south-east of the
+  // this frame's camera: a long lens (f 4400 px, a 13.7 deg field across the picture) from the sea south-south-east of the
   // berth, held on the platform; over the beat it rises from 88 to 112 m and swings from bearing 157 to 153 deg round the
   // berth at about 1 km, so the ship's bow, the jetty's line and the Hajar slide past one another
   view(lt) {
     const q = clamp((lt - 0.4) / 7.6), u = 0.8 * q + 0.2 * easeInOut(q);
     const b = lerp(157, 153, u) * Math.PI / 180, D = lerp(1030, 1010, u), h = lerp(88, 112, u);
-    return E3.camera([D * Math.sin(b), D * Math.cos(b), h], JT.L(lerp(-30, -26, u), -24, 9), 4700, 470, 800);
+    return E3.camera([D * Math.sin(b), D * Math.cos(b), h], JT.L(lerp(-30, -26, u), -24, 9), 4400, 520, 800);
   },
   // where the horizon, the shore and the ranges fall on screen this frame (the washes and the sea follow them)
   frame(lt) {
@@ -596,11 +586,11 @@ scene({
       E3.line([wl[i], wl[(i + 1) % nW]], INK, 1.3, 0.85 * a);
     }
     if (vis[iStem - 1] !== vis[iStem]) E3.line([wl[iStem], dk[iStem]], INK, 1.3, 0.9 * a);
-    // the boot-top: the band from the water to her load line (5.5 m up), her bottom paint, a lighter tone than her sides
+    // the boot-top: the band from the water to her load line (5.5 m up), her bottom paint, a shade darker than her sides
     for (let i = 0; i < this.wlPts.length; i++) {
       const j = (i + 1) % this.wlPts.length, p = this.wlPts[i], q = this.wlPts[j], P2 = this.deckPts[i], Q2 = this.deckPts[j], t = 5.5 / F;
       const pm = [lerp(p[0], P2[0], t), lerp(p[1], P2[1], t), 5.5], qm = [lerp(q[0], Q2[0], t), lerp(q[1], Q2[1], t), 5.5];
-      E3.face([p, q, qm, pm], { n: this.hullN([p, q, Q2, P2]), tone: 0.5, shade: 0.3, edges: false, hatchCol: INK, hdir: JT.along, fillCol: OPT.colour ? '#6F6A64' : null, fillA: 0.3 }, 8100 + i);
+      E3.face([p, q, qm, pm], { n: this.hullN([p, q, Q2, P2]), tone: 0.86, shade: 0.3, edges: false, hatchCol: INK, hdir: JT.along, fillCol: OPT.colour ? '#353A41' : null, fillA: 0.6 }, 8100 + i);
     }
     const rail = []; for (let s = 2; s <= 300; s += 6) rail.push(S(s, this.bd(s), F + 1.1)); E3.line(rail, INK, 0.7, 0.6 * a);
     // deck items, far to near
@@ -619,7 +609,7 @@ scene({
       [-1, 1].forEach(sg => {
         const at = (s, dz) => { const [ws, wb] = this.wlAt(s), t = Math.max(0, dz) / F; return S(lerp(s, ws, t), sg * (lerp(this.bd(s), wb, t) + 0.08), F - dz); };
         const pk = [at(313.5, 0.8), at(318.5, 0.8), at(318.5, -2.2), at(313.5, -2.2)];
-        E3.face(pk, { n: this.hullN([at(312, 7), at(320, 7), at(320, 0), at(312, 0)]), fillCol: INK, fillA: 0.6, noHatch: true, lw: 0.9, edgeA: 0.85 * a }, 8095 + sg);
+        E3.face(pk, { n: this.hullN([at(312, 7), at(320, 7), at(320, 0), at(312, 0)]), fillCol: INK, fillA: 0.22, noHatch: true, lw: 0.9, edgeA: 0.85 * a }, 8095 + sg);
         E3.line([at(316, 0.4), at(316, -1.8)], INK, 1.2, 0.8 * a);
       });
     } });
@@ -705,17 +695,30 @@ scene({
     for (let t = 0.1; t < 1; t += 0.12) segs.push([[0, 1, 2].map(i => lerp(g0[i], g1[i], t)), [0, 1, 2].map(i => lerp(g0b[i], g1b[i], t)), 0.6]);
     E3.segments(segs, INK, 0.8);
   },
-  // the east-coast bulletin: the draft writes itself line by line from 0.4 s after the cut, and the forecaster signs it
-  // 3.4 s in, as the narrator says so
+  // the east-coast marine bulletin, set as NCM's product (its title, then its table of areas, wind and waves, written
+  // row by row), never as a map: a bare coast chart beside a tanker at Fujairah would read as a news locator map. The
+  // forecaster signs it as the narrator says so; the whole sheet leaves before the dissolve into Shams 1, so nothing of
+  // it is under the next plate's sun
   drawInset(lt) {
-    const iq = easeOut(prog(lt, 0.2, 0.5));
-    if (iq <= 0) return;
-    mask(this.sheet); fill(this.sheet, SEPIA, 0.05 * iq); stroke(this.sheet, iq, INK, 1.4); stroke(this.sheetIn, iq, INK, 0.7, 0.6);
-    if (OPT.colour) { wash(this.chartSeaA, HUE.sea, 0.35 * iq); wash(this.chartLandA, HUE.sand, 0.35 * iq); }
-    stroke(this.chartBox, iq, INK, 0.8, 0.6);
-    this.chartSea.forEach(p => stroke(p, iq, BLUE, 0.9, 0.5));
-    stroke(this.coast, iq, INK, 1.4, 0.85);
-    this.textLines.forEach((l, j) => { const wq = clamp((lt - 1.4 - j * 0.17) / 0.3); if (wq > 0) stroke(new P([[l.x, l.y], [l.x + l.w * wq, l.y]]), 1, INK, 1.2, 0.6); });
-    stroke(this.sign, easeInOut(prog(lt, 4.4, 0.7)), BLUE, 1.6, 0.9);
+    const iq = easeOut(prog(lt, 0.2, 0.5)), fo = 1 - easeInOut(prog(lt, 6.9, 0.45));
+    if (iq <= 0 || fo <= 0) return;
+    const X0 = 64, Y0 = 72, xr = X0 + 300;
+    mask(this.sheet, fo); fill(this.sheet, SEPIA, 0.05 * iq * fo); stroke(this.sheet, iq, INK, 1.4, 0.92 * fo); stroke(this.sheetIn, iq, INK, 0.7, 0.6 * fo);
+    const tq = easeOut(prog(lt, 0.5, 0.6)) * fo;
+    smallAr('النشرة البحرية · الساحل الشرقي', xr, Y0 + 40, tq, { size: 19, align: 'right', a: 0.9, weight: 700 });
+    small('MARINE BULLETIN · EAST COAST', xr, Y0 + 58, tq, { size: 10.5, ls: 1.5, align: 'right', a: 0.75, weight: 600 });
+    stroke(new P([[X0 + 18, Y0 + 68], [X0 + 300, Y0 + 68]]), iq, INK, 1.1, 0.75 * fo);
+    // the table: three columns (area, wind, waves), a header row and four rows; each cell is written in turn
+    const cols = [X0 + 18, X0 + 128, X0 + 214, X0 + 300], rows = [Y0 + 68, Y0 + 94, Y0 + 124, Y0 + 154, Y0 + 184, Y0 + 214];
+    [cols[1], cols[2]].forEach(x => stroke(new P([[x, rows[0]], [x, rows[5]]]), iq, INK, 0.7, 0.5 * fo));
+    rows.slice(1).forEach((y, j) => stroke(new P([[X0 + 18, y], [X0 + 300, y]]), iq, INK, j === 0 ? 0.9 : 0.6, (j === 0 ? 0.6 : 0.35) * fo));
+    for (let j = 0; j < 5; j++) for (let c = 0; c < 3; c++) {
+      const wq = clamp((lt - 1.2 - (j * 3 + c) * 0.12) / 0.3) * fo;
+      if (wq <= 0) continue;
+      const x1 = cols[c + 1] - 10, w = (cols[c + 1] - cols[c] - 22) * (0.45 + 0.4 * (((j * 7 + c * 3) % 5) / 5)), y = (rows[j] + rows[j + 1]) / 2 + 4;
+      stroke(new P([[x1, y], [x1 - w * wq, y]]), 1, INK, j === 0 ? 1.6 : 1.2, (j === 0 ? 0.7 : 0.55) * fo);
+    }
+    stroke(new P([[X0 + 180, Y0 + 276], [X0 + 296, Y0 + 276]]), iq, INK, 0.7, 0.45 * fo);
+    stroke(this.sign, easeInOut(prog(lt, 4.4, 0.7)), BLUE, 1.6, 0.9 * fo);
   },
 });

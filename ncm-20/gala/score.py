@@ -327,9 +327,9 @@ def main(cues_path, out_dir):
     # B07–B08 · the Center (D Dorian): the ras player's takhmeera brings the Ayyala drums in, pianissimo, on the first
     # downbeat after the iris (ras and takhamir only); the seven emirates lit together get one tar and tus stroke
     c0, c1 = st('centre'), en('nation')
-    # Revision 11: the founding decree's charter holds the screen for its first 5.4 s: a held chord, the voices and the
+    # Revision 11: the founding decree's charter holds the screen for its first 7.4 s: a held chord, the voices and the
     # horn's motif, no pulse; the pulse enters as the charter settles over the Center's instruments
-    charter = 5.4 if R11 else 0.0
+    charter = 7.4 if R11 else 0.0
     if R11:
         chord(music, [D2 + 12, A2 + 12, 62, 65, 69], c0, charter + 1.5, gain=0.34, bright=1600, attack=1.4, release=2.0)
         music.add(A.choir(D3 + 12, charter + 0.6, vowel='o', gain=0.4), c0 + 0.6)
@@ -337,6 +337,7 @@ def main(cues_path, out_dir):
             if t < c0 + charter - 0.3:
                 music.add(A.horn(m, d, gain=0.75), t, 0.55)
         music.add(harmonic(D4 + 24, 0.7), c0 + 0.9)  # as the decree's title inks in
+        music.add(harmonic(D4 + 24 + 7, 0.6), c0 + 13.4)  # the Center's star glints in the ring on «واحد»
     prog_ = [Dm7, Csus, Gsus, Dm7]
     k, t = 0, (next_bar(c0 + charter) if R11 else c0)
     while t < c1 - 0.1:
@@ -350,7 +351,7 @@ def main(cues_path, out_dir):
     wash_t = st('nation') + 8.3  # the seven emirates washed in gold together, named in constitutional order
     takhmeera(perc, pulse0, 'pp')
     play(perc, RAS + TAKHAMIR, pulse0, pulse0, wash_t - 0.1, 'pp')
-    hw = 7.8 if R11 else 1.7  # the headline's time in its beat
+    hw = 10.0 if R11 else 1.7  # the headline's time in its beat
     music.add(A.horn(D4 - 12 + 7, 2.5, gain=0.8), st('centre') + hw)  # swell under THEN WE BUILT A CENTER TO READ THE SKY
     music.add(A.horn(D4 - 12 + 2, 2.5, gain=0.6), st('centre') + hw)
     chord(music, [D3, A3, 62, 66, 69], wash_t, 3.2, gain=0.3, bright=2200, attack=0.6, release=1.8)
