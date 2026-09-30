@@ -13,7 +13,7 @@ const SCALE = Number(new URLSearchParams(location.search).get('scale')) || 1; //
 // ?grade=led: the LED-wall grade for a dark hall. Parchment at about two-thirds of the web grade's luminance
 // with a deeper vignette, so the page does not glare into the front rows. A starting point for calibration.
 const GRADE = new URLSearchParams(location.search).get('grade') || 'web';
-const OPT = (q => ({ vo: q.has('vo'), tc: q.has('tc'), fadeout: Number(q.get('fadeout') || 0), colour: q.has('colour') || q.has('color') }))(new URLSearchParams(location.search));
+const OPT = (q => ({ vo: q.has('vo'), tc: q.has('tc'), fadeout: Number(q.get('fadeout') || 0), colour: q.has('colour') || q.has('color'), heritage: q.has('heritage') }))(new URLSearchParams(location.search));
 // Two themes: ink on parchment by day; light on a dark sky by night. Helpers read these at call time.
 const DAY = { INK: '#1D1813', RED: '#B3391D', BLUE: '#28478C', OCHRE: '#C9973B', SEPIA: '#6E6253', BLEND: 'multiply' };
 const NIGHT = { INK: '#F1E4C8', RED: '#F08A63', BLUE: '#9DB9EE', OCHRE: '#F3C862', SEPIA: '#B9AC98', BLEND: 'screen' };
@@ -487,11 +487,29 @@ function ornament(x, y, r, p, col = null, a = 0.9) {
   fill(s, col || GOLD, a);
   stroke(s, 1, INK, 1, 0.6);
 }
-function ruleWithStar(cx, y, half, p, a = 0.7) {
+// weave (?heritage, the leaders' cards): each rule becomes a strip of Al Sadu's al-hubub, "the grains" (the Bedouin
+// weaving of the UAE, on UNESCO's Representative List since December 2025): small grains between two edge lines, woven
+// outward from the star. In ?colour the grains alternate ink and the Hajar's rust, as the weave's two warps alternate.
+function ruleWithStar(cx, y, half, p, a = 0.7, weave = false) {
   if (p <= 0) return;
   const q = easeInOut(p);
-  stroke(new P([[cx - 22, y], [cx - 22 - half * q, y]]), 1, INK, 1.2, a);
-  stroke(new P([[cx + 22, y], [cx + 22 + half * q, y]]), 1, INK, 1.2, a);
+  if (!weave) {
+    stroke(new P([[cx - 22, y], [cx - 22 - half * q, y]]), 1, INK, 1.2, a);
+    stroke(new P([[cx + 22, y], [cx + 22 + half * q, y]]), 1, INK, 1.2, a);
+  } else {
+    const L = half * q, endA = a * clamp((q - 0.9) / 0.1);
+    [-1, 1].forEach(s => {
+      [-4.5, 4.5].forEach(dy => stroke(new P([[cx + 22 * s, y + dy], [cx + (22 + L) * s, y + dy]]), 1, INK, 1, a));
+      stroke(new P([[cx + 22 * s, y - 4.5], [cx + 22 * s, y + 4.5]]), 1, INK, 1, a);
+      if (endA > 0) stroke(new P([[cx + (22 + L) * s, y - 4.5], [cx + (22 + L) * s, y + 4.5]]), 1, INK, 1, endA);
+      for (let k = 0; k < 25; k++) {
+        const d = 30 + 9 * k, kf = clamp((22 + L - d + 2.5) / 5);
+        if (d + 2.5 > 22 + half || kf <= 0) continue;
+        const x = cx + d * s, col = OPT.colour && k % 2 ? HUE.hill : INK;
+        fill(new P([[x - 2.5, y], [x, y - 1.5], [x + 2.5, y], [x, y + 1.5]], true), col, (OPT.colour ? 0.85 : 0.8) * a * kf);
+      }
+    });
+  }
   ornament(cx, y, 11, p);
 }
 // A leadership card, set centred: Arabic first, the English under it, then the credit. q = { ar, en, whoAr?, titleAr?,
@@ -510,7 +528,7 @@ function quoteCard(q, s, lt, { cy = 480, arSize = 54, enSize = 27, t0 = 0.3 } = 
     smallAr(q.kickerAr, cx, y - 58, kq, { size: 30, align: 'center', a: 0.78 });
     small(q.kickerEn, cx, y - 26, kq, { size: 16, ls: 4, align: 'center', a: 0.6, weight: 600 });
   }
-  ruleWithStar(cx, y, 230, prog(lt, t0, 1.0) * out);
+  ruleWithStar(cx, y, 230, prog(lt, t0, 1.0) * out, 0.7, OPT.heritage);
   y += 34 + arSize;
   q.ar.forEach((l, i) => { arLine(l, cx, y, t0 + 0.4 + i * 0.7, lt, { size: arSize, align: 'center', font: F_NASKH, weight: 700, out, dur: 1.5 }); y += arSize * 1.55; });
   y += 10 - arSize * 0.35;
@@ -524,7 +542,7 @@ function quoteCard(q, s, lt, { cy = 480, arSize = 54, enSize = 27, t0 = 0.3 } = 
   if (q.whoEn) { small(q.whoEn, cx, y, c(3), { size: 18, ls: 3, align: 'center', a: 0.76, weight: 600 }); y += 28; }
   if (q.titleEn) { small(q.titleEn, cx, y, c(4), { size: 15, ls: 2, align: 'center', a: 0.62, weight: 600 }); y += 26; }
   small(q.whatEn, cx, y, c(5), { size: 15, ls: 2, align: 'center', a: 0.6, weight: 600 });
-  ruleWithStar(cx, y + 34, 230, prog(lt, tC + 0.6, 1.0) * out);
+  ruleWithStar(cx, y + 34, 230, prog(lt, tC + 0.6, 1.0) * out, 0.7, OPT.heritage);
 }
 
 /* ---------- camera: art point (px, py) sits at screen (sx, sy), magnified s times ---------- */

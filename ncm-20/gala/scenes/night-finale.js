@@ -64,6 +64,13 @@ scene({
       disc(x, y, rad, hero ? '#FFE6B8' : INK, al);
       if (m < 2 && !hero) { const L = 3 + (2 - m) * 4; stroke(new P([[x - L, y], [x + L, y]]), 1, INK, 0.8, 0.5 * al); stroke(new P([[x, y - L], [x, y + L]]), 1, INK, 0.8, 0.5 * al); }
       if (hero) this.suhailXY = [x, y];
+      // ?heritage: al-Shi'ra (Sirius) stands straight above Suhail as the ring closes, the forebears' sign of spring (WAM,
+      // 4 Aug 2020); a soft halo lets the eye find it. No line between them (it would read as a trail), no label.
+      if (OPT.heritage && s.name === 'Sirius') {
+        const hq = this.hold ? 1 : easeOut(prog(t, this.ringT - 0.6, 1.6));
+        if (hq > 0) { ctx.save(); ctx.globalCompositeOperation = 'screen'; const g = ctx.createRadialGradient(x, y, 0, x, y, 44);
+          g.addColorStop(0, `rgba(215,228,255,${0.3 * hq})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - 44, y - 44, 88, 88); ctx.restore(); }
+      }
     });
     if (this.suhailXY) {
       const [hx, hy] = this.suhailXY, q = easeOut(prog(t, 1.2, 2.0)), k = 1 + 0.06 * this.tw(t0, 0, 2.3);

@@ -73,6 +73,12 @@ scene({
   over(lt) {
     const { cx, cy } = this, z = 1 + 0.025 * easeInOut(prog(lt, 0, 11));
     wash(el(cx, cy, 268 * z, 268 * z, 0, TAU, 1, 0), HUE.gold, 0.16 * easeInOut(prog(lt, 0.3, 1.8)));
+    if (OPT.heritage) { // Suhail's rising, gilded on the card
+      const a = (11.25 * 14 - 90) * Math.PI / 180;
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(-lt * 0.06); ctx.translate(-cx, -cy);
+      wash(starP(cx + 240 * Math.cos(a), cy + 240 * Math.sin(a), 10, 3.0, 8, -Math.PI / 2), HUE.gold, 0.5 * easeOut(prog(lt, 3.0, 0.6)));
+      ctx.restore();
+    }
   },
   draw(lt) {
     const { cx, cy } = this;
@@ -87,6 +93,16 @@ scene({
       stroke(q.a, p, INK, 1.2, 0.8); stroke(q.b, p, INK, 1.2, 0.8);
     });
     disc(cx, cy, 14 * easeOut(prog(lt, 1.8, 0.5)), OCHRE); disc(cx, cy, 4.5 * easeOut(prog(lt, 1.9, 0.5)), INK);
+    // ?heritage: the card as the pearling captains' «الدّيرة», whose 32 points Ibn Majid named for stars: a mark on every
+    // rhumb at r 240 (clear of the winds); the north (al-Jah, the Pole Star) a small ink star; the south a ring (no star
+    // marks it); and one gold star at SSE, Suhail's rising, the star the film opened on. No labels.
+    if (OPT.heritage) for (let k = 0; k < 32; k++) {
+      const a = (11.25 * k - 90) * Math.PI / 180, x = cx + 240 * Math.cos(a), y = cy + 240 * Math.sin(a), q = easeOut(prog(lt, 2.2 + 0.025 * k, 0.4));
+      if (k === 0) fill(starP(x, y, 7, 2.1, 8, -Math.PI / 2), INK, 0.85 * q);
+      else if (k === 14) { const qS = easeOut(prog(lt, 3.0, 0.6)); fill(starP(x, y, 10, 3.0, 8, -Math.PI / 2), OCHRE, 0.95 * qS); stroke(starP(x, y, 10, 3.0, 8, -Math.PI / 2), qS, INK, 1, 0.8 * qS); }
+      else if (k === 16) stroke(el(x, y, 4.5, 4.5, 0, TAU, 900, 0), q, INK, 1, 0.7 * q);
+      else disc(x, y, 2.2, INK, 0.7 * q);
+    }
     ctx.restore();
     this.winds.forEach((w, i) => {
       const p = easeInOut(prog(lt, 1.8 + i * 0.4, 2.4));
@@ -130,9 +146,10 @@ scene({
     stroke(this.mast, prog(lt, 1.8, 0.8), INK, 2.4);
     if (sp > 0) {
       fill(this.sail, OCHRE, 0.24 * sp);
-      if (OPT.colour) wash(this.sail, HUE.dawn, 0.3 * sp);
+      if (OPT.colour) wash(this.sail, OPT.heritage ? HUE.sail : HUE.dawn, (OPT.heritage ? 0.4 : 0.3) * sp); // ?heritage: khoos straw
       ctx.save(); ctx.beginPath(); this.sail.trace(ctx, 1); ctx.clip();
-      this.sailMat.forEach(q => stroke(q, sp, SEPIA, 0.7, 0.4));
+      // ?heritage: the palm-leaf mat's courses (khoos) at the LED's 1 px, a little lighter to keep the sail's tone
+      this.sailMat.forEach(q => stroke(q, sp, SEPIA, OPT.heritage ? 1.0 : 0.7, OPT.heritage ? 0.3 : 0.4));
       ctx.restore();
     }
     stroke(this.sail, sp, INK, 1.6); stroke(this.yard, prog(lt, 2.0, 1.0), INK, 2.8);
