@@ -81,13 +81,29 @@ scene({
     sea(cx - R, cy - R, 2 * R, 2 * R, op);
     stroke(this.outline, op, INK, 2.2);
     // graticule every 15°
-    const gp = easeOut(prog(lt, -0.5, 1.6));
+    const gp = easeOut(prog(lt, R11W ? -2.2 : -0.5, R11W ? 1.4 : 1.6));
     if (gp > 0) {
       ctx.save(); ctx.globalAlpha = SA * 0.45 * gp; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 0.9; ctx.beginPath();
       const run = pts => { let on = false; pts.forEach(([x, y, v]) => { if (v > 0.02) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; }); };
       for (let lon = -180; lon < 180; lon += 15) { const pts = []; for (let lat = -90; lat <= 90; lat += 3) pts.push(P2(lat, lon)); run(pts); }
       for (let lat = -75; lat <= 75; lat += 15) { const pts = []; for (let lon = -180; lon <= 180; lon += 3) pts.push(P2(lat, lon)); run(pts); }
       ctx.stroke(); ctx.restore();
+    }
+    // Revision 11 (?rev11): the watch's disc carries the seven emirates in gold into this globe; they stay through the
+    // dissolve and give way gently to Abu Dhabi's star once it is in, so the country never leaves an empty globe
+    if (R11W) {
+      const ua = 1 - easeInOut(prog(lt, 1.2, 1.8));
+      if (ua > 0) {
+        UAE_MAP.emirates.forEach(em => em.polygons.forEach(pg => {
+          const pts = pg.map(([lo, la]) => P2(la, lo)); if (pts.some(p => p[2] < 0.015)) return;
+          const pp = new P(pts.map(p => [p[0], p[1]]), true); mask(pp, ua); fill(pp, GOLD, 0.72 * ua);
+        }));
+        ctx.save(); ctx.globalAlpha = SA * 0.8 * ua; ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = INK; ctx.lineWidth = 0.88; ctx.lineJoin = 'round'; ctx.beginPath();
+        UAE_MAP.arcs.items.filter(a => a.type === 'coast' || a.type === 'land_border').forEach(a => {
+          let on = false; (a.closed ? a.points.concat([a.points[0]]) : a.points).forEach(([lo, la]) => { const [x, y, v] = P2(la, lo); if (v > 0.015) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; });
+        });
+        ctx.stroke(); ctx.restore();
+      }
     }
     // night: the true terminator for the ceremony evening (or, if switched off, engraved shading on the far limb)
     if (this.nightSide) this.adNight = this.nightShade(lt, lat0, lon0);

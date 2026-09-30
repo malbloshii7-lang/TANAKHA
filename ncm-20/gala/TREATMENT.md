@@ -662,7 +662,10 @@ chart hatches it; forecast charts) and two clocks, UTC and the Emirates' time. T
 Operations Centre, which H.H. Sheikh Mansour toured on 4 Aug 2025 (WAM), is drawn only from NCM's photographs (§11
 row 47), so it is not named and the supercomputer appears only in the narration. Then the camera pushes into the
 satellite image while the room fades to paper; the disc turns to the world beat's projection and the world dissolves
-in over it (its approved iris would have opened a pale disc over the UAE). Label «المركز الوطني للأرصاد» / NATIONAL
+in over it (its approved iris would have opened a pale disc over the UAE); the gold emirates stay through the dissolve
+and give way to Abu Dhabi's star. The disc's coastlines outside the UAE's box are Natural Earth 1:50m land (public
+domain; Iran's shore faint, with no borders or labels); inside the box, the land, the islands and the neighbours' coasts
+come only from the film's own UAE map. Label «المركز الوطني للأرصاد» / NATIONAL
 CENTER OF METEOROLOGY; headline, echoing the end of the narration and giving the beat to its people: «وللمتنبئين القرار
 الأخير» / FORECASTERS HAVE THE FINAL WORD. No figure: the only one to hand, the supercomputer's 2.8 petaflops
 theoretical peak of 2021 (HPE), would read as modest to WMO guests beside peer services in 2027, so it stays off screen
