@@ -32,8 +32,8 @@ scene({
     // each figure named, Arabic first (caption position: [x, align])
     this.names = [
       ['رادار الطقس', 'WEATHER RADAR', 404, 'right'],
-      ['محطة أرصاد آلية', 'AUTOMATIC WEATHER STATION', 702, 'left'],
-      ['محطة رصد زلزالي', 'SEISMIC STATION', 110, 'left'],
+      ['محطة أرصاد آلية', ['AUTOMATIC', 'WEATHER STATION'], 702, 'left'],
+      ['رصد الزلازل', 'SEISMIC STATION', 110, 'left'],
       ['مسبار جوي', 'RADIOSONDE', 702, 'left'],
     ];
     // the gold threads: one from the charter down to the ring, then one from each figure's inner corner
@@ -44,7 +44,7 @@ scene({
     });
     // FIG. I · the weather radar: a C-band dish in a spherical radome of irregular foam panels on a lattice tower, an
     // equipment shelter at its foot; the radome's right half cut away to show the dish turning on its pedestal and yoke
-    const G1 = 640, tx = 190;
+    const G1 = 640, tx = 164;
     this.rad = { G: G1, tx, cy: 494, rr: 44 };
     this.tower = [ln(tx - 26, G1, tx - 12, 548, 301, 0.2), ln(tx + 26, G1, tx + 12, 548, 302, 0.2)];
     const zz = []; for (let k = 0; k <= 6; k++) { const y = G1 - k * 15.3, u = (G1 - y) / (G1 - 548); zz.push([k % 2 ? lerp(tx + 26, tx + 12, u) : lerp(tx - 26, tx - 12, u), y]); }
@@ -79,18 +79,18 @@ scene({
     // FIG. II · the automatic weather station, drawn to one scale (the 10 m mast, 17 px a metre): cup anemometer and vane
     // on the cross-arm at the top, the radiation shield on its arm at 1.5 m, the logger and its solar panel below it, a
     // rain gauge on open ground, guy wires; a detail roundel shows the anemometer and vane magnified
-    const G2 = 640, mx = 900;
-    this.aws = { G: G2, mx, top: 470 };
-    this.mast = ln(mx, G2, mx, 470, 340, 0.1);
-    this.guys = [ln(mx, 520, mx - 66, G2, 341, 0.2), ln(mx, 520, mx + 66, G2, 342, 0.2)];
-    this.arm = ln(mx - 14, 472, mx + 14, 472, 343, 0);
-    this.shieldArm = ln(mx, 614, mx + 12, 614, 344, 0);
-    this.shield = [0, 1, 2, 3, 4].map(k => el(mx + 14, 609 + k * 2.6, 4.2, 1.1, 0, TAU, 345 + k, 0));
-    this.logger = new P([[mx - 13, 617], [mx - 3, 617], [mx - 3, 628], [mx - 13, 628]], true);
-    this.panel = new P([[mx - 16, 600], [mx - 3, 596], [mx - 3, 603], [mx - 16, 607]], true);
-    this.gauge = new P([[843, G2], [843, 628], [849, 628], [849, G2]], true);
-    this.gaugeRim = el(846, 628, 3, 0.9, 0, TAU, 360, 0);
-    this.roundel = { x: 772, y: 566, r: 44 };
+    const G2 = 640, mx = 940;
+    this.aws = { G: G2, mx, top: 540 };
+    this.mast = ln(mx, G2, mx, 540, 340, 0.1);
+    this.guys = [ln(mx, 572, mx - 46, G2, 341, 0.2), ln(mx, 572, mx + 46, G2, 342, 0.2)];
+    this.arm = ln(mx - 10, 542, mx + 10, 542, 343, 0);
+    this.shieldArm = ln(mx, 625, mx + 8, 625, 344, 0);
+    this.shield = [0, 1, 2, 3, 4].map(k => el(mx + 10, 621 + k * 2, 3.2, 0.8, 0, TAU, 345 + k, 0));
+    this.logger = new P([[mx - 9, 624], [mx - 3, 624], [mx - 3, 631], [mx - 9, 631]], true);
+    this.panel = new P([[mx - 12, 615], [mx - 3, 612], [mx - 3, 617], [mx - 12, 620]], true);
+    this.gauge = new P([[845, G2], [845, 634], [849, 634], [849, G2]], true);
+    this.gaugeRim = el(847, 634, 2, 0.6, 0, TAU, 360, 0);
+    this.roundel = { x: 786, y: 592, r: 40 };
     this.ground2 = ln(698, G2, 1002, G2, 361, 0.4);
     this.ground1 = ln(106, G1, 410, G1, 362, 0.4);
     // FIG. III · the seismic station in section: a hut above ground, a shallow vault below it, the broadband sensor (a
@@ -99,17 +99,17 @@ scene({
     const G3 = 800;
     this.seis = { G: G3 };
     this.ground3 = ln(106, G3, 410, G3, 370, 0.4);
-    this.hut = new P([[300, G3], [300, 772], [380, 772], [380, G3]], true);
-    this.hutRoof = new P([[294, 774], [340, 758], [386, 774]]);
-    this.door = new P([[318, G3], [318, 782], [330, 782], [330, G3]], true);
-    this.vault = new P([[288, G3], [288, 842], [392, 842], [392, G3]], true);
-    this.pier = new P([[304, 842], [304, 832], [376, 832], [376, 842]], true);
-    this.cover = new P([[318, 832], [318, 812], [362, 812], [362, 832]], true);
-    this.sensor = new P([[330, 829], [330, 818], [350, 818], [350, 829]], true);
-    this.lid = el(340, 818, 10, 2.4, 0, TAU, 372, 0);
-    this.cable = new P(wob([[358, 822], [372, 816], [374, 804], [368, G3 - 2]], 371, 0.2));
+    this.hut = new P([[312, G3], [312, 772], [392, 772], [392, G3]], true);
+    this.hutRoof = new P([[306, 774], [352, 758], [398, 774]]);
+    this.door = new P([[330, G3], [330, 782], [342, 782], [342, G3]], true);
+    this.vault = new P([[300, G3], [300, 842], [404, 842], [404, G3]], true);
+    this.pier = new P([[316, 842], [316, 832], [388, 832], [388, 842]], true);
+    this.cover = new P([[330, 832], [330, 812], [374, 812], [374, 832]], true);
+    this.sensor = new P([[342, 829], [342, 818], [362, 818], [362, 829]], true);
+    this.lid = el(352, 818, 10, 2.4, 0, TAU, 372, 0);
+    this.cable = new P(wob([[370, 822], [384, 816], [386, 804], [380, G3 - 2]], 371, 0.2));
     this.rock = new P([[106, 842], [410, 842], [410, 946], [106, 946]], true);
-    this.soil = new P([[106, G3], [288, G3], [288, 842], [392, 842], [392, G3], [410, G3], [410, 842], [106, 842]], true);
+    this.soil = new P([[106, G3], [410, G3], [410, 842], [106, 842]], true);
     this.strip = [112, 852, 280, 906];
     // FIG. IV · the radiosonde: the balloon, its parachute and the sonde on a long train, launched beside an airport
     // station's shelter; the line pays out from the ground until the balloon lifts the sonde
@@ -136,7 +136,7 @@ scene({
     wash([this.rings[1], this.rings[2]], HUE.gold, 0.16 * rq, 'evenodd');
   },
   bq: lt => easeInOut(prog(lt, 9.0, 1.2)), // the figures' frames and grounds, as the camera settles
-  rq: lt => easeInOut(prog(lt, 12.0, 1.4)), // the ring
+  rq: lt => easeInOut(prog(lt, 11.0, 1.4)), // the ring
   draw(lt) {
     const c = this.ch;
     // the charter's frame and ornaments are whole from the first frame of the iris, so it opens onto the charter, not
@@ -163,9 +163,12 @@ scene({
     this.figs.forEach(g => { mask(g.box[0], bq); stroke(g.box[0], bq, INK, 1.6, 0.85); stroke(g.box[1], bq, INK, 0.8, 0.5); this.tone(g, lt); });
     this.fig1(lt); this.fig2(lt); this.fig3(lt); this.fig4(lt);
     this.captions(lt);
+    // the detail roundel's leader to the mast head, over the captions' paper
+    { const R = this.roundel, mx = this.aws.mx, rq = easeOut(prog(lt, 10.3, 0.8)), ang = Math.atan2(541 - R.y, mx - R.x);
+      if (rq > 0) stroke(new P([[R.x + (R.r + 3) * Math.cos(ang), R.y + (R.r + 3) * Math.sin(ang)], [mx - 3, 541]]), rq, INK, 0.8, 0.55, [3, 3]); }
     // the thread from the decree to the ring, then the threads from the instruments on "in one national center"
-    stroke(this.stem, easeInOut(prog(lt, 11.3, 0.9)), GOLD, 1.8, 0.85);
-    this.threads.forEach((t, i) => stroke(t, easeInOut(prog(lt, 12.3 + i * 0.12, 0.9)), GOLD, 1.8, 0.85));
+    stroke(this.stem, easeInOut(prog(lt, 10.4, 0.8)), GOLD, 1.8, 0.85);
+    this.threads.forEach((t, i) => stroke(t, easeInOut(prog(lt, 11.3 + i * 0.12, 0.9)), GOLD, 1.8, 0.85));
     const rq = this.rq(lt), rot = lt * 0.02;
     if (rq > 0) {
       mask(this.rings[0], rq);
@@ -174,19 +177,19 @@ scene({
       this.rope.forEach(q => stroke(q, rq, GOLD, 0.9, 0.35)); this.petals.forEach(q => stroke(q, rq, GOLD, 0.9, 0.3));
       ctx.restore();
       // the Center's star glints in the ring as the narration's «واحد» lands
-      ornament(this.ring.x, this.ring.y, 22, prog(lt, 13.3, 0.6));
+      ornament(this.ring.x, this.ring.y, 22, prog(lt, 12.2, 0.6));
     }
   },
-  // each figure's name, on a paper patch
+  // each figure's name, Arabic first, on a paper patch set where the drawing leaves the box clear
   captions(lt) {
     this.names.forEach(([ar, en, x, align], i) => {
-      const g = this.figs[i], q = easeOut(prog(lt, 10.2 + i * 0.15, 0.7)), y = g.y0 + 36;
+      const g = this.figs[i], q = easeOut(prog(lt, 10.2 + i * 0.15, 0.7)), y = g.y0 + 38, E = [].concat(en);
       if (q <= 0) return;
-      const wA = textWidth(ar, `600 25px ${F_KUFI}`, 0, 'rtl'), wE = textWidth(en, `600 13px ${F_MONO}`, 2), w = Math.max(wA, wE) + 14;
-      const x0 = align === 'right' ? x - w + 7 : x - 7;
-      mask(new P([[x0, y - 28], [x0 + w, y - 28], [x0 + w, y + 26], [x0, y + 26]], true), q);
-      smallAr(ar, x, y, q, { size: 25, align, a: 0.9, weight: 600 });
-      small(en, x, y + 19, q, { size: 13, ls: 2, align, a: 0.75, weight: 600 });
+      const wA = textWidth(ar, `600 30px ${F_KUFI}`, 0, 'rtl'), wE = Math.max(...E.map(l => textWidth(l, `600 16px ${F_MONO}`, 2))), w = Math.max(wA, wE) + 14;
+      const x0 = align === 'right' ? x - w + 7 : x - 7, yb = y + 20 + 20 * E.length;
+      mask(new P([[x0, y - 32], [x0 + w, y - 32], [x0 + w, yb], [x0, yb]], true), q);
+      smallAr(ar, x, y, q, { size: 30, align, a: 0.9, weight: 600 });
+      E.forEach((l, k) => small(l, x, y + 28 + 20 * k, q, { size: 16, ls: 2, align, a: 0.78, weight: 600 }));
     });
   },
   // each figure's own landscape: a sky hatched dense at the top and open at the horizon, a low line of dunes, the
@@ -257,15 +260,13 @@ scene({
     if (q <= 0) return;
     const spin = lt * 5.2, vw = Math.sin(lt * 0.7) * 0.35;
     // at scale on the mast: the cups (a small rotor) on the right end of the arm, the vane on the left
-    for (let k = 0; k < 3; k++) { const a = spin + k * TAU / 3; disc(mx + 14 + 4 * Math.cos(a), 469 + 1 * Math.sin(a), 1.4, INK, 0.8 * q); }
-    stroke(new P([[mx + 14, 472], [mx + 14, 468]]), q, INK, 1);
-    stroke(new P([[mx - 14 - 6 * Math.cos(vw), 468], [mx - 14 + 5 * Math.cos(vw), 468]]), q, INK, 1.2);
-    stroke(new P([[mx - 14, 472], [mx - 14, 468]]), q, INK, 1);
+    for (let k = 0; k < 3; k++) { const a = spin + k * TAU / 3; disc(mx + 10 + 3 * Math.cos(a), 539 + 0.8 * Math.sin(a), 1.1, INK, 0.8 * q); }
+    stroke(new P([[mx + 10, 542], [mx + 10, 539]]), q, INK, 1);
+    stroke(new P([[mx - 10 - 5 * Math.cos(vw), 539], [mx - 10 + 4 * Math.cos(vw), 539]]), q, INK, 1.1);
+    stroke(new P([[mx - 10, 542], [mx - 10, 539]]), q, INK, 1);
     // the detail roundel, joined to the mast head by a fine leader
     const R = this.roundel, rq = easeOut(prog(lt, 10.3, 0.8));
     if (rq <= 0) return;
-    const ang = Math.atan2(470 - R.y, mx - R.x);
-    stroke(new P([[R.x + (R.r + 3) * Math.cos(ang), R.y + (R.r + 3) * Math.sin(ang)], [mx - 4, 471]]), rq, INK, 0.8, 0.55, [3, 3]);
     const circ = el(R.x, R.y, R.r, R.r, 0, TAU, 460, 0), circ2 = el(R.x, R.y, R.r - 4, R.r - 4, 0, TAU, 461, 0);
     mask(circ, rq); stroke(circ, rq, INK, 1.6, 0.85); stroke(circ2, rq, INK, 0.8, 0.5);
     ctx.save(); ctx.beginPath(); ctx.arc(R.x, R.y, R.r - 5, 0, TAU); ctx.clip();
@@ -300,13 +301,13 @@ scene({
     hatch(this.rock, [106, 842, 410, 946], -0.5, 4, p, SEPIA, 0.9, 0.5, 401); hatch(this.rock, [106, 842, 410, 946], 0.9, 8, p, SEPIA, 0.8, 0.3, 402);
     stroke(this.ground3, p, INK, 1.8, 0.8);
     mask(this.vault, p); stroke(this.vault, p, INK, 1.8);
-    mask(this.hut, p); hatch(this.hut, [300, 772, 380, G], 1.1, 5, p, INK, 0.8, 0.28, 404); stroke(this.hut, p, INK, 2); stroke(this.hutRoof, p, INK, 2.2);
+    mask(this.hut, p); hatch(this.hut, [312, 772, 392, G], 1.1, 5, p, INK, 0.8, 0.28, 404); stroke(this.hut, p, INK, 2); stroke(this.hutRoof, p, INK, 2.2);
     mask(this.door, p); stroke(this.door, p, INK, 1.2);
     const q = easeInOut(prog(lt, 10.1, 1.0));
-    hatch(this.pier, [304, 832, 376, 842], 0.9, 3, q, INK, 0.9, 0.45, 403); stroke(this.pier, q, INK, 1.6);
+    hatch(this.pier, [316, 832, 388, 842], 0.9, 3, q, INK, 0.9, 0.45, 403); stroke(this.pier, q, INK, 1.6);
     stroke(this.cover, q, INK, 1, 0.55, [2, 2]);
-    [[332, 829], [340, 829], [348, 829]].forEach(([x, y]) => stroke(new P([[x, y], [x, y + 3]]), q, INK, 1.2));
-    mask(this.sensor, q); hatch(this.sensor, [330, 818, 350, 829], 1.57, 3, q, INK, 0.8, 0.3, 405); stroke(this.sensor, q, INK, 1.6); mask(this.lid, q); stroke(this.lid, q, INK, 1.4);
+    [[344, 829], [352, 829], [360, 829]].forEach(([x, y]) => stroke(new P([[x, y], [x, y + 3]]), q, INK, 1.2));
+    mask(this.sensor, q); hatch(this.sensor, [342, 818, 362, 829], 1.57, 3, q, INK, 0.8, 0.3, 405); stroke(this.sensor, q, INK, 1.6); mask(this.lid, q); stroke(this.lid, q, INK, 1.4);
     stroke(this.cable, q, INK, 1, 0.75);
     // the record: a ruled strip, minute ticks along its top, quiet ground written across it
     const [x0, y0, x1, y1] = this.strip, sq = easeOut(prog(lt, 10.4, 0.6));

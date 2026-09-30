@@ -2,7 +2,8 @@
 // The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 to 6): 20 beats, 49 bars at 72 BPM, 2:43.3
 // (19 beats and 2:38.3 with the tanker pulled: ?pull=tanker). ?april2024 puts April 2024 on the national map back
 // after the seven emirates (B09): 21 beats, 54 bars, 3:00.0.
-// Revision 11 (?rev11, a draft): 23 beats, 57 bars, 3:10.0 (3:03.3 with the tanker pulled); see REV11_BEATS below.
+// Revision 11 (?rev11, a draft): 23 beats, 58.5 bars, 3:15.0 (3:08.3 with the tanker pulled; 3:31.7 with ?april2024);
+// see REV11_BEATS below.
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -250,7 +251,6 @@ function REV11_BEATS() {
         words(t) {
           const f = filmT(this, t), s = this.start;
           levelA(f, s + 0.4, s + 4.75, ['ونقرأ السماء', 'لكل رحلة'], 'WE READ THE SKY FOR EVERY FLIGHT', { y: 520, maxW: COLW - 60 });
-          levelB(f, s + 1.0, s + 4.75, 'رصد جوي للطيران على مدار الساعة', '24-HOUR AVIATION WEATHER WATCH', { y: 790 });
         } },
       // B12 · Jebel Ali in its might (2.5 bars; was 1.5): the long container quay under a line of ship-to-shore cranes,
       // ultra-large ships berthed nose to tail, the yard behind; the camera rises along the line. Its figure is the port's
@@ -260,8 +260,8 @@ function REV11_BEATS() {
         words(t) {
           const f = filmT(this, t), s = this.start;
           levelB(f, s + 0.333, s + 7.6, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
-          levelB(f, s + 1.2, s + 7.6, 'طاقة استيعابية سنوية ' + ltr('19.4') + ' مليون حاوية نمطية · موانئ دبي العالمية', '19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD', { y: 404 });
-          levelA(f, s + 0.9, s + 7.6, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 560, maxW: COLW - 60 });
+          levelB(f, s + 1.2, s + 7.6, ['طاقة استيعابية سنوية ' + ltr('19.4') + ' مليون حاوية نمطية', 'موانئ دبي العالمية · ' + ltr('2026')], '19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD, 2026', { y: 404, maxW: COLW - 60 });
+          levelA(f, s + 0.9, s + 7.6, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 620, maxW: COLW - 60 });
         } },
       // B14 · Shams 1 (the plate stays, 1.5 bars): its label gains the operator's own record, with its year (Shams Power:
       // "the first operational utility-scale CSP plant in the MENA region"; inaugurated 17 March 2013)
@@ -270,7 +270,7 @@ function REV11_BEATS() {
         words(t) {
           const f = filmT(this, t), s = this.start;
           levelB(f, s + 0.2, s + 4.4, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 300 });
-          levelB(f, s + 1.0, s + 4.4, ['أول محطة تشغيلية للطاقة الشمسية المركّزة', 'على نطاق المرافق في المنطقة · ' + ltr('2013')], ["THE REGION'S FIRST OPERATIONAL", 'UTILITY-SCALE CSP PLANT · 2013'], { y: 374 });
+          levelB(f, s + 1.0, s + 4.4, ['أول محطة تشغيلية للطاقة الشمسية المركّزة', 'على نطاق المرافق في المنطقة · ' + ltr('2013')], ["THE REGION'S FIRST OPERATIONAL", 'UTILITY-SCALE CSP PLANT · 2013'], { y: 374, maxW: COLW - 60 });
           levelA(f, s + 0.4, s + 4.4, ['ونتنبأ بسطوع الشمس', 'وهبوب الرياح'], 'WE FORECAST THE SUN AND THE WIND', { y: 620, maxW: COLW - 60 });
         } },
       // B13 · the east coast with its jetty (2 bars; was 1.5): an oil terminal's jetty off Fujairah, a tanker alongside
@@ -296,12 +296,12 @@ function REV11_BEATS() {
       // B18b · the Center's watch (2.5 bars), after HH Sheikh Mansour's card and before the world: forecasters at work
       // (a generic room: the real Operations Centre is drawn only from NCM's photographs, when they come), then the push
       // into the full-disk satellite image, which turns and lands on the world beat's globe; the world then dissolves in
-      world: [{ id: 'watch', use: 'watch', bars: 2.5, speed: 1, offset: 1.3, xf: 1.2, cam: R11.CAM,
+      world: [{ id: 'watch', use: 'watch', bars: 2.5, speed: 1, offset: 1.3, xf: 1.2,
+        cam: t => R11.camLand(t, typeof R11_WATCH_PUSH !== 'undefined' ? R11_WATCH_PUSH : [98, 99]),
         words(t) {
           const f = filmT(this, t), s = this.start;
           levelB(f, s + 0.6, s + 7.6, 'المركز الوطني للأرصاد', 'NATIONAL CENTER OF METEOROLOGY', { y: 330 });
-          levelA(f, s + 1.4, s + 7.6, ['نرصد الطقس', 'على مدار الساعة'], 'WE WATCH THE WEATHER AROUND THE CLOCK', { y: 520, maxW: COLW - 60 });
-          levelB(f, s + 3.4, s + 7.6, 'حاسوب فائق · ذروة أداء نظرية ' + ltr('2.8') + ' بيتافلوب · ' + ltr('2021'), 'SUPERCOMPUTER · 2.8 PETAFLOPS THEORETICAL PEAK · 2021', { y: 790 });
+          levelA(f, s + 1.4, s + 7.6, ['وللمتنبئين', 'القرار الأخير'], 'FORECASTERS HAVE THE FINAL WORD', { y: 520, maxW: COLW - 60 });
         } }],
     },
     after: {
@@ -312,9 +312,9 @@ function REV11_BEATS() {
       energy: [{ id: 'solar', use: 'solar', bars: 2, speed: 1, offset: 0.6, xf: 0.8, cam: R11.CAM,
         words(t) {
           const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.4, s + 6.4, 'محطة الظفرة للطاقة الشمسية · ' + ltr('2') + ' جيجاواط · ' + ltr('2023'), 'AL DHAFRA SOLAR PV · 2 GW · 2023', { y: 330 });
+          levelB(f, s + 0.4, s + 6.4, 'محطة الظفرة للطاقة الشمسية · ' + ltr('2') + ' جيجاواط · ' + ltr('2023'), 'AL DHAFRA SOLAR PV · 2 GW · 2023', { y: 330, maxW: COLW - 60 });
           levelA(f, s + 0.8, s + 6.4, ['الحياد المناخي', 'بحلول ' + ltr('2050')], 'NET ZERO BY 2050', { y: 560, maxW: COLW - 60 });
-          levelB(f, s + 1.6, s + 6.4, 'أول دولة في الشرق الأوسط وشمال أفريقيا · ' + ltr('2021'), 'FIRST IN THE MIDDLE EAST AND NORTH AFRICA · 2021', { y: 800 });
+          levelB(f, s + 1.6, s + 6.4, 'أول دولة في الشرق الأوسط وشمال أفريقيا · ' + ltr('2021'), 'FIRST NATION IN THE MIDDLE EAST AND NORTH AFRICA · 2021', { y: 800, maxW: COLW - 60 });
         } }],
     },
   };
@@ -377,7 +377,7 @@ const VO = [
   { id: 'VO-03', in: 18.6, out: 24.2, ar: 'ومِن جُلْفار، وقَّتَ ابنُ ماجدٍ أسفارَهُ برياحِ الموسِم، وقاسَ ارتفاعَ النُّجومِ بالأصابِع.', en: 'From Julfar, Ahmed bin Majid timed his voyages by the monsoon winds and measured star heights in fingers.' },
   { id: 'VO-04', in: 24.6, out: 27.0, ar: 'وعرَفَ البحّارةُ كلَّ ريحٍ باسمِها.', en: 'Sailors knew every wind by name.' },
   { id: 'VO-05', in: 29.0, out: 36.6, ar: 'وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه.', en: 'In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them.' },
-  { id: 'VO-06', beat: 'centre', in: 0.3, out: 6.7, r11: { in: 7.6, out: 14.0 }, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
+  { id: 'VO-06', beat: 'centre', in: 0.3, out: 6.7, r11: { in: 6.2, out: 12.6 }, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
   { id: 'VO-07', beat: 'nation', in: 0.267, out: 9.867, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
@@ -386,12 +386,12 @@ const VO = [
   { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, r11: { in: 0.5, out: 2.9, en: 'for every flight, a watch that never sleeps;' }, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
-  { id: 'VO-10t', beat: 'tanker', in: 0.3, out: 4.2, r11: { in: 0.4, out: 5.0, ar: 'وللساحلِ الشرقيِّ نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, marine bulletins that AI helps prepare and forecasters approve;' }, ar: 'وللساحلِ الشرقيِّ نشرةٌ يقترحُها الذكاءُ الاصطناعيّ، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, a bulletin that AI drafts and forecasters approve;' },
-  { id: 'VO-11', beat: 'energy', in: 0.433, out: 3.733, r11: { ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح،', en: 'for clean energy, forecasts of sunshine and wind,' }, ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح.', en: 'for clean energy, forecasts of sunshine and wind.' },
-  { id: 'VO-11b', beat: 'solar', only11: true, in: 0.3, out: 5.6, ar: 'والإماراتُ أوّلُ دولةٍ في الشرقِ الأوسطِ وشمالِ أفريقيا تلتزمُ بالحيادِ المناخيّ.', en: 'and the UAE is the first nation in the Middle East and North Africa to commit to net zero.' },
+  { id: 'VO-10t', beat: 'tanker', in: 0.3, out: 4.2, r11: { in: 0.4, out: 5.9, ar: 'وللساحلِ الشرقيِّ نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, marine bulletins that AI helps prepare and forecasters approve;' }, ar: 'وللساحلِ الشرقيِّ نشرةٌ يقترحُها الذكاءُ الاصطناعيّ، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, a bulletin that AI drafts and forecasters approve;' },
+  { id: 'VO-11', beat: 'energy', in: 0.433, out: 3.733, ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح.', en: 'for clean energy, forecasts of sunshine and wind.' },
+  { id: 'VO-11b', beat: 'solar', only11: true, in: 0.3, out: 6.3, ar: 'والإماراتُ أوّلُ دولةٍ في الشرقِ الأوسطِ وشمالِ أفريقيا تلتزمُ بالحيادِ المناخيِّ بحلولِ عامِ ألفَينِ وخمسين.', sub: 'والإمارات أوّل دولة في الشرق الأوسط وشمال أفريقيا تلتزم بالحياد المناخيّ بحلول عام ' + ltr('2050') + '.', en: 'And the UAE is the first nation in the Middle East and North Africa to commit to net zero by 2050.' },
   { id: 'VO-12', beat: 'seeding', in: 0.5, out: 7.4, ar: 'وفي أرضٍ يقِلُّ مطرُها عن مِئةِ مِلّيمترٍ في العامِ المُعتاد، سعَينا إلى استمطارِ السَّحاب.', sub: 'وفي أرض يقلّ مطرها عن ' + ltr('100') + ' ملّيمتر في العام المعتاد، سعينا إلى استمطار السحاب.', en: 'In a land with less than 100 millimetres of rain in a typical year, we sought more rain from the clouds.' },
   { id: 'VO-13', beat: 'science', in: 1.333, out: 5.333, ar: 'ثمَّ استثمَرْنا في العلمِ نفسِه، للدُّوَلِ التي تُواجِهُ شُحَّ المياه.', en: 'Then we invested in the science itself, for the countries facing water scarcity.' },
-  { id: 'VO-13b', beat: 'watch', only11: true, in: 0.6, out: 7.9, ar: 'وعلى مَدارِ السّاعة، ترصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.', en: 'Around the clock, stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters have the final word.' },
+  { id: 'VO-13b', beat: 'watch', only11: true, in: 0.3, out: 7.9, ar: 'وعلى مَدارِ السّاعة، ترصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.', en: 'Around the clock, stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters have the final word.' },
   { id: 'VO-14a', beat: 'world', in: 0.6, out: 3.8, ar: 'واليومَ، مِن سماءِ الإماراتِ إلى العالَم:', en: 'And today, from the skies of the Emirates to the world,' },
   { id: 'VO-14b', beat: 'world', in: 4.0, out: 11.6, ar: 'يرأَسُ المنظّمةَ العالميّةَ للأرصادِ الجوّيّة، لأوّلِ مرّةٍ من دُوَلِ مجلسِ التعاوُنِ الخليجيّ، معالي الدكتور عبدالله أحمد المَنْدوس.', en: 'the first President of the World Meteorological Organization from the GCC: His Excellency Dr Abdulla Ahmed Al Mandous.' },
   { id: 'VO-15a', beat: 'gauge', in: 2.133, out: 6.033, ar: 'إلى المتنبِّئينَ الجوّيّينَ والراصِدينَ وعلماءِ الزلازل، والطيّارينَ والمهندسينَ والعلماء…', en: 'To the forecasters, observers and seismologists, the pilots, engineers and scientists…' },

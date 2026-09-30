@@ -337,7 +337,7 @@ def main(cues_path, out_dir):
             if t < c0 + charter - 0.3:
                 music.add(A.horn(m, d, gain=0.75), t, 0.55)
         music.add(harmonic(D4 + 24, 0.7), c0 + 0.9)  # as the decree's title inks in
-        music.add(harmonic(D4 + 24 + 7, 0.6), c0 + 13.4)  # the Center's star glints in the ring on «واحد»
+        music.add(harmonic(D4 + 24 + 7, 0.6), c0 + 12.3)  # the Center's star glints in the ring on «واحد»
     prog_ = [Dm7, Csus, Gsus, Dm7]
     k, t = 0, (next_bar(c0 + charter) if R11 else c0)
     while t < c1 - 0.1:

@@ -3,8 +3,19 @@
 // These plates draw in screen space (their timeline entries use R11.CAM), inside the same picture box the v3 plates
 // fill under the gala's left-plate camera, so the words column on the right is untouched.
 const R11 = (() => {
-  const BOX = [34, 44, 1086, 1080]; // the picture box on screen (the v3 plates' washes fill the same box)
-  const CAM = () => ({ s: 1, px: 0, py: 0, sx: 0, sy: 0 });
+  // the plates draw in their own coordinates, inside BOX; their camera sets that box on screen in the approved v3
+  // plates' frame (about x 96-1027, y 60-990, measured on the rail and Shams 1 plates), so the picture keeps one format
+  // from cut to cut through the montage and keeps a clear gutter before the words column
+  const BOX = [34, 44, 1086, 1080];
+  const FRAME = [96, 60, 1027, 990], K = (FRAME[2] - FRAME[0]) / (BOX[2] - BOX[0]);
+  const SCALED = { s: K, px: BOX[0], py: BOX[1], sx: FRAME[0], sy: FRAME[1] + ((FRAME[3] - FRAME[1]) - (BOX[3] - BOX[1]) * K) / 2 };
+  const CAM = () => SCALED;
+  // a camera that eases from the frame to plate = screen between t0 and t1 (the watch's push into its satellite disc,
+  // which must land on the world globe's own screen position)
+  function camLand(t, [t0, t1]) {
+    const u = easeInOut(clamp((t - t0) / (t1 - t0)));
+    return { s: Math.exp(lerp(Math.log(K), 0, u)), px: lerp(SCALED.px, 0, u), py: lerp(SCALED.py, 0, u), sx: lerp(SCALED.sx, 0, u), sy: lerp(SCALED.sy, 0, u) };
+  }
   const boxPath = () => boxP(BOX[0], BOX[1], BOX[2], BOX[3]);
   // draw inside the picture box only
   function clipped(fn) { ctx.save(); ctx.beginPath(); boxPath().trace(ctx, 1); ctx.clip(); try { fn(); } finally { ctx.restore(); } }
@@ -37,5 +48,5 @@ const R11 = (() => {
     const d = Math.max(1, (dep(a) + dep(b)) / 2);
     E3.line([a, b], col, clamp(lw * 260 / d, 0.35, 2.4), al * air(d));
   }
-  return { BOX, CAM, boxPath, clipped, faded, air, dep, sky, paint, ring, cylinder, member };
+  return { BOX, FRAME, CAM, camLand, boxPath, clipped, faded, air, dep, sky, paint, ring, cylinder, member };
 })();

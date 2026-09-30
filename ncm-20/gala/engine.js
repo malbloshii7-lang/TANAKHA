@@ -438,10 +438,18 @@ function inkBox(text, x, y, font, ls, dir, align, ws = 0, pad = 4) {
   const m = ctx.measureText(text); ctx.restore();
   return [x - m.actualBoundingBoxLeft - pad, y - m.actualBoundingBoxAscent - pad, m.actualBoundingBoxLeft + m.actualBoundingBoxRight + 2 * pad, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + 2 * pad];
 }
-function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = Math.ceil(arSize * 0.48 + enSize * 0.72) + 6, patch = false } = {}) {
+// maxW (optional) fits the lines to a width, as levelA's does: the widest line of each language sets its size.
+function levelB(f, tin, tout, ar, en, { x = 1840, y = 300, align = 'right', arSize = 32, enSize = 20, gap = null, patch = false, maxW = 0 } = {}) {
   recText('B', tin, tout, ar, en);
   const q = textIn(f, tin, tout), q2 = textIn(f, tin + 0.15, tout);
   const A = [].concat(ar || []), E = [].concat(en || []);
+  if (maxW) {
+    const wA = Math.max(1, ...A.map(l => textWidth(l, `600 ${arSize}px ${F_KUFI}`, 0, 'rtl')));
+    const wE = Math.max(1, ...E.map(l => textWidth(l, `600 ${enSize}px ${F_MONO}`, 2)));
+    if (wA > maxW) arSize = Math.floor(arSize * maxW / wA);
+    if (wE > maxW) enSize = Math.floor(enSize * maxW / wE * 10) / 10;
+  }
+  if (gap === null) gap = Math.ceil(arSize * 0.48 + enSize * 0.72) + 6;
   if (patch) {
     const ye0 = y + (A.length - 1) * arSize * 1.32 + gap;
     wordPatch([...A.map((l, i) => inkBox(l, x, y + i * arSize * 1.32, `600 ${arSize}px ${F_KUFI}`, 0, 'rtl', align)),
