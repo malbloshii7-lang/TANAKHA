@@ -208,7 +208,7 @@ scene({
     // the forecasters, far ones first; each chair after its forecaster
     [...this.people].sort((a, c) => c.Z - a.Z).forEach((o, k) => {
       const q = easeInOut(prog(sl, T0 + 0.1 + (o.dress === 'shayla' ? 0.15 : k * 0.15), 1.0));
-      this.chairBase(o, q); this.person(o, sl, q); this.chairBack(o, q);
+      this.chairBase(o, dq); this.person(o, sl, q); this.chairBack(o, dq); // the chairs stand with the desk; the people ink in after the cut
     });
   },
   // two clocks over the video wall, UTC and the Emirates' time (UTC+4), 19:05 and 23:05 (the night after the working
