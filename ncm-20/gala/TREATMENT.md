@@ -568,8 +568,9 @@ leads at the WMO).
 **B07 · the founding (4.5 bars).** The decree is the celebration's main message, so it now opens the Center's movement,
 one bar longer than first drafted so that it is held and read.
 - **The charter (0–9.6 s).** The iris opens from the Zayed card's rosette straight onto an engraved charter framed to
-  the whole screen (its title about 84 px), which inks in line by line and is then held, complete, for 3 s with no
-  narration while the music holds its chord. It is typography, never a facsimile: no signature block, seal, rosette,
+  the whole screen (its title about 84 px), which inks in line by line and is then held, complete, for 3 s while the
+  music holds its chord; the narration enters in the last second of the hold, so «في عامِ ألفَينِ وسبعة» falls on the
+  decree it is about. It is typography, never a facsimile: no signature block, seal, rosette,
   emblem or palace. It carries:
   - the decree's title as it was gazetted: «مرسوم بقانون اتحادي رقم (6) لسنة 2007 بإنشاء وتنظيم المركز الوطني للأرصاد
     الجوية والزلازل» / FEDERAL DECREE-LAW No. (6) OF 2007, on the establishment and regulation of the National Center of
@@ -587,7 +588,7 @@ one bar longer than first drafted so that it is held and read.
   August 2008); «مسبار جوي» / RADIOSONDE (the balloon lifting the sonde on its train from an airport station, AvMet). A
   gold thread drops from the decree to one ring; as VO-06 says «في مركزٍ وطنيٍّ واحد» a thread runs from each instrument
   into it and the Center's star glints on «واحد»; the map (B08) opens from that ring. The approved headline «ثم أسسنا
-  مركزاً يرصد السماء» (held 4.6 s) and VO-06 (after the hold) are kept.
+  مركزاً يرصد السماء» (held 4.6 s) and VO-06 are kept.
 - **Not used.** Article 13's penalties (they read as a security clause); "official source" attributed to the decree
   (the decree's words are "unify the source", Art. 3, and "to the exclusion of all others", Art. 4; the approved
   "official source" line on B08 stays as approved). The proposing office (the Minister of Presidential Affairs, then
@@ -608,16 +609,16 @@ one bar longer than first drafted so that it is held and read.
   over at its true 70 m/s and crosses the threshold about 17 m up (the AIP's datum height, 57 ft; the earlier plate said
   15 m) over lights drawn steady (no strobing); the runway dark asphalt; Terminal A and the 109 m crescent tower (NASM)
   at their true size beyond. Runway visual range transmissometers stand beside the runway (AIP GEN 3.5; their owner is
-  not named). The approved headline and VO-09; the register «رصد جوي للطيران على مدار الساعة» / 24-HOUR AVIATION
-  WEATHER WATCH. The AIP names NCM as the airport's MET office, H24 (TAF every 6 h, a 2-hour TREND every 30 minutes) and
-  as the Meteorological Watch Office for the Emirates FIR.
+  not named). The approved headline and VO-09, and no register: VO-09's "a watch that never sleeps" already says it.
+  The AIP names NCM as the airport's MET office, H24 (TAF every 6 h, a 2-hour TREND every 30 minutes) and as the
+  Meteorological Watch Office for the Emirates FIR.
 
 **B12 · Jebel Ali (2.5 bars).** The container quay in its length, in true 3D, seen from high over the harbour: Terminal
 3-class cranes (69.5 m lifting height, reaching across ships 25 containers wide, over 138 m with the boom raised: DP
 World) working ultra-large ships of the 400 m, 24,000 TEU class that call there (DP World, 2020), their bridges forward
 and funnels aft standing clear of the stacks, yard blocks parallel to the quay under gantries. Under the port's name:
-«طاقة استيعابية سنوية 19.4 مليون حاوية نمطية · موانئ دبي العالمية» / 19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD (DP
-World, 19 Feb 2025, restated 22 Jul 2026). A capacity, not a year's throughput: the 2025 figure was the last before the
+«طاقة استيعابية سنوية 19.4 مليون حاوية نمطية / موانئ دبي العالمية · 2026» / 19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD,
+2026 (DP World, 19 Feb 2025, restated 22 Jul 2026). A capacity, not a year's throughput: the 2025 figure was the last before the
 2026 fall, and set under «ونقرأ البحر لكل سفينة» it read as NCM's outcome. No smoke, haze or warm glow (a berth fire
 from interception debris, 1 Mar 2026), no red, no route lines, no liveries. The approved headline and VO-10.
 
@@ -643,25 +644,30 @@ removable with `?pull=tanker`.
   جيجاواط · 2023» / AL DHAFRA SOLAR PV · 2 GW · 2023 (Masdar, 16 Nov 2023). Headline «الحياد المناخي بحلول 2050» / NET
   ZERO BY 2050, and under it «أول دولة في الشرق الأوسط وشمال أفريقيا · 2021» / FIRST IN THE MIDDLE EAST AND NORTH AFRICA ·
   2021 (Masdar, 7 Oct 2021: "the first Middle East and North Africa (MENA) nation"; "the region" alone would be
-  contestable: Türkiye announced a 2053 target in September 2021). VO-11 runs on into VO-11b: «والإماراتُ أوّلُ دولةٍ في
-  الشرقِ الأوسطِ وشمالِ أفريقيا تلتزمُ بالحيادِ المناخيّ.» / "and the UAE is the first nation in the Middle East and North
-  Africa to commit to net zero." "The world's largest single-site solar plant at its opening" (overtaken since) goes to
-  the programme, so the headline can be read for 4 s.
+  contestable: Türkiye announced a 2053 target in September 2021). VO-11 keeps its approved full stop and VO-11b follows
+  as its own sentence, echoed by the headline: «والإماراتُ أوّلُ دولةٍ في الشرقِ الأوسطِ وشمالِ أفريقيا تلتزمُ بالحيادِ
+  المناخيِّ بحلولِ عامِ ألفَينِ وخمسين.» / "And the UAE is the first nation in the Middle East and North Africa to commit to
+  net zero by 2050." "The world's largest single-site solar plant at its opening" (overtaken since, and DEWA calls the
+  Mohammed bin Rashid Al Maktoum Solar Park the largest single-site solar park) goes to the programme, so the headline
+  can be read for 4 s.
 - **Left out.** Barakah (a drone strike caused a fire outside its inner perimeter on 17 May 2026), any pin map of
   energy sites, the 5.2 GW round-the-clock project (due 2027, not yet operating).
 
-**B18b · the watch (new, 2.5 bars), after H.H. Sheikh Mansour's card.** Forecasters at work before dawn: three seen
+**B18b · the watch (new, 2.5 bars), after H.H. Sheikh Mansour's card.** Forecasters at work at night, after the working
+day's sunset (the clocks read 19:05 UTC and 23:05 in the Emirates): three seen
 from behind at a curved console, two in the ghutra and agal and one in the shayla, drawn in true proportion; the middle
 forecaster's hand signs off a printed forecast. Above them a video wall (a geostationary full-disk image centred on the
 equator at 45.5° E with Africa, Arabia and India under light cloud; the national picture with its weather hatched as a
 chart hatches it; forecast charts) and two clocks, UTC and the Emirates' time. The room is generic: the real
 Operations Centre, which H.H. Sheikh Mansour toured on 4 Aug 2025 (WAM), is drawn only from NCM's photographs (§11
-row 47), so it is not named and the supercomputer appears only in the register. Then the camera pushes into the
+row 47), so it is not named and the supercomputer appears only in the narration. Then the camera pushes into the
 satellite image while the room fades to paper; the disc turns to the world beat's projection and the world dissolves
 in over it (its approved iris would have opened a pale disc over the UAE). Label «المركز الوطني للأرصاد» / NATIONAL
-CENTER OF METEOROLOGY; headline «نرصد الطقس على مدار الساعة» / WE WATCH THE WEATHER AROUND THE CLOCK (the weather named
-as the object, so nothing reads as air-defence language); register «حاسوب فائق · ذروة أداء نظرية 2.8 بيتافلوب · 2021» /
-SUPERCOMPUTER · 2.8 PETAFLOPS THEORETICAL PEAK · 2021 (HPE, 18 Oct 2021). New narration VO-13b: «وعلى مَدارِ السّاعة،
+CENTER OF METEOROLOGY; headline, echoing the end of the narration and giving the beat to its people: «وللمتنبئين القرار
+الأخير» / FORECASTERS HAVE THE FINAL WORD. No figure: the only one to hand, the supercomputer's 2.8 petaflops
+theoretical peak of 2021 (HPE), would read as modest to WMO guests beside peer services in 2027, so it stays off screen
+until NCM gives a current, dated figure (§11 row 11). New narration VO-13b, the weather named as the object so nothing
+reads as air-defence language: «وعلى مَدارِ السّاعة،
 ترصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.» /
 "Around the clock, stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters
 have the final word." (WAM, 29 Jun 2026: outputs are reviewed and approved by specialists before issue.) Music: the
@@ -670,6 +676,14 @@ counts conflict (radars: 5, 6, 7 or 9 by source and year).
 
 **The world (B19) is unchanged** but for its entry, a dissolve. WMO's own wording is "the first GCC meteorologist" as
 President; "first Arab" would be false (Egypt's M. F. Taha, 1971–1979). The term runs to Cg-20, 14–25 June 2027.
+
+**One frame.** The new plates are drawn in true 3D, but they sit in the approved plates' frame (x 96–1027, y 60–990 on
+a 1920 × 1080 screen), so the picture keeps one format from cut to cut and the words keep a clear gutter.
+
+**The runtime.** 3:15.0 is 15 s over the earlier ~3:00 instruction (which the approved 2:43.3 cut met). Every added
+second answers a named ask. If a tighter cut is wanted, one that keeps every ask is ready to build: the founding 4.5 →
+3.5 bars, the two airport shots 3 → 2, Jebel Ali 2.5 → 2, the jetty 2 → 1.5, the watch 2.5 → 2 and the solar beat 2 →
+1.5, which saves 4 bars and gives 3:01.7 (§11 row 43).
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
@@ -783,7 +797,7 @@ Revision 8: 20 stills, one from every beat, are identical to the pixel. No touch
 
 **Tone.** A tribute, not a sales reel. It is slower than v3 (72 BPM instead of 120), carries fewer words, and uses three silent leadership cards. It has one restrained passage for April 2024 and one moment of celebration (the twentieth year). The applause room after Dr Al Mandous's name is planned.
 
-**What it is not.** It is not an economic-impact film: v3's sector figures (18.2% of GDP, 21 million TEU, 6 GW) describe sectors, not NCM outcomes, so they go to the press fact sheet with their qualifiers. It does not claim what other bodies do: no "keeping skies open", no "guiding ships", no "lives saved", no alerts on phones.
+**What it is not.** It is not an economic-impact film: v3's sector figures (18.2% of GDP, 21 million TEU, 6 GW) describe sectors, not NCM outcomes, so they go to the press fact sheet with their qualifiers. (Revision 11, a draft, shows a few owners' facts that answer the requester's named asks, each under its owner's name and never under an NCM headline: §9.3.) It does not claim what other bodies do: no "keeping skies open", no "guiding ships", no "lives saved", no alerts on phones.
 
 ---
 
@@ -1476,7 +1490,7 @@ Every number on screen, its qualifier and its source:
 |---|---|---|
 | 254.8 mm at Khatm Al Shakla | Restraint in the April passage | MC script and press |
 | 51.8 °C and −5.7 °C (records) | Not needed in the film | MC script and press |
-| The Atmosphere supercomputer's 2.8 petaflops (2021) | Too much text for the science beat | Press. *Superseded under `?rev11`: on screen in B18b as a theoretical peak (below)* |
+| The Atmosphere supercomputer's 2.8 petaflops (2021) | Too much text for the science beat; in Revision 11, a 2021 theoretical peak would read as modest to WMO guests | Press, until NCM gives a current, dated figure |
 | "8 patents" | Source says "obtained and filed" and is undated | — |
 | UAEREP country and researcher counts | Sources conflict (9 vs 13) | — |
 | Aircraft and mission counts for 2025 | Sources conflict | — |
@@ -1490,13 +1504,12 @@ Every number on screen, its qualifier and its source:
 
 | Figure | Qualifier on screen | Source | Status |
 |---|---|---|---|
-| Federal Decree-Law No. (6) of 2007; 1428 AH / 2007; Official Gazette No. 473 | the title as gazetted in 2007 (the Center's name before 2017); the year only | UAE Legislation portal; the Gazette record | [V] |
+| Federal Decree-Law No. (6) of 2007; 1428 AH / 2007; Official Gazette No. 473 | the title with the Center's name before 2017; the year only | UAE Legislation portal (today's consolidated title; the pre-2017 name); the Gazette record (issue and date) | [S] reconstructed: confirm the 2007 wording word for word against Gazette No. 473 or a November 2007 report before lock; if it cannot be confirmed, use today's title with «وتعديلاته» / AS AMENDED and drop the Gazette line |
 | 32.5 million passengers, 2025 | Zayed International alone | Abu Dhabi Airports, 29 Jan 2026 | [V] |
 | 19.4 million TEU | annual capacity, DP World (not throughput) | DP World, 19 Feb 2025, restated 22 Jul 2026 | [V] |
 | Shams 1 · 2013 | the region's first *operational utility-scale* CSP plant | Shams Power | [V] |
 | Al Dhafra Solar PV · 2 GW · 2023 | — ("largest at its opening" to the programme) | Masdar, 16 Nov 2023 | [V] |
 | Net zero by 2050 · 2021 | first in the Middle East and North Africa | Masdar, 7 Oct 2021 | [V] |
-| 2.8 petaflops · 2021 | theoretical peak | HPE, 18 Oct 2021 | [S] |
 | Sector sizes | *Superseded under `?rev11`* for the Jebel Ali capacity only, set under the port's name, apart from NCM's headline | — | — |
 
 ### 9.4 NCM's role and the April 2024 passage
@@ -1688,9 +1701,9 @@ Every number on screen, its qualifier and its source:
 | 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
 | 41 | **The colour pass (Revision 9, `?colour`):** adopt it for the ceremony masters, and if so as drafted or more restrained. Management asked for the film to be "More colorful" | The look of the whole film in the hall; the LED grade is calibrated on the wall with it | Requester and NCM | The approved Revision 8 look; the colour pass is delivered as a subtitled review copy |
 | 42 | **The Emirati crafts and skills (Revision 10, `?heritage`):** adopt them for the ceremony masters, all or some (the «الدِّيرة» card, the nahham, Al Sadu on the cards, the ghaf, al-Shi'ra above Suhail) | Heritage shown before the Vice President must be true and dignified; the cards carry the leaders' words | Requester, NCM, the cultural adviser (row 37) and the protocol office | The approved Revision 8 look; the touches are delivered in a subtitled review copy |
-| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 3:15.0. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2 | The requester asked for them; they lengthen the film by 31.7 s; the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
+| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 3:15.0, 15 s over the earlier ~3:00 instruction; a tighter cut that keeps every ask (3:01.7, minus 4 bars) is ready to build. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2 | The requester asked for them; they lengthen the film by 31.7 s; the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
 | 44 | **The Fujairah jetty in the 2026 context.** The oil zone and the port's manifolds were struck in March and May 2026. The plate shows only the jetty, the breakwater, the sea and the Hajar, calm and in morning light, bow south | A terminal picture can read as a target or damage | NCM, the protocol office and MoFA; the go/no-go checks as for the tanker beat | Built as requested; removable with `?pull=tanker` |
-| 45 | **The operators' figures on screen (Revision 11).** 32.5 million passengers at Zayed International in 2025 (Abu Dhabi Airports); Jebel Ali's annual capacity of 19.4 million TEU (DP World; not its 2025 throughput, the last before the 2026 fall); Al Dhafra Solar PV, 2 GW, 2023 (Masdar; "the world's largest single-site solar plant at its inauguration" goes to the programme); Shams 1, the region's first operational utility-scale CSP plant (Shams Power); the supercomputer's 2.8 petaflops theoretical peak (HPE, 2021); the first nation in the Middle East and North Africa to commit to net zero (Masdar, 2021). Each is its owner's fact, with its year and every qualifier, set under the place's name, never under an NCM "we" headline | Every number on screen carries its source and year; the owners may wish to see them | NCM communications, with each owner | As built, with the sources in Revision 11 and §9.3 |
+| 45 | **The operators' figures on screen (Revision 11).** 32.5 million passengers at Zayed International in 2025 (Abu Dhabi Airports); Jebel Ali's annual capacity of 19.4 million TEU (DP World; not its 2025 throughput, the last before the 2026 fall); Al Dhafra Solar PV, 2 GW, 2023 (Masdar; "the world's largest single-site solar plant at its inauguration" goes to the programme); Shams 1, the region's first operational utility-scale CSP plant (Shams Power); the first nation in the Middle East and North Africa to commit to net zero (Masdar, 2021). Each is its owner's fact, with its year and every qualifier, set under the place's name, never under an NCM "we" headline | Every number on screen carries its source and year; the owners may wish to see them | NCM communications, with each owner | As built, with the sources in Revision 11 and §9.3 |
 | 46 | **VO-10t in the approved cut.** It says NCM's AI drafts the east-coast bulletin; WAM (29 June 2026) says the Forecaster Assistant helps prepare weather and marine bulletins in general, without naming the east-coast one. Revision 11 uses WAM's own verb | The narration is not yet recorded, so it can be corrected before the session | NCM and the Arabic editor | Revision 11's wording, «…نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،» |
 | 47 | **The Operations Centre and the forecasters (Revision 11, B18b).** Reference photographs of NCM's Operations Centre, and of consenting staff at work, so the room can be drawn as it is and named; the cultural adviser (row 37) to confirm the ghutra, agal and shayla as drawn from behind. Until then the room is generic and unnamed, and the supercomputer appears only in the register | H.H. Sheikh Mansour toured the real room on 4 Aug 2025, and NCM's staff work in it; an invented interior must not be labelled as theirs | NCM communications and the cultural adviser | A generic room, not named; three anonymous forecasters seen from behind |
 ---
