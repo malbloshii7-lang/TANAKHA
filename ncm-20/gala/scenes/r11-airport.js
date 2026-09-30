@@ -117,13 +117,11 @@ const AUH = (() => {
       const st = k.stab, ss = y => { const t = (y - st.y[0]) / (st.y[1] - st.y[0]), z = st.z0 + (y - st.y[0]) * Math.tan(st.dih * D); return { le: [lerp(st.le[0], st.le[1], t), s * y, z], te: [lerp(st.te[0], st.te[1], t), s * y, z], t: lerp(st.t[0], st.t[1], t) }; };
       out.push({ kind: 'stab', f: slab(ss(st.y[0]), ss(st.y[1])) });
       parts.side[side] = out;
-      // landing lights: in the wing roots' leading edges
-      parts.side[side].light = [edgeAt(w, 'le', w.y[0] + 1.6) + .2, s * (w.y[0] + 1.6), wingZ(w, w.y[0] + 1.6)];
     });
     const fn = k.fin;
     parts.fin = slab({ le: [fn.le[0], 0, fn.z[0]], te: [fn.te[0], 0, fn.zte], t: fn.t[0], n: [0, 1, 0] }, { le: [fn.le[1], 0, fn.z[1]], te: [fn.te[1], 0, fn.z[1]], t: fn.t[1], n: [0, 1, 0] });
     const g = k.gear, nz = flight ? -k.z0 + g.nr - 0.3 : -k.z0 + g.nr;
-    parts.noseGear = { strut: [[g.nx, 0, g.ntop], [g.nx, 0, nz + .2]], wheels: [wheel(g.nx, .38, nz, g.nr, .35, 8), wheel(g.nx, -.38, nz, g.nr, .35, 8)], light: [g.nx + .4, 0, nz + 1.4] };
+    parts.noseGear = { strut: [[g.nx, 0, g.ntop], [g.nx, 0, nz + .2]], wheels: [wheel(g.nx, .38, nz, g.nr, .35, 8), wheel(g.nx, -.38, nz, g.nr, .35, 8)] };
     return parts;
   }
   // the pose of an aircraft: position (runway frame), heading psi (degrees from +u toward +v), pitch theta (nose up)
@@ -147,7 +145,11 @@ const AUH = (() => {
       const L = Math.hypot(...n) || 1; n = [n[0] / L, n[1] / L, n[2] / L];
       if (E3.dot(n, E3.sub(E3.centroid(f), cs)) < 0) n = [-n[0], -n[1], -n[2]];
       let s = Object.assign({}, st, { n });
-      if (warm && OPT.colour) { const lit = E3.dot(n, sun); s.fillCol = lit > 0.25 ? warm : st.fillCol; s.fillA = lit > 0.25 ? (st.warmA ?? 0.3) * Math.min(1, lit * 1.6) + 0.08 : st.fillA; }
+      if (warm && OPT.colour) {
+        const lit = E3.dot(n, sun);
+        if (lit > 0.25) { s.fillCol = warm; s.fillA = (st.warmA ?? 0.3) * Math.min(1, lit * 1.6) + 0.08; }
+        else if (st.warmAll) { s.fillCol = warm; s.fillA = st.warmAll; } // the dawn's glow on everything that stands above the fog
+      }
       if (st.inkFill && !OPT.colour) { const dk = clamp((st.tone || 0) + (st.shade ?? 0.6) * (1 - Math.max(0, E3.dot(n, sun)))); s.fillCol = INK; s.fillA = st.inkFill * dk * dk; }
       if (sil) { s.edges = false; info.push({ f, n, front: E3.dot(n, E3.sub(C, E3.centroid(f))) > 0 }); }
       E3.face(f, s, seed + i * 13);
@@ -187,7 +189,7 @@ const AUH = (() => {
     const tw = pts => pts.map(pose.toW);
     const hx = pose.toW([1, 0, 0]), h0 = pose.toW([0, 0, 0]), along = [hx[0] - h0[0], hx[1] - h0[1], hx[2] - h0[2]];
     const base = { lw: o.lw ?? 1.2, edgeA: 0.85 * a, hdir: along, fillCol: o.fill ?? null, fillA: o.fillA ?? 0.25, warmA: o.warmA };
-    const skin = Object.assign({}, base, { tone: o.tone ?? 0.02, shade: o.shade ?? 0.5, inkFill: o.inkFill || 0 });
+    const skin = Object.assign({}, base, { tone: o.tone ?? 0.02, shade: o.shade ?? 0.5, inkFill: o.inkFill || 0, warmAll: o.warmAll || 0 });
     const seed = ac.seed || 1;
     const gearDraw = g => {
       if (!g) return;
@@ -289,7 +291,11 @@ const AUH = (() => {
       const rid = []; for (let s = pr.s0 + 30; s <= pr.s1 + 0.1; s += ds) rid.push(pr.at(s, 0, pr.hP(s) + 1.8)); seg(rid, 0.6);
       for (let s = pr.s0 + 34; s < pr.s1; s += 68) seg([pr.at(s, -31, pr.hP(s)), pr.at(s, -11, pr.hP(s) + 1.8), pr.at(s, 11, pr.hP(s) + 1.8), pr.at(s, 31, pr.hP(s))], 0.8);
     });
-    return { faces: out, piers, hRoof, lines };
+    // shadow casters: point sets whose convex hulls stand for the processor's roof and each pier's roof
+    const casters = [[]];
+    for (let i = 0; i < 24; i++) [0.55, 1].forEach(fr => { const [a, b] = hubPt(i / 24 * TAU, fr); casters[0].push(TL(a, b, hRoof(a, b))); });
+    piers.forEach(pr => { const c = []; for (let s = pr.s0 + 20; s <= pr.s1; s += 34) [-31, 31].forEach(o => c.push(pr.at(s, o, pr.hP(s)))); casters.push(c); });
+    return { faces: out, piers, hRoof, lines, casters };
   }
   // Terminal A into a painter's list: every face (no facet edges) and every line segment at its own depth
   function terminalItems(list, term, ink, o = {}) {
@@ -300,6 +306,7 @@ const AUH = (() => {
       list.push({ d, draw: () => {
         const a = R11.air(d, k) * ink, glass = fc.st.kind === 'glass';
         const st = Object.assign({}, fc.st, { edges: false, noHatch: o.noHatch && !glass, fillCol: OPT.colour ? (glass ? HUE.deep : '#EFE7D8') : null, fillA: glass ? 0.32 : 0.3, inkFill: glass ? (o.inkFill ?? 0.26) : 0 });
+        if (o.warmAll && fc.st.kind === 'roof') st.warmAll = o.warmAll;
         solid([fc.pts], st, fc.seed, fc.st.kind === 'roof' ? o.warm : null, fc.inside);
       } });
     });
@@ -338,11 +345,11 @@ const AUH = (() => {
     const cab = E3.box(0, 1, 0, 1, 0, 1).map(f => f.map(([x, y, z]) => TP(ci - 12 + x * 13, -8 + y * 16, 86 + z * 8)));
     const roof = E3.box(0, 1, 0, 1, 0, 1).map(f => f.map(([x, y, z]) => TP(ci - 13.5 + x * 15.5, -9 + y * 18, 94 + z * 1.6)));
     const floor = E3.box(0, 1, 0, 1, 0, 1).map(f => f.map(([x, y, z]) => TP(ci - 12.5 + x * 14, -8.5 + y * 17, 84.8 + z * 1.2)));
-    const edges = { outer: Array.from({ length: 25 }, (_, i) => { const [p, z] = outer(i / 24); return TP(p, 0, z); }), inner: Array.from({ length: 25 }, (_, i) => { const [p, z] = inner(i / 24); return TP(p, 0, z); }) };
-    return { blade, base, cab, roof, floor, edges, TP };
+    const casters = [sec.flat()];
+    return { blade, base, cab, roof, floor, TP, casters };
   }
   function drawTower(tw, a, warm, tone = .1, inkFill = .3) {
-    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22 + .2 * tone, inkFill };
+    const st = { tone, shade: .5, lw: 1.1, edgeA: .85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? HUE.steel : null, fillA: .22 + .55 * tone, inkFill };
     solid(tw.base, Object.assign({}, st, { tone: .12 }), 9100, warm);
     const info = [], C = E3.cam().C;
     tw.blade.map((b, i) => ({ b, i, d: E3.depth(E3.centroid(b.f)) })).sort((p, q) => q.d - p.d).forEach(({ b, i }) => {
@@ -427,6 +434,17 @@ const AUH = (() => {
       });
     }
     ctx.restore();
+    // the shadows of what stands out of the fog, lying on its top (all hulls wound the same way, so one fill is their union)
+    // (a wash in colour, over horizontal rules on a fixed 2.6 px pitch, so the shadow reads as engraved tone)
+    if (o.shadow && o.shadow.polys.length) {
+      const sa = SA * o.shadow.a * clamp(a0 * 1.2);
+      ctx.save(); ctx.beginPath(); ctx.rect(B[0], ya, B[2] - B[0], yb - ya); ctx.clip();
+      ctx.beginPath(); o.shadow.polys.forEach(q => q.trace(ctx, 1)); ctx.clip('nonzero');
+      if (OPT.colour) { ctx.globalAlpha = sa * 0.8; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = o.shadow.col; ctx.fillRect(B[0], ya, B[2] - B[0], yb - ya); }
+      ctx.globalAlpha = sa * (OPT.colour ? 0.5 : 1.15); ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#4E5A6A' : INK; ctx.lineWidth = 0.85; ctx.lineCap = 'butt';
+      ctx.beginPath(); for (let y = Math.ceil(ya / 2.6) * 2.6; y < yb; y += 2.6) { ctx.moveTo(B[0], y); ctx.lineTo(B[2], y); } ctx.stroke();
+      ctx.restore();
+    }
     // light horizontal hatching on the rows in this band, in flat bands and lenses (o.rule gives each dash its weight)
     if (rows.length && o.rule) {
       const segs = [[], [], [], []];
@@ -466,7 +484,7 @@ const AUH = (() => {
   }
   // polygons filled as one union (no seams where they overlap), laid on the page in multiply at alpha a
   let UN_CV, UN;
-  function unionFill(polys, col, a) {
+  function unionFill(polys, col, a, rule = 0) {
     if (a <= 0 || !polys.length) return;
     if (!UN_CV) { UN_CV = document.createElement('canvas'); UN_CV.width = W * SCALE; UN_CV.height = H * SCALE; UN = UN_CV.getContext('2d'); }
     const m = ctx.getTransform(), g = UN;
@@ -475,7 +493,12 @@ const AUH = (() => {
     x0 = Math.max(0, Math.floor(x0) - 2); y0 = Math.max(0, Math.floor(y0) - 2); x1 = Math.min(W * SCALE, Math.ceil(x1) + 2); y1 = Math.min(H * SCALE, Math.ceil(y1) + 2);
     if (x1 <= x0 || y1 <= y0) return;
     g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(x0, y0, x1 - x0, y1 - y0); g.setTransform(m); g.fillStyle = col;
-    polys.forEach(q => { g.beginPath(); q.trace(g, 1); g.fill(); }); g.restore();
+    polys.forEach(q => { g.beginPath(); q.trace(g, 1); g.fill(); });
+    if (rule) { // as engraved rules inside the shape (rule: their pitch in px)
+      g.globalCompositeOperation = 'destination-in'; g.setTransform(1, 0, 0, 1, 0, 0);
+      g.beginPath(); for (let y = y0 + 0.5; y < y1; y += rule * m.d) g.rect(x0, y, x1 - x0, 0.9 * m.d); g.fill();
+    }
+    g.restore();
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply';
     ctx.drawImage(UN_CV, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0); ctx.restore();
   }
@@ -496,6 +519,20 @@ const AUH = (() => {
       g.globalCompositeOperation = 'destination-in'; g.fillStyle = vg; g.fillRect(B[0], y0, B[2] - B[0], y1 - y0); g.restore();
       ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA; ctx.drawImage(FOG_CV, bx0, by0, bx1 - bx0, by1 - by0, bx0, by0, bx1 - bx0, by1 - by0); ctx.restore();
     } }));
+  }
+  // the shadow of a set of world points on the plane z = h, along the sun: its outline on the screen (the convex hull of
+  // the projected points, counter-clockwise), or null
+  function shadowHull(pts, h) {
+    const sun = E3.sun(), out = [];
+    pts.forEach(p => { if (p[2] <= h) return; const k = (p[2] - h) / sun[2], q = [p[0] - sun[0] * k, p[1] - sun[1] * k, h]; if (E3.depth(q) > 2) out.push(E3.proj(q)); });
+    // the part of the caster standing in the fog's top (its foot on the plane)
+    pts.forEach(p => { if (p[2] > h) { const q = [p[0], p[1], h]; if (E3.depth(q) > 2) out.push(E3.proj(q)); } });
+    if (out.length < 3) return null;
+    out.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], hi = [];
+    out.forEach(p => { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); });
+    for (let i = out.length - 1; i >= 0; i--) { const p = out[i]; while (hi.length >= 2 && cr(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
+    return new P(lo.slice(0, -1).concat(hi.slice(0, -1)), true);
   }
   // smooth noise from a few long sines (deterministic, no texture needed)
   const noise = (x, y, s = 0) => 0.5 + 0.28 * Math.sin(x * 0.9 + y * 0.31 + s) * Math.cos(y * 0.73 - x * 0.2 + 1.7 * s) + 0.22 * Math.sin(x * 2.3 - y * 1.1 + 2.1 + s * 0.7);
@@ -535,16 +572,17 @@ const AUH = (() => {
     ctx.globalAlpha = SA * a; ctx.beginPath(); byA.forEach(([s, r]) => { ctx.moveTo(s[0] + r, s[1]); ctx.arc(s[0], s[1], r, 0, TAU); }); ctx.fill();
     ctx.restore();
   }
-  return { hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES };
+  return { shadowHull, hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES };
 })();
 
 /* ==========================================================================================================
-   1 · Dawn (beat 'airport-dawn', 5 s, entered at lt 0.8): from 55 m over the apron west-south-west of Terminal A (720 m
-   out along the west pier's line, 150 m to its airside), looking east across the apron. Radiation fog lies ~9 m deep
-   over the airfield; the processor's great roof, the piers' waving roofs, the tails of the widebodies at the west pier's
-   gates and the crescent tower 2.4 km off stand out of it; the sun, just risen at 116°, is low to the right of the tower.
-   Over the beat the eye rises a little and drifts south, the fog thins and slides with the dawn air, and more of the
-   apron shows through it.
+   1 · Dawn (beat 'airport-dawn', 5 s, entered at lt 0.8): from 40 m over the taxilane behind the west pier's gates (580 m
+   out along the pier's line, 160 m to its airside; 600 m from the processor's high point), looking east across the apron
+   on a 1050 px lens. Radiation fog lies ~9 m deep over the airfield; the processor's great roof (52 m, ~90 px), the
+   piers' waving roofs, the tails of the widebodies at the gates and the crescent tower 2.3 km off (109 m, ~50 px) stand
+   out of it; the sun, just risen at 116°, lays their long shadows across the fog's top toward the eye. The eye pans
+   slowly right (069° to 093°) and tilts up a little, from the processor and the tails to the tower with the sun low beside
+   it; over the beat the fog thins and settles, slides with the dawn air, and more of the apron shows through it.
    ========================================================================================================== */
 scene({
   id: 'airportdawn',
@@ -574,7 +612,6 @@ scene({
     // the apron under the fog: the taxilane behind the tails, each stand's lead-in line, the apron's edge
     const g = -45 * AUH.D, d = [Math.cos(g), Math.sin(g)], n = [Math.sin(g), -Math.cos(g)];
     const at = (s, o, z = 0.05) => AUH.W3(A[0] + d[0] * s + n[0] * o, A[1] + d[1] * s + n[1] * o, z);
-    this.at = at;
     this.marks = [[at(120, 150), at(1100, 150)], [at(120, 262), at(1100, 262)]];
     planes.slice(0, 4).forEach(p => this.marks.push([at(p.s, 150), at(p.s, 40)]));
     for (let s = 560; s < 1100; s += 60) this.marks.push([at(s, 142), at(s, 158)]);
@@ -618,8 +655,10 @@ scene({
     AUH.radialWash(sx, sy + 60, 1400, [[0, HUE.gold, 0.16], [0.6, HUE.sand, 0.1], [1, HUE.sand, 0]], q);
     // the apron under the fog (it shows only where the fog is thin): grey concrete, darker toward the eye
     washFade([B[0], hy - 2, B[2], B[3]], [[0, HUE.steel, 0.2], [1, HUE.steel, 0.45]], 0, q);
+    E3.sunAt();
   },
   draw(lt) {
+    AUH.sunAt(116, 2.4);
     R11.clipped(() => {
       this.frame(lt);
       const B = R11.BOX, hy = this.hy, [sx, sy] = this.sunXY, w = easeInOut(clamp((lt - 0.8) / 5)), ink = easeOut(prog(lt, 0.55, 0.8));
@@ -645,10 +684,10 @@ scene({
       const list = [];
       const tw = this.tower, dT = R11.dep(AUH.W3(AUH.TWR[0], AUH.TWR[1], 40));
       list.push({ d: dT, draw: () => AUH.drawTower(tw, R11.air(dT, 3400) * ink, OPT.colour ? HUE.dawn : null, 0.45, 0.5) });
-      AUH.terminalItems(list, this.term, ink, { warm: OPT.colour ? HUE.dawn : null });
+      AUH.terminalItems(list, this.term, ink, { warm: OPT.colour ? HUE.dawn : null, warmAll: 0.22 });
       this.planes.forEach(p => {
         const k = AUH.TYPES[p.type], c = p.pose.toW([k.fus[0][0] * 0.2 + k.fus[11][0] * 0.8, 0, 0]), d = R11.dep(c);
-        list.push({ d, draw: () => AUH.drawPlane(p, { air: R11.air(d, 2400) * ink, lw: 1.2, fill: OPT.colour ? '#E4E0DA' : null, fillA: 0.35, warm: OPT.colour ? HUE.dawn : null, tone: 0.22, shade: 0.5, inkFill: 0.28 }) });
+        list.push({ d, draw: () => AUH.drawPlane(p, { air: R11.air(d, 2400) * ink, lw: 1.2, fill: OPT.colour ? '#E4E0DA' : null, fillA: 0.35, warm: OPT.colour ? HUE.dawn : null, warmAll: 0.16, tone: 0.22, shade: 0.5, inkFill: 0.28 }) });
       });
       this.bridges.forEach(b => list.push({ d: R11.dep(b.b), draw: () => R11.member(b.a, b.b, 3.4, 0.7 * ink) }));
       // the fog: dense to 9 m at first, settling to 7.2 m, under a soft top (two thin veils over it); visibility in it
@@ -656,8 +695,11 @@ scene({
       const hF = lerp(9, 7.2, w), V = lerp(36, 160, w * w), slide = 3.2 * (lt - 0.8);
       // the fog in shade is cool; only toward the sun does its top take the light
       const sxn = clamp((sx - B[0]) / (B[2] - B[0]), -0.5, 1.6);
+      // the long shadows the low sun lays on the fog's top (24 times the height they stand above it), toward the eye
+      const casters = this.term.casters.concat(this.tower.casters, this.planes.map(p => p.parts.fin.flat().map(p.pose.toW)));
+      const shadow = { polys: casters.map(c => AUH.shadowHull(c, hF)).filter(Boolean), col: OPT.colour ? '#7F8EA3' : INK, a: (OPT.colour ? 0.42 : 0.42) * (1 - 0.45 * w) };
       AUH.fogLayer(list, {
-        h: hF, V, amt: 0.97 * ink, strokes: this.fogSk, veils: [[0, 2.2, 70, 0.5]],
+        h: hF, V, amt: 0.97 * ink, strokes: this.fogSk, veils: [[0, 2.2, 70, 0.5]], shadow,
         dens: (l, t) => {
           const near = clamp((380 - t) / 300), n = AUH.noise((l + slide) / 60, t / 14, 0.3);
           return 1 - (0.2 + 0.5 * w) * near * AUH.smooth(clamp((n - 0.4) * 2.2));
@@ -785,23 +827,26 @@ scene({
     washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sand, 0.24], [0.3, HUE.sand, 0.34], [1, HUE.dune, 0.46]], 0, q);
   },
   draw(lt) {
+    AUH.sunAt(118, 9); // ~45 min after sunrise
     R11.clipped(() => {
       this.frame(lt);
-      AUH.sunAt(118, 9);
       const B = R11.BOX, hy = this.hy, ink = easeOut(prog(lt, 0.3, 0.7)), W3 = AUH.W3;
       AUH.skyRules(hy, (x, y) => { const up = clamp((hy - y) / (hy - B[1])); return ink * (0.18 + 0.82 * up) * clamp((hy - y) / 26) * (OPT.colour ? 0.5 : 1); }, { amax: 0.42, step: 5.4, step0: 3, lw: 0.8 });
       stroke(new P([[B[0], hy], [B[2], hy]]), ink, INK, 0.8, 0.35);
       // the ground: sand grain lying on the field, the paved surfaces, their markings
-      E3.segments(this.grain.map(([u, v, k]) => [W3(u, v, 0), W3(u + 1.5 + 4 * k, v + 0.5, 0), (OPT.colour ? 0.25 + 0.4 * k : 0.4 + 0.5 * k) * ink]), OPT.colour ? HUE.dune : SEPIA, OPT.colour ? 0.9 : 1.1);
-      E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.14 + 0.3 * k : 0.2 + 0.4 * k) * ink]), OPT.colour ? HUE.hill : SEPIA, 0.85);
-      this.track.forEach(t => E3.line(t, OPT.colour ? HUE.hill : SEPIA, 1, 0.4 * ink));
+      E3.segments(this.grain.map(([u, v, k]) => [W3(u, v, 0), W3(u + 1.5 + 4 * k, v + 0.5, 0), (OPT.colour ? 0.25 + 0.4 * k : 0.22 + 0.36 * k) * ink]), OPT.colour ? HUE.dune : SEPIA, OPT.colour ? 0.9 : 1);
+      E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.14 + 0.3 * k : 0.12 + 0.3 * k) * ink]), OPT.colour ? HUE.hill : SEPIA, 0.85);
+      this.track.forEach(t => E3.line(t, OPT.colour ? HUE.hill : SEPIA, 0.9, 0.25 * ink));
       const along = [0, 1, 0];
-      const pave = (pts, tone, seed, col, fa = 0.42) => E3.face(pts, { n: [0, 0, 1], tone, shade: 0, hdir: along, fillCol: OPT.colour ? col : null, fillA: fa, lw: 0.9, edgeA: 0.5 * ink }, seed);
-      pave(this.far, 0.3, 501, HUE.steel);
-      this.twy.forEach((t, i) => pave(t, 0.26, 510 + i, HUE.steel));
+      // (in the default look the asphalt takes a light ink tone under its hatching)
+      const pave = (pts, tone, seed, col, fa = 0.42) => E3.face(pts, { n: [0, 0, 1], tone, shade: 0, hdir: along, fillCol: OPT.colour ? col : tone > 0.3 ? INK : null, fillA: OPT.colour ? fa : 0.16 * tone, lw: 0.9, edgeA: 0.5 * ink }, seed);
+      // (asphalt: darker than the sand, so the paint shows white on it)
+      const dk = OPT.colour ? 0 : 0.2;
+      pave(this.far, 0.3 + dk, 501, HUE.steel);
+      this.twy.forEach((t, i) => pave(t, 0.26 + dk, 510 + i, HUE.steel));
       E3.line(this.exitL, INK, 0.9, 0.4 * ink);
       pave(this.q(-60, this.rw.L, -37.5, 37.5, 0), 0.08, 520, '#C9BFAE', 0.35);
-      pave(this.q(0, this.rw.L, -30, 30, 0.01), 0.44, 521, HUE.steel, 0.5);
+      pave(this.q(0, this.rw.L, -30, 30, 0.01), 0.44 + dk, 521, HUE.steel, 0.5);
       this.marks.forEach(p => mask(new P(p.map(E3.proj), true), 0.88 * ink));
       // the aircraft's shadow on the field, ahead of it down-sun (the sun at 118°, 9° up behind the eye)
       const fl = this.flight(lt), pose = AUH.poser(fl), ac = Object.assign({}, this.plane, { pose });
@@ -813,7 +858,7 @@ scene({
         P_.fus.forEach(seg => seg.forEach(push));
         ['L', 'R'].forEach(s => P_.side[s].forEach(p => { if (p.f) p.f.forEach(push); if (p.nac) p.nac.forEach(push); }));
         P_.fin.forEach(push);
-        AUH.unionFill(polys, OPT.colour ? '#56616E' : '#5E5446', 0.36 * shq);
+        AUH.unionFill(polys, OPT.colour ? '#56616E' : INK, (OPT.colour ? 0.36 : 0.6) * shq, OPT.colour ? 0 : 2.2);
       }
       // the approach lights' frames near the eye, then every light, steady
       this.frames.forEach(fr => {
