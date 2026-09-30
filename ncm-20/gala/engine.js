@@ -487,9 +487,11 @@ function ornament(x, y, r, p, col = null, a = 0.9) {
   fill(s, col || GOLD, a);
   stroke(s, 1, INK, 1, 0.6);
 }
-// weave (?heritage, the leaders' cards): each rule becomes a strip of Al Sadu's al-hubub, "the grains" (the Bedouin
-// weaving of the UAE, on UNESCO's Representative List since December 2025): small grains between two edge lines, woven
-// outward from the star. In ?colour the grains alternate ink and the Hajar's rust, as the weave's two warps alternate.
+// weave (?heritage, the leaders' cards): each rule becomes a strip of al-hubub, "the grains", a design of Al Sadu (the
+// traditional weaving skills of the UAE's Bedouin women; UNESCO element 02223, on the Representative List since December
+// 2025; DCT Abu Dhabi: "long, usually white strips with points like crop grains"): small grains on a paper ground between
+// two edge lines, woven outward from the star. In ?colour every other grain takes the Hajar rust, standing in for Sadu's
+// red yarn. The strip is snapped to the pixel grid, so its edges are single hairlines.
 function ruleWithStar(cx, y, half, p, a = 0.7, weave = false) {
   if (p <= 0) return;
   const q = easeInOut(p);
@@ -497,13 +499,15 @@ function ruleWithStar(cx, y, half, p, a = 0.7, weave = false) {
     stroke(new P([[cx - 22, y], [cx - 22 - half * q, y]]), 1, INK, 1.2, a);
     stroke(new P([[cx + 22, y], [cx + 22 + half * q, y]]), 1, INK, 1.2, a);
   } else {
-    const L = half * q, endA = a * clamp((q - 0.9) / 0.1);
+    y = Math.round(y);
+    const L = half * q, endA = a * clamp((q - 0.9) / 0.1), innerA = a * clamp(L / 6);
     [-1, 1].forEach(s => {
+      wordPatch([[s > 0 ? cx + 22 : cx - 22 - L, y - 4, L, 8]], clamp(L / 6)); // the woven ground
       [-4.5, 4.5].forEach(dy => stroke(new P([[cx + 22 * s, y + dy], [cx + (22 + L) * s, y + dy]]), 1, INK, 1, a));
-      stroke(new P([[cx + 22 * s, y - 4.5], [cx + 22 * s, y + 4.5]]), 1, INK, 1, a);
+      stroke(new P([[cx + 22 * s, y - 4.5], [cx + 22 * s, y + 4.5]]), 1, INK, 1, innerA);
       if (endA > 0) stroke(new P([[cx + (22 + L) * s, y - 4.5], [cx + (22 + L) * s, y + 4.5]]), 1, INK, 1, endA);
       for (let k = 0; k < 25; k++) {
-        const d = 30 + 9 * k, kf = clamp((22 + L - d + 2.5) / 5);
+        const d = 29 + 9 * k, kf = clamp((22 + L - d + 2.5) / 5);
         if (d + 2.5 > 22 + half || kf <= 0) continue;
         const x = cx + d * s, col = OPT.colour && k % 2 ? HUE.hill : INK;
         fill(new P([[x - 2.5, y], [x, y - 1.5], [x + 2.5, y], [x, y + 1.5]], true), col, (OPT.colour ? 0.85 : 0.8) * a * kf);

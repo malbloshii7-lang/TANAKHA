@@ -102,13 +102,11 @@ scene({
     ctx.save(); const local = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 100, 900, 712); ctx.clip(); ctx.setTransform(local);
     const cq = easeOut(prog(lt, 3.2, 0.6)); // the nakhoda aft, the haulers at the rail; the bulwark hides their legs
     if (cq > 0) this.bCrew.forEach(([x, y]) => { disc(x, y - 22, 3.6 * cq, INK, 0.85); stroke(new P([[x - 4.5, y - 15], [x, y - 17.5], [x + 4.5, y - 15]]), cq, INK, 2.2, 0.85); stroke(new P([[x, y - 17], [x, y - 6]]), cq, INK, 2.8, 0.85); });
-    // ?heritage: the nahham, whose call the hall hears in the score (film 27.1 s = lt 5.70): as it comes he leans back,
-    // chin up, and holds it (2-3 px, slowly; no hand gesture, which would read as the call to prayer)
+    // ?heritage: a fifth figure forward of the mainmast, the nahham, the boat's song leader; the score carries his call.
+    // He stands still like the crew: no gesture is drawn or claimed (a hand to the ear would read as the call to prayer)
     if (OPT.heritage && cq > 0) {
-      const [x, y0] = this.nahham, u = easeInOut(prog(lt, 5.70, 0.6));
-      disc(x - 2 * u, y0 - 22 - 2 * u, 3.6 * cq, INK, 0.85);
-      stroke(new P([[x - 4.5 - u, y0 - 15], [x - 1.5 * u, y0 - 17.5 - 1.5 * u], [x + 4.5 - u, y0 - 15]]), cq, INK, 2.2, 0.85);
-      stroke(new P([[x, y0 - 6], [x - 1.5 * u, y0 - 17 - 1.5 * u]]), cq, INK, 2.8, 0.85);
+      const [x, y] = this.nahham;
+      disc(x, y - 22, 3.6 * cq, INK, 0.85); stroke(new P([[x - 4.5, y - 15], [x, y - 17.5], [x + 4.5, y - 15]]), cq, INK, 2.2, 0.85); stroke(new P([[x, y - 17], [x, y - 6]]), cq, INK, 2.8, 0.85);
     }
     // the hull's paper comes in with its outline, so the sea line is never cut before the boat is there
     mask(this.boat, bp); if (OPT.colour) wash(this.boat, HUE.teak, 0.5 * bp);

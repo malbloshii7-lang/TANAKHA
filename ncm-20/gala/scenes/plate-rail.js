@@ -28,11 +28,13 @@ scene({
     for (let k = 0; k < 50; k++) this.cars.push({ kind: 'hopper', len: 15.0, top: 3.9, heap: 0.25 + 0.2 * r() });
     this.posts = []; for (let s = -2400; s < 400; s += 4) this.posts.push(s);
     this.palms = Array.from({ length: 70 }, () => ({ az: 72 + r() * 18, dist: 2200 + r() * 2600, h: 9 + r() * 7, lean: (r() - 0.5) * 0.3 }));
-    // ?heritage: ghaf trees (Prosopis cineraria, the national tree) on the plain, as measured at Dhaid (Gallacher and
-    // El-Keblawy 2016: 29-94 trees a hectare; camels keep them bare to 3.0-3.5 m), kept sparse: [bearing deg, distance m, height m]
-    this.ghaf = [[78, 400, 5.5], [79, 455, 5], [80.5, 440, 6.5], [82.5, 385, 4.5], [95.5, 640, 6], [98.5, 700, 7], [101.5, 660, 4],
-      [117.5, 310, 6], [121, 335, 5], [108, 1250, 7], [126, 1500, 6.5], [139, 1700, 7], [145, 520, 6], [148.5, 545, 5], [150.5, 505, 5.5]]
-      .map(([b, d, h], i) => ({ X: d * Math.sin((b - 90) * Math.PI / 180), Y: d * Math.cos((b - 90) * Math.PI / 180), h, i, stems: 1 + (i % 3) }));
+    // ?heritage: ghaf trees (Prosopis cineraria, the national tree) on the plain. The browse line (camels keep them bare to
+    // 3.0-3.5 m) and the stands' densities at Dhaid (29.4 trees a hectare on gravel, 93.7 on sand) are from Gallacher and
+    // El-Keblawy 2016; the trees' places are composed, not surveyed, and the plain is drawn far sparser than a stand. None
+    // stands behind the train's roofline or under the far palm grove: [bearing deg, distance m, height m]
+    this.ghaf = [[95.5, 640, 6.5], [98.5, 700, 7], [101.5, 660, 6.5], [117.5, 310, 7], [121, 335, 6.5], [145, 520, 7], [148.5, 545, 6.5]]
+      .map(([b, d, h], i) => ({ X: d * Math.sin((b - 90) * Math.PI / 180), Y: d * Math.cos((b - 90) * Math.PI / 180), h, i,
+        full: RAIL.f * h / d >= 16 })); // its style is fixed from its size, so nothing switches mid-beat
   },
   // the head's position along the track (metres from Q) at scene time t, and the camera's pan that keeps it in view
   headS(t) { return -55 + 22.2 * t; },
@@ -107,37 +109,35 @@ scene({
     boxes.reverse().forEach(b => this.vehicle(b, psi, zr, tq));
     ctx.restore();
   },
-  // a ghaf tree at its true size from the viewpoint: crooked stems that fork under the crown, bare to the camels' browse
-  // line; a broad, clumpy crown wider than it is tall, flat underneath, with drooping branchlets hanging from it (never a
-  // smooth dome on a stick, which reads as a parasol); ash-grey foliage in ?colour
+  // a ghaf tree at its true size from the viewpoint, drawn as a ghaf and not the flat-topped samr: one crooked grey-brown
+  // trunk forking low into two steep limbs; a rounded, deep crown about as wide as it is tall above the browse line, its
+  // lower edge a ragged hem of drooping foliage down to the browse line (the ghaf's weeping habit)
   ghafTree(g, psi, q) {
     const base = this.proj(g.X, g.Y, 0, psi), top = this.proj(g.X, g.Y, g.h, psi), br = this.proj(g.X, g.Y, 3.2, psi);
     if (!base || !top || !br || base[0] < 945 || base[0] > 1925) return;
-    const k = RAIL.f / base[2], xc = base[0], yb = br[1], yt = top[1], w = 1.3 * g.h * k, hh = yb - yt, rr = rng(870 + g.i);
-    const ph = rr() * TAU, n = 18, topPts = [];
+    const k = RAIL.f / base[2], xc = base[0], yb = br[1], yt = top[1], w = 1.05 * g.h * k, hh = yb - yt, rr = rng(870 + g.i);
+    const yc = yb - 0.3 * hh, ph = rr() * TAU, n = 20, topPts = [];
     for (let j = 0; j <= n; j++) {
-      const u = j / n, lump = 0.14 * Math.abs(Math.sin(u * Math.PI * 3.5 + ph)) + 0.05 * rr();
-      topPts.push([xc - w / 2 + w * u, yb - hh * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.45) * (0.86 + lump)]);
+      const u = j / n, lump = 0.1 * Math.abs(Math.sin(u * Math.PI * 3 + ph)) + 0.04 * rr();
+      topPts.push([xc - w / 2 + w * u, yc - (yc - yt) * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.65) * (0.9 + lump)]);
     }
-    const under = [[xc + w * 0.42, yb + 0.06 * hh], [xc + w * 0.15, yb + 0.02 * hh], [xc - w * 0.12, yb + 0.05 * hh], [xc - w * 0.4, yb + 0.03 * hh]];
+    // the hem: the foliage hangs in ragged drooping tips down to the browse line, part of the crown's own outline
+    const under = [], teeth = 7;
+    for (let j = 0; j < teeth; j++) {
+      const x0 = xc + w / 2 - w * j / teeth, x1 = x0 - w / teeth, drop = (0.55 + 0.45 * rr()) * (yb - yc);
+      under.push([x0 - 0.35 * (x0 - x1), yc + drop], [x1, yc + 0.15 * (yb - yc) * rr()]);
+    }
     const crown = new P(topPts.concat(under), true);
-    const stemCol = OPT.colour ? '#5A3A22' : INK, lw = Math.max(1, 0.22 * k);
+    const bark = OPT.colour ? '#5E574C' : INK, lw = Math.max(1.2, 0.45 * k);
     fill(el(xc, base[1], w / 2, 1.5, 0, TAU, 1, 0), SEPIA, 0.12 * q); // its shade on the ground, no sun direction implied
-    for (let j = 0; j < g.stems; j++) { // crooked stems, each forking into two limbs under the crown
-      const off = (j - (g.stems - 1) / 2) * 0.3 * k, fork = [xc + off * 0.6 + (j % 2 ? 1 : -1) * 0.12 * k, base[1] - (base[1] - yb) * 0.55];
-      stroke(new P([[xc + off * 0.25, base[1]], fork]), q, stemCol, lw, 0.85);
-      stroke(new P([fork, [fork[0] - 0.22 * w, yb + 1]]), q, stemCol, Math.max(1, lw * 0.75), 0.8);
-      stroke(new P([fork, [fork[0] + 0.2 * w, yb + 1]]), q, stemCol, Math.max(1, lw * 0.75), 0.8);
-    }
+    const fork = [xc + 0.08 * k, base[1] - 0.55 * (base[1] - yc)];
+    stroke(new P([[xc, base[1]], [xc + 0.12 * k, base[1] - 0.3 * (base[1] - yc)], fork]), q, bark, lw, 0.85);
+    stroke(new P([fork, [xc - 0.2 * w, yc + 1]]), q, bark, Math.max(1, lw * 0.7), 0.8);
+    stroke(new P([fork, [xc + 0.17 * w, yc + 1]]), q, bark, Math.max(1, lw * 0.7), 0.8);
     mask(crown, q);
-    if (OPT.colour) wash(crown, '#8FA07A', 0.34 * q);
-    if (base[1] - yt >= 12) hatch(crown, [xc - w / 2, yt - 2, xc + w / 2, yb + 0.1 * hh], -0.2, 3, q, INK, 1, 0.28, 850 + g.i);
-    else fill(crown, SEPIA, 0.3 * q);
+    if (OPT.colour) wash(crown, '#6E7F5A', 0.45 * q); else fill(crown, SEPIA, 0.15 * q);
+    if (g.full) hatch(crown, [xc - w / 2, yt - 2, xc + w / 2, yb + 2], -0.2, 3, q, INK, 1, 0.28, 850 + g.i);
     stroke(crown, q, INK, 1, 0.6);
-    if (hh >= 8) for (let j = 0; j < 5; j++) { // drooping branchlets below the crown's edge
-      const x = xc - w * 0.4 + w * 0.2 * j + (rr() - 0.5) * 3, L = hh * (0.14 + 0.1 * rr());
-      stroke(new P([[x, yb], [x + 0.6, yb + L]]), q, INK, 1, 0.45);
-    }
   },
   // a box on the track from s0 to s1 (along), o0 to o1 (across; the camera is on the o0 side), z0 to z1: its visible faces
   box(s0, s1, o0, o1, z0, z1, psi) {

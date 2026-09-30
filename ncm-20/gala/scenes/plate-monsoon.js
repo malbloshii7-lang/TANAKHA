@@ -75,8 +75,8 @@ scene({
     wash(el(cx, cy, 268 * z, 268 * z, 0, TAU, 1, 0), HUE.gold, 0.16 * easeInOut(prog(lt, 0.3, 1.8)));
     if (OPT.heritage) { // Suhail's rising, gilded on the card
       const a = (11.25 * 14 - 90) * Math.PI / 180;
-      ctx.save(); ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(-lt * 0.06); ctx.translate(-cx, -cy);
-      wash(starP(cx + 240 * Math.cos(a), cy + 240 * Math.sin(a), 10, 3.0, 8, -Math.PI / 2), HUE.gold, 0.5 * easeOut(prog(lt, 3.0, 0.6)));
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(-(lt - 3.3) * 0.06); ctx.translate(-cx, -cy);
+      wash(starP(cx + 200 * Math.cos(a), cy + 200 * Math.sin(a), 11, 5, 8, -Math.PI / 2), HUE.gold, 0.5 * easeOut(prog(lt, 3.0, 0.6)));
       ctx.restore();
     }
   },
@@ -84,7 +84,9 @@ scene({
     const { cx, cy } = this;
     ctx.save();
     const z = 1 + 0.025 * easeInOut(prog(lt, 0, 11));
-    ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(-lt * 0.06); ctx.translate(-cx, -cy); // turns anticlockwise, like the sky about the North Star
+    // turns anticlockwise, like the sky about the North Star; with ?heritage the turn is phased so the card stands true
+    // (north up) as Suhail's mark lands, 3.3 s into its clock
+    ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(-(lt - (OPT.heritage ? 3.3 : 0)) * 0.06); ctx.translate(-cx, -cy);
     stroke(this.circle, easeInOut(prog(lt, 0.3, 1.8)), INK, 1.4, 0.7);
     this.rhumbs.forEach((r, i) => stroke(r, easeOut(prog(lt, 0.5 + (i % 8) * 0.06, 1.4)), INK, 0.9, 0.3));
     this.rose.forEach((q, k) => {
@@ -93,14 +95,15 @@ scene({
       stroke(q.a, p, INK, 1.2, 0.8); stroke(q.b, p, INK, 1.2, 0.8);
     });
     disc(cx, cy, 14 * easeOut(prog(lt, 1.8, 0.5)), OCHRE); disc(cx, cy, 4.5 * easeOut(prog(lt, 1.9, 0.5)), INK);
-    // ?heritage: the card as the pearling captains' «الدّيرة», whose 32 points Ibn Majid named for stars: a mark on every
-    // rhumb at r 240 (clear of the winds); the north (al-Jah, the Pole Star) a small ink star; the south a ring (no star
-    // marks it); and one gold star at SSE, Suhail's rising, the star the film opened on. No labels.
+    // ?heritage: the card as the Gulf seafarers' compass, «الدِّيرة», its 32 points (akhnan) named for the risings and settings
+    // of stars as Ibn Majid records them: a mark on every rhumb at r 200 (at least 13 px clear of the three winds through
+    // the beat); the north (al-Jah, the Pole Star) a small ink star; the south a ring (no star marks it); and one gold star at
+    // SSE, Suhail's rising, the star the film opened on. No labels.
     if (OPT.heritage) for (let k = 0; k < 32; k++) {
-      const a = (11.25 * k - 90) * Math.PI / 180, x = cx + 240 * Math.cos(a), y = cy + 240 * Math.sin(a), q = easeOut(prog(lt, 2.2 + 0.025 * k, 0.4));
-      if (k === 0) fill(starP(x, y, 7, 2.1, 8, -Math.PI / 2), INK, 0.85 * q);
-      else if (k === 14) { const qS = easeOut(prog(lt, 3.0, 0.6)); fill(starP(x, y, 10, 3.0, 8, -Math.PI / 2), OCHRE, 0.95 * qS); stroke(starP(x, y, 10, 3.0, 8, -Math.PI / 2), qS, INK, 1, 0.8 * qS); }
-      else if (k === 16) stroke(el(x, y, 4.5, 4.5, 0, TAU, 900, 0), q, INK, 1, 0.7 * q);
+      const a = (11.25 * k - 90) * Math.PI / 180, x = cx + 200 * Math.cos(a), y = cy + 200 * Math.sin(a), q = easeOut(prog(lt, 2.2 + 0.025 * k, 0.4));
+      if (k === 0) fill(starP(x, y, 8, 3.4, 8, -Math.PI / 2), INK, 0.85 * q);
+      else if (k === 14) { const qS = easeOut(prog(lt, 3.0, 0.6)), st = starP(x, y, 11, 5, 8, -Math.PI / 2); fill(st, OCHRE, 0.95 * qS); stroke(st, qS, INK, 0.8, 0.5 * qS); }
+      else if (k === 16) stroke(el(x, y, 4.5, 4.5, 0, TAU, 900, 0), 1, INK, 1, 0.7 * q);
       else disc(x, y, 2.2, INK, 0.7 * q);
     }
     ctx.restore();
@@ -118,7 +121,9 @@ scene({
       stroke(ln(1846, y, k % 5 === 0 ? 1826 : 1834, y, 80 + k, 0.1), q, INK, 1.1, 0.7);
     }
     const sq = easeOut(prog(lt, 4.1, 0.8));
-    fill(starP(1846, 552, 15 * sq, 6 * sq, 8), OCHRE, 0.95); stroke(starP(1846, 552, 15 * sq, 6 * sq, 8), sq, INK, 1, 0.8);
+    // ?heritage: the isba' measures the Pole Star (Ibn Majid's latitude star), so its star is ink and the card's Suhail is the
+    // one gold star
+    fill(starP(1846, 552, 15 * sq, 6 * sq, 8), OPT.heritage ? INK : OCHRE, OPT.heritage ? 0.7 : 0.95); stroke(starP(1846, 552, 15 * sq, 6 * sq, 8), sq, INK, 1, 0.8);
     // the ship, riding the swell in front of the wind; everything below the waterline is hidden by the sea
     const dx = 1170 + 10 * lt, dy = 798 + 5 * Math.sin(lt * 1.4);
     const world = ctx.getTransform();
@@ -146,10 +151,9 @@ scene({
     stroke(this.mast, prog(lt, 1.8, 0.8), INK, 2.4);
     if (sp > 0) {
       fill(this.sail, OCHRE, 0.24 * sp);
-      if (OPT.colour) wash(this.sail, OPT.heritage ? HUE.sail : HUE.dawn, (OPT.heritage ? 0.4 : 0.3) * sp); // ?heritage: khoos straw
+      if (OPT.colour) wash(this.sail, HUE.dawn, 0.3 * sp);
       ctx.save(); ctx.beginPath(); this.sail.trace(ctx, 1); ctx.clip();
-      // ?heritage: the palm-leaf mat's courses (khoos) at the LED's 1 px, a little lighter to keep the sail's tone
-      this.sailMat.forEach(q => stroke(q, sp, SEPIA, OPT.heritage ? 1.0 : 0.7, OPT.heritage ? 0.3 : 0.4));
+      this.sailMat.forEach(q => stroke(q, sp, SEPIA, 0.7, 0.4));
       ctx.restore();
     }
     stroke(this.sail, sp, INK, 1.6); stroke(this.yard, prog(lt, 2.0, 1.0), INK, 2.8);
