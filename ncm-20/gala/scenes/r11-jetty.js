@@ -27,8 +27,8 @@
 //     for the shore about 330 m north of the berth's centre, its trunk passing the port's directional light (NTM 148,
 //     25 11.622 N 56 22.706 E); 630 m of arm and 2.3 km of trunk. The frame cuts the trunk before its root.
 // The ship: a generic VLCC, 330 m by 60 m, 30.5 m deep, partly laden at the berth (16.5 m draught, 14 m of hull showing,
-// a darker band below her load line), her manifold amidships; bow SOUTH (away from the strait), starboard side to the
-// berth. Plain: no name, flag, funnel colours, logo or livery, and no funnel smoke.
+// the band of her bottom paint below her load line in a lighter tone), her manifold amidships; bow SOUTH (away from the
+// strait), starboard side to the berth. Plain: no name, flag, funnel colours, logo or livery, and no funnel smoke.
 // The Hajar: the true skyline and the ranges in front of it, computed from terrain tiles from the eye's own position
 // (JT_RIDGES: AWS Terrain Tiles z12, SRTM-derived; standard refraction; ground outside the UAE ignored, as
 // data/build/rak_skyline.py and lab/ridges.py), each range lighter with its distance and hatched where its slopes turn
@@ -210,6 +210,8 @@ scene({
   // ship-local: s from the stern (north) to the stem (south), w across from her centreline (+ to port, seaward), z up
   S(s, w, z) { return JT.L(165 - s, 30 + w, z); },
   SB(s0, s1, w0, w1, z0, z1) { return E3.box(s0, s1, w0, w1, z0, z1).map(f => f.map(q => this.S(q[0], q[1], q[2]))); },
+  // the waterline station [s, half-breadth] the loft joins to deck station s
+  wlAt(s) { const T = this.ST; for (let i = 1; i < T.length; i++) if (s <= T[i][0]) { const u = (s - T[i - 1][0]) / (T[i][0] - T[i - 1][0]); return [lerp(T[i - 1][2], T[i][2], u), lerp(T[i - 1][3], T[i][3], u)]; } return [T[T.length - 1][2], 0]; },
   bd(s) { const T = this.ST; for (let i = 1; i < T.length; i++) if (s <= T[i][0]) { const u = (s - T[i - 1][0]) / (T[i][0] - T[i - 1][0]); return lerp(T[i - 1][1], T[i][1], u); } return 0; },
   walkway(A, B) {
     const du = B.u - A.u, dv = B.v - A.v, ea = Math.min(A.hu / Math.abs(du || 1e-9), A.hv / Math.abs(dv || 1e-9)), eb = Math.min(B.hu / Math.abs(du || 1e-9), B.hv / Math.abs(dv || 1e-9));
@@ -594,18 +596,13 @@ scene({
       E3.line([wl[i], wl[(i + 1) % nW]], INK, 1.3, 0.85 * a);
     }
     if (vis[iStem - 1] !== vis[iStem]) E3.line([wl[iStem], dk[iStem]], INK, 1.3, 0.9 * a);
-    // the boot-top: the band from the water to her load line (5.5 m up) on the lit side, a little darker
+    // the boot-top: the band from the water to her load line (5.5 m up), her bottom paint, a lighter tone than her sides
     for (let i = 0; i < this.wlPts.length; i++) {
       const j = (i + 1) % this.wlPts.length, p = this.wlPts[i], q = this.wlPts[j], P2 = this.deckPts[i], Q2 = this.deckPts[j], t = 5.5 / F;
       const pm = [lerp(p[0], P2[0], t), lerp(p[1], P2[1], t), 5.5], qm = [lerp(q[0], Q2[0], t), lerp(q[1], Q2[1], t), 5.5];
       E3.face([p, q, qm, pm], { n: this.hullN([p, q, Q2, P2]), tone: 0.5, shade: 0.3, edges: false, hatchCol: INK, hdir: JT.along, fillCol: OPT.colour ? '#6F6A64' : null, fillA: 0.3 }, 8100 + i);
     }
     const rail = []; for (let s = 2; s <= 300; s += 6) rail.push(S(s, this.bd(s), F + 1.1)); E3.line(rail, INK, 0.7, 0.6 * a);
-    // the anchors stowed in their pockets on each bow, under the forecastle
-    [-1, 1].forEach(sg => {
-      const s0 = 316, w0 = sg * (this.bd(s0) + 0.05), pk = [S(s0 - 2.2, w0 * 0.99, F - 3.4), S(s0 + 2.2, w0 * 1.02, F - 3.4), S(s0 + 2.2, w0 * 1.02, F - 0.4), S(s0 - 2.2, w0 * 0.99, F - 0.4)];
-      E3.face(pk, { n: this.hullN([S(s0 - 3, sg * this.bd(s0 - 3), 0), S(s0 + 3, sg * this.bd(s0 + 3), 0), S(s0 + 3, sg * this.bd(s0 + 3), F), S(s0 - 3, sg * this.bd(s0 - 3), F)]), fillCol: INK, fillA: 0.55, noHatch: true, lw: 0.8, edgeA: 0.8 * a }, 8095 + sg);
-    });
     // deck items, far to near
     const items = [];
     const box = (s0, s1, w0, w1, z0, z1, st, seed) => ({ p: S((s0 + s1) / 2, (w0 + w1) / 2, (z0 + z1) / 2), draw: () => E3.solid(this.SB(s0, s1, w0, w1, z0, z1), st, seed) });
@@ -617,6 +614,14 @@ scene({
       const sides = fc.slice(1, -1);
       sides.forEach((f, i) => E3.face(f, Object.assign({}, hullSt, { n: i === sides.length - 1 ? [JT.UH[0], JT.UH[1], 0] : this.hullN(f), edges: i === sides.length - 1 }), 8200 + i));
       E3.face(top, { n: JT.up, tone: 0.2, shade: 0.4, lw: 1.3, edgeA: 0.95 * a, fillCol: OPT.colour ? '#B9B6A6' : null, fillA: 0.35, hdir: JT.along }, 8219);
+      // the anchors stowed in their pockets on each bow, just under the deck edge, lying on the flared plating (a point dz
+      // below the deck edge at deck station s lies on the loft's line from that station down to its waterline station)
+      [-1, 1].forEach(sg => {
+        const at = (s, dz) => { const [ws, wb] = this.wlAt(s), t = Math.max(0, dz) / F; return S(lerp(s, ws, t), sg * (lerp(this.bd(s), wb, t) + 0.08), F - dz); };
+        const pk = [at(313.5, 0.8), at(318.5, 0.8), at(318.5, -2.2), at(313.5, -2.2)];
+        E3.face(pk, { n: this.hullN([at(312, 7), at(320, 7), at(320, 0), at(312, 0)]), fillCol: INK, fillA: 0.6, noHatch: true, lw: 0.9, edgeA: 0.85 * a }, 8095 + sg);
+        E3.line([at(316, 0.4), at(316, -1.8)], INK, 1.2, 0.8 * a);
+      });
     } });
     // the accommodation aft: the engine casing, six decks, the wheelhouse and its wings, the funnel, an A-frame mast
     items.push(box(4, 17, -12, 12, F, F + 12, steel, 8210));
