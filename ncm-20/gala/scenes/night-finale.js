@@ -46,6 +46,15 @@ scene({
     this.palaceLights = Array.from({ length: 70 }, () => [pcx - half * 0.95 + r() * half * 1.9, m(4 + r() * 10), r()]);
   },
   J(t) { return jdUTC(2027, 3, 15, 15.75 + 0.5 * clamp(this.hold ? 1 : t / (this.dur * (this.speed || 1)))); },
+  // the azimuth gap between Sirius and Canopus (deg) at the moment the film's gold ring closes (the same sky in the holds)
+  plumb() {
+    if (this._plumb == null) {
+      const span = this.hold ? (this.endT || this.dur) : this.dur * (this.speed || 1), J = jdUTC(2027, 3, 15, 15.75 + 0.5 * clamp(this.ringT / span));
+      const c = this.stars.find(q => q.name === 'Canopus'), si = this.stars.find(q => q.name === 'Sirius');
+      this._plumb = Math.abs(altAz(si.ra, si.dec, J)[1] - altAz(c.ra, c.dec, J)[1]);
+    }
+    return this._plumb;
+  },
   // In the stage hold (hold: true, loop: seconds) the sky stands still, everything is fully drawn, and every
   // motion is periodic in the loop length, so the rendered loop joins seamlessly.
   // in a hold every twinkle is periodic in the loop, and starts from its phase at the film's last frame (endT)
@@ -62,12 +71,16 @@ scene({
       const underWords = !hero && ((y > 120 && y < 345 && x > 160 && x < 1760) || (y > 340 && y < 530 && x > 660 && x < 1260));
       const rad = Math.max(0.8, 3.7 - 0.6 * m) * (1 + 0.06 * this.tw(t0, s.ph, 3.1)), al = clamp((6.6 - m) / 3.4) * fade * (underWords ? 0.12 : 1);
       disc(x, y, rad, hero ? '#FFE6B8' : INK, al);
-      if (m < 2 && !hero) { const L = 3 + (2 - m) * 4; stroke(new P([[x - L, y], [x + L, y]]), 1, INK, 0.8, 0.5 * al); stroke(new P([[x, y - L], [x, y + L]]), 1, INK, 0.8, 0.5 * al); }
+      if (m < 2 && !hero) { const L = 3 + (2 - m) * 4, sw = OPT.heritage && s.name === 'Sirius' ? 1.0 : 0.8; stroke(new P([[x - L, y], [x + L, y]]), 1, INK, sw, 0.5 * al); stroke(new P([[x, y - L], [x, y + L]]), 1, INK, sw, 0.5 * al); }
       if (hero) this.suhailXY = [x, y];
-      // ?heritage: al-Shi'ra (Sirius) stands straight above Suhail as the ring closes, the forebears' sign of spring (WAM,
-      // 4 Aug 2020); a soft halo lets the eye find it. No line between them (it would read as a trail), no label.
-      if (OPT.heritage && s.name === 'Sirius') {
-        const hq = this.hold ? 1 : easeOut(prog(t, this.ringT - 0.6, 1.6));
+      // ?heritage: as the gold ring closes, the computed sky puts al-Shi'ra (Sirius) straight above Suhail. Ibrahim Al Jarwan
+      // notes that al-Shi'ra and Suhail stand one above the other over the southern horizon after sunset as spring arrives,
+      // about 20 March (WAM, 4 Aug 2020). A soft halo, from the ring's close, lets the eye find it; it is drawn only if the
+      // sky really aligns them then (within 1 deg: the date is not yet fixed), and eases to half by the film's end, which
+      // the stage holds keep (the pair leans 7 deg by 20:15). No line between them (it would read as a trail), no label.
+      if (OPT.heritage && s.name === 'Sirius' && this.plumb() < 1) {
+        const span = this.hold ? (this.endT || this.dur) : this.dur * (this.speed || 1);
+        const hq = easeInOut(prog(t, this.ringT, 2.0)) * (1 - 0.5 * easeInOut(prog(t, this.ringT + 2.5, span - this.ringT - 2.5)));
         if (hq > 0) { ctx.save(); ctx.globalCompositeOperation = 'screen'; const g = ctx.createRadialGradient(x, y, 0, x, y, 44);
           g.addColorStop(0, `rgba(215,228,255,${0.3 * hq})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - 44, y - 44, 88, 88); ctx.restore(); }
       }
