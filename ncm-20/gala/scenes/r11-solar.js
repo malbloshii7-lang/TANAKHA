@@ -3,7 +3,7 @@
 // 2 GW in a single phase (inaugurated 16 November 2023; at its inauguration the world's largest single-site solar
 // plant): almost 4 million bifacial modules on single-axis trackers over more than 20 km² of desert, 35 km from the city.
 // True 3D (engrave3d.js), metres: x east, y north, z up, the sand at z 0. The eye stands on an east-west service road
-// inside the plant, looks south-south-west down an aisle between two rows, and cranes up from 2.5 m to 13 m, so the rows
+// inside the plant, looks south-south-west down an aisle between two rows, and cranes up from 2.9 m to 10.5 m, so the rows
 // open out to the horizon; a pyranometer on its post by the road (NCM forecasts the sun for solar plants).
 //   modules: a 2023 bifacial module is about 2.28 × 1.13 m; two deep in portrait, a strip 4.6 m across; 56 modules
 //   along a tracker (four strings of 28), about 65 m; three trackers end to end make a block, 10 m service roads
@@ -47,17 +47,18 @@ scene({
     }
     // the pyranometer's post on the road's north edge, where no row shades it (as a station must stand)
     this.PYR = [-2.2, 3.4];
-    // wheel ruts along the eye's road
-    this.ruts = [];
-    for (let k = 0; k < 160; k++) { const x = -60 + r() * 120, y = (r() < 0.5 ? -1.1 : 1.1) + (r() - 0.5) * 0.35; this.ruts.push([x, y, 0.6 + r() * 2.4]); }
+    // a vehicle's wheel tracks along the eye's road (a pair 1.8 m apart, wandering a little)
+    const wob1 = wobble(1117, 0.25), wob2 = wobble(1118, 0.3);
+    this.tracks = [-0.9, 0.9, -0.2, 1.6].map((y0, i) => Array.from({ length: 121 }, (_, k) => { const x = -300 + k * 5; return [x, y0 + (i < 2 ? wob1(x * 4) : wob2(x * 4) + 0.3), 0]; }));
     // sand ripples near the eye, the road's gravel, the desert beyond the plant
     this.ripples = Array.from({ length: 900 }, () => [r(), r(), r()]);
     this.gravel = Array.from({ length: 1400 }, () => [r(), r()]);
+    this.stip = Array.from({ length: 5000 }, () => [r(), r(), r()]);
     this.dunes = Array.from({ length: 500 }, () => [r(), r(), r()]);
   },
   // this frame's sun (16 November at 24.2° N: its azimuth from its altitude) and the trackers' tilt
   sun(lt) {
-    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6)), alt = lerp(14.5, 11, u) * D, lat = 24.2 * D, dec = -18.8 * D;
+    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6)), alt = lerp(15.2, 11.5, u) * D, lat = 24.2 * D, dec = -18.8 * D;
     const az = TAU - Math.acos((Math.sin(dec) - Math.sin(alt) * Math.sin(lat)) / (Math.cos(alt) * Math.cos(lat)));
     const s = [Math.cos(alt) * Math.sin(az), Math.cos(alt) * Math.cos(az), Math.sin(alt)];
     // backtracking: the true-tracking angle in the plane across the rows, turned back until the rows just clear
@@ -70,10 +71,10 @@ scene({
     return s;
   },
   view(lt) {
-    // in the aisle among the northern block's rows, eye height 2.45 m, looking out over the road to the southern
+    // in the aisle among the northern block's rows, eye height 2.9 m, looking out over the road to the southern
     // blocks; it rises to 10.5 m and draws back north along the aisle, with a slight turn toward the sun
     const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6));
-    const C = [lerp(-0.3, 1.5, u), lerp(9.2, 15.5, u), lerp(2.45, 10.5, u)], az = lerp(212.5, 214, u) * D, pt = lerp(2.2, 10.5, u) * D;
+    const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 212.3, u) * D, pt = lerp(2.0, 10.5, u) * D;
     return E3.camera(C, [C[0] + 100 * Math.cos(pt) * Math.sin(az), C[1] + 100 * Math.cos(pt) * Math.cos(az), C[2] - 100 * Math.sin(pt)], 580, 540, 560);
   },
   // the camera, and where the horizon and the sun fall on screen (the colour washes follow them)
@@ -86,6 +87,42 @@ scene({
   },
   // a module strip's corner: u across (east edge up), y along the row
   corner(xr, u, y) { const T = this.T; return [xr + u * T.ct - this.OFF * T.st, y, this.HUB + u * T.st + this.OFF * T.ct]; },
+  // lines radiating from a vanishing point on the horizon over the ground below it, about gap px apart wherever they
+  // are: a finer line starts only where its neighbours have spread apart, each at its own point, so the tone never steps
+  radial(vp, box, gap, a, p) {
+    const [x0, , x1, y1] = box, R = Math.hypot(Math.max(vp[0] - x0, x1 - vp[0]), y1 - vp[1]) + 20, n = 1024, dA = Math.PI / n, r = rng(1175);
+    ctx.save(); ctx.globalAlpha = SA * a * p; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.75; ctx.lineCap = 'butt';
+    ctx.beginPath();
+    for (let i = 1; i < n; i++) {
+      let lev = 0; while (lev < 10 && (i >> lev) % 2 === 0) lev++;
+      const r0 = Math.max(24, gap / (dA * (1 << lev)) * (0.45 + 0.9 * r())), ang = i * dA;
+      if (r0 > R) continue;
+      const c = Math.cos(ang), sn = Math.sin(ang);
+      ctx.moveTo(vp[0] + c * r0, vp[1] + sn * r0); ctx.lineTo(vp[0] + c * R, vp[1] + sn * R);
+    }
+    ctx.stroke(); ctx.restore();
+  },
+  // a wash graded between two screen points (the glass along a row)
+  gradFill(path, p0, p1, c0, a0, c1, a1) {
+    const rgba = (c, al) => { const n = parseInt(c.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${al})`; };
+    ctx.save();
+    if (Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) < 1) ctx.fillStyle = rgba(c0, (a0 + a1) / 2);
+    else { const g = ctx.createLinearGradient(p0[0], p0[1], p1[0], p1[1]); g.addColorStop(0, rgba(c0, a0)); g.addColorStop(1, rgba(c1, a1)); ctx.fillStyle = g; }
+    ctx.globalAlpha = SA; ctx.globalCompositeOperation = BLEND; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore();
+  },
+  // a line of bare paper along a path (the white an engraver leaves round a near object, to part it from what is behind)
+  halo(path, lw) {
+    ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA; ctx.strokeStyle = PAPER_PAT; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); path.trace(ctx, 1); ctx.stroke(); ctx.restore();
+  },
+  // the convex hull of screen points (monotone chain)
+  hull(pts) {
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], hi = [];
+    p.forEach(q => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); });
+    p.slice().reverse().forEach(q => { while (hi.length > 1 && cr(hi[hi.length - 2], hi[hi.length - 1], q) <= 0) hi.pop(); hi.push(q); });
+    return lo.slice(0, -1).concat(hi.slice(0, -1));
+  },
   // mix two #rrggbb colours
   mix(a, b, t) {
     const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16), c = sh => Math.round(lerp((pa >> sh) & 255, (pb >> sh) & 255, clamp(t)));
@@ -98,7 +135,7 @@ scene({
     return clamp(0.42 + 0.3 * Math.exp(-el / 0.2) + 0.4 * Math.exp(-g / 0.3));
   },
   skyCol(r) {
-    if (r[2] < 0) return HUE.hill;
+    if (r[2] < 0) return this.mix(HUE.steel, HUE.dune, 0.35);
     const el = Math.asin(clamp(r[2], -1, 1)), g = Math.acos(clamp(E3.dot(r, this.S), -1, 1));
     return this.mix(this.mix(HUE.sky, HUE.dawn, Math.exp(-el / 0.25) * 0.8), HUE.dawn, Math.exp(-g / 0.4) * 0.7);
   },
@@ -108,7 +145,7 @@ scene({
     const m = front ? this.T.n : this.T.nb, vm = E3.dot(v, m), cosi = clamp(-vm), F = 0.04 + 0.96 * Math.pow(1 - cosi, 5);
     const r = [v[0] - 2 * vm * m[0], v[1] - 2 * vm * m[1], v[2] - 2 * vm * m[2]];
     const B = F * this.skyLum(r) + (1 - F) * (front ? 0.12 : 0.2);
-    return { tone: clamp(0.92 - B, 0.1, 0.86), col: this.mix(front ? HUE.deep : HUE.steel, this.skyCol(r), clamp(F * 1.4)), F };
+    return { tone: clamp(0.92 - B, 0.1, 0.86), col: this.mix(front ? HUE.deep : HUE.steel, this.skyCol(r), clamp(0.12 + F * 1.6)), F };
   },
   // colour: the evening sky warming low toward the sun, the sand
   under(lt) {
@@ -136,18 +173,20 @@ scene({
   },
   // the sky ruled as an engraver rules it: close lines high up, opening toward the horizon and around the sun
   drawSky(lt) {
-    const B = R11.BOX, hy = this.hy, sp = this.sp, bands = [[], [], [], [], []], k = OPT.colour ? 0.55 : 1;
-    for (let y = B[1] + 2; y < hy - 3; y += 4.2) {
+    const B = R11.BOX, hy = this.hy, sp = this.sp, NB = 14, bands = Array.from({ length: NB + 1 }, () => []), k = OPT.colour ? 0.55 : 1;
+    let row = 0;
+    for (let y = B[1] + 2; y < hy - 3; y += 4.2, row++) {
       const e = (hy - y) / (hy - B[1]);
-      for (let x = B[0]; x < B[2]; x += 26) {
-        const dsun = sp ? Math.hypot(x + 13 - sp[0], (y - sp[1]) * 1.6) : 1e4, open = 1 - Math.exp(-Math.pow(dsun / 190, 2));
-        const a = (0.1 + 0.5 * Math.pow(e, 0.9)) * open * k;
-        if (a > 0.02) bands[Math.min(4, Math.floor(a * 7))].push([x, y, x + 26]);
+      for (let x = B[0], j = 0; x < B[2]; x += 8, j++) {
+        const dsun = sp ? Math.hypot(x + 4 - sp[0], (y - sp[1]) * 1.6) : 1e4, open = 1 - Math.exp(-Math.pow(dsun / 190, 2));
+        const a = (0.1 + 0.5 * Math.pow(e, 0.9)) * open * k, h = ((row * 73856093) ^ (j * 19349663)) >>> 0;
+        const bi = Math.round(a / 0.62 * NB + ((h % 1000) / 1000 - 0.5));
+        if (bi > 0) bands[Math.min(NB, bi)].push([x, y, x + 8]);
       }
     }
     bands.forEach((segs, i) => {
       if (!segs.length) return;
-      ctx.save(); ctx.globalAlpha = SA * (i + 0.5) / 7; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.75;
+      ctx.save(); ctx.globalAlpha = SA * 0.62 * i / NB; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.75; ctx.lineCap = 'butt';
       ctx.beginPath(); segs.forEach(([x0, y, x1]) => { ctx.moveTo(x0, y); ctx.lineTo(x1, y); }); ctx.stroke(); ctx.restore();
     });
     // the sun: a plain disc, low in the south-west
@@ -180,7 +219,9 @@ scene({
       }
       const xs = sp.map(p => p[0]), ys = sp.map(p => p[1]);
       if (Math.max(...xs) < B[0] || Math.min(...xs) > B[2] || Math.max(...ys) < hy - 2 || Math.min(...ys) > B[3]) return;
-      out.push(new P(sp, true));
+      // one winding for all, so overlapping shadows add up (nonzero) instead of cancelling
+      let area = 0; for (let i = 0; i < sp.length; i++) { const a = sp[i], b = sp[(i + 1) % sp.length]; area += a[0] * b[1] - b[0] * a[1]; }
+      out.push(new P(area < 0 ? sp.slice().reverse() : sp, true));
     };
     this.rows.forEach(w => {
       const ax = Math.abs(w.x - C[0]);
@@ -199,21 +240,53 @@ scene({
     const q = easeInOut(prog(lt, 0, 0.6));
     if (shade.length) {
       if (OPT.colour) { ctx.save(); ctx.beginPath(); shade.forEach(p => p.trace(ctx, 1)); ctx.globalAlpha = SA * 0.34 * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = HUE.steel; ctx.fill(); ctx.restore(); }
-      hatch(shade, box, 0, 3.6, q, INK, 0.75, OPT.colour ? 0.26 : 0.32, 1170);
-      // under the modules, inside the shade, the sand sees less of the sky
-      if (umbra.length) { ctx.save(); ctx.beginPath(); shade.forEach(p => p.trace(ctx, 1)); ctx.clip(); hatch(umbra, box, 0.05, 2.7, q, INK, 0.7, OPT.colour ? 0.16 : 0.2, 1172); ctx.restore(); }
+      ctx.save(); ctx.beginPath(); shade.forEach(p => p.trace(ctx, 1)); ctx.clip();
+      // the shade is ruled along the sun's direction on the sand: every line runs back to the horizon under the sun
+      const vp = E3.projDir([s[0], s[1], 0]);
+      if (vp) this.radial(vp, box, 3.8, OPT.colour ? 0.28 : 0.4, q);
+      hatch(shade, box, 0, 4.4, q, INK, 0.6, OPT.colour ? 0.12 : 0.18, 1170);
+      // under the modules the sand sees less of the sky
+      if (umbra.length) hatch(umbra, box, 0.05, 2.7, q, INK, 0.7, OPT.colour ? 0.16 : 0.22, 1172);
+      ctx.restore();
     }
-    // the sand: ripples lying on the ground near the eye, the gravel of the road, its ruts and edges
-    const segs = [];
-    this.ripples.forEach(([a, b, c]) => {
-      const x = C[0] - 70 + a * 140, y = C[1] - 80 + b * 100, l = 0.5 + c * 1.6, d = E3.depth([x, y, 0]);
-      if (d > 1 && d < 90) segs.push([[x, y, 0], [x + l, y + 0.15, 0], 0.5 * R11.air(d, 60)]);
+    // the piles' long shadows, where they fall on sunlit sand (the rest lie inside the rows' shade)
+    const inQuad = (pt, q) => { let sg = 0; for (let i = 0; i < 4; i++) { const a = q[i], b = q[(i + 1) % 4], c = (b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0]); if (c !== 0) { if (sg && Math.sign(c) !== sg) return false; sg = Math.sign(c); } } return true; };
+    const quadOf = (x, ya, yb) => [this.corner(x, -hw, ya), this.corner(x, hw, ya), this.corner(x, hw, yb), this.corner(x, -hw, yb)].map(shp);
+    const pshad = [], step = (this.UL - 0.6) / 8;
+    this.rows.forEach((w, wi) => {
+      if (Math.abs(w.x - C[0]) > 45) return;
+      const near = this.rows.slice(Math.max(0, wi - 2), wi + 1);
+      this.blocks.forEach(b => b.units.forEach(([ya, yb]) => {
+        [ya + 0.3, yb - 0.3].forEach(y => {
+          if (Math.abs(y - C[1]) > 50) return;
+          const base = [w.x, y, 0], tip = shp([w.x, y, this.HUB - 0.12]);
+          const quads = [];
+          near.forEach(v => this.blocks.forEach(bb => bb.units.forEach(([a2, b2]) => { if (Math.abs(a2 - y) < 90 || Math.abs(b2 - y) < 90) quads.push(quadOf(v.x, a2, b2)); })));
+          let run = null;
+          for (let k = 0; k <= 16; k++) {
+            const t = k / 16, pt = [lerp(base[0], tip[0], t), lerp(base[1], tip[1], t), 0], lit = !quads.some(q => inQuad(pt, q));
+            if (lit && !run) run = pt; else if (!lit && run) { pshad.push([run, pt]); run = null; }
+            if (lit && k === 16) pshad.push([run, pt]);
+          }
+        });
+      }));
     });
-    this.ruts.forEach(([x, y, l]) => segs.push([[x, y, 0], [x + l, y, 0], 0.45]));
+    pshad.forEach(([a, b]) => E3.line([a, b], INK, clamp(0.12 * E3.cam().f / Math.max(1, E3.depth(a)), 0.6, 2.2), 0.55));
+    // the sand: a stipple lying on the ground (denser toward the horizon, as perspective packs it), ripples near the eye,
+    // the road's gravel, a vehicle's wheel tracks and the gravel's edges
+    const dots = [], segs = [];
+    this.stip.forEach(([a, b, c]) => {
+      const x = C[0] - 90 + a * 180, y = C[1] + 25 - b * b * 260, d = E3.depth([x, y, 0]);
+      if (d > 1 && d < 260) dots.push([[x, y, 0], [x + 0.03 + 0.05 * c, y, 0], (0.35 + 0.4 * c) * R11.air(d, 140)]);
+    });
+    this.ripples.forEach(([a, b, c]) => {
+      const x = C[0] - 60 + a * 120, y = C[1] + 20 - b * 90, l = 0.6 + c * 1.8, d = E3.depth([x, y, 0]);
+      if (d > 1 && d < 80) segs.push([[x, y, 0], [x + l, y + 0.2 * (c - 0.5), 0], 0.45 * R11.air(d, 50)]);
+    });
+    this.gravel.forEach(([a, b]) => { const x = C[0] - 45 + a * 90, y = -2.6 + b * 5.2, d = E3.depth([x, y, 0]); if (d > 1) dots.push([[x, y, 0], [x + 0.05, y, 0], 0.6 * R11.air(d, 60)]); });
+    E3.segments(dots, INK, 1.2);
     E3.segments(segs, INK, 0.8);
-    const grav = [];
-    this.gravel.forEach(([a, b]) => { const x = C[0] - 40 + a * 80, y = -2.6 + b * 5.2; grav.push([[x, y, 0], [x + 0.06, y, 0], 0.55]); });
-    E3.segments(grav, INK, 1.1);
+    this.tracks.forEach(t => E3.line(t, INK, 0.9, 0.3));
     [-2.6, 2.6].forEach(y => E3.line([[C[0] - 300, y, 0], [C[0] + 300, y, 0]], INK, 0.8, 0.4));
     // the desert past the plant's far edge, to the horizon: a few ruled strokes
     const far = [];
@@ -287,13 +360,20 @@ scene({
     const quad = [this.corner(xr, -hw, y0), this.corner(xr, hw, y0), this.corner(xr, hw, y1), this.corner(xr, -hw, y1)];
     const mid = [(quad[0][0] + quad[2][0]) / 2, (y0 + y1) / 2, (quad[0][2] + quad[2][2]) / 2];
     const front = E3.dot(T.n, E3.sub(C, mid)) > 0, g = this.glass(mid, front);
+    // the reflection at each end of the piece: the glass shades along the row from one to the other, in bands
+    const e0 = this.corner(xr, 0, y0), e1 = this.corner(xr, 0, y1), g0 = this.glass(e0, front), g1 = this.glass(e1, front);
     // pixels per metre here: the details thin out with distance
     const ppm = E3.cam().f / d;
-    const glassSt = { n: front ? T.n : T.nb, tone: g.tone, shade: 0, hdir: [0, 1, 0], lw: 1.1, edgeA: 0.85 * a,
-      fillCol: OPT.colour ? g.col : INK, fillA: OPT.colour ? 0.62 : 0.1 + 0.25 * g.tone, noHatch: ppm < 6 };
+    const glassSt = { n: front ? T.n : T.nb, tone: (g0.tone + g1.tone) / 2, shade: 0, hdir: [0, 1, 0], lw: 1.1, edgeA: 0.85 * a, noHatch: ppm < 6 };
     const under = () => this.understructure(xr, ya, yb, y0, y1, d, ppm, front, seed);
     if (front) under();
-    E3.face(quad, glassSt, seed);
+    const f = E3.face(quad, glassSt, seed);
+    if (f) {
+      const pe = (e, alt) => E3.depth(e) > 0.8 ? E3.proj(e) : E3.proj(alt);
+      const p0 = pe(e0, mid), p1 = pe(e1, mid);
+      if (OPT.colour) this.gradFill(f.path, p0, p1, g0.col, 0.62, g1.col, 0.62);
+      else this.gradFill(f.path, p0, p1, INK, 0.08 + 0.3 * g0.tone, INK, 0.08 + 0.3 * g1.tone);
+    }
     // the module joints across the strip and the line between the two modules of the pair
     if (ppm * this.MOD > 5) {
       const off = front ? T.n : T.nb, o = p => [p[0] + off[0] * 0.01, p[1], p[2] + off[2] * 0.01], L = [];
@@ -344,26 +424,35 @@ scene({
   // the pyranometer: a glass dome over its sensor on a levelled plate, its white sun screen, on a post by the road,
   // and the data logger on the post
   pyranometer(lt) {
-    const [px, py] = this.PYR, s = this.S, colr = OPT.colour, d = E3.depth([px, py, 1.9]);
-    const st = (tone, fc, fa = 0.5) => ({ tone, shade: 0.5, lw: 1.1, edgeA: 0.9, fillCol: colr ? fc : null, fillA: fa, noHatch: tone < 0.05 });
-    // its shadow on the sand
+    const [px, py] = this.PYR, s = this.S, colr = OPT.colour, d = E3.depth([px, py, 1.9]), f = E3.cam().f;
+    const st = (tone, fc, fa = 0.5, shade = 0.5) => ({ tone, shade, lw: 1.1, edgeA: 0.9, fillCol: colr ? fc : null, fillA: fa, noHatch: tone < 0.05 });
+    // its shadow on the sand, then the white an engraver leaves round it
     const sh = z => [px - s[0] * z / s[2], py - s[1] * z / s[2], 0];
     E3.line([[px, py, 0], sh(1.95)], INK, 1.4, 0.35);
+    this.halo(new P([E3.proj([px, py, 0.12]), E3.proj([px, py, 2.03])]), 0.2 * f / d);
+    this.halo(new P([E3.proj([px - 0.07, py, 2.0]), E3.proj([px + 0.07, py, 2.0])]), 0.14 * f / d);
     E3.solid(E3.box(px - 0.2, px + 0.2, py - 0.2, py + 0.2, 0, 0.12), st(0.08, '#D9D0C0', 0.5), 1600);
     E3.solid(R11.cylinder([px, py], 0.03, 0.12, 1.95, 10), st(0.12, HUE.steel, 0.4), 1601);
     // the logger box on the post's north side, with its door
     E3.solid(E3.box(px - 0.15, px + 0.15, py + 0.035, py + 0.19, 1.05, 1.45), st(0.04, '#EFE9DC', 0.6), 1602);
     E3.line([[px - 0.12, py + 0.192, 1.08], [px + 0.12, py + 0.192, 1.08], [px + 0.12, py + 0.192, 1.42], [px - 0.12, py + 0.192, 1.42], [px - 0.12, py + 0.192, 1.08]], INK, 0.8, 0.6);
-    // the levelled plate and the up-facing pyranometer: body, sun screen, the glass domes
-    E3.solid(E3.box(px - 0.09, px + 0.09, py - 0.09, py + 0.09, 1.95, 1.965), st(0.1, HUE.steel, 0.4), 1606);
-    E3.solid(R11.cylinder([px, py], 0.045, 1.965, 2.005, 14), st(0.2, HUE.steel, 0.5), 1607);
-    E3.solid(R11.cylinder([px, py], 0.075, 1.975, 2.025, 20), st(0.02, '#F6F2E8', 0.8), 1608);
-    const c = E3.proj([px, py, 2.025]), rr = 0.026 * E3.cam().f / d, ri = 0.017 * E3.cam().f / d;
-    const dome = new P(Array.from({ length: 19 }, (_, k) => { const t = Math.PI + k / 18 * Math.PI; return [c[0] + rr * Math.cos(t), c[1] + rr * 1.05 * Math.sin(t)]; }), true);
-    mask(dome); fill(dome, colr ? HUE.sky : BLUE, 0.28); stroke(dome, 1, INK, 1, 0.9);
-    stroke(new P(Array.from({ length: 13 }, (_, k) => { const t = Math.PI + k / 12 * Math.PI; return [c[0] + ri * Math.cos(t), c[1] + ri * 1.05 * Math.sin(t)]; })), 1, INK, 0.7, 0.7);
-    disc(c[0] - rr * 0.35, c[1] - rr * 0.55, Math.max(0.6, rr * 0.18), '#FFFFFF', 0.8, 'source-over');
-    // the cables down to the logger
+    // the cable up to the sensor
     E3.line([[px + 0.04, py + 0.02, 1.98], [px + 0.06, py + 0.05, 1.8], [px + 0.05, py + 0.05, 1.46]], INK, 0.8, 0.7);
+    // the levelled plate and the sensor's body
+    E3.solid(E3.box(px - 0.09, px + 0.09, py - 0.09, py + 0.09, 1.95, 1.965), st(0.1, HUE.steel, 0.4), 1606);
+    E3.solid(R11.cylinder([px, py], 0.045, 1.965, 1.985, 14), st(0.2, HUE.steel, 0.5), 1607);
+    // the screen: a short white drum (its outline is the hull of its two rims), the top face bare paper
+    const rimPts = (r, z) => R11.ring([px, py], r, z, 28).slice(0, 28).map(E3.proj);
+    const top = rimPts(0.075, 2.025), drum = new P(this.hull(top.concat(rimPts(0.075, 1.975))), true), rim = new P(top, true);
+    const bb = [Math.min(...drum.pts.map(p => p[0])), Math.min(...drum.pts.map(p => p[1])), Math.max(...drum.pts.map(p => p[0])), Math.max(...drum.pts.map(p => p[1]))];
+    mask(drum); if (colr) fill(drum, '#F6F2E8', 0.5);
+    hatch(drum, bb, Math.PI / 2, 2.2, 1, INK, 0.6, 0.16, 1609);
+    mask(rim); stroke(drum, 1, INK, 1, 0.9); stroke(rim, 1, INK, 0.8, 0.85);
+    // the glass domes, outer and inner, with the light on them
+    const c = E3.proj([px, py, 2.025]), rr = Math.max(1.6, 0.026 * f / d), ri = 0.017 * f / d;
+    const dome = new P(Array.from({ length: 19 }, (_, k) => { const t = Math.PI + k / 18 * Math.PI; return [c[0] + rr * Math.cos(t), c[1] + rr * 1.05 * Math.sin(t)]; }), true);
+    mask(dome); fill(dome, colr ? HUE.sky : BLUE, 0.3); stroke(dome, 1, INK, 0.9, 0.9);
+    if (ri > 1.2) stroke(new P(Array.from({ length: 13 }, (_, k) => { const t = Math.PI + k / 12 * Math.PI; return [c[0] + ri * Math.cos(t), c[1] + ri * 1.05 * Math.sin(t)]; })), 1, INK, 0.6, 0.7);
+    disc(c[0] - rr * 0.35, c[1] - rr * 0.55, Math.max(0.6, rr * 0.2), '#FFFFFF', 0.85, 'source-over');
   },
 });
