@@ -90,6 +90,17 @@ scene({
       hzg.addColorStop(0, 'rgba(0,0,0,0)'); hzg.addColorStop(1, `rgba(70,80,120,${0.3 * tw})`);
       ctx.fillStyle = hzg; ctx.fillRect(0, SUHAIL_VIEW.hz - 260, W, 260); ctx.restore();
     }
+    if (OPT.colour) { // the same twilight in colour: a warm band low in the east under a violet one, growing with the sun
+      const c = 0.25 + 0.75 * tw;
+      ctx.save(); ctx.globalCompositeOperation = 'screen';
+      const band = ctx.createLinearGradient(0, SUHAIL_VIEW.hz - 330, 0, SUHAIL_VIEW.hz);
+      band.addColorStop(0, 'rgba(0,0,0,0)'); band.addColorStop(0.55, `rgba(92,70,140,${0.22 * c})`); band.addColorStop(1, `rgba(236,138,92,${0.42 * c})`);
+      ctx.fillStyle = band; ctx.fillRect(0, SUHAIL_VIEW.hz - 330, W, 330);
+      const east = ctx.createRadialGradient(-220, SUHAIL_VIEW.hz, 0, -220, SUHAIL_VIEW.hz, 1400); // strongest in the east, off the left edge
+      east.addColorStop(0, `rgba(240,150,96,${0.34 * c})`); east.addColorStop(0.5, `rgba(150,96,140,${0.14 * c})`); east.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = east; ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
     // stars: brighter ones larger; they fade as twilight grows and toward the horizon (extinction)
     const fadeIn = easeOut(prog(t, 0.2, 2.2));
     this.stars.forEach(s => {
@@ -124,11 +135,12 @@ scene({
     // the land: a dark desert with the first light on the dune crests, nearer ridges darker (the air between lightens the
     // far ones), then the near dune with its ripples, and the man and his camel on its crest
     const solid = (path, col, a = 1) => { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore(); };
-    solid(this.land, '#04050A', 0.96);
+    const [cLand, cRidge0, cRidge1, cNear] = OPT.colour ? ['#110C16', '#0E0A14', '#0B0811', '#08060D'] : ['#04050A', '#04060B', '#030409', '#020307'];
+    solid(this.land, cLand, 0.96);
     const cq = easeInOut(prog(t, 0.4, 2.4));
     stroke(this.crest, cq, INK, 1.2, 0.35 + 0.35 * tw);
-    this.ridges.forEach((r, i) => { solid(r.fill, i ? '#030409' : '#04060B'); stroke(r.crest, cq, INK, 1, (0.14 + 0.16 * tw) * (i ? 0.8 : 1)); });
-    solid(this.near, '#020307');
+    this.ridges.forEach((r, i) => { solid(r.fill, i ? cRidge1 : cRidge0); stroke(r.crest, cq, INK, 1, (0.14 + 0.16 * tw) * (i ? 0.8 : 1)); });
+    solid(this.near, cNear);
     ctx.save(); ctx.beginPath(); this.near.trace(ctx, 1); ctx.clip();
     this.ripples.forEach((r, i) => stroke(r, cq, INK, 1, (0.05 + 0.07 * tw) * (1 - i / 13)));
     ctx.restore();

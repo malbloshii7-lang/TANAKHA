@@ -33,6 +33,15 @@ scene({
     this.book = [new P([[1080, 868], [1166, 856], [1172, 916], [1086, 930]], true), new P([[1166, 856], [1252, 866], [1250, 928], [1172, 916]], true)];
     this.bookRules = [0, 1, 2, 3, 4].map(k => ln(1182, 878 + k * 9, 1242, 886 + k * 9, 255 + k, 0.2));
   },
+  // colour: the scope's floor in teal; the radome pale, the logbook's pages cream (a diagram: no sky)
+  under(lt) {
+    const { cx, cy, k } = this, q = easeInOut(prog(lt, 0.3, 1.6));
+    wash(el(cx, cy, 370, 370 * k, 0, TAU, 1, 0), HUE.sea, 0.22 * q);
+  },
+  over(lt) {
+    wash(this.dome, HUE.cloud, 0.3 * easeInOut(prog(lt, 2.0, 1.2)));
+    wash(this.book, HUE.sail, 0.45 * easeOut(prog(lt, 1.2, 1.0)));
+  },
   draw(lt) {
     const { cx, cy, k } = this;
     this.rings.forEach((r, i) => stroke(r, easeInOut(prog(lt, 0.3 + i * 0.25, 1.4)), i === 3 ? INK : SEPIA, i === 3 ? 1.8 : 1.2, 0.8));

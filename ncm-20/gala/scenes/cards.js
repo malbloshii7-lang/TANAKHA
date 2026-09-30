@@ -25,6 +25,16 @@ scene({
     stroke(this.frame[0], f, GOLD, 1.3, 0.45); stroke(this.frame[1], f, INK, 0.9, 0.3);
     [[96, 96], [W - 96, 96], [96, H - 96], [W - 96, H - 96]].forEach(([x, y]) => ornament(x, y, 9, prog(t, 1.6, 0.8), GOLD, 0.8));
   },
+  // colour, the same on every card: the rosette's rope band in teal and its petal band in gold, as a seal's tint, and a
+  // deep blue between the frame's two rules; the words stay ink on paper
+  over(t) {
+    const p = easeInOut(prog(t, 0.2, 2.4)), f = easeInOut(prog(t, 0.4, 2.0));
+    ctx.save(); ctx.translate(W / 2, 525); ctx.rotate(t * 0.012); ctx.translate(-W / 2, -525);
+    wash([this.rings[0], this.rings[1]], HUE.sea, 0.2 * p, 'evenodd');
+    wash([this.rings[1], this.rings[2]], HUE.gold, 0.14 * p, 'evenodd');
+    ctx.restore();
+    wash(this.frame, HUE.deep, 0.45 * f, 'evenodd');
+  },
   // the words centred in the framed page (optically, a little above its middle)
   words(t) { quoteCard(QUOTES[this.quote], this, t, { cy: 525 }); },
 });

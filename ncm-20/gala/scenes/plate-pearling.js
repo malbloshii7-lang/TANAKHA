@@ -61,6 +61,19 @@ scene({
     this.openBot = el(1405, 1032, 6, 2.6, 0, Math.PI, 720, 0.2);
     this.openTop = el(1403, 1029, 6, 2.6, Math.PI, TAU, 721, 0.2, -0.5);
   },
+  // colour: the pearling sea in section, turquoise at the surface deepening to the bank, sand on the bed, a pale sky
+  under(lt) {
+    const q = easeOut(prog(lt, 0.6, 1.8)), bed = this.bedPts;
+    const water = new P([[980, 812], [1890, 812], [1890, bed[bed.length - 1][1]]].concat(bed.slice().reverse(), [[980, bed[0][1]]]), true);
+    const floor = new P(bed.concat([[1890, bed[bed.length - 1][1]], [1890, 1090], [980, 1090], [980, bed[0][1]]]), true);
+    washFade([990, 812, 1880, 1040], [[0, HUE.sea, 0.6], [0.55, HUE.water, 0.55], [1, HUE.deep, 0.65]], 120, q, water);
+    washFade([990, 1012, 1880, 1080], [[0, HUE.sand, 0.55], [1, HUE.sand, 0]], 120, q, floor);
+    washFade([990, 640, 1880, 812], [[0, HUE.sky, 0], [0.75, HUE.sky, 0.26], [1, HUE.dawn, 0.28]], 160, q);
+  },
+  over(lt) {
+    const { cx, cy } = this;
+    wash(el(cx, cy, 174, 174, 0, TAU, 1, 0), HUE.gold, 0.16 * easeInOut(prog(lt, 0.3, 1.5)));
+  },
   draw(lt) {
     const { cx, cy } = this;
     this.rings.forEach((r, i) => stroke(r, easeInOut(prog(lt, 0.3 + i * 0.2, 1.5)), INK, 1.6, 0.85));
@@ -89,18 +102,20 @@ scene({
     const cq = easeOut(prog(lt, 3.2, 0.6)); // the nakhoda aft, the haulers at the rail; the bulwark hides their legs
     if (cq > 0) this.bCrew.forEach(([x, y]) => { disc(x, y - 22, 3.6 * cq, INK, 0.85); stroke(new P([[x - 4.5, y - 15], [x, y - 17.5], [x + 4.5, y - 15]]), cq, INK, 2.2, 0.85); stroke(new P([[x, y - 17], [x, y - 6]]), cq, INK, 2.8, 0.85); });
     // the hull's paper comes in with its outline, so the sea line is never cut before the boat is there
-    mask(this.boat, bp); hatch(this.boat, [-130, -60, 135, 20], 0.3, 6, bp, INK, 1, 0.4, 146); stroke(this.boat, bp, INK, 2);
+    mask(this.boat, bp); if (OPT.colour) wash(this.boat, HUE.teak, 0.5 * bp);
+    hatch(this.boat, [-130, -60, 135, 20], 0.3, 6, bp, INK, 1, 0.4, 146); stroke(this.boat, bp, INK, 2);
     this.bSeams.forEach((q, k) => stroke(q, prog(lt, 2.0 + k * 0.2, 0.9), INK, 0.9, 0.6));
     stroke(this.bRail, bp, INK, 1.3, 0.8); stroke(this.stemHead, bp, INK, 2.2);
     this.poop.forEach(q => stroke(q, prog(lt, 2.4, 0.6), INK, 1.2, 0.8));
     ctx.restore();
     // below the waterline the sea is drawn in section, so the submerged hull (~1.2 m draft) shows through the water, paler
     ctx.save(); const local2 = ctx.getTransform(); ctx.setTransform(world); ctx.beginPath(); ctx.rect(985, 812, 900, 60); ctx.clip(); ctx.setTransform(local2);
-    mask(this.boat, bp); fill(this.boat, BLUE, 0.1 * bp); stroke(this.boat, bp, INK, 1.4, 0.45);
+    mask(this.boat, bp); fill(this.boat, BLUE, 0.1 * bp); if (OPT.colour) wash(this.boat, HUE.sea, 0.4 * bp); stroke(this.boat, bp, INK, 1.4, 0.45);
     ctx.restore();
     stroke(this.boatMast, prog(lt, 2.4, 0.7), INK, 2.2); stroke(this.mizzen, prog(lt, 2.5, 0.6), INK, 1.8);
     const aq = easeOut(prog(lt, 2.8, 0.7)); // the sail spread as an awning
-    fill(this.awning, OCHRE, 0.3 * aq); stroke(this.awning, aq, INK, 1.1, 0.8); stroke(this.awnYard, aq, INK, 2.2);
+    fill(this.awning, OCHRE, 0.3 * aq); if (OPT.colour) wash(this.awning, HUE.dawn, 0.28 * aq);
+    stroke(this.awning, aq, INK, 1.1, 0.8); stroke(this.awnYard, aq, INK, 2.2);
     this.oars.forEach((o, i) => { const q = easeOut(prog(lt, 3.0 + i * 0.1, 0.5)); stroke(o.p, q, INK, 1.8, 0.85); stroke(o.blade, q, INK, 3, 0.85); });
     ctx.restore();
     // everything in the water is drawn on the plate: it does not heave with the boat

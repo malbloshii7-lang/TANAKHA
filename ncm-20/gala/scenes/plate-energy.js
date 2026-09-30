@@ -40,6 +40,18 @@ scene({
     this.plate = ln(988, 944, 1020, 944, 633, 0.1);
     this.dome = el(1004, 942, 13, 13, Math.PI, TAU, 634, 0.1);
   },
+  // colour: a sky warming toward the horizon, a warm halo about the sun, desert under the rows, the mirrors holding the sky
+  under(lt) {
+    const q = easeInOut(prog(lt, 0.2, 1.2));
+    washFade([985, -300, 1885, this.HY], [[0, HUE.sky, 0.4], [0.7, HUE.sky, 0.3], [1, HUE.dawn, 0.34]], 150, q);
+    washFade([985, this.HY, 1885, 1010], [[0, HUE.sand, 0.34], [1, HUE.dune, 0.5]], 150, q);
+    const sa = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(lt, 0.6, 7.2))), sx = 1430 + 420 * Math.cos(sa), sy = this.HY + 372 * Math.sin(sa), sq = easeOut(prog(lt, 0.8, 0.6));
+    if (sq > 0) {
+      ctx.save(); const g = ctx.createRadialGradient(sx, sy, 20, sx, sy, 190);
+      g.addColorStop(0, `rgba(242,163,107,${0.5 * sq})`); g.addColorStop(1, 'rgba(242,163,107,0)');
+      ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(sx - 190, sy - 190, 380, 380); ctx.restore();
+    }
+  },
   draw(lt) {
     const HY = this.HY;
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
@@ -69,7 +81,7 @@ scene({
       const zf = lerp(Z1, Z0, 1), zNear = Z0, zFar = lerp(Z0 + 2, Z1, q);
       const near = this.sec.map(p => at(zNear, off, p)), far = this.sec.map(p => at(zFar, off, p));
       const surf = new P(near.concat(far.slice().reverse()), true);
-      mask(surf); fill(surf, BLUE, 0.22);
+      mask(surf); fill(surf, BLUE, 0.22); if (OPT.colour) wash(surf, HUE.sky, 0.35);
       // mirror facets run along the row
       [0, 4, 8, 12, 16].forEach(i => stroke(new P([near[i], far[i]]), 1, INK, i % 8 ? 0.7 : 1.2, i % 8 ? 0.45 : 0.85));
       // frames and pylons every few metres, far to near

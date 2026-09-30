@@ -49,6 +49,7 @@ scene({
     // the land, washed, and the sea engraved in fine horizontal lines
     const lq = easeInOut(prog(t, 1.2, 1.6));
     this.land.forEach(e => e.polys.forEach(p => fill(p, OCHRE, 0.13 * lq)));
+    if (OPT.colour) this.land.forEach(e => e.polys.forEach(p => wash(p, HUE.sand, 0.3 * lq))); // every emirate in one colour
     const sq = prog(t, 0.6, 2.4);
     if (sq > 0) {
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); // the fade, not a box, sets where the engraving ends
@@ -56,6 +57,11 @@ scene({
       ctx.clip('evenodd');
       // the engraving fades out toward the edge of the plate instead of stopping on a line
       const fx = MAP_BOX.x + MAP_BOX.w * 0.52, fy = MAP_BOX.y + MAP_BOX.h * 0.42, grd = ctx.createRadialGradient(fx, fy, 150, fx, fy, 640);
+      if (OPT.colour) { // the sea washed in the Gulf's colour, fading out with the engraving
+        const sw = ctx.createRadialGradient(fx, fy, 120, fx, fy, 700);
+        sw.addColorStop(0, `rgba(47,154,166,${0.5 * sq})`); sw.addColorStop(0.6, `rgba(47,154,166,${0.3 * sq})`); sw.addColorStop(1, 'rgba(47,154,166,0)');
+        ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = sw; ctx.fillRect(0, 0, W, H); ctx.restore();
+      }
       grd.addColorStop(0, 'rgba(40,71,140,0.26)'); grd.addColorStop(0.6, 'rgba(40,71,140,0.13)'); grd.addColorStop(1, 'rgba(40,71,140,0)');
       ctx.globalAlpha = SA; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = IS_NIGHT ? BLUE : grd; ctx.lineWidth = 0.8; ctx.beginPath();
       const n = Math.floor(H / 7 * sq);

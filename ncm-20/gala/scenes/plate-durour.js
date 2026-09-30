@@ -33,6 +33,19 @@ scene({
     for (let i = 0; i <= 180; i++) { const t = i / 180, a = -Math.PI / 2 + 0.35 + TAU * 0.82 * t, r = 404 + 48 * t; sp.push(pt(r, a)); }
     this.spiral = new P(wob(sp, 17, 0.6));
   },
+  // colour: the medallion's dawn sky over the sand, and each petal washed in its season's colour (as its lozenge)
+  under(lt) {
+    const { cx, cy } = this, z = 1 + 0.03 * easeInOut(prog(lt, 0, 11)), R = 122 * z, q = easeOut(prog(lt, 2.0, 1.4));
+    const medal = el(cx, cy, R, R, 0, TAU, 1, 0);
+    washGrad([cx - R, cy - R, cx + R, this.hy], [0, cy - R], [0, this.hy], [[0, HUE.sky, 0.5], [0.6, HUE.dawn, 0.4], [1, HUE.rose, 0.5]], q, medal);
+    washGrad([cx - R, this.hy, cx + R, cy + R], [0, this.hy], [0, cy + R], [[0, HUE.sand, 0.55], [1, HUE.dune, 0.6]], q, medal);
+  },
+  over(lt) {
+    const { cx, cy } = this, z = 1 + 0.03 * easeInOut(prog(lt, 0, 11)), tints = [HUE.gold, HUE.sky, HUE.rose, HUE.hill];
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(z, z); ctx.rotate(lt * 0.06); ctx.translate(-cx, -cy);
+    this.petals.forEach((p, i) => { const g = Math.floor(i / 10); wash(p, tints[g], 0.34 * easeOut(prog(lt, 2.8 + g * 0.45 + (i % 10) * 0.05, 0.8))); });
+    ctx.restore();
+  },
   draw(lt) {
     const { cx, cy } = this;
     ctx.save();

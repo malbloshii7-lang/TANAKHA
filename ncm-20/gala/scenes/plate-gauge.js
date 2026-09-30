@@ -22,6 +22,12 @@ scene({
     for (let i = 0; i < 40; i++) this.drops.push({ x: 1000 + r() * 880, ph: r(), v: 700 + r() * 300, len: 16 + r() * 14, on: 0.6 + (i / 40) * 1.6, a: 0.25 + r() * 0.3 });
   },
   arrive(k) { return this.t20 - (20 - k) * this.dt; },
+  // colour: the sky clearing behind the glass after the shower, the sand it stands on
+  under(lt) {
+    const q = easeInOut(prog(lt, 0.4, 1.6));
+    washFade([985, -300, 1885, 986], [[0, HUE.sky, 0.42], [0.8, HUE.sky, 0.3], [1, HUE.dawn, 0.24]], 150, q);
+    washFade([985, 984, 1885, 1300], [[0, HUE.sand, 0.4], [0.3, HUE.sand, 0.22], [1, HUE.sand, 0]], 150, q);
+  },
   levelY(k) { return 950 - k * 35.5; },
   draw(lt) {
     const t0c = this.arrive(1) - 0.6; // the count begins; the shower has passed
@@ -65,6 +71,7 @@ scene({
     if (fillIn > 0) {
       const settle = k ? easeOut(prog(lt, this.arrive(k), 0.18)) : 1;
       const top = lerp(k ? this.levelY(k - 1) : 958, this.levelY(k), settle) * fillIn + 958 * (1 - fillIn);
+      if (OPT.colour) washFade([1453, top, 1547, 958], [[0, HUE.water, 0.4], [1, HUE.deep, 0.45]], 0, 1);
       ctx.save(); ctx.globalAlpha = SA * 0.22; ctx.globalCompositeOperation = BLEND; ctx.fillStyle = BLUE; ctx.fillRect(1453, top, 94, 958 - top);
       ctx.beginPath(); ctx.rect(1453, top, 94, 958 - top); ctx.clip();
       ctx.globalAlpha = SA * 0.55; ctx.strokeStyle = BLUE; ctx.lineWidth = 1.1; ctx.beginPath();
@@ -78,7 +85,7 @@ scene({
       stroke(el(1500, top, 44, 5, 0, TAU, 450, 0.1), 1, BLUE, 2, 0.9); // the water surface, an ellipse like the mouth
       stroke(new P(quad([1456, top - 5], [1462, top], [1470, top + 1], 6)), 1, BLUE, 1.3, 0.8); stroke(new P(quad([1544, top - 5], [1538, top], [1530, top + 1], 6)), 1, BLUE, 1.3, 0.8);
       const year = 2007 + k;
-      back(String(year), 1432, top + 7, 'right', 1, 22, 2);
+      if (!OPT.colour) back(String(year), 1432, top + 7, 'right', 1, 22, 2); // (in colour the patch would show on the sky; nothing crosses the label)
       small(String(year), 1432, top + 7, 1, { size: 26, ls: 2, align: 'right', weight: 600, col: year === 2027 ? GOLD : INK, a: 0.95 });
       // a ripple as each drop lands
       if (k) { const age = lt - this.arrive(k); if (age < 0.5) stroke(el(1500, top, 10 + 80 * age, 3 + 10 * age, 0, TAU, 460 + k, 0), 1, BLUE, 1.2, 0.8 * (1 - age / 0.5)); }
@@ -101,7 +108,7 @@ scene({
     this.ticks.forEach((t, kk) => {
       const q = prog(lt, 1.2 + kk * 0.04, 0.4);
       stroke(t.p, q, INK, t.major ? 1.5 : 1, 0.85);
-      if (t.major) { back(String(2007 + kk), 1584, t.y + 6, 'left', q, 20, 2); small(String(2007 + kk), 1584, t.y + 6, q, { size: 20, ls: 2, a: 0.8, weight: 600, col: kk === 20 && lt >= this.t20 ? GOLD : INK }); }
+      if (t.major) { if (!OPT.colour) back(String(2007 + kk), 1584, t.y + 6, 'left', q, 20, 2); small(String(2007 + kk), 1584, t.y + 6, q, { size: 20, ls: 2, a: 0.8, weight: 600, col: kk === 20 && lt >= this.t20 ? GOLD : INK }); }
     });
     // the twentieth: it lands in gold (a crown of gold droplets thrown up from the surface and falling back inside the
     // tube, gold ripples running out to the glass), then a gold glint on the 2027 graduation and a ring widening from

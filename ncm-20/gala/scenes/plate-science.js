@@ -62,6 +62,11 @@ scene({
     for (let i = 0; i <= 20; i++) { const a = (Math.PI * i) / 20; bottom.push([ox + 16 * Math.cos(a), oy + 4 + 16 * Math.sin(a)]); }
     this.dropP = new P(quad([ox, oy - 30], [ox + 6, oy - 14], [ox + 16, oy + 4], 12).concat(bottom.slice(1), quad([ox - 16, oy + 4], [ox - 6, oy - 14], [ox, oy - 30], 12).slice(1)), true);
   },
+  // colour: each figure on its own pale ground, as plates were printed on tinted papers
+  under(lt) {
+    const tints = [HUE.sky, HUE.sea, HUE.sand, HUE.gold];
+    this.cells.forEach((c, i) => { if (this.only == null || this.only === i) wash(c.inner, tints[i], 0.16 * easeInOut(prog(lt, 0.4 + i * 0.25, 1.4))); });
+  },
   draw(lt) {
     // (the v3 table heading is left out: under the gala framing it fell off the frame, and the words column names the programme)
     // only: one figure alone (its index), when the cut wants one research image rather than the plate of four

@@ -52,6 +52,13 @@ scene({
     const mx = az => RAIL.cx + RAIL.f * Math.tan((az - RAIL.azC) * Math.PI / 180 - psi);
     const ridge = this.sky.map(([az, a]) => [mx(az), RAIL.hz - RAIL.f * Math.tan(a * Math.PI / 180)]);
     const rp = new P(ridge), rf = new P(ridge.concat([[ridge[ridge.length - 1][0], RAIL.hz], [ridge[0][0], RAIL.hz]]), true);
+    if (OPT.colour) { // a clear sky down to the computed skyline, the Hajar in its rust, the plain in sand (the train keeps no colour:
+      // its livery is not shown until Etihad Rail clears it)
+      const skyP = new P(ridge.concat([[ridge[ridge.length - 1][0], RAIL.y0 - 10], [ridge[0][0], RAIL.y0 - 10]]), true);
+      washFade([RAIL.x0, RAIL.y0, RAIL.x1, RAIL.hz], [[0, HUE.sky, 0.12], [0.6, HUE.sky, 0.36], [1, HUE.dawn, 0.22]], 0, q, skyP);
+      wash(rf, HUE.hill, 0.34 * q);
+      washFade([RAIL.x0, RAIL.hz, RAIL.x1, RAIL.y1], [[0, HUE.sand, 0.3], [1, HUE.dune, 0.45]], 0, q);
+    }
     hatch(rf, [RAIL.x0, RAIL.hz - 60, RAIL.x1, RAIL.hz], -1.3, 6, q, SEPIA, 0.7, 0.25, 811); stroke(rp, q, INK, 1.1, 0.5);
     // a faint dust veil along the horizon, nothing more: the day is clear
     hatch(new P([[RAIL.x0, RAIL.hz - 70], [RAIL.x1, RAIL.hz - 70], [RAIL.x1, RAIL.hz], [RAIL.x0, RAIL.hz]], true), [RAIL.x0, RAIL.hz - 70, RAIL.x1, RAIL.hz], 0, 6, q, OCHRE, 0.7, 0.12, 815);
@@ -59,8 +66,8 @@ scene({
     this.palms.forEach(p => {
       const x = mx(p.az), top = RAIL.hz - RAIL.f * (p.h - RAIL.eye) / p.dist, base = RAIL.hz + RAIL.f * RAIL.eye / p.dist;
       if (x < RAIL.x0 || x > RAIL.x1) return;
-      stroke(new P([[x, base], [x + p.lean * (base - top), top]]), q, INK, 1, 0.45);
-      for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + (k - 2) * 0.55; stroke(new P([[x + p.lean * (base - top), top], [x + p.lean * (base - top) + 5 * Math.cos(a), top + 3 + 4 * Math.sin(a) * -0.5]]), q, INK, 0.9, 0.45); }
+      stroke(new P([[x, base], [x + p.lean * (base - top), top]]), q, OPT.colour ? '#5A3A22' : INK, 1, 0.45);
+      for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + (k - 2) * 0.55; stroke(new P([[x + p.lean * (base - top), top], [x + p.lean * (base - top) + 5 * Math.cos(a), top + 3 + 4 * Math.sin(a) * -0.5]]), q, OPT.colour ? '#3F6A2A' : INK, 0.9, OPT.colour ? 0.7 : 0.45); }
     });
     stroke(new P([[RAIL.x0, RAIL.hz + 1], [RAIL.x1, RAIL.hz + 1]]), q, INK, 0.8, 0.35);
     // the plain: sparse ground hatching that closes up toward the horizon
@@ -74,7 +81,7 @@ scene({
     berm.forEach(f => fill(f, SEPIA, 0.12 * q));
     farSlope.forEach(f => fill(f, SEPIA, 0.1 * q));
     const nearSlope = strips(-8.5, 0, -3.5, ez), top = strips(-3.5, ez, 8, ez);
-    nearSlope.forEach(f => { mask(f); hatch(f, [RAIL.x0, RAIL.hz - 20, RAIL.x1, RAIL.y1], 0.25, 5, q, SEPIA, 0.9, 0.35, 812); });
+    nearSlope.forEach(f => { mask(f); if (OPT.colour) wash(f, HUE.dune, 0.32 * q); hatch(f, [RAIL.x0, RAIL.hz - 20, RAIL.x1, RAIL.y1], 0.25, 5, q, SEPIA, 0.9, 0.35, 812); });
     top.forEach(f => fill(f, SEPIA, 0.14 * q));
     const edge = (o, z) => { const pts = []; for (let a = S0; a <= S1; a += 20) { const [X, Y] = this.at(a, o), p = this.proj(X, Y, z, psi); if (p) pts.push([p[0], p[1]]); } return new P(pts); };
     stroke(edge(-8.5, 0), q, INK, 1, 0.55); stroke(edge(-3.5, ez), q, INK, 1, 0.6); stroke(edge(8, ez), q, INK, 0.8, 0.45); stroke(edge(16, 0), q, INK, 0.7, 0.35);

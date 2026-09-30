@@ -82,9 +82,15 @@ scene({
     ctx.save(); ctx.globalCompositeOperation = 'screen';
     const glow = ctx.createLinearGradient(0, FINALE_VIEW.hz - 200, 0, FINALE_VIEW.hz);
     glow.addColorStop(0, 'rgba(0,0,0,0)'); glow.addColorStop(1, `rgba(120,90,70,${0.35 * fade})`);
-    ctx.fillStyle = glow; ctx.fillRect(0, FINALE_VIEW.hz - 200, W, 200); ctx.restore();
+    ctx.fillStyle = glow; ctx.fillRect(0, FINALE_VIEW.hz - 200, W, 200);
+    if (OPT.colour) { // colour: the city's warm glow under a violet band (20:00, long after sunset: no twilight is painted)
+      const cg = ctx.createLinearGradient(0, FINALE_VIEW.hz - 340, 0, FINALE_VIEW.hz);
+      cg.addColorStop(0, 'rgba(0,0,0,0)'); cg.addColorStop(0.5, `rgba(96,72,150,${0.2 * fade})`); cg.addColorStop(1, `rgba(236,146,92,${0.42 * fade})`);
+      ctx.fillStyle = cg; ctx.fillRect(0, FINALE_VIEW.hz - 340, W, 340);
+    }
+    ctx.restore();
     const cq = easeOut(prog(t, 0.2, 2.0)), hz = FINALE_VIEW.hz, E = this.etihad;
-    const sil = (path, lw = 1.1) => { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = cq; ctx.fillStyle = '#05060B'; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore(); stroke(path, cq, INK, lw, 0.2); };
+    const sil = (path, lw = 1.1) => { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = cq; ctx.fillStyle = OPT.colour ? '#070A18' : '#05060B'; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore(); stroke(path, cq, INK, lw, 0.2); };
     const lamp = (x, y, a, w = 2, h = 3) => { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a; ctx.fillStyle = '#F2C97A'; ctx.fillRect(x, y, w, h); ctx.restore(); };
     // the low shore across the water
     sil(new P([[0, hz], [0, hz - 5], [W, hz - 4], [W, hz]], true), 0.8);
@@ -101,7 +107,7 @@ scene({
     this.windows.forEach(ws => ws.forEach(([x, y, v]) => { const on = prog(t, 1.0 + v * 3, 0.6); if (on > 0) lamp(x, y, 0.6 * on * (0.6 + 0.4 * v), 4, 6); }));
     ctx.restore();
     // the water in front: dark, with each light's reflection drawn down as a faint, shimmering column
-    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#04050A'; ctx.fillRect(0, hz, W, H - hz); ctx.restore();
+    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = OPT.colour ? '#0A1230' : '#04050A'; ctx.fillRect(0, hz, W, H - hz); ctx.restore();
     stroke(ln(0, hz, W, hz, 790, 0.4), fade, INK, 1, 0.25);
     const refl = (x, a, len, ph) => { const s = 0.5 + 0.5 * this.tw(t0, ph, 1.7); ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a * (0.6 + 0.4 * s); const g = ctx.createLinearGradient(0, hz, 0, hz + len); g.addColorStop(0, '#F2C97A'); g.addColorStop(1, 'rgba(242,201,122,0)'); ctx.fillStyle = g; ctx.fillRect(x - 1, hz + 2, 2, len); ctx.restore(); };
     const rq = cq * easeOut(prog(t, 2.0, 2.0));

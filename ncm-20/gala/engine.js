@@ -13,12 +13,18 @@ const SCALE = Number(new URLSearchParams(location.search).get('scale')) || 1; //
 // ?grade=led: the LED-wall grade for a dark hall. Parchment at about two-thirds of the web grade's luminance
 // with a deeper vignette, so the page does not glare into the front rows. A starting point for calibration.
 const GRADE = new URLSearchParams(location.search).get('grade') || 'web';
-const OPT = (q => ({ vo: q.has('vo'), tc: q.has('tc'), fadeout: Number(q.get('fadeout') || 0) }))(new URLSearchParams(location.search));
+const OPT = (q => ({ vo: q.has('vo'), tc: q.has('tc'), fadeout: Number(q.get('fadeout') || 0), colour: q.has('colour') || q.has('color') }))(new URLSearchParams(location.search));
 // Two themes: ink on parchment by day; light on a dark sky by night. Helpers read these at call time.
 const DAY = { INK: '#1D1813', RED: '#B3391D', BLUE: '#28478C', OCHRE: '#C9973B', SEPIA: '#6E6253', BLEND: 'multiply' };
 const NIGHT = { INK: '#F1E4C8', RED: '#F08A63', BLUE: '#9DB9EE', OCHRE: '#F3C862', SEPIA: '#B9AC98', BLEND: 'screen' };
 let INK = DAY.INK, RED = DAY.RED, BLUE = DAY.BLUE, OCHRE = DAY.OCHRE, SEPIA = DAY.SEPIA, BLEND = DAY.BLEND, IS_NIGHT = false;
 const GOLD = '#C9973B';
+// ?colour: the plates hand-coloured, as engravings and maps were: transparent washes over the printed line (multiply),
+// so the paper grain and every line show through. Earth colours of the land and sea; never a red wash (no alert or
+// war-graphic reading), and every emirate in one colour. Each scene lays its washes in plate space: under(t) before its
+// line-work (the plate's paper masks then cut it away behind objects), over(t) after it, for the objects themselves.
+const HUE = { sea: '#2F9AA6', deep: '#1F5E8C', sky: '#6FA8D6', dawn: '#F2A36B', rose: '#E39A86', sand: '#E0A45C', dune: '#D98C4A',
+  hill: '#B06A4A', leaf: '#6E9A4E', teak: '#9A5B34', sail: '#EBD3A0', gold: '#D9A23A', water: '#3F8FC4', cloud: '#8FA9C9', steel: '#7F93A6' };
 const cv = document.getElementById('film');
 cv.width = W * SCALE; cv.height = H * SCALE;
 let ctx = cv.getContext('2d'); // helpers draw on ctx; during a crossfade it points at LAYER
@@ -138,6 +144,49 @@ function stroke(path, p = 1, col = INK, lw = 2, a = 0.92, dash = null, dashOff =
   if (dash) { ctx.setLineDash(dash); ctx.lineDashOffset = dashOff; }
   ctx.beginPath(); path.trace(ctx, p); ctx.stroke();
   ctx.restore();
+}
+function wash(paths, col, a = 0.5, rule = 'nonzero') { // a transparent wash inside closed paths ('evenodd': a band between two)
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = SA * Math.min(1, a); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = col;
+  ctx.beginPath(); [].concat(paths).forEach(q => q.trace(ctx, 1)); ctx.fill(rule); ctx.restore();
+}
+// a graded wash over a box, clipped to paths if given: stops [[offset, colour, alpha], ...] from (x0, y0) to (x1, y1)
+function washGrad(box, from, to, stops, a = 1, clip = null) {
+  if (a <= 0) return;
+  const [x0, y0, x1, y1] = box;
+  ctx.save();
+  if (clip) { ctx.beginPath(); [].concat(clip).forEach(q => q.trace(ctx, 1)); ctx.clip(); }
+  const g = ctx.createLinearGradient(from[0], from[1], to[0], to[1]);
+  stops.forEach(([o, c, al]) => { const n = parseInt(c.slice(1), 16); g.addColorStop(o, `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${al})`); });
+  ctx.globalAlpha = SA * Math.min(1, a); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  ctx.restore();
+}
+const boxP = (x0, y0, x1, y1) => new P([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], true); // a closed rectangle path
+// a graded wash (top to bottom) whose ends feather out over fade px, as a brush wash does: painted on a scratch sheet
+// limited to its own box, then laid on the page in multiply. clip: paths the wash stays inside ('evenodd': between them).
+let WASH_CV, WASH;
+function washFade(box, stops, fade = 120, a = 1, clip = null, rule = 'nonzero') {
+  if (a <= 0) return;
+  if (!WASH_CV) { WASH_CV = document.createElement('canvas'); WASH_CV.width = W * SCALE; WASH_CV.height = H * SCALE; WASH = WASH_CV.getContext('2d'); }
+  const [x0, y0, x1, y1] = box, m = ctx.getTransform();
+  const pts = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]);
+  const bx0 = Math.max(0, Math.floor(Math.min(...pts.map(p => p[0])))), by0 = Math.max(0, Math.floor(Math.min(...pts.map(p => p[1]))));
+  const bx1 = Math.min(W * SCALE, Math.ceil(Math.max(...pts.map(p => p[0])))), by1 = Math.min(H * SCALE, Math.ceil(Math.max(...pts.map(p => p[1]))));
+  if (bx1 <= bx0 || by1 <= by0) return;
+  const g = WASH;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(bx0, by0, bx1 - bx0, by1 - by0); g.setTransform(m);
+  if (clip) { g.beginPath(); [].concat(clip).forEach(q => q.trace(g, 1)); g.clip(rule); }
+  const v = g.createLinearGradient(0, y0, 0, y1);
+  stops.forEach(([o, c, al]) => { const n = parseInt(c.slice(1), 16); v.addColorStop(o, `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${al})`); });
+  g.fillStyle = v; g.fillRect(x0, y0, x1 - x0, y1 - y0);
+  if (fade > 0) {
+    const f = Math.min(0.5, fade / (x1 - x0)), h = g.createLinearGradient(x0, 0, x1, 0);
+    h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(f, 'rgba(0,0,0,1)'); h.addColorStop(1 - f, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalCompositeOperation = 'destination-in'; g.fillStyle = h; g.fillRect(x0, y0, x1 - x0, y1 - y0);
+  }
+  g.restore();
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = SA * Math.min(1, a); ctx.globalCompositeOperation = 'multiply';
+  ctx.drawImage(WASH_CV, bx0, by0, bx1 - bx0, by1 - by0, bx0, by0, bx1 - bx0, by1 - by0); ctx.restore();
 }
 function fill(path, col, a = 1) {
   if (a <= 0) return;
@@ -540,7 +589,8 @@ function makeNight() {
   const g = c.getContext('2d'), r = rng(23);
   g.scale(SCALE, SCALE);
   const sky = g.createLinearGradient(0, 0, 0, H);
-  sky.addColorStop(0, '#05070F'); sky.addColorStop(0.55, '#0B1122'); sky.addColorStop(0.8, '#141A2C'); sky.addColorStop(1, '#0D1120');
+  if (OPT.colour) { sky.addColorStop(0, '#050A1E'); sky.addColorStop(0.5, '#0B1840'); sky.addColorStop(0.78, '#1A2B5E'); sky.addColorStop(1, '#141E44'); }
+  else { sky.addColorStop(0, '#05070F'); sky.addColorStop(0.55, '#0B1122'); sky.addColorStop(0.8, '#141A2C'); sky.addColorStop(1, '#0D1120'); }
   g.fillStyle = sky; g.fillRect(0, 0, W, H);
   for (let i = 0; i < 40; i++) {
     const x = r() * W, y = r() * H, rad = 120 + r() * 420, a = 0.02 + r() * 0.03;
@@ -614,7 +664,9 @@ function drawScene(s, lt) {
   const off = s.offset || 0, wl = lt * (s.speed || 1), sl = s.warp ? s.warp(lt) : off + wl;
   ctx.save();
   if (s.cam) camera(s.cam(sl, lt));
+  if (OPT.colour && s.under) s.under(sl, lt);
   s.draw(sl, lt);
+  if (OPT.colour && s.over) s.over(sl, lt);
   ctx.restore();
   if (s.tint) { // a wash over the plate (not the words): the April sky greying and clearing
     const a = s.tint(s.start + lt);

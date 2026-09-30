@@ -66,6 +66,13 @@ scene({
     this.buoy = new P([[-14, 0], [14, 0], [9, -26], [-9, -26]], true);
     this.buoyMast = ln(0, -26, 0, -62, 580, 0.1);
   },
+  // colour: a clear sky behind the cranes, the harbour water, the hull above her boot-top (cranes and liveries stay ink:
+  // none is verified)
+  under(lt) {
+    const q = easeInOut(prog(lt, 0.2, 1.2));
+    washFade([985, -300, 1885, 812], [[0, HUE.sky, 0.4], [0.75, HUE.sky, 0.28], [1, HUE.dawn, 0.22]], 150, q);
+    washFade([985, 812, 1885, 1010], [[0, HUE.sea, 0.6], [0.7, HUE.deep, 0.5], [1, HUE.deep, 0]], 130, q);
+  },
   draw(lt) {
     const lq = easeOut(prog(lt, 2.0, 0.8));
     // the quay and the yard behind it
@@ -95,6 +102,7 @@ scene({
     // the ship
     const hp = easeInOut(prog(lt, 0.4, 1.2));
     mask([this.hull, this.accom, this.bridge, this.funnel]);
+    if (OPT.colour) wash([this.hull, this.boot], HUE.deep, 0.42 * hp, 'evenodd');
     fill(this.boot, RED, 0.72 * hp); hatch(this.hull, [1070, 730, 1885, 812], 0.12, 8, hp, INK, 1, 0.28, 547);
     stroke(this.hullLine, hp, INK, 2.2); stroke(this.sheerLine, hp, INK, 1, 0.6); stroke(this.hatches, hp, INK, 1.2, 0.7);
     this.moor.forEach(m => stroke(m, prog(lt, 1.4, 0.6), INK, 1, 0.7));

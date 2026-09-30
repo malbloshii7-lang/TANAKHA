@@ -79,6 +79,9 @@ scene({
     this.chartBox = new P([[1030, 172], [1160, 172], [1160, 400], [1030, 400]], true);
     // the sea to the east of the coast: wavy lines from the shore to the box's edge
     const coastX = y => { const p = this.coastPts; for (let i = 1; i < p.length; i++) if (p[i][1] >= y) { const u = (y - p[i - 1][1]) / Math.max(1e-6, p[i][1] - p[i - 1][1]); return p[i - 1][0] + u * (p[i][0] - p[i - 1][0]); } return p[p.length - 1][0]; };
+    const cp = this.coastPts, cyN = cp[0][1], cyS = cp[cp.length - 1][1]; // colour: the sea east of the coast, the land west of it
+    this.chartSeaA = new P(cp.concat([[1160, cyS], [1160, cyN]]), true);
+    this.chartLandA = new P(cp.concat([[1030, cyS], [1030, cyN]]), true);
     this.chartSea = []; for (let y = 180; y < 398; y += 15) { const x0 = coastX(y) + 5, pts = []; for (let x = x0; x <= 1155; x += 5) pts.push([x, y + 1.2 * Math.sin((x - x0) * 0.35 + y)]); if (pts.length > 1) this.chartSea.push(new P(pts)); }
     this.textLines = []; for (let j = 0; j < 11; j++) this.textLines.push({ y: 186 + j * 17, w: 70 + (j * 37) % 55 });
     this.sign = new P(wob([[1200, 390], [1212, 380], [1222, 392], [1232, 377], [1246, 391], [1262, 384], [1280, 386]], 970, 0.6));
@@ -87,7 +90,12 @@ scene({
     ctx.save(); ctx.beginPath(); ctx.rect(985, 100, 900, 900); ctx.clip();
     // the Hajar behind Fujairah, far and light
     const mq = easeInOut(prog(lt, 0.2, 1.4));
+    if (OPT.colour) { // a clear sky, the Sea of Oman deepening toward us (the ship keeps no colour: no livery)
+      washFade([985, 100, 1885, 610], [[0, HUE.sky, 0.1], [0.6, HUE.sky, 0.36], [1, HUE.dawn, 0.2]], 0, mq);
+      washFade([985, 604, 1885, 1000], [[0, HUE.water, 0.42], [1, HUE.deep, 0.62]], 0, easeOut(prog(lt, 0.3, 1.4)));
+    }
     mask(this.ridgeFill);
+    if (OPT.colour) wash(this.ridgeFill, HUE.hill, 0.32 * mq);
     hatch(this.ridgeFill, [985, 480, 1885, 610], -1.35, 6, mq, SEPIA, 0.8, 0.28, 905);
     stroke(this.ridgeP, mq, INK, 1.3, 0.6);
     stroke(this.shore, easeOut(prog(lt, 0.6, 1.0)), INK, 1, 0.5);
@@ -120,6 +128,7 @@ scene({
     const iq = easeOut(prog(lt, 0.8, 0.8));
     if (iq > 0) {
       mask(this.sheet); fill(this.sheet, SEPIA, 0.05 * iq); stroke(this.sheet, iq, INK, 1.4); stroke(this.sheetIn, iq, INK, 0.7, 0.6);
+      if (OPT.colour) { wash(this.chartSeaA, HUE.sea, 0.35 * iq); wash(this.chartLandA, HUE.sand, 0.35 * iq); }
       stroke(this.chartBox, iq, INK, 0.8, 0.6);
       this.chartSea.forEach(p => stroke(p, iq, BLUE, 0.9, 0.5));
       stroke(this.coast, iq, INK, 1.4, 0.85);

@@ -24,6 +24,8 @@ scene({
     const hf = hp.map(([u, v]) => [1440 + 440 * u, HZ - 118 * v]);
     this.hafeet = new P(wob(hf, 242, 0.6));
     this.hafeetFill = new P(hf.concat([[1880, HZ], [1440, HZ]]), true);
+    // for the colour washes: the sky down to the skyline
+    this.skyArea = new P([[985, -300]].concat(hj, [[1440, HZ]], hf, [[1885, HZ], [1885, -300]]), true);
     this.strata = [0.3, 0.55].map((f, k) => new P(wob(hf.slice(2, -2).map(([x, y]) => [x, y + f * (HZ - y) + 3]), 243 + k, 0.5)));
     // the ground in section, falling gently from the foothills to the oasis
     const S = [[985, 640], [1020, 612], [1060, 594], [1100, 590], [1140, 600], [1200, 622], [1280, 648], [1360, 670], [1440, 690], [1520, 706], [1600, 720], [1680, 730], [1760, 738], [1840, 744], [1885, 747]];
@@ -31,11 +33,13 @@ scene({
     this.ys = x => yOn(S, x);
     this.surface = pl(S, false, 150, 0.6);
     this.ground = new P(S.concat([[1885, 900], [985, 900]]), true);
+    this.plain = new P([[985, HZ], [1885, HZ]].concat(S.slice().reverse()), true);
     // the water table in the alluvium, and the saturated ground below it: it falls faster than the gallery, which lies below it
     // upstream (the stretch that gathers water) and above it downstream (the stretch that only carries it), so the fields stay dry
     const wt = [[985, 660], [1120, 668], [1380, 706], [1535, 730], [1650, 745], [1885, 772]];
     this.watertable = new P(wob(wt, 244, 0.4));
     this.wet = new P(wt.concat([[1885, 900], [985, 900]]), true);
+    this.dry = new P(S.concat(wt.slice().reverse()), true); // the ground above the water table
     // the channel floor falls more gently than the ground, so the water surfaces at the oasis
     const yg = x => 680 + 0.1 * (x - 1120); // gentler than the ground, and the slabs stay buried to the open channel
     this.yg = yg;
@@ -73,6 +77,16 @@ scene({
       return { trunk, fronds, top, s };
     });
   },
+  // colour: a morning sky to the skyline, the far plain in sand, the mountains in the Hajar's own rust
+  under(lt) {
+    const q = easeInOut(prog(lt, 0.3, 1.8));
+    washFade([985, -300, 1885, this.HZ], [[0, HUE.sky, 0.4], [0.75, HUE.sky, 0.3], [1, HUE.dawn, 0.2]], 150, q, this.skyArea);
+    washFade([985, this.HZ, 1885, 750], [[0, HUE.sand, 0.4], [1, HUE.dune, 0.45]], 150, q, this.plain);
+  },
+  over(lt) {
+    const q = easeInOut(prog(lt, 0.3, 1.8));
+    wash(this.hajarFill, HUE.hill, 0.3 * q); wash(this.hafeetFill, HUE.hill, 0.4 * q);
+  },
   draw(lt) {
     const HZ = this.HZ, yg = this.yg;
     // the far horizon: the Hajar to the east, Jebel Hafeet to the south
@@ -90,6 +104,10 @@ scene({
     // the ground in section, the water table and the wet alluvium below it
     const p0 = easeInOut(prog(lt, 0.3, 1.8));
     mask(this.ground);
+    if (OPT.colour) {
+      washFade([985, 580, 1885, 780], [[0, HUE.sand, 0.5], [1, HUE.dune, 0.55]], 0, p0, this.dry);
+      washFade([985, 650, 1885, 900], [[0, HUE.water, 0.3], [1, HUE.deep, 0.34]], 0, easeOut(prog(lt, 1.6, 1.2)), this.wet);
+    }
     fill(this.wet, BLUE, 0.07 * easeOut(prog(lt, 1.6, 1.2)));
     hatch(this.ground, [985, 580, 1885, 900], 0.9, 16, prog(lt, 1.0, 2.2), INK, 0.9, 0.16, 197);
     stroke(this.surface, p0, INK, 2);
@@ -121,8 +139,9 @@ scene({
     const lq = easeOut(prog(lt, 4.4, 0.8));
     this.palms.forEach((p, i) => {
       const q = easeOut(prog(lt, 5.8 + i * 0.3, 1.0));
-      stroke(p.trunk, q, INK, 3 * p.s, 0.9);
-      p.fronds.forEach((f, k) => stroke(f, easeOut(prog(lt, 6.4 + i * 0.3 + k * 0.05, 0.7)), INK, 1.6, 0.85));
+      stroke(p.trunk, q, OPT.colour ? '#5A3A22' : INK, 3 * p.s, 0.9);
+      p.fronds.forEach((f, k) => stroke(f, easeOut(prog(lt, 6.4 + i * 0.3 + k * 0.05, 0.7)), OPT.colour ? '#3F6A2A' : INK, OPT.colour ? 2.4 : 1.6, 0.85));
+      if (OPT.colour) wash(el(p.top[0], p.top[1] + 16 * p.s, 64 * p.s, 30 * p.s, 0, TAU, 1, 0), HUE.leaf, 0.2 * easeOut(prog(lt, 6.4 + i * 0.3, 1.0)));
       const dq2 = easeOut(prog(lt, 7.4 + i * 0.2, 0.6));
       for (let d = 0; d < 6; d++) disc(p.top[0] - 6 + (d % 3) * 6, p.top[1] + 14 + Math.floor(d / 3) * 6, 3.4 * dq2, OCHRE, 0.95);
     });

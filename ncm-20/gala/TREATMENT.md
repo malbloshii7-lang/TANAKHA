@@ -479,6 +479,57 @@ block, every narration line and every cue is identical to Revision 7's.
   - The English narration peaks at 22 characters a second (VO cue 17).
   - `qc/subs.py` reports this only. Nothing is re-timed or re-worded.
 
+## Revision 9 · 30 September 2026: more colour (a draft for approval)
+
+The requester passed on management's instruction: "More colorful". The cut, the words, the narration and the score are
+unchanged. The colour pass is a switch, `?colour`. Without it the film is the approved Revision 8, and its masters are
+untouched: 20 stills, one from every beat, are identical to the pixel. When the colour pass is approved, the masters
+are rendered again with it (row 41).
+
+**The approach.** The plates are hand-coloured, as engravings and maps were.
+- The colour is transparent washes laid over the printed line, so the paper grain and every line show through.
+- The palette is the country's own: the Gulf's turquoise and the deeper blue of the Sea of Oman; sand, dune and the
+  Hajar's rust; the green of the palms; a clear sky; gold for the instruments and the film's circle.
+- The night becomes blue instead of near-black, and stays dark enough for the hall.
+
+**Rules the colour keeps.**
+- Never a red wash, since red reads as an alert or a war graphic. The seven emirates share one colour, and their gold
+  wash still arrives together. The neighbours stay faint and unnamed.
+- No colour where none is verified. The locomotive's livery waits for Etihad Rail's clearance (row 35). The tanker
+  carries no livery, as before. The port's cranes stay ink.
+- The three leaders' cards are coloured alike: a teal and gold seal tint in the rosette and a deep blue between the
+  frame's rules. Their words stay ink on paper.
+- Nothing flashes. Each wash fades in with the drawing it colours.
+- The skies are true to the moment:
+  - the opening colours its computed twilight: a violet and rose band in the east that grows as the sun climbs;
+  - the finale, at 20:00 and long after sunset, has only the city's warm glow;
+  - in the stage loops every colour stands still, so they still join seamlessly.
+
+**Beat by beat.**
+- **Durour:** each season's petals in its colour, and a dawn sky over sand in the medallion.
+- **Monsoon and pearling:**
+  - the Gulf in section, turquoise deepening to the bank, with sand on the bed;
+  - teak hulls and a warm palm-mat sail;
+  - the compass cards gilded.
+- **Falaj:**
+  - the sky cut at the true skyline, the Hajar and Jebel Hafeet in rust;
+  - the section's dry ground in sand and the saturated ground below the water table in water colour;
+  - green palms.
+- **Centre:** the radar scope in teal, the radome pale, the logbook cream.
+- **National map:** the Gulf and the Sea of Oman in turquoise, fading with the engraving; the land in sand.
+- **Airport, rail, port, tanker, energy:**
+  - a clear sky, desert either side, the runway grey;
+  - the Hajar in rust, harbour water and a deep-blue hull above the boot-top;
+  - the Sea of Oman deepening toward the eye;
+  - a warm halo about the sun, and the troughs holding the sky.
+- **Seeding and science:**
+  - a clear sky with the cumulus left white;
+  - the cloud's base in a cool shade that deepens as the seeding takes hold;
+  - each figure on its own pale ground.
+- **World:** the globe's sea lit from the upper left, and a gold armillary ring. The labels on the globe sit on clean sea.
+- **Gauge:** the sky clearing behind the glass after the shower, and the water column in blue.
+
+
 ## 1. Purpose and audience
 
 **Why this film exists.** It opens the ceremony. In 2 minutes 38 seconds it has to tell a room of UAE ministers, the Center's leadership and staff, partners and international guests one thing: *the people of this land have always read the sky; for twenty years the National Center of Meteorology has done it for the whole nation; now the world listens.*
@@ -1385,6 +1436,7 @@ Every number on screen, its qualifier and its source:
 | 38 | Which mix on the night: the full mix, or the restrained mix (no drums, tus, claps or jahla) if the ceremony falls in Ramadan (expected about 8 February to 9 March 2027) or a period of mourning | Propriety | NCM protocol | Full mix; restrained mix delivered |
 | 39 | The leaders' cards' reading time: lengthen all three equally (for example to 15 s each, adding about 10 s) or trim their English | The rule of 3 s plus 0.3 s a word; equal treatment | Protocol office | 11.7 s beats as built |
 | 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
+| 41 | **The colour pass (Revision 9, `?colour`):** adopt it for the ceremony masters, and if so as drafted or more restrained. Management asked for the film to be "More colorful" | The look of the whole film in the hall; the LED grade is calibrated on the wall with it | Requester and NCM | The approved Revision 8 look; the colour pass is delivered as a subtitled review copy |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

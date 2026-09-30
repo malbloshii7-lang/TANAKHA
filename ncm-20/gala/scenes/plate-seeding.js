@@ -103,6 +103,8 @@ scene({
     this.terrain = [[985, 940]].concat([[985,873.2],[992,872.4],[999,871.2],[1007,870.4],[1014,869.6],[1021,867.2],[1028,861.0],[1035,858.3],[1043,858.8],[1050,860.5],[1057,861.1],[1064,859.9],[1071,858.8],[1079,859.4],[1086,860.5],[1093,862.5],[1100,863.6],[1107,861.6],[1115,862.1],[1122,862.2],[1129,867.9],[1136,872.1],[1143,877.1],[1151,875.4],[1158,875.4],[1165,871.6],[1172,871.7],[1179,874.2],[1187,875.1],[1194,879.0],[1201,877.6],[1208,882.5],[1215,883.9],[1223,885.8],[1230,887.5],[1237,889.2],[1244,890.2],[1251,891.2],[1259,892.4],[1266,890.9],[1273,890.6],[1280,890.1],[1287,889.1],[1295,886.5],[1302,885.4],[1309,886.1],[1316,885.5],[1323,886.3],[1331,884.7],[1338,885.0],[1345,885.9],[1352,885.1],[1359,883.4],[1367,881.0],[1374,879.7],[1381,878.3],[1388,877.4],[1395,876.7],[1403,874.7],[1410,873.6],[1417,873.0],[1424,872.5],[1431,872.8],[1439,873.4],[1446,874.0],[1453,873.6],[1460,874.4],[1467,874.0],[1475,871.6],[1482,870.0],[1489,867.9],[1496,865.9],[1503,863.5],[1511,861.8],[1518,862.7],[1525,864.2],[1532,864.5],[1539,863.0],[1547,861.7],[1554,858.1],[1561,856.3],[1568,856.6],[1575,859.1],[1583,854.5],[1590,853.3],[1597,852.1],[1604,852.3],[1611,852.5],[1619,852.5],[1626,851.5],[1633,848.9],[1640,846.4],[1647,843.2],[1655,841.7],[1662,839.9],[1669,837.5],[1676,833.4],[1683,830.6],[1691,829.5],[1698,826.6],[1705,828.1],[1712,829.0],[1719,828.5],[1727,828.8],[1734,831.6],[1741,834.6],[1748,835.0],[1755,836.2],[1763,838.2],[1770,844.7],[1777,848.2],[1784,853.2],[1791,854.0],[1799,856.5],[1806,857.7],[1813,859.3],[1820,860.4],[1827,861.5],[1835,862.8],[1842,862.9],[1849,864.4],[1856,865.2],[1863,865.2],[1871,866.1],[1878,864.4],[1885,862.3]], [[1885, 940]]);
     this.ground = pl(this.terrain.slice(1, -1), false, 271, 0.5); // the ridge line only: the plate's edges cut the view, no cliffs
     this.groundFill = new P(this.terrain.concat([[1885, 1006], [985, 1006]]), true);
+    const ridge = this.terrain.slice(1, -1);
+    this.skyArea = new P([[ridge[0][0], -300]].concat(ridge, [[ridge[ridge.length - 1][0], -300]]), true); // colour: the sky to the skyline
     this.hero = [1450, 489]; // the droplet the next plate opens from
     // aircraft, local coordinates (nose to the right)
     this.fuse = el(0, 0, 70, 10, 0, TAU, 272, 0.2);
@@ -121,9 +123,19 @@ scene({
   // camera plate x 930 is already on screen and 1905 is mid-frame, so the aircraft flies in from off the left edge and
   // keeps flying until the iris into the science covers it (the v3 plate's frame ran only from 930 to 1905)
   planeX(lt) { return 930 + (lt - 1.4) * (980 / 6.2); },
+  // colour: a clear sky to the Hajar's skyline (the cloud's turrets paint their own paper, so it stays white), the cloud's
+  // base in a cool shade that deepens as the seeding takes hold, the mountains in their rust
+  under(lt) {
+    washFade([985, -300, 1885, 900], [[0, HUE.sky, 0.44], [0.8, HUE.sky, 0.32], [1, HUE.dawn, 0.22]], 150, easeInOut(prog(lt, 0.3, 1.6)), this.skyArea);
+  },
+  over(lt) {
+    const sp = easeOut(prog(lt, 1.0, 1.8)), wet = easeInOut(prog(lt, 3.8, 2.4));
+    washFade([1100, 380, 1770, 506], [[0, HUE.cloud, 0], [1, HUE.cloud, 0.34 + 0.2 * wet]], 80, sp, this.turrets.map(c => c.body));
+  },
   draw(lt) {
     // ground
-    mask(this.groundFill); hatch(this.groundFill, [985, 780, 1885, 1012], -1.2, 8, prog(lt, 1.0, 1.6), SEPIA, 0.9, 0.3, 273);
+    mask(this.groundFill);
+    if (OPT.colour) washFade([985, 780, 1885, 1010], [[0, HUE.hill, 0.45], [1, HUE.dune, 0.4]], 0, prog(lt, 1.0, 1.6), this.groundFill); hatch(this.groundFill, [985, 780, 1885, 1012], -1.2, 8, prog(lt, 1.0, 1.6), SEPIA, 0.9, 0.3, 273);
     stroke(this.ground, easeInOut(prog(lt, 0.6, 1.6)), INK, 1.8);
     // the cloud, engraved turret by turret: paper, then contour hatching in each turret's shadow (a lighter outer band
     // and a darker core), then its visible edge; last, the flat base in shade, darkening as the seeding takes hold

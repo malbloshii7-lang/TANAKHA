@@ -62,9 +62,20 @@ scene({
     const op = easeInOut(prog(lt, -1.1, 1.4));
     const rp = easeInOut(prog(lt, 1.0, 2.0)), sf = (lt * 0.045) % 1;
     const sat = () => { const [sx, sy] = this.ring.at(sf); disc(sx, sy, 5, INK, 0.9); disc(sx, sy, 2.5, OCHRE, 1); };
-    stroke(this.ringBack, clamp(rp * 2 - 1), SEPIA, 1.2, 0.65);
+    const ringCol = OPT.colour ? GOLD : SEPIA;
+    stroke(this.ringBack, clamp(rp * 2 - 1), ringCol, 1.2, 0.65);
     if (lt > 3 && sf >= 0.5) sat();
     mask(new P(this.outline.pts, true));
+    // colour: the globe's sea, lit from the upper left and deepening to the limb; sea(x, y, w, h, a) lays it again over a
+    // label's paper patch where the patch lies on the globe, so a name sits on clean sea
+    const sea = (x, y, w, h, a) => {
+      if (!OPT.colour || a <= 0) return;
+      const g = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
+      g.addColorStop(0, 'rgba(111,168,214,0.3)'); g.addColorStop(0.7, 'rgba(47,154,166,0.46)'); g.addColorStop(1, 'rgba(31,94,140,0.62)');
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+      ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(x, y, w, h); ctx.restore();
+    };
+    sea(cx - R, cy - R, 2 * R, 2 * R, op);
     stroke(this.outline, op, INK, 2.2);
     // graticule every 15°
     const gp = easeOut(prog(lt, -0.5, 1.6));
@@ -84,7 +95,7 @@ scene({
       ctx.restore();
     }
     // the armillary ring and a small satellite on it
-    stroke(this.ringFront, clamp(rp * 2), SEPIA, 1.2, 0.65);
+    stroke(this.ringFront, clamp(rp * 2), ringCol, 1.2, 0.65);
     if (lt > 3 && sf < 0.5) sat();
     // home and arcs
     const [hx, hy] = P2(...this.home);
@@ -98,6 +109,7 @@ scene({
       const w = Math.max(textWidth('أبوظبي', `700 30px ${F_KUFI}`, 0, 'rtl'), textWidth('ABU DHABI', `600 14px ${F_MONO}`, 2)) + 12;
       ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * hp; ctx.fillStyle = PAPER_PAT;
       ctx.fillRect(hx - 18 - w + 6, hy + 8, w, 66); ctx.restore();
+      sea(hx - 18 - w + 6, hy + 8, w, 66, 0.92 * hp);
     }
     this.places.forEach(pl => {
       const [ex, ey, vis] = P2(...pl.ll), lq = easeOut(prog(lt, pl.t, 0.8));
@@ -105,6 +117,7 @@ scene({
       const right = pl.side ? pl.side === 'right' : ex > cx, lx = right ? ex + 14 : ex - 14, w = Math.max(textWidth(pl.ar, `700 28px ${F_KUFI}`, 0, 'rtl'), textWidth(pl.label, `600 14px ${F_MONO}`, 2) + 2 * pl.label.length) + 8;
       ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA * 0.92 * lq; ctx.fillStyle = PAPER_PAT;
       ctx.fillRect(right ? lx - 4 : lx - w + 4, ey - 24, w, 64); ctx.restore();
+      sea(right ? lx - 4 : lx - w + 4, ey - 24, w, 64, 0.92 * lq);
     });
     smallAr('أبوظبي', hx - 18, hy + 36, hp, { size: 30, align: 'right', weight: 700, a: 0.9 });
     small('ABU DHABI', hx - 18, hy + 66, hp, { size: 14, ls: 2, align: 'right', weight: 600, a: 0.7 });

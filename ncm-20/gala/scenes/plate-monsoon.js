@@ -64,6 +64,16 @@ scene({
     ];
     this.scale = ln(1846, 826, 1846, 576, 70, 0.3);
   },
+  // colour: the Gulf under the ship, deepening away from the surface, a pale sky over it; the chart's rose on old paper
+  under(lt) {
+    const q = easeOut(prog(lt, 0.6, 1.6));
+    washFade([990, 826, 1880, 992], [[0, HUE.sea, 0.6], [0.7, HUE.deep, 0.55], [1, HUE.deep, 0]], 120, q);
+    washFade([990, 610, 1880, 826], [[0, HUE.sky, 0], [0.75, HUE.sky, 0.28], [1, HUE.dawn, 0.3]], 160, q);
+  },
+  over(lt) {
+    const { cx, cy } = this, z = 1 + 0.025 * easeInOut(prog(lt, 0, 11));
+    wash(el(cx, cy, 268 * z, 268 * z, 0, TAU, 1, 0), HUE.gold, 0.16 * easeInOut(prog(lt, 0.3, 1.8)));
+  },
   draw(lt) {
     const { cx, cy } = this;
     ctx.save();
@@ -104,6 +114,7 @@ scene({
     const fq = easeOut(prog(lt, 3.4, 0.6)); // crew: the helmsman aft, two hands forward; the hull hides their legs
     if (fq > 0) this.crew.forEach(([x, y]) => { disc(x, y - 23, 3.8 * fq, INK, 0.85); stroke(new P([[x - 4.5, y - 16], [x, y - 18.5], [x + 4.5, y - 16]]), fq, INK, 2.2, 0.85); stroke(new P([[x, y - 18], [x, y - 7]]), fq, INK, 3, 0.85); });
     mask([this.hull, this.rudder]);
+    if (OPT.colour) wash([this.hull, this.rudder], HUE.teak, 0.5 * hp);
     hatch(this.hull, [-200, -80, 210, 50], 0.18, 7, hp, INK, 1, 0.3, 43);
     stroke(this.hull, hp, INK, 2.1); stroke(this.rail, hp, INK, 1.3, 0.8);
     this.seamP.forEach((q, k) => stroke(q, prog(lt, 1.4 + k * 0.15, 1.0), INK, 0.9, 0.6));
@@ -119,6 +130,7 @@ scene({
     stroke(this.mast, prog(lt, 1.8, 0.8), INK, 2.4);
     if (sp > 0) {
       fill(this.sail, OCHRE, 0.24 * sp);
+      if (OPT.colour) wash(this.sail, HUE.dawn, 0.3 * sp);
       ctx.save(); ctx.beginPath(); this.sail.trace(ctx, 1); ctx.clip();
       this.sailMat.forEach(q => stroke(q, sp, SEPIA, 0.7, 0.4));
       ctx.restore();

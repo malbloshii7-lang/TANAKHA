@@ -56,6 +56,14 @@ scene({
     // windsock, to scale: a ~9 m pole about 60 m left of the centre line
     this.pole = ln(1104, 849, 1104, 799, 530, 0.1);
   },
+  // colour: a morning sky over the horizon (the fog banks, paper, burn off through it), desert either side, a grey runway
+  under(lt) {
+    const { VX, HY, Y, HW } = this, q = easeInOut(prog(lt, 0.2, 1.2));
+    const runway = new P([[VX - HW(0), Y(0)], [VX + HW(0), Y(0)], [VX + HW(60), Y(60)], [VX - HW(60), Y(60)]], true);
+    washFade([985, -300, 1885, HY], [[0, HUE.sky, 0.4], [0.7, HUE.sky, 0.3], [1, HUE.dawn, 0.26]], 150, q);
+    washFade([985, HY, 1885, 1060], [[0, HUE.sand, 0.3], [1, HUE.dune, 0.45]], 150, q, [boxP(985, HY, 1885, 1060), runway], 'evenodd');
+    wash(runway, HUE.steel, 0.32 * q);
+  },
   draw(lt) {
     const lq = easeOut(prog(lt, 4.6, 0.8));
     const { VX, HY, Y, HW, K } = this;
