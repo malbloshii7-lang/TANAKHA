@@ -437,8 +437,6 @@ def main(cues_path, out_dir):
         tk = st('tanker')
         sea_tk = A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5)
         sfx.add(sea_tk, tk - 0.3)
-        if FOLEY:  # gulls over the jetty
-            sfx.add(FOLEY.layer('gulls', en('tanker') - tk + 1.0, sea_tk, 8, hp=300), tk - 0.3)
         music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
         music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
     sfx.add(A.wind(en('energy') - st('energy') if SLOW else 5.0, gain=0.35, gust=0.12), st('energy'))

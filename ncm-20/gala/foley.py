@@ -34,7 +34,7 @@ the beat's own sound. audio.rng, the score's one seeded generator, is advanced e
 is still made, as the level reference), so every sound left synthesized renders sample for sample as in the build
 without --foley; the recordings' choices (which stretch of a bed, which round robin) come from foley's own generator,
 so the score still renders the same every time. score.py adds a few layers only when this module is installed (FOLEY):
-crickets under the night sky, gulls over the jetty and the port, the quay cranes' twistlocks, the operations room's
+crickets under the night sky, gulls over the port, the quay cranes' twistlocks, the operations room's
 keyboards and air.
 
 SOURCES (each a git checkout in DIR, at the commit named):

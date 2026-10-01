@@ -35,15 +35,10 @@
 // from the sun; the shore and the foot of the hills from the same tiles. Nothing ashore is drawn: no tank farm, terminal,
 // pipe rack or manifold (the coastal strip stays a bare, far band); no single-point mooring, no other ship, no craft, no
 // buoy. Clear air: no smoke, haze plume, flare, glow, fire or backlight anywhere.
-// Life on the water (1 October 2026): four large gulls glide over the berth, the Steppe and Heuglin's gulls (Larus
-// fuscus barabensis, L. f. heuglini), common winter visitors and passage migrants on the UAE's coasts until late March
-// (UAE Checklist, Emirates Bird Records Committee, via uaebirding.com; Kalba and Fujairah beach records, Jan-Feb
-// 2015-16). Each is drawn at its true wingspan, 1.4 m (1.24-1.5 m), so small at its distance: the nearest glides high
-// (92 m) toward the eye, from 250 to 170 m away, the second away from it at 310-345 m, two more circle at 600-800 m. Their
-// wings are set as a gull's in a glide (the arm raised 15 deg, the hand angled 20 deg down: the 'M' that reads at this
-// size), at 9-10 m/s, banked to their turns; one gives three slow wingbeats. Mantles grey, wingtips black. The swell
-// (84 m, 7.4 s, from the east-south-east: deep water's own length for its period) runs through the sea's strokes as
-// before and now along the hull's waterline: the hull stands still, a laden ship on her moorings, while the water rises
+// Life on the water (1 October 2026): the swell. (Four gulls drawn gliding over the berth the same day were taken out
+// at the requester's direction: small dark shapes in the sky over an oil terminal read, in 2026, as attacking drones.)
+// The swell (84 m, 7.4 s, from the east-south-east: deep water's own length for its period) runs through the sea's
+// strokes as before and now along the hull's waterline: the hull stands still, a laden ship on her moorings, while the water rises
 // and falls 0.3 m along her side and the wash line under it opens on each crest, so the swell is seen running along her
 // from bow to stern.
 // The inset: NCM's east-coast marine bulletin, drafting itself line by line (the AI assistant prepares the draft), then
@@ -200,17 +195,6 @@ scene({
     this.sheet = new P([[X0, Y0], [X0 + 318, Y0], [X0 + 318, Y0 + 296], [X0, Y0 + 296]], true);
     this.sheetIn = new P([[X0 + 8, Y0 + 8], [X0 + 310, Y0 + 8], [X0 + 310, Y0 + 288], [X0 + 8, Y0 + 288]], true);
     this.sign = new P(wob([[X0 + 196, Y0 + 268], [X0 + 208, Y0 + 258], [X0 + 218, Y0 + 270], [X0 + 228, Y0 + 255], [X0 + 242, Y0 + 269], [X0 + 258, Y0 + 262], [X0 + 278, Y0 + 264]], 970, 0.6));
-    // the gulls: each glides round a circle (centre x, y in metres, radius, height) at v m/s, counter-clockwise when w is
-    // 1, from angle a0 at t 0; flap: the centre and half-length (scene s) of a bout of slow wingbeats. The nearest glides
-    // high toward the eye and passes across the frame, its spread wings (the gull's 'M') facing it; the second glides
-    // away, bearing a little east-north-east against the drift the camera's swing round the berth gives near things
-    // (about 6 m/s at its distance), so it holds its place; the two farther ones circle, showing their span, then their side
-    this.gulls = [
-      { c: [569, -542], R: 300, z: 92, v: 9.5, w: 1, a0: -2.58, ph: 0.2 },
-      { c: [510, -682], R: 220, z: 60, v: 9.5, w: -1, a0: 3.065, ph: 1.3, flap: [4.1, 0.75] },
-      { c: [125, -368], R: 28, z: 60, v: 9, w: 1, a0: -2.953, ph: 2.1 },
-      { c: [137, -159], R: 32, z: 24, v: 9.5, w: -1, a0: 5.989, ph: 0.7 }
-    ];
   },
   // is a point of the sea plane short of the shore (the computed coast along its bearing from the ranges' eye)
   onWater(p) {
@@ -320,7 +304,6 @@ scene({
       this.jetty(list, lt);
       R11.paint(list);
       this.drawShip(lt);
-      this.drawGulls(lt);
       this.drawInset(lt);
     });
     E3.sunAt();
@@ -402,42 +385,6 @@ scene({
   swell(x, y, lt) {
     const a1 = 300 * Math.PI / 180, a2 = 240 * Math.PI / 180;
     return -0.3 * Math.cos(TAU / 84 * (Math.sin(a1) * x + Math.cos(a1) * y) - TAU / 7.4 * lt + 0.25) - 0.06 * Math.cos(TAU / 23 * (Math.sin(a2) * x + Math.cos(a2) * y) - TAU / 3.8 * lt + 1.0);
-  },
-  // the gulls (see the notes at the top), each round its circle: seen from above at 450-870 m, a large gull in its glide,
-  // its two wings (the arm and the hand), body and tail, banked to its turn; inked with a doubled line and masked white
-  // (only the outer contour stays), the mantle toned grey on the side seen from above, the wingtips black
-  drawGulls(lt) {
-    const C = this.ec.C;
-    this.gulls.forEach(G => {
-      const th = G.a0 + G.w * G.v / G.R * lt, pos = [G.c[0] + G.R * Math.cos(th), G.c[1] + G.R * Math.sin(th), G.z + 1.5 * Math.sin(TAU * lt / 9 + G.ph)];
-      const h = th + G.w * Math.PI / 2, bank = G.w * Math.atan(G.v * G.v / (9.81 * G.R));
-      const fw = [Math.cos(h), Math.sin(h), 0], l0 = [-Math.sin(h), Math.cos(h)];
-      const up = [l0[0] * Math.sin(bank), l0[1] * Math.sin(bank), Math.cos(bank)], lf = [l0[0] * Math.cos(bank), l0[1] * Math.cos(bank), -Math.sin(bank)];
-      // the wings' set: the arm raised about 15 deg, the hand angled 20 deg down; a slow flex, and the bout of wingbeats
-      let din = 15 + 2 * Math.sin(TAU * lt / 4 + G.ph);
-      if (G.flap) { const u = (lt - G.flap[0]) / G.flap[1]; if (Math.abs(u) < 1) din += 24 * 0.5 * (1 + Math.cos(Math.PI * u)) * Math.sin(TAU * 2.4 * (lt - G.flap[0])); }
-      const ti = Math.tan(din * Math.PI / 180), to = Math.tan((din - 35) * Math.PI / 180);
-      const wz = y => (Math.abs(y) <= 0.33 ? (Math.abs(y) - 0.05) * ti : 0.28 * ti + (Math.abs(y) - 0.33) * to);
-      const B = (x, y, z) => [pos[0] + x * fw[0] + y * lf[0] + z * up[0], pos[1] + x * fw[1] + y * lf[1] + z * up[1], pos[2] + x * fw[2] + y * lf[2] + z * up[2]];
-      const sp = pts => pts.map(([x, y, z]) => E3.proj(B(x, y, z === undefined ? wz(y) : z)));
-      if (E3.depth(pos) < 50) return;
-      // the wings' mid-chord line from tip to tip, and its seen width: the chord as projected, never under 1.5 px, since the
-      // eye, from level with them to 10 deg above, sees them nearly edge-on and a real gull there is a white 'M' a few
-      // pixels deep
-      const half = [[-0.14, 0.70], [-0.06, 0.55], [0.0, 0.33], [0.0, 0.05]];
-      const wing = sp(half.concat(half.slice().reverse().map(([x, y]) => [x, -y])).map(([x, y]) => [x, y]));
-      const c0 = E3.proj(B(0.1, 0.2, wz(0.2))), c1 = E3.proj(B(-0.1, 0.2, wz(0.2))), ww = Math.max(1.5, Math.hypot(c1[0] - c0[0], c1[1] - c0[1]));
-      const body = sp([[-0.33, 0, 0.02], [0.0, 0, 0.06], [0.3, 0, 0.04]]);
-      const d = E3.depth(pos), a = R11.air(d, 2600), seen = (up[0] * (C[0] - pos[0]) + up[1] * (C[1] - pos[1]) + up[2] * (C[2] - pos[2])) > 0;
-      // inked a little wider than the bird, then the bird laid in paper over it, so a fine contour stays round it
-      stroke(new P(wing), 1, INK, ww + 1.3, 0.85 * a);
-      stroke(new P(body), 1, INK, 2.9, 0.85 * a);
-      JT.paperLine(wing, ww);
-      JT.paperLine(body, 1.7);
-      // the grey mantle across the arms (seen from above), the black wingtips
-      if (seen) stroke(new P(wing.slice(2, 6)), 1, INK, ww * 0.75, 0.14 * a);
-      [wing.slice(0, 2), wing.slice(6, 8)].forEach(tp => stroke(new P(tp), 1, INK, ww + 0.5, 0.8 * a));
-    });
   },
   // shadows the morning sun throws on the water (away from it, to the west-north-west): each convex solid's corners
   // carried down the sun's rays to the sea

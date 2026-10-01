@@ -825,7 +825,8 @@ airport, Jebel Ali at work, live radar on the watch wall, Shams 1's mirrors trac
 - *Soul.* Arabic coffee on the forecasters' desk: a brass dallah with its crescent beak and three finjan, true to size
   (Arabic coffee, UNESCO's list, 2015); dromedaries grazing and walking calmly outside Etihad Rail's camel fence while
   the freight passes (the line's camel fence and underpasses: Etihad Rail's civil-works specification; Gulf News, 11 Sep
-  2023); gulls gliding over the jetty at their true size, and a slow swell running along the moored tanker's waterline.
+  2023); a slow swell running along the moored tanker's waterline. (Gulls gliding over the jetty were taken out the same
+  day at the requester's direction: over an oil terminal in 2026 they read as attacking drones.)
 - *The music.* The score is rebuilt on the new bar lengths (not stretched further): sounds that belong to something drawn
   (the arrival's jet, the seeding aircraft and the rain from its cloud, the winds) follow the plates' slower clocks, and
   the watch's walk gains a bar (D minor, B flat, G minor, C). Every leader's card still measures above the world beat
@@ -844,7 +845,7 @@ have a sound effect of water not a mechanical generation sound."*
 - *The sound (`foley.py`, `score.py --foley`).* Every sound effect is now a field recording, or a physical model of an
   event no free recording covers: the falaj's water is a real stream babbling over stones (gluckose, CC0) where it was
   filtered noise under a regular pulse; the desert wind is Felix Blume's (CC0); the dhows' sea is water along a sailing
-  boat's hull with its timbers creaking; the jetty has lapping water and gulls; the seeding cloud's rain, the passing
+  boat's hull with its timbers creaking; the jetty has lapping water (its gulls, drawn and heard, were taken out: over an oil terminal they read as drones); the seeding cloud's rain, the passing
   freight and the night's crickets are recorded; Jebel Ali gains water at the quay, gulls and the twistlocks of the boxes
   the cranes set down; the operations room its keyboards. The landing airliner is modelled as heard from beside the
   runway: its roar comes up under the end of the dawn shot, and the Doppler fall, the ground reflection's sweeping comb
