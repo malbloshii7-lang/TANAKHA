@@ -367,17 +367,17 @@ scene({
     [0.205, 0.086, 0.086, 0.101, 0.035], [0.188, 0.091, 0.091, 0.108, 0.035], [0.172, 0.093, 0.093, 0.11, 0.034], [0.155, 0.097, 0.097, 0.114, 0.032],
     [0.125, 0.104, 0.104, 0.118, 0.03], [0.09, 0.11, 0.11, 0.12, 0.024], [0.05, 0.117, 0.117, 0.121, 0.014], [0.02, 0.129, 0.129, 0.12, 0.005],
     [0.0, 0.148, 0.148, 0.119, 0], [-0.02, 0.176, 0.176, 0.118, 0], [-0.04, 0.2, 0.2, 0.118, 0], [-0.06, 0.219, 0.219, 0.12, 0.005]],
-  // her head under the shayla: a rounded oval 0.17 m across and 0.22 m deep, a little fuller at the back where the hair
-  // is gathered; the scarf wraps close under the jaw and round the neck, then lies over her shoulders (all scaled by her
-  // 0.95)
-  SHAYLA: [[0.25, 0.004, 0.004, 0.005, 0.015], [0.245, 0.036, 0.036, 0.043, 0.015], [0.234, 0.06, 0.06, 0.071, 0.013], [0.217, 0.077, 0.077, 0.092, 0.01],
-    [0.195, 0.086, 0.086, 0.106, 0.006], [0.168, 0.09, 0.09, 0.116, 0], [0.138, 0.09, 0.09, 0.119, -0.006], [0.108, 0.087, 0.087, 0.113, -0.002],
-    [0.078, 0.082, 0.082, 0.1, 0.006], [0.05, 0.078, 0.078, 0.091, 0.006], [0.028, 0.082, 0.082, 0.092, 0], [0.008, 0.103, 0.103, 0.1, -0.005],
-    [-0.012, 0.138, 0.138, 0.106, -0.005], [-0.034, 0.174, 0.174, 0.11, 0], [-0.056, 0.2, 0.2, 0.112, 0], [-0.08, 0.218, 0.218, 0.115, 0.005]],
-  // the abaya: loose from her shoulders (0.43 m across the sleeves), falling straight past the waist and spreading over
+  // her head under the shayla: a rounded oval 0.18 m across and 0.22 m deep, its top 0.23 m above C7, a little fuller at
+  // the back where the hair is gathered; the scarf wraps close under the jaw and round the neck (0.14 m across), then
+  // lies over her shoulders (all scaled by her 0.95)
+  SHAYLA: [[0.243, 0.004, 0.004, 0.005, 0.015], [0.238, 0.038, 0.038, 0.045, 0.015], [0.228, 0.062, 0.062, 0.073, 0.013], [0.212, 0.08, 0.08, 0.094, 0.01],
+    [0.19, 0.09, 0.09, 0.108, 0.006], [0.163, 0.095, 0.095, 0.117, 0], [0.135, 0.094, 0.094, 0.119, -0.006], [0.106, 0.089, 0.089, 0.113, -0.002],
+    [0.078, 0.081, 0.081, 0.1, 0.006], [0.055, 0.074, 0.074, 0.091, 0.006], [0.034, 0.075, 0.075, 0.092, 0], [0.014, 0.088, 0.088, 0.098, -0.004],
+    [-0.006, 0.12, 0.12, 0.104, -0.005], [-0.03, 0.162, 0.162, 0.11, 0], [-0.056, 0.194, 0.194, 0.112, 0], [-0.08, 0.21, 0.21, 0.115, 0.005]],
+  // the abaya: loose from her shoulders (0.40 m across), falling straight past the waist and spreading over
   // the seat; on her right the side falls from under the raised arm, on her left the arm hangs in the wide sleeve
-  ABAYA: [[0.0, 0.11, 0.11, 0.095, -0.005], [-0.03, 0.165, 0.165, 0.105, 0], [-0.055, 0.2, 0.2, 0.11, 0], [-0.085, 0.212, 0.22, 0.113, 0.005],
-    [-0.14, 0.198, 0.226, 0.116, 0.01], [-0.22, 0.19, 0.228, 0.12, 0.02], [-0.3, 0.188, 0.226, 0.124, 0.03], [-0.38, 0.19, 0.22, 0.126, 0.03],
+  ABAYA: [[0.0, 0.11, 0.11, 0.095, -0.005], [-0.03, 0.16, 0.16, 0.105, 0], [-0.055, 0.194, 0.194, 0.11, 0], [-0.085, 0.205, 0.212, 0.113, 0.005],
+    [-0.14, 0.194, 0.218, 0.116, 0.01], [-0.22, 0.188, 0.222, 0.12, 0.02], [-0.3, 0.186, 0.222, 0.124, 0.03], [-0.38, 0.19, 0.218, 0.126, 0.03],
     [-0.46, 0.206, 0.218, 0.13, 0.025], [-0.52, 0.222, 0.228, 0.14, 0.035], [-0.56, 0.236, 0.238, 0.155, 0.05]],
   person(o, sl, q) {
     if (q <= 0) return;
@@ -546,19 +546,22 @@ scene({
   // seams run down behind the shoulders
   kandura(K, path, sd, q) {
     const ss = this.ss, open = pts => new P(this.crs(pts, false, 3)), tw = sd > 0 ? 0.13 : 0.87;
+    // soft folds of the cotton below the ghutra (their own random stream: [s, half-width, strength, top, bottom])
+    const r = rng(2031 + (sd > 0 ? 0 : 7)), soft = Array.from({ length: 7 }, (_, i) => [-0.85 + 1.7 * (i + 0.2 + 0.6 * r()) / 7, 0.035 + 0.035 * r(), 0.12 + 0.14 * r(), -0.1 - 0.12 * r(), -0.36 - 0.2 * r()]);
     mask(path, q);
     if (OPT.colour) wash(path, HUE.sky, 0.06 * q);
     // the working arm's pull: two folds from under that arm toward the middle of the waist
     const pull = (d, v) => { const f = clamp((-0.13 - d * 0.6 - v) / 0.24), sp = K.spine(v); return { f, t: lerp(tw + sd * d, sp + sd * 0.04, f) }; };
     const tone = (s, v, t) => {
       const dl = 1 + s * sd, df = 1 - s * sd, sp = K.spine(v);
-      let tn = (0.2 * ss(-0.16, -0.42, v) + 0.2 * ss(0.5, 0.15, df) * ss(0.02, 0.1, df)) * ss(0.05, 0.45, dl);
+      let tn = (0.1 * ss(-0.2, -0.46, v) + 0.2 * ss(0.5, 0.15, df) * ss(0.02, 0.1, df)) * ss(0.05, 0.45, dl);
+      soft.forEach(([c, w, a, v0, v1]) => { tn += a * Math.exp(-(((s - c) / w) ** 2)) * ss(v0, v0 - 0.06, v) * ss(v1, v1 + 0.06, v) * ss(0.05, 0.3, dl); });
       tn += 0.32 * Math.exp(-(((t - sp - 0.03 * sd) / 0.03) ** 2)) * ss(-0.19, -0.27, v);
       [0, 0.08].forEach(d => { const p = pull(d, v); if (p.f > 0 && p.f < 1) tn += 0.26 * Math.sin(Math.PI * p.f) * Math.exp(-(((t - p.t) / 0.028) ** 2)); });
       tn += 0.3 * Math.exp(-(((v + 0.49) / 0.018) ** 2)) * ss(0.2, 0.05, Math.min(t, 1 - t));
       return tn;
     };
-    this.engrave(path, this.fallLines(K, 48, -0.02, -0.566, 0.014, null, tone), 0.75, 0.6 * q);
+    this.engrave(path, this.fallLines(K, 52, -0.02, -0.566, 0.012, null, tone), 0.75, 0.6 * q);
     this.within(path, () => {
       // the sleeve seams behind the shoulders
       [-1, 1].forEach(g => { const pts = []; for (let v = -0.05; v >= -0.216; v -= 0.022) pts.push(K.back(g * (0.2 - 0.15 * (-0.05 - v)), v)); stroke(open(pts), q, INK, 0.7, 0.42); });
@@ -572,8 +575,9 @@ scene({
   // the ghutra: a white square folded into a triangle and laid over the ghafiya, starched. From behind it domes over the
   // crown, falls from under the agal past the ears and over the nape, spreads over the shoulders (its two ends fall to the
   // front) and hangs down the back as a triangle whose point lies over the spine at the shoulder blades, the folded
-  // square's two layers showing at the point. flip: the end on his working side is thrown back over that shoulder, as men
-  // do at a desk, and hangs down his back beside the point. Over it the agal, its two cords hanging down the back
+  // square's two layers showing at the point. flip: the end on his working side is thrown back over that shoulder (an
+  // Emirati way of wearing it) and hangs down his back beside the point. Over it the agal, its two cords hanging down the
+  // back
   ghutra(V, k, sd, q, flip) {
     const ss = this.ss, PI = Math.PI, closed = pts => new P(this.crs(pts, true, 3), true), open = pts => new P(this.crs(pts, false, 3));
     const secs = this.GHUTRA.concat(this.KAND.filter(sc => sc[0] < -0.06).map(([v, aR, aL, b, cw]) => [v, aR + 0.008, aL + 0.008, b + 0.008, cw]));
@@ -582,7 +586,7 @@ scene({
     // over the shoulders at vs and its point hangs D lower (to the shoulder blades); past the sides, on the fronts of the
     // shoulders, it turns down where the ends fall to the front
     const hemV = th => {
-      if (th > 0 || th < -PI) return vs - 0.022 * Math.min(1, 3 * Math.abs(Math.sin(th)));
+      if (th > 0 || th < -PI) return vs - 0.014 * this.ss(0, 0.35, Math.abs(Math.sin(th)));
       const x = Math.max(0, 1 - Math.sqrt(Math.cos(th) ** 2 + 0.0009));
       return vs - D * Math.pow(x, 1.1) + 0.0045 * Math.sin(th * 12 + sd) * Math.sin(PI * x);
     };
@@ -636,10 +640,10 @@ scene({
       // hangs a little below the ghutra's own, and back up its inner edge
       const at = ([u, v], o2 = 0.007) => {
         const x = clamp(u / (G.at(v)[1] + o2), -1, 1);
-        return x > 0.985 ? G.pt(v, clamp(sd > 0 ? 0.18 : -PI - 0.18, G.eL(v), G.eR(v)), o2) : G.back(sd * u, v, o2);
+        return x > 0.985 ? G.pt(v, sd > 0 ? G.eR(v) : G.eL(v), o2) : G.back(sd * u, v, o2);
       };
-      const top = [[0.105, -0.02], [0.145, -0.034], [0.185, -0.049], [0.215, -0.061], [0.235, -0.073]], tipE = [0.178, -0.258];
-      const side = [[0.233, -0.12], [0.222, -0.175], [0.2, -0.225]], inner = [[0.152, -0.205], [0.128, -0.14], [0.112, -0.07]];
+      const top = [[0.105, -0.02], [0.145, -0.034], [0.185, -0.049], [0.215, -0.061], [0.235, -0.073]], tipE = [0.182, -0.252];
+      const side = [[0.25, -0.098], [0.236, -0.13], [0.228, -0.178], [0.207, -0.228], [0.194, -0.246]], inner = [[0.168, -0.242], [0.146, -0.2], [0.126, -0.14], [0.112, -0.075]];
       const fl = closed([...top, ...side, tipE, ...inner].map(p => at(p)));
       stroke(open([tipE, ...inner].map(p => at(p))), q, INK, 4, 0.16);
       mask(fl, q);
@@ -651,8 +655,9 @@ scene({
       }
       this.engrave(fl, lines, 0.65, 0.6 * q);
       // where it folds over the top of the shoulder
-      stroke(open(top.slice(1, 4).map(([u, v]) => at([u - 0.004, v - 0.014]))), q, INK, 0.7, 0.35);
-      this.rim(fl, 2.4, 0.9 * q); stroke(fl, q, INK, 1.2, 0.88);
+      stroke(open(top.slice(1, 5).map(([u, v]) => at([u - 0.004, v - 0.016]))), q, INK, 0.7, 0.3);
+      this.rim(fl, 2.4, 0.9 * q);
+      stroke(open([top[top.length - 1], ...side, tipE, ...inner].map(p => at(p))), q, INK, 1.1, 0.82);
     }
     // the agal: a black cord in two coils, each 1.25 cm thick, on the crown a third of the way down the head, level but
     // for a slight tilt (it sits on the forehead and over the back of the skull). Seen from behind and a little above, the
@@ -708,7 +713,7 @@ scene({
     const S = this.body(V, secs), sOf = (v, t) => { const sp = S.spine(v); return t < sp ? (t - sp) / sp : (t - sp) / (1 - sp); };
     // the wrap's lower edge, from her right shoulder dipping over the spine to her left shoulder (under the end)
     const hemV = t => -0.078 - 0.09 * Math.pow(Math.sin(Math.PI * clamp(t)), 1.3) + 0.005 * Math.sin(t * 19 + 1) * Math.sin(Math.PI * clamp(t));
-    const so = S.outline(0.25, -0.078, 30), hem = [];
+    const so = S.outline(0.243, -0.078, 30), hem = [];
     for (let i = 1; i < 30; i++) { const t = i / 30; hem.push(S.across(hemV(t), t)); }
     const sh = closed(so.R.concat(hem, so.L.slice().reverse())), hemP = open([so.R[so.R.length - 1], ...hem, so.L[so.L.length - 1]]);
     stroke(hemP, q, INK, 5, 0.3);
@@ -717,32 +722,31 @@ scene({
     // hair gathered at the back of the head, a swell that bends the lines over it (the top in the light, a sheen round the
     // back of the head, the swell lit on its upper side and shadowed under); below it the cloth hangs free over the nape and
     // the shoulders in soft folds that spread as they fall, the lines swelling in their hollows and breaking on the crests
-    const PI = Math.PI, bc = 0.165, bw = 0.056, bh = 0.041, bun = (u, v) => 0.04 * Math.sqrt(Math.max(0, 1 - (u / bw) ** 2 - ((v - bc) / bh) ** 2));
+    const PI = Math.PI, bc = 0.179, bw = 0.07, bh = 0.052, bun = (u, v) => 0.034 * Math.sqrt(Math.max(0, 1 - (u / bw) ** 2 - ((v - bc) / bh) ** 2));
     const vH = bc - bh, sv = [-0.6, -0.28, 0.04, 0.36, 0.66], sc = [-0.44, -0.12, 0.2, 0.52];
     const tone = (s, v, u) => {
-      let tn = 0.6 - 0.48 * ss(0.205, 0.245, v) - 0.28 * Math.exp(-(((v - 0.205) / 0.01) ** 2)) * (1 - s * s);
+      let tn = 0.6 - 0.48 * ss(0.2, 0.239, v) - 0.28 * Math.exp(-(((v - 0.2) / 0.01) ** 2)) * (1 - s * s);
       const h = bun(u, v);
-      if (h > 0) tn += -0.5 * ss(bc - 0.01, bc + 0.03, v) * h / 0.04 + 0.28 * ss(bc - 0.012, vH, v);
-      tn += 0.3 * Math.exp(-(((v - vH + 0.012) / 0.01) ** 2)) * ss(bw * 1.4, bw * 0.4, Math.abs(u));
+      if (h > 0) tn += -0.42 * ss(bc - 0.015, bc + 0.035, v) * h / 0.034 + 0.12 * ss(bc - 0.02, vH, v);
+      tn += 0.14 * Math.exp(-(((v - vH + 0.02) / 0.024) ** 2)) * ss(bw * 1.5, bw * 0.3, Math.abs(u));
       const g = ss(vH + 0.01, vH - 0.03, v), f = clamp((vH - v) / 0.2), s2 = s / lerp(0.7, 1, f);
       sv.forEach(c => { tn += 0.3 * g * Math.exp(-(((s2 - c) / 0.07) ** 2)); });
       sc.forEach(c => { tn -= 0.45 * g * Math.exp(-(((s2 - c) / 0.05) ** 2)); });
       return clamp(tn - 0.38 * ss(0.68, 0.98, Math.abs(s)) - 0.22 * ss(-0.02, -0.07, v) * ss(0.45, 0.85, Math.abs(s)));
     };
     const lines = [];
-    for (let v = 0.247; v >= -0.2; v -= 0.0042) {
+    for (let v = 0.24; v >= -0.2; v -= 0.0042) {
       const Lw = [], e0 = S.eR(v), e1 = S.eL(v), a = S.at(v);
       for (let i = 0; i <= 32; i++) { const t = i / 32, th = lerp(e0, e1, t), u = (Math.cos(th) >= 0 ? a[1] : a[2]) * Math.cos(th), p = S.pt(v, th, bun(u, v)); Lw.push([p[0], p[1], tone(sOf(v, t), v, u)]); }
       lines.push(Lw);
     }
     this.engrave(sh, lines, 0.55, 0.8 * q);
     const arc = (v, t0, t1, n = 10) => open(Array.from({ length: n + 1 }, (_, i) => S.across(v, lerp(t0, t1, i / n))));
-    this.lite(arc(0.228, 0.28, 0.74), '#EFE5CF', 1.4, 0.4 * q);
-    this.lite(arc(0.205, 0.2, 0.82), '#EFE5CF', 0.9, 0.2 * q);
-    // the swell's lit top and its lower edge, where the cloth drops away from the hair
+    this.lite(arc(0.222, 0.28, 0.74), '#EFE5CF', 1.4, 0.4 * q);
+    this.lite(arc(0.2, 0.2, 0.82), '#EFE5CF', 0.9, 0.2 * q);
+    // the swell's lit top
     const bunAt = (a, r) => { const u = bw * r * Math.cos(a), v = bc + bh * r * Math.sin(a); return S.back(u, v, bun(u, v) * 0.9); };
-    this.lite(open(Array.from({ length: 9 }, (_, i) => bunAt(PI * (0.2 + 0.6 * i / 8), 0.62))), '#EFE5CF', 1.2, 0.36 * q);
-    stroke(open(Array.from({ length: 11 }, (_, i) => bunAt(-PI * (0.12 + 0.76 * i / 10), 0.97))), q, INK, 1, 0.5);
+    this.lite(open(Array.from({ length: 9 }, (_, i) => bunAt(PI * (0.3 + 0.4 * i / 8), 0.72))), '#EFE5CF', 1, 0.2 * q);
     // the creases of the folds below it, and the light on their crests
     this.within(sh, () => {
       sv.slice(1, 4).forEach(c => { const pts = []; for (let v = vH - 0.008; v >= -0.17; v -= 0.02) pts.push(S.across(v, this.tAt(S, v, c * lerp(0.7, 1, clamp((vH - v) / 0.2))))); stroke(open(pts), q, INK, 0.8, 0.4); });
