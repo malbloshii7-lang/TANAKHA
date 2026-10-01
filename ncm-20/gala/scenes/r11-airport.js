@@ -1276,9 +1276,12 @@ scene({
       });
       AUH.hazeItems(list, [900, 1500, 2200, 3100, 4200], { hy, up: 160, down: 70, a: 0.13 * ink, tint: OPT.colour ? [HUE.sand, 0.2] : null });
       R11.paint(list);
-      // the approach lamps that stand in the fog glow through it, steadily (lit, never sequenced)
-      const inFog = this.lamps.filter(p => fogF(p[1], p[0]) > 0.15);
-      AUH.lights(inFog, OPT.colour ? '#F0B43C' : OCHRE, { r0: 1.8, k: 260, a: 0.55 * ink, halo: 0.2 * ink });
+      // the approach lamps that stand in the fog glow through it, steadily (lit, never sequenced): each as strongly as the
+      // fog lies over it, so a lens drifting across a lamp brightens its glow over seconds, never in a step
+      this.lamps.forEach(p => {
+        const k = AUH.smooth(clamp((fogF(p[1], p[0]) - 0.05) / 0.5));
+        if (k > 0.01) AUH.lights([p], OPT.colour ? '#F0B43C' : OCHRE, { r0: 1.8, k: 260, a: 0.55 * ink * k, halo: 0.2 * ink * k });
+      });
     });
     E3.sunAt();
   },

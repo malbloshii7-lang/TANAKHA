@@ -563,10 +563,10 @@ scene({
     else R11.member([g0, b.y0 - 4, zz + 1], [g0, b.y1 + 4, zz + 1], 1.4, 0.7 * a);
   },
   // the crane's structure landward of the quay face, with the tractors under its portal and the load while it is over
-  // the quay. The eye is always seaward of the quay and astern of every crane, so the parts go far to near by side: the
-  // landside legs and portal beam; the tractors in the lanes; the load (with the far legs' bracing before it when it
-  // hangs high, after it when it hangs low: a brace is nearer than whatever lower it crosses on screen); the near bracing;
-  // the waterside legs and portal beam; then the girder, trolley, machinery house, A-frames and back stays
+  // the quay. The eye is always seaward of the quay, astern of every crane and above it all (so of two things on one line
+  // of sight the higher is the nearer), and the parts go far to near: the landside legs and portal beam; the tractors in
+  // the lanes; the far legs' bracing (high over the tractors, and beyond the load hanging between the legs); the load;
+  // the near bracing; the waterside legs and portal beam; then the girder, trolley, machinery house, A-frames and stays
   craneFrame(c, d, lt) {
     const p = c.parts, a = R11.air(d, 2600), st = { tone: 0.08, shade: 0.55, lw: 1.3, edgeA: 0.9 * a, noHatch: d > 1300, fillCol: OPT.colour ? '#E6E1D4' : null, fillA: 0.45 };
     const leg = i => { const l = p.legs[i]; E3.solid(l.bog, Object.assign({}, st, { tone: 0.3, noHatch: true }), 4000 + c.i * 20 + i); E3.solid(l.f, st, 4010 + c.i * 20 + i); };
@@ -574,10 +574,9 @@ scene({
     [3, 2].forEach(leg);
     E3.solid(p.cross[1].f, st, 4100 + c.i * 20 + 1);
     c.here.map(g => ({ g, d: R11.dep([g.kx - 3.75, g.ky, this.QZ + 2]) })).sort((m, n) => n.d - m.d).forEach((o, k) => this.inked(o.g.ix, () => this.drawRig(o.g, o.d, 7300 + c.i * 7 + k)));
-    const mv = c.mv, over = mv && mv.y >= this.YW, high = over && mv.z > 40;
-    if (!high) brace(1);
+    const mv = c.mv, over = mv && mv.y >= this.YW;
+    brace(1);
     if (over) this.drawHoist(c, mv, d);
-    if (high) brace(1);
     brace(0);
     [1, 0].forEach(leg);
     E3.solid(p.cross[0].f, st, 4100 + c.i * 20);
