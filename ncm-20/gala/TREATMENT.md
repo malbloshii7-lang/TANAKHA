@@ -862,7 +862,8 @@ have a sound effect of water not a mechanical generation sound."*
   four-wheel bogies; stowed at the gate, flaps 30 and slats out on arrival, the spoilers rising and the reversers opening
   at touchdown; steady landing lights, the beacons dark (no strobes). The dawn shot looks down on it at its Terminal A
   pier, two jet bridges docked at L1 and L2, the tug at its nose gear, a baggage train passing, as the fog lifts. The
-  arrival is now a tracking pan from beside runway 31L (150 m from the centreline): the aircraft in its flare, its main
+  arrival is now a tracking pan from beside runway 31L (150 m from the centreline; now 240 m, from a 12 m mast: see the
+  fourth notes): the aircraft in its flare, its main
   gear touching 298 m in, the nose lowering, the crescent tower sliding in behind it, all at real speed. *Not possible:*
   the full approach at real speed in one beat (it opens in the flare), and the tower in the dawn shot (it stands toward
   the rising sun, behind any viewpoint where the terminal is lit). *Corrected:* runway 31L's true bearing (308 degrees;
@@ -877,6 +878,26 @@ have a sound effect of water not a mechanical generation sound."*
 - *Checked.* The review copy (4:11.2, no narration, recorded sound) passes the photosensitivity pre-check (no flash
   transitions), its sound sits on the mix at zero lag, every leader's card measures above the world beat
   (-13.4/-13.5/-13.5 against -14.2 LUFS), and the approved cut's cue lists, score (12 of 12 WAVs) and stills are unchanged.
+
+**The requester's fourth notes (1 October 2026).** *"the airport scene showing planes on the backgorund in stupid
+position, kindly fix it, add some colors to the scene like jebel ali port, remove the flying bird in the east cost scene
+looks like attacking drone !"*
+- *The aircraft at Terminal A.* The terminal is drawn to its as-built plan (OpenStreetMap's outline of the building,
+  carried into the runway frame from the tower's AIP position): the processor behind its 300 m landside facade, the
+  single-sided piers 1 and 4, the double-sided piers 2 and 3 and the courtyard between them. Every airliner stands
+  nose-in at a real stand, square to the glass, wheels and shadow on the apron, its glass bridges meeting the L1 and L2
+  doors at sill height; none stands behind a pier or appears to float at a roof line.
+- *Colour, as at Jebel Ali.* Both airport beats are hand-coloured: a dawn sky, the roof silvery, the glass sea-green,
+  the apron warm grey with yellow lead-in lines and red stop bars, the 787s white with grey bellies and nacelles, the
+  ground vehicles yellow, the fog pearly; on arrival a blue morning sky over honey sand, the runway dark asphalt with
+  white paint and its lights in their real, steady colours (green threshold, white edge, centreline and touchdown zone,
+  blue taxiway edges, the PAPI as its lamps show from the camera: one white and three red on the near side), and the
+  tower's silvery ETFE. The arrival is seen from a survey mast's platform 12 m up, 240 m from the centreline (outside the
+  runway strip and under its transitional surface, ICAO Annex 14), so the airfield reads in bands; a second 787 holds
+  short at its taxiway's holding position as the arrival rolls past, and the taxiway guidance signs show their real
+  colours with no letters or figures. The landing's sound is retimed to this vantage.
+- *The east coast.* The gulls are taken out of the jetty, drawn and heard: small dark shapes in the sky over an oil
+  terminal read, in 2026, as attacking drones. Jebel Ali's harbour tug and pilot boat stay (they read as harbour craft).
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above

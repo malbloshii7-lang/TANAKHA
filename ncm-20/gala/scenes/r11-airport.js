@@ -89,6 +89,15 @@
 //   its own finish: the crescent clad in silvery ETFE cushions and aluminium on a concrete base (NASM, "Art of the Airport
 //   Tower"; Wikimedia Commons, after ADPI and Vector Foiltec: "Texlon ETFE facades on both the east and west faces";
 //   Building, 17 Aug 2016: "polycarbonate, aluminium and ETFE foil cushion panels"), its cab glazed.
+// Round 4 (1 Oct 2026; the arrival made richer for the same request): the eye raised to 12 m on a survey mast 240 m off
+// the centreline (ICAO Annex 14 §3.4.3: a code 4 precision approach runway's strip 140 m either side; §4.1.17-4.1.20:
+// the transitional surface rising 1:7 from the strip's edge, 14.3 m over the mast); a crossing link 480 m in with its
+// runway-holding positions 90 m from the centreline (Annex 14 Table 3-2, code 4, CAT II/III), pattern A markings
+// (§5.2.10, Fig. 5-6), stop bars and blue taxiway edge lights; a second 787-9 holding short; guidance signs as panels in
+// their colours without inscriptions (mandatory white on red, location yellow on black on the holding signs' backs: FAA
+// AC 150/5340-18; runway exit, black on yellow, 60 m before the exit: Annex 14 §5.4.3); the strip's graded portion 75 m
+// either side (§3.4.8); the PAPI recomputed for the new eye; the lamps laid on as light in colour (AUH.lights' glow); the
+// airliners in colour white over lighter hatching (o.shadeK, o.white) with steady landing lights that read off-axis.
 const AUH = (() => {
   const D = Math.PI / 180, HEAD = 308;
   const W3 = (u, v, z = 0) => [v, u, z];
@@ -1267,10 +1276,11 @@ const B789 = (() => {
     // the landing lights, steady (never flashing), as bright as they face the eye
     if (o.lights > 0) LIGHTS.forEach(l => {
       if (l.sg && (l.sg > 0 ? 'L' : 'R') !== near) return;
-      const p = W(l.p), d = dirW(pose, l.dir), v = sub(C, p), k = Math.pow(Math.max(0, dot(d, v) / Math.hypot(...v)), 0.8) * o.lights;
+      // (a landing light's beam is wide: its glare still reads from well off its axis)
+      const p = W(l.p), d = dirW(pose, l.dir), v = sub(C, p), k = Math.pow(clamp((dot(d, v) / Math.hypot(...v) + 0.1) / 1.1), 0.7) * o.lights;
       if (k < 0.01) return;
       const s = E3.proj(p), pxm = E3.cam().f / Math.max(1, E3.depth(p)), r = clamp(0.32 * pxm, 1.4, 8);
-      if (OPT.colour) disc(s[0], s[1], r * 4.5, '#F3C27A', 0.3 * k, 'multiply');
+      if (OPT.colour) disc(s[0], s[1], r * 4.5, '#FFD49A', 0.4 * k, 'screen');
       disc(s[0], s[1], r * 1.25, INK, 0.45 * k * (o.air ?? 1));
       mask(el(s[0], s[1], r, r * 0.8, 0, TAU, 17, 0), k);
       if (OPT.colour) disc(s[0], s[1], r * 0.8, '#FFF6DE', 0.85 * k, 'source-over');
@@ -1684,16 +1694,27 @@ scene({
 
 /* ==========================================================================================================
    2 · The arrival (beat 'airport', 8.33 s on a 0.6 clock: lt 0.6-5.6, seen lt 0.45-5.75): the aviation photographer's
-   tracking pan (round 2). The eye stands 3.5 m up on the sand 150 m left of runway 31L's centreline (at the runway
-   strip's edge), abeam a point 240 m past the threshold, and pans with the 787-9 as it flares, puts its main gear down
-   and lowers its nose: seen first from the front quarter (37° ahead of its beam, its landing lights toward the eye),
-   broadside just before the touchdown, and from the rear quarter at the end (57° behind its beam), when the crescent
-   tower (2.3 km on, 1 km right of the runway, 109 m) has slid in behind it and Terminal A's piers (4.2 km) beyond. The
+   tracking pan (round 2; raised in round 4). The eye stands 12 m up on a survey mast's platform 240 m left of runway
+   31L's centreline, abeam a point 240 m past the threshold (outside the 140 m strip and under its 1:7 transitional
+   surface), and pans with the 787-9 as it flares, puts its main gear down and lowers its nose: seen first from the
+   front quarter (25° ahead of its beam, its landing lights toward the eye), broadside just before the touchdown, and
+   from the rear quarter at the end (45° behind its beam), when the crescent tower (2.3 km on, 1 km right of the runway,
+   109 m) and the tip of Terminal A's airside pier 3 have slid in behind it: from the mast they lie 28-31° right of the
+   runway's heading and the rest of the terminal 10-28°, so they can enter only as the pan turns down the runway. The
    pan is computed from the aircraft's position: the lens turns on a point just ahead of its main gear (its position,
    not its attitude), its focal length grows gently with the distance (as its 0.2 power) but never so far that the
-   airframe (nose, tail, fin, wing tips and wheels, softly bounded) fills more than 84% of the frame's width, and the frame
-   is shifted so that the airframe's middle sits a little right of the frame's (room ahead of its nose), moving right as
-   the tower comes in; all of it smooth in time, so nothing jumps.
+   airframe (nose, tail, fin, wing tips and wheels, softly bounded) fills more than 84% of the frame's width, easing back
+   by 14% over the last 1.5 s, and the frame is shifted so that the airframe's middle sits right of the frame's (room
+   ahead of its nose), moving right as the tower comes in; all of it smooth in time, so nothing jumps.
+   Round 4 (1 Oct 2026; the requester's "add some colors to the scene like jebel ali port", for the arrival): from 12 m
+   the airfield lies in bands, from the honey sand at the foot of the mast through the strip's graded sand, the light
+   shoulder, the dark runway with its white paint and lights, the infield, the parallel taxiway's yellow line and blue
+   lights, to the haze; a link 480 m in crosses the runway, its pattern A holding positions 90 m out with their stop bars
+   (steady red) and blue edge lights; a second 787-9, unmarked and flaps up, holds short on its far side waiting to
+   cross behind the arrival; the guidance signs stand as panels in their real colours with plain bands for legends (no
+   letters or figures); the runway's lights in theirs, steady: green threshold, white touchdown zone, centreline and
+   edges. (From any vantage under the transitional surface the runway's 60 m subtends under 0.9°, at most for a 20 m mast
+   280 m off, so it stays a narrow band beside the airframe.)
    The motion is the aircraft's real one on the scene clock (the clock runs at 0.6, a gentle slow motion; never faster
    than real). The main gear crosses the threshold about 10 m up (the ILS's 17.4 m datum is the antenna's height, 57 ft)
    at 70 m/s on the 3.0° glide path; the flare begins with the main wheels at 30 ft (Airbus FCTM: about 30 ft; the
@@ -1880,7 +1901,7 @@ scene({
     this.frame(lt);
     const B = R11.BOX, hy = this.hy, q = easeInOut(prog(lt, 0.4, 0.8));
     // the clear morning sky away from the sun: blue overhead, paling to a warm haze along the horizon
-    washFade([B[0], B[1] - 200, B[2], hy + 2], [[0, HUE.deep, 0.46], [0.26, HUE.water, 0.5], [0.5, HUE.sky, 0.56], [0.78, HUE.sky, 0.34], [0.92, HUE.sail, 0.32], [1, HUE.dawn, 0.3]], 0, q);
+    washFade([B[0], B[1] - 200, B[2], hy + 2], [[0, HUE.water, 0.5], [0.26, HUE.water, 0.52], [0.5, HUE.sky, 0.58], [0.78, HUE.sky, 0.38], [0.92, HUE.sail, 0.34], [1, HUE.dawn, 0.32]], 0, q);
     // the ground: the graded strip's desert sand, honey-coloured in the low sun behind the eye's right shoulder, paler
     // into the distance
     washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sail, 0.4], [0.12, HUE.sand, 0.34], [0.5, HUE.sand, 0.46], [1, HUE.gold, 0.5]], 0, q);
@@ -1892,14 +1913,14 @@ scene({
     R11.clipped(() => {
       this.frame(lt);
       const B = R11.BOX, hy = this.hy, ink = easeOut(prog(lt, 0.3, 0.7)), W3 = AUH.W3, cam = E3.cam();
-      AUH.skyRules(hy, (x, y) => { const up = clamp((hy - y) / (hy - B[1])); return ink * (0.16 + 0.84 * up) * clamp((hy - y) / 22) * (OPT.colour ? 0.5 : 1); }, { amax: 0.46, step: 5.2, step0: 2.9, lw: 0.8 });
+      AUH.skyRules(hy, (x, y) => { const up = clamp((hy - y) / (hy - B[1])); return ink * (0.16 + 0.84 * up) * clamp((hy - y) / 22) * (OPT.colour ? 0.34 : 1); }, { amax: 0.46, step: 5.2, step0: 2.9, lw: 0.8 });
       stroke(new P([[B[0], hy], [B[2], hy]]), ink, INK, 0.8, 0.4);
       // the sand: engraved rules on the ground, finer toward the horizon, heavier toward the eye, broken into the long
       // low wind ripples of the graded strip; its grain
       AUH.groundRules(hy, this.CAM[2], (wu, wv, t) => {
         const rip = 0.5 + 0.5 * Math.sin((wu * 0.8 + wv * 0.35) / 2.1 + 2.4 * AUH.noise(wu / 30, wv / 24, 1.3));
         // (in colour the ripples' troughs hatched deeper, so the honey sand reads rippled)
-        const r0 = OPT.colour ? 0.18 : 0.35;
+        const r0 = OPT.colour ? 0.04 : 0.35;
         return ink * (r0 + (1 - r0) * AUH.smooth(clamp((rip - 0.2) * 1.6))) * (0.55 + 0.45 * AUH.noise(wu / 90, wv / 70, 3.1));
       }, { pitch: y => lerp(2.0, 4.4, clamp((y - hy) / (B[3] - hy))), lw: y => lerp(0.5, 1.35, clamp((y - hy) / (B[3] - hy))), a: OPT.colour ? 0.56 : 0.62, col: OPT.colour ? '#A5773A' : SEPIA });
       E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.16 + 0.3 * k : 0.14 + 0.32 * k) * ink]), OPT.colour ? '#956A35' : SEPIA, 0.85);
@@ -1911,6 +1932,9 @@ scene({
       pave(this.far, 0.3 + dk, 501, '#5E646C', 0.5);
       pave(this.twy[0], 0.26 + dk, 510, '#5A6068', 0.55);
       E3.line(this.exitL, INK, 0.9, 0.4 * ink);
+      // (colour) the strip's graded portion, 75 m either side of the centreline (Annex 14 §3.4.8), its sand rolled firm
+      // and paler than the honey sand beyond
+      if (OPT.colour) wash(new P(this.q(-60, this.rw.L, -75, 75, 0).map(E3.proj), true), '#C8B79A', 0.3 * ink);
       pave(this.q(-60, this.rw.L, -37.5, 37.5, 0), 0.08, 520, '#C2BBAE', 0.38);
       this.twy.slice(1).forEach((t, i) => pave(t, 0.26 + dk, 511 + i, '#5A6068', 0.55));
       pave(this.q(0, this.rw.L, -30, 30, 0.01), 0.62 + dk, 521, '#3A3F46', 0.72);
@@ -1955,12 +1979,17 @@ scene({
         [-0.45, 0.45].forEach(o => R11.member(W3(q.u + 0.3, q.v + o, 0), W3(q.u + 0.3, q.v + o, 0.45), 1, 0.8 * al));
         E3.solid(E3.box(q.v - 0.75, q.v + 0.75, q.u - 0.5, q.u + 0.6, 0.45, 1.05), st, 4100 + i);
         // its three lamps on the face toward the approach, steady: each shows white above its setting and red below it
-        // (3.0° PAPI: 3.5°, 3.17°, 2.83°, 2.5° from the runway's edge outward); the eye, 3.5 m up and some 180 m off,
-        // sees them from 0.8° up, below every setting, so all show red, dimmer as it stands further off their beams' axis
+        // (3.0° PAPI: 3.5°, 3.17°, 2.83°, 2.5° from the runway's edge outward); the eye, 12 m up on its mast, sees the
+        // units on its own side from 2.5-2.8° up, so the outer one (2.5°) shows white and the other three red, and those
+        // across the runway from about 2° up, all red; dimmer as it stands further off their beams' axis
         const lam = [-0.45, 0, 0.45].map(o => W3(q.u - 0.52, q.v + o, 0.78)), C = E3.cam().C, l0 = lam[1];
         const el = Math.atan2(C[2] - l0[2], Math.hypot(C[0] - l0[0], C[1] - l0[1])) / AUH.D, set = [3.5, 3.17, 2.83, 2.5][i % 4];
         const off = Math.abs(Math.atan2(C[0] - l0[0], -(C[1] - l0[1]))) / AUH.D, k = clamp(1 - (off - 10) / 60, 0.55, 1);
-        if (C[1] < l0[1]) AUH.lights(lam, OPT.colour ? (el > set ? '#FFF4DC' : '#D2412C') : OCHRE, { r0: 1.1, k: 260, a: 0.9 * k * ink, halo: 0.16 * k * ink });
+        if (C[1] < l0[1]) {
+          // (each lamp in its dark bezel, so a white one reads on the white housing)
+          lam.forEach(p => { const s2 = E3.proj(p), r = clamp(0.25 * E3.cam().f / Math.max(1, E3.depth(p)), 0.8, 3); disc(s2[0], s2[1], r * 1.5, INK, 0.55 * al); });
+          AUH.lights(lam, OPT.colour ? (el > set ? '#FFFBF0' : '#E8432C') : OCHRE, { r0: 1.1, k: 260, a: 0.95 * k * ink, halo: 0.2 * k * ink, glow: true });
+        }
       } }); });
       this.bars.forEach(b => { const p = W3(b.u, 0, b.z), d = R11.dep(p); if (d > 1) { const s = E3.proj(p); if (s[0] > B[0] - 80 && s[0] < B[2] + 80) list.push({ d, draw: () => this.drawBar(b, ink) }); } });
       const dP = R11.dep(pose.toW([0, 0, 0]));
@@ -1973,7 +2002,7 @@ scene({
         return AUH.fogDepth(fu - dv[0] * slide, fv - dv[1] * slide, 0.52 + 0.01 * w, 0.12, 1.1) * (1 - onRw);
       };
       AUH.fogLayer(list, {
-        h: hF, V: Vf, amt: 0.92 * ink, strokes: this.fogSk,
+        h: hF, V: Vf, amt: (OPT.colour ? 0.7 : 0.92) * ink, strokes: this.fogSk,
         dens: (l, t) => { const g = AUH.rowGround(l, t); return AUH.fogShare(fogF(g[1], g[0]), hF * t / Math.max(1, C2 - hF), Vf); },
         tint: OPT.colour ? () => [[0, HUE.cloud, 0.16], [1, HUE.cloud, 0.12]] : null,
         pearl: OPT.colour ? ['#FBFAF6', 0.4] : null,

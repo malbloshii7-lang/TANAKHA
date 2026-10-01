@@ -277,10 +277,11 @@ def jet_source(n, rev_from=None):
     return s
 
 
-def jet_pass(dur, gain, t_close, t_down=None, side=220.0, v=70.0, k=1.0):
-    """the arrival heard from beside the runway, side metres off its centreline: closest at t_close (s into the sound),
-    main gear down at t_down; the motion on the picture's clock (k: the plate's clock rate, so the Doppler is the
-    picture's), 3-degree path, flare to the ground at touchdown, then decelerating at 2 m/s2 with reverse thrust"""
+def jet_pass(dur, gain, t_close, t_down=None, side=220.0, ear=1.6, v=70.0, k=1.0):
+    """the arrival heard from beside the runway, side metres off its centreline and ear metres up: closest at t_close
+    (s into the sound), main gear down at t_down; the motion on the picture's clock (k: the plate's clock rate, so the
+    Doppler is the picture's), 3-degree path, flare to the ground at touchdown, then decelerating at 2 m/s2 with reverse
+    thrust"""
     n = int(dur * SR)
     ref = ORIG['jet_far'](dur, gain)
     vk = v * k
@@ -295,7 +296,7 @@ def jet_pass(dur, gain, t_close, t_down=None, side=220.0, v=70.0, k=1.0):
 
     # the reversers open about a second after the mains touch (2 s of the picture's slowed clock)
     s = jet_source(n, rev_from=td + 2.0)
-    y = propagate(s, path, ear_h=3.5)
+    y = propagate(s, path, ear_h=ear)
     y = np.vstack([y, y])
     return level(fades(y, 1.5, 1.5), ref)
 
