@@ -64,6 +64,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 | `qc/` | The show deliverables and the checks, run by `qc/deliver.sh`: LTC (`ltc.py`), WebVTT and EBU-STL (`subs.py`), the show caller's reference (`caller_ref.py`), `masters_qc.py` → `QC.md` and `qc-report.json` (with `pse.py`, a BT.1702-model photosensitivity pre-check, and `mp4info.py`), and `dossier.py` → `QC.html` |
 | `audio.py`, `score.py` | The synthesized temp score, placed from the timeline: stems (music, Emirati percussion, sfx), the mixes (with a restrained mix without percussion), the stage loop and the applause bed. The build fails if any leader's card measures quieter than the world beat |
 | `sampler.py` | Opt-in (`score.py … --samples DIR`): the orchestra (strings, horn, timpani, pizzicato, harp, glockenspiel, a cymbal swell into the two blooms) plays recorded samples from VSCO-2 Community Edition (Versilian Studios, CC0), each note at the loudness of the synthesized voice it replaces. The Emirati and Arabic instruments, the voices and the effects stay synthesized. Without the flag the score is byte-identical |
+| `foley.py` | Opt-in (`score.py … --foley DIR`): every sound effect a field recording (the falaj's stream, the desert wind, the sea along a dhow's hull and lapping at the jetty, gulls, rain, the passing freight train, the night's crickets, the operations room's keyboards) or, where no free recording of the event exists, a physical model of its pass (the landing airliner and the seeding aircraft: Doppler, ground reflection, air absorption, reverse thrust); the drums of Al Ayyala and the sea songs as recorded hits (VCSL, CC0). Each sound is set to the loudness of the synthesized one it replaces; sources and licences in its docstring. Without the flag the score is byte-identical |
 | `subtitles.py` | On-screen text and narration as Arabic and English SRT files |
 | `cuesheet.py` | The show-control cue sheet (cue to cue, with SMPTE timecode) |
 | `script.py` → `SCRIPT.md` | The as-built script for approval: every narration line and every words block, with its times |
@@ -92,6 +93,9 @@ python3 pace.py out/r11/mix.wav out/r11/mix-paced.wav 1.1
 # the same score with the orchestra recorded instead of synthesized (a draft for comparison), from a checkout of
 # https://github.com/sgossner/VSCO-2-CE (the folders sampler.py lists, about 0.5 GB)
 mkdir -p out/r11s && python3 score.py out/r11/cues-design.json out/r11s/ --samples ../VSCO-2-CE && python3 pace.py out/r11s/mix.wav out/r11s/mix-paced.wav 1.1
+# with recorded sound effects and drums as well (the review copy since 1 October): DIR holds checkouts of blanket, noisekun,
+# moodist and VCSL at the commits foley.py names
+mkdir -p out/r11f && python3 score.py out/r11/cues-design.json out/r11f/ --samples ../VSCO-2-CE --foley ../foley && python3 pace.py out/r11f/mix.wav out/r11f/mix-paced.wav 1.1
 FILM_QUERY=rev11 node render.js cues out/r11/cues.json
 FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix-paced.wav --jobs 3
 

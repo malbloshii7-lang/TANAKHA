@@ -45,6 +45,11 @@ import numpy as np
 
 import audio as A
 
+FOLEY = None  # foley.py, when --foley installs it: recorded sound effects and drums, and the layers only they have
+# the arrival's moments on its plate's clock (scenes/r11-airport.js), for its pass with --foley: nearest the listener
+# beside the runway, and the main gear's touchdown
+JET_CLOSE, JET_DOWN = 2.0, 5.4
+
 BPM = 72
 BEAT = 60 / BPM
 BAR = 4 * BEAT
@@ -275,7 +280,10 @@ def main(cues_path, out_dir):
     # B01 · night: the drone, wind, starlight; a hummed lead and its answer; the rababa states the motif as Suhail
     # clears the dunes; the ring tone. No drums at night.
     t_end = en('suhail')
-    sfx.add(A.wind(t_end + 3, gain=0.9, gust=0.05), 1.5)
+    night = A.wind(t_end + 3, gain=0.9, gust=0.05)
+    sfx.add(night, 1.5)
+    if FOLEY:  # crickets in the desert night, far under the wind
+        sfx.add(FOLEY.layer('night', t_end + 3, night, 14, hp=1800), 1.5)
     music.add(A.strings(D2, t_end - 1.0, bright=600, attack=3.5, release=3.0, voices=5), 1.5, 0.85)
     music.add(A.strings(A2, t_end - 2.0, bright=700, attack=4.0, release=3.0, voices=5), 2.5, 0.5)
     for k, (dt, m) in enumerate([(2.2, 86), (3.4, 93), (4.9, 88), (6.1, 91), (7.2, 86)]):
@@ -411,17 +419,37 @@ def main(cues_path, out_dir):
             play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
     for sid in ['rail', 'port', 'energy'] + (['solar'] if R11 else []):
         stroke(perc, 'tus', st(sid), 0.7)
-    sfx.add(A.jet_far(4.5 / S['airport']['speed'] if SLOW else 4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
+    if FOLEY and SLOW:
+        # the arrival heard from beside the runway: its pass, touchdown and reverse thrust on the plate's own clock
+        a0, k_ = st('airport'), S['airport']['speed']
+        sfx.add(FOLEY.jet_pass(en('airport') - a0 + 1.0, 0.9, sc('airport', JET_CLOSE) - a0 + 0.2,
+                               sc('airport', JET_DOWN) - a0 + 0.2, k=k_), a0 - 0.2, 0.8)
+    else:
+        sfx.add(A.jet_far(4.5 / S['airport']['speed'] if SLOW else 4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
     if R11:
         sfx.add(A.wind(en('airport-dawn') - w0 if SLOW else 5.0, gain=0.25, gust=0.04), w0)  # the still air of a fog morning
         sfx.add(A.wind(0.75 * (en('solar') - st('solar')) if SLOW else 5.0, gain=0.3, gust=0.08), st('solar'))
     sfx.add(diesel_far(en('rail') - st('rail') + 0.6, gain=1.0), st('rail') - 0.3, pan=0.25)
+    if FOLEY:  # the open desert's air around the line
+        sfx.add(FOLEY.extra(A.wind, en('rail') - st('rail') + 1.0, gain=0.3, gust=0.05), st('rail') - 0.5)
     if 'tanker' in S:  # the laden tanker under way: calm sea, the crew's drone again; no horn, nothing that waits
         tk = st('tanker')
-        sfx.add(A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5), tk - 0.3)
+        sea_tk = A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5)
+        sfx.add(sea_tk, tk - 0.3)
+        if FOLEY:  # gulls over the jetty
+            sfx.add(FOLEY.layer('gulls', en('tanker') - tk + 1.0, sea_tk, 8, hp=300), tk - 0.3)
         music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
         music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
     sfx.add(A.wind(en('energy') - st('energy') if SLOW else 5.0, gain=0.35, gust=0.12), st('energy'))
+    if FOLEY and R11:
+        # Jebel Ali at work: water at the quay wall, gulls, and far across the quay the twistlocks of the boxes the
+        # cranes set down (at the plate's own set-downs, scene clock: crane 4 on its box, crane 5 on its trailer, crane 3)
+        p0, p1 = st('port'), en('port')
+        lap = FOLEY.ref('sea', p1 - p0 + 1.0, 0.45, 7.5)
+        sfx.add(FOLEY.layer('lap', p1 - p0 + 1.0, lap, 0, hp=80), p0 - 0.3)
+        sfx.add(FOLEY.layer('gulls', p1 - p0 + 1.0, lap, 9, hp=300), p0 - 0.3, pan=0.2)
+        for x, pan in [(3.75, -0.3), (5.10, 0.25), (7.9, 0.45)]:
+            sfx.add(FOLEY.clank(1.0), sc('port', x), pan=pan)
     for m in [55, 59, 62]:  # a brass swell on the last chord of the day, into the President's card
         music.add(A.horn(m, 2.6, gain=0.6), d0 + (k - 1) * BAR)
 
@@ -463,6 +491,9 @@ def main(cues_path, out_dir):
         # low string pedal, the harmony walking D minor - B flat - C (the world's dominant), the strings rising to its
         # landing; no drums (the Ayyala waits for the national line)
         a0, a1 = st('watch'), st('world')
+        if FOLEY:  # the operations room: keyboards, quiet, under the music
+            room = FOLEY.ref('wind', a1 - a0, 0.2, 0.04)
+            sfx.add(FOLEY.layer('keys', a1 - a0, room, 6, hp=400, lp=6000), a0)
         k, t = 0, a0
         # the slower watch (3.5 bars) walks D minor - B flat - G minor - C, the same landing a bar later
         for ch in [Dm7, [34, 41, 58, 62, 65]] + ([[43, 50, 58, 62, 65]] if SLOW else []) + [[36, 43, 60, 64, 67]]:
@@ -537,7 +568,10 @@ def main(cues_path, out_dir):
     # full cadence at the title; it rings into the hold pad
     f0, f1 = st('finale'), en('finale')
     title = f0 + 5.0  # finaleWords: the title at b + 5
-    sfx.add(A.wind(f1 - f0 + 3, gain=0.6, gust=0.05), f0)
+    fin_w = A.wind(f1 - f0 + 3, gain=0.6, gust=0.05)
+    sfx.add(fin_w, f0)
+    if FOLEY:  # the desert night again
+        sfx.add(FOLEY.layer('night', f1 - f0 + 3, fin_w, 14, hp=1800), f0)
     chord(music, [D3, A3, 66, 69], f0, title - f0, gain=0.34, bright=1500, attack=2.0, release=1.2)
     music.add(A.shimmer(f1 - f0 + 2, gain=0.8, base=86), f0)
     for j, (t, m, d) in enumerate(motif(f0 + 0.4, root=D4, major=True, stretch=0.9)):
@@ -668,5 +702,12 @@ if __name__ == '__main__':
         k = args.index('--samples')
         import sampler
         sampler.install(args[k + 1], sys.modules[__name__])
+        del args[k:k + 2]
+    if '--foley' in args:
+        # opt-in: recorded sound effects and Emirati drums instead of synthesis (foley.py); without the flag foley.py
+        # is never imported, and the score renders exactly as before
+        k = args.index('--foley')
+        import foley
+        foley.install(args[k + 1], sys.modules[__name__])
         del args[k:k + 2]
     main(args[0], args[1] if len(args) > 1 else '.')

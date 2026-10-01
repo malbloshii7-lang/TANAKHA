@@ -4,9 +4,9 @@
 // plant): almost 4 million bifacial modules on single-axis trackers over more than 20 km² of desert, 35 km from the city.
 // True 3D (engrave3d.js), metres: x east, y north, z up, the sand at z 0. The eye stands in an aisle of a northern block,
 // 4 m from the east-west service road, and looks south-south-west over the road down the aisles; it cranes up from 2.9 m
-// to 10.5 m and draws back 6 m, turning 3.5° toward the sun and tilting from level to 10.5° down, so the rows open out to
-// the horizon (f 580 px: 84° across the picture box). A pyranometer stands on its post at the road's edge (NCM forecasts
-// the sun for solar plants).
+// to 10.5 m and draws back 6 m, turning 10.8° south (heading 208.8° to 198°, against the sun's swing west) and tilting
+// from level to 8° down, so the rows open out to the horizon and the sun crosses to the picture's right (f 580 px: 84°
+// across the picture box). A pyranometer stands on its post at the road's edge (NCM forecasts the sun for solar plants).
 //   modules: a 2023 bifacial module is about 2.28 × 1.13 m; two deep in portrait, a strip 4.6 m across; 56 modules
 //   along a tracker (four strings of 28), about 65 m; three trackers end to end make a block, 10 m service roads
 //   between blocks, a wider north-south road every 36 rows; the torque tube (the axis, north-south) 2.5 m up on piles
@@ -30,14 +30,26 @@
 //   west; the shadows of the piles, the stations and the pyranometer swing from 33° to 53° (north-east by north to
 //   north-east by east) and nearly double; the rows' shade widens from half the aisle to nine-tenths; the light warms
 //   (w, from the sun's height: the low sky, the glow round the sun, the disc's edge, the sky in the glass). The clock,
-//   and the crane on the same clock, runs at an even pace, about 12 minutes of afternoon to a second of the beat,
-//   easing in and out over its first and last fifth; the crane's cubic ease used to tilt the view down faster than the
-//   sun sinks mid-beat, which with this sun would lift the disc on screen. A lower sun is out of reach: below about 25°
-//   the rows stand at their stop or backtrack.
+//   and the crane on the same clock, runs at an even pace, about 12.5 minutes of afternoon to a second of the beat
+//   (design time), easing in over its first eighth (inside the dissolve from Shams 1) and out over its last quarter, and
+//   comes to rest at lt 6.7 (film 139.15 at the design pace; the sun has all but stopped by 138.8), before the dissolve
+//   to the leaders' card begins (139.4): the sun has arrived and stands still when the card takes the frame, where it
+//   used to be still moving at mid-frame. The crane's cubic ease used to tilt the view down faster than the sun sinks
+//   mid-beat, which with this sun would lift the disc on screen; the tilt and the turn are linear in the clock. A lower
+//   sun is out of reach: below about 25° the rows stand at their stop or backtrack.
 //   sun: the disc is drawn at 24 px, about four and a half times its true 0.53° (5 px through this lens), so it reads;
 //   at 13:50 it stands high, so the camera starts level (it started 2° down) to hold the disc whole in the frame. (In the
 //   dissolve it stands straight above the Shams 1 plate's sun, about 100 px higher: Shams 1's day ends just past noon,
-//   and this one carries it on into the afternoon.)
+//   and this one carries it on into the afternoon.) Its 21° swing west alone would carry it only from the middle of the
+//   picture to just right of it (screen x 580 to 766), so the camera turns 10.8° the other way as it tilts down: the
+//   sun crosses from screen (580, 87) to (945, 127), in the picture's right-hand part, whole, 82 px inside the frame's
+//   right edge, at an even 44-50 px a second mid-beat, sinking 40 px. It never dims: the disc keeps its size, colour
+//   and opacity, and its glow keeps the strength it has at 13:50 and only warms, laid in 'color' mode (the multiply
+//   glow used to darken round the disc as it warmed, which read as the sun sinking into a haze); the film's vignette,
+//   centred on the screen, lies lighter where the sun is going, so the disc reads a little brighter as it goes.
+//   culling: a block, tracker or piece of tracker is drawn if its axis line at the glass's height, the ground under it,
+//   or either long edge of its glass is in view; the axis line alone let the turning camera pop the northern block's
+//   near row into the frame's lower-left corner already part-grown (film 136.27), where it now slides in from the edge.
 scene({
   id: 'solar',
   start: 0, dur: 5,
@@ -100,11 +112,12 @@ scene({
   },
   // the rows' true-tracking angle (radians, west positive) for a sun at alt, az (degrees)
   trueTrack(alt, az) { const D = Math.PI / 180; return Math.atan2(-Math.cos(alt * D) * Math.sin(az * D), Math.sin(alt * D)); },
-  // the time-lapse's clock (0-1), shared by the crane: an even pace, easing in and out over its first and last fifth
-  // (the speed rises and falls as a smoothstep, so it never jerks), from the dissolve in to the dissolve out
+  // the time-lapse's clock (0-1), shared by the crane: an even pace, easing in over its first eighth (a) and out over its
+  // last quarter (b) (the speed rises and falls as a smoothstep, so it never jerks), from the dissolve in (lt 0.3) to
+  // rest at lt 6.7, before the dissolve out begins (lt 6.87)
   clock(lt) {
-    const x = clamp((lt - 0.3) / 6.9), e = 0.2, sm = t => t * t * t - t * t * t * t / 2;
-    return (x < e ? e * sm(x / e) : x > 1 - e ? 1 - e - e * sm((1 - x) / e) : e / 2 + x - e) / (1 - e);
+    const x = clamp((lt - 0.3) / 6.4), a = 0.12, b = 0.25, sm = t => t * t * t - t * t * t * t / 2;
+    return (x < a ? a * sm(x / a) : x > 1 - b ? 1 - a / 2 - b / 2 - b * sm((1 - x) / b) : a / 2 + x - a) / (1 - a / 2 - b / 2);
   },
   // the clock's hours: 13:50, and the moment the true-tracking angle reaches the 60° stop (found once, by bisection);
   // the sun's altitude at each, for the warming light
@@ -136,10 +149,11 @@ scene({
   },
   view(lt) {
     // in the aisle among the northern block's rows, eye height 2.9 m, looking out over the road to the southern
-    // blocks; it rises to 10.5 m and draws back north along the aisle, with a slight turn toward the sun, on the
-    // time-lapse's clock; it starts level, so the early afternoon's high sun stands whole in the frame
+    // blocks; it rises to 10.5 m and draws back north along the aisle, turning 10.8° south against the sun's swing west
+    // and tilting 8° down, on the time-lapse's clock, so the sun crosses to the picture's right; it starts level, so the
+    // early afternoon's high sun stands whole in the frame
     const D = Math.PI / 180, u = this.clock(lt);
-    const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 212.3, u) * D, pt = lerp(0, 10.5, u) * D;
+    const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 198, u) * D, pt = lerp(0, 8, u) * D;
     return E3.camera(C, [C[0] + 100 * Math.cos(pt) * Math.sin(az), C[1] + 100 * Math.cos(pt) * Math.cos(az), C[2] - 100 * Math.sin(pt)], 580, 540, 560);
   },
   // the camera, and where the horizon and the sun fall on screen (the colour washes follow them)
@@ -223,11 +237,16 @@ scene({
     R11.clipped(() => {
       washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.48 - 0.04 * w], [0.55, HUE.sky, 0.34 - 0.06 * w], [0.85, HUE.dawn, 0.08 + 0.14 * w], [1, HUE.rose, 0.1 + 0.24 * w]], 0, q);
       if (this.sp) {
-        // the glow round the sun: a pale cream while it stands high, warming to apricot
-        const [sx, sy] = this.sp, R = 300, c = [lerp(246, 242, w), lerp(214, 163, w), lerp(170, 107, w)].map(Math.round).join(',');
-        ctx.save(); const g = ctx.createRadialGradient(sx, sy, 10, sx, sy, R);
-        g.addColorStop(0, `rgba(${c},${0.4 + 0.16 * w})`); g.addColorStop(0.5, `rgba(${c},${0.13 + 0.07 * w})`); g.addColorStop(1, `rgba(${c},0)`);
-        ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(sx - R, sy - R, 2 * R, 2 * R); ctx.restore();
+        // the glow round the sun: a pale cream tint that holds its strength all afternoon, and a warmth that rises as the
+        // sun lowers, laid in 'color' mode (it takes the apricot's hue and keeps the sky's lightness), so the glow warms
+        // without darkening round the disc: the sun never dims or sinks into a haze as it lowers
+        const [sx, sy] = this.sp, R = 300, glow = (c, a0, a1, mode) => {
+          ctx.save(); const g = ctx.createRadialGradient(sx, sy, 10, sx, sy, R);
+          g.addColorStop(0, `rgba(${c},${a0})`); g.addColorStop(0.5, `rgba(${c},${a1})`); g.addColorStop(1, `rgba(${c},0)`);
+          ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = mode; ctx.fillStyle = g; ctx.fillRect(sx - R, sy - R, 2 * R, 2 * R); ctx.restore();
+        };
+        glow('246,214,170', 0.4, 0.13, 'multiply');
+        if (w > 0) glow('242,163,107', 0.45 * w, 0.18 * w, 'color');
       }
       washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.dune, 0.36 + 0.1 * w], [0.12, HUE.sand, 0.34], [1, HUE.sand, 0.28 + 0.06 * w]], 0, q);
     });
@@ -390,6 +409,11 @@ scene({
       if (Math.max(p[0], q[0]) < B[0] - 20 || Math.min(p[0], q[0]) > B[2] + 20 || Math.max(p[1], q[1]) < B[1] - 40 || Math.min(p[1], q[1]) > B[3] + 60) return null;
       return s;
     };
+    // a length of tracker is in view if the line along its axis at the glass's height, either long edge of its glass,
+    // or the ground under it is (the axis line alone let a near piece beside the eye pop in when its glass had already
+    // reached into the frame)
+    const seen = (x, y0, y1) => inView([x, y0, zt], [x, y1, zt]) || inView([x, y0, 0], [x, y1, 0]) ||
+      inView(this.corner(x, -hw, y0), this.corner(x, -hw, y1)) || inView(this.corner(x, hw, y0), this.corner(x, hw, y1));
     const dmin = (ya, yb, x) => Math.max(0.6, Math.min(E3.depth([x, ya, this.HUB]), E3.depth([x, yb, this.HUB]), E3.depth([x, clamp(C[1], ya, yb), this.HUB])));
     const farLine = (w, ya, yb) => {
       const a = [w.x + xo, ya, zt], b = [w.x + xo, yb, zt], s = inView(a, b);
@@ -402,18 +426,17 @@ scene({
     this.rows.forEach(w => {
       const key = Math.abs(w.x - C[0]);
       this.blocks.forEach(b => {
-        const s = inView([w.x, b.y0, zt], [w.x, b.y1, zt]);
-        if (!s) return;
+        if (!seen(w.x, b.y0, b.y1)) return;
         if (dmin(b.y0, b.y1, w.x) > FAR) { farLine(w, b.y0, b.y1); return; }
         b.units.forEach(([ya, yb], ui) => {
-          if (!inView([w.x, ya, zt], [w.x, yb, zt]) && !inView([w.x, ya, 0], [w.x, yb, 0])) return;
+          if (!seen(w.x, ya, yb)) return;
           const d = dmin(ya, yb, w.x);
           if (d > FAR) { farLine(w, ya, yb); return; }
           // pieces: one pile span near the eye, longer further out
           const n = d < 45 ? 8 : d < 110 ? 4 : d < 220 ? 2 : 1, L = (yb - ya) / n;
           for (let i = 0; i < n; i++) {
             const y0 = ya + i * L, y1 = y0 + L, dm = E3.depth([w.x, (y0 + y1) / 2, this.HUB]);
-            if (!inView([w.x, y0, zt], [w.x, y1, zt]) && !inView([w.x, y0, 0], [w.x, y1, 0])) continue;
+            if (!seen(w.x, y0, y1)) continue;
             items.push({ key, d: dm, draw: () => this.piece(w, ya, yb, y0, y1, Math.max(0.6, Math.min(E3.depth([w.x, y0, this.HUB]), E3.depth([w.x, y1, this.HUB]))), 1200 + w.k * 7 + i) });
           }
         });

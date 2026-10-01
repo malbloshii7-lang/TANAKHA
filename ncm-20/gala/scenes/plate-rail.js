@@ -54,26 +54,32 @@ scene({
     this.ghaf = [[95.5, 640, 6.5], [98.5, 700, 7], [101.5, 660, 6.5], [117.5, 310, 7], [121, 335, 6.5], [145, 520, 7], [148.5, 545, 6.5]]
       .map(([b, d, h], i) => ({ X: d * Math.sin((b - 90) * Math.PI / 180), Y: d * Math.cos((b - 90) * Math.PI / 180), h, i,
         full: RAIL.f * h / d >= 16 })); // its style is fixed from its size, so nothing switches mid-beat
-    // Revision 11 (?rev11): the camels (see camel11). Each: s along the track and o across it (metres; the near fence
-    // stands at o -22, the eye at o -52.8), hd its heading (radians from the train's direction of travel, toward the far
-    // side positive; each is turned near broadside to the eye, as camels are most often seen and read), sc its size (a
-    // cow 1), its coat, what it does (graze: browses with one slow lift of the head at lift; settle: lowers its head to
-    // graze between t0 and t1; walk: at v m/s), ph its own phase. The near group is in view to about t 3.9 (the pan then
-    // leaves it), the far cow and calf from about t 2.4 to 4.6, the far three from t 4.5 to the end, all over the train
+    // Revision 11 (?rev11): the camels (see camel11) and the plants of the plain (see sow11). Each camel: s along the
+    // track and o across it (metres; the near fence stands at o -22, the eye at o -52.8), hd its heading (radians from
+    // the train's direction of travel, toward the far side positive; each is turned broadside or three-quarters to the
+    // eye, as camels are most often seen and read), sc its size (a cow 1), its coat, what it does (feed: eats from its
+    // food plant, fh m high, by bites, see feed11; walk: at v m/s), ph its own phase. A feeder bites in cycles of P
+    // (nibble: crops the tops; browse: nips a shrub), or by the bites listed in ev (tear: grips, pulls and tears a
+    // mouthful, lifts her head to gL between up and dn and chews it in until chew[1]); lower: [t0, t1, g] brings a raised
+    // head down to feed. The near group, brought to 44-53 m from the eye so their eating reads, is in view to about t
+    // 3.9 (the pan then leaves it), the far cow and calf from about t 2.4 to 4.6, the far three from t 4.5 to the end,
+    // all over the train
     if (typeof REV11 !== 'undefined' && REV11) {
       this.herd11 = [
-        { s: 23.5, o: -28.6, hd: Math.PI + 0.75, sc: 1, coat: 'tan', act: 'graze', lift: 2.3, ph: 0.3, side: 'near' },
-        { s: 30, o: -25.8, hd: 0.7, sc: 1.03, coat: 'dark', act: 'settle', t0: 1.9, t1: 3.3, ph: 1.1, side: 'near' },
-        { s: 44.6, o: -29.6, hd: Math.PI + 0.55, sc: 0.98, coat: 'pale', act: 'walk', v: 0.55, ph: 0.15, side: 'near' },
-        { s: 41.6, o: -31.8, hd: Math.PI + 0.6, sc: 0.68, coat: 'pale', act: 'walk', v: 0.55, ph: 0.62, side: 'near' },
-        { s: -112, o: 118, hd: 0.84, sc: 1, coat: 'tan', act: 'walk', v: 0.55, ph: 0.4, side: 'far' },
-        { s: -109, o: 120.5, hd: 0.9, sc: 0.68, coat: 'tan', act: 'walk', v: 0.55, ph: 0.9, side: 'far' },
+        { s: 42.5, o: -27.6, hd: 0.42, sc: 1.03, coat: 'dark', act: 'feed', food: 'thumam', fh: 0.78, ph: 1.1, side: 'near',
+          ev: [{ tA: 0.75, tG: 1.4, tC: 2.05, tR: 2.75, pm: 0.2, pl: 0.06, kind: 'tear', up: [2.0, 2.75], dn: [3.55, 4.3], gL: 0.44, chew: [2.15, 3.8] },
+            { tA: 4.3, tG: 4.8, tC: 5.35, tR: 6.0, pm: 0.18, pl: -0.05, kind: 'tear', up: [5.3, 6.0], dn: [7.2, 7.8], gL: 0.44, chew: [5.45, 7.6] }] },
+        { s: 34.5, o: -26.4, hd: -2.18, sc: 1, coat: 'tan', act: 'feed', food: 'thumam', fh: 0.66, bite: 'nibble', P: 1.35, ph: 0.3, side: 'near' },
+        { s: 37.0, o: -32.4, hd: -1.75, sc: 0.98, coat: 'pale', act: 'feed', food: 'rimth', fh: 0.5, bite: 'browse', P: 1.6, ph: 0.15, side: 'near' },
+        { s: 40.6, o: -34.6, hd: 1.2, sc: 0.68, coat: 'pale', act: 'feed', food: 'thanda', fh: 0.36, bite: 'nibble', P: 1.15, ph: 0.62, side: 'near' },
+        { s: -112, o: 118, hd: 0.84, sc: 1, coat: 'tan', act: 'feed', food: 'thumam', fh: 0.6, bite: 'nibble', P: 1.5, ph: 0.4, side: 'far' },
+        { s: -109, o: 120.5, hd: 0.9, sc: 0.68, coat: 'tan', act: 'walk', v: 0.3, ph: 0.9, side: 'far' },
         { s: -8, o: 128, hd: 0.25, sc: 1, coat: 'tan', act: 'walk', v: 0.5, ph: 1.6, side: 'far' },
-        { s: 12, o: 134, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'graze', lift: 5.4, ph: 0.7, side: 'far' },
-        { s: 30, o: 138, hd: 0.3, sc: 0.97, coat: 'pale', act: 'settle', t0: 4.9, t1: 6.0, ph: 2.2, side: 'far' }
+        { s: 12, o: 134, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'feed', food: 'thumam', fh: 0.62, bite: 'nibble', P: 1.4, ph: 0.7, side: 'far' },
+        { s: 30, o: 138, hd: 0.3, sc: 0.97, coat: 'pale', act: 'feed', food: 'thanda', fh: 0.38, bite: 'nibble', P: 1.3, lower: [4.9, 5.9, 0.12], ph: 2.2, side: 'far' }
       ];
-      // low shrubs on the near plain besides the ones the grazers browse ([s, o, height m])
-      this.shrubs11 = [[27.5, -31.2, 0.35], [48.5, -26.0, 0.32], [35.0, -33.5, 0.3]];
+      this.herd11.forEach(cm => this.plan11(cm));
+      this.flora11 = this.sow11();
     }
   },
   // the head's position along the track (metres from Q) at scene time t, and the camera's pan that keeps it in view
@@ -140,6 +146,8 @@ scene({
       const pts = []; for (let s = S0; s <= S1; s += 20) { const [X, Y] = this.at(s, tr + g), p = this.proj(X, Y, ez + 0.3, psi); if (p) pts.push([p[0], p[1]]); }
       if (pts.length > 1) stroke(new P(pts), q, INK, 1.1, 0.8);
     });
+    // Revision 11 (?rev11): the plants inside the right of way, between the bank and the fence, out of the camels' reach
+    if (typeof REV11 !== 'undefined' && REV11 && this.flora11) this.plants11(psi, lt, q, 'row');
     // the right-of-way fence on the camera side (posts every 4 m, 1.5 m tall)
     this.posts.forEach(s => { const [X, Y] = this.at(s, -22), a = this.proj(X, Y, 0, psi), b = this.proj(X, Y, 1.5, psi); if (a && b && a[0] > RAIL.x0 - 5 && a[0] < RAIL.x1 + 5) stroke(new P([[a[0], a[1]], [b[0], b[1]]]), q, INK, Math.min(2, 60 / a[2]), 0.55); });
     const wire = z => { const pts = []; for (let s = -2400; s <= 400; s += 16) { const [X, Y] = this.at(s, -22), p = this.proj(X, Y, z, psi); if (p) pts.push([p[0], p[1]]); } return new P(pts); };
