@@ -648,12 +648,16 @@ const AUH = (() => {
     const B = R11.BOX; ctx.fillRect(B[0], B[1], B[2] - B[0], B[3] - B[1]); ctx.restore();
   }
   // steady lights (never flashing): small discs whose size falls with distance; a soft halo in fog
-  function lights(pts, col, { r0 = 1.4, k = 260, a = 0.95, halo = 0 } = {}) {
+  // (glow, in colour: the lamp laid on as light, its core over the paper and a soft halo lightening round it, so a white
+  // or a blue lamp reads in its own colour)
+  function lights(pts, col, { r0 = 1.4, k = 260, a = 0.95, halo = 0, glow = false } = {}) {
     const byA = [];
     pts.forEach(p => { const d = E3.depth(p); if (d < 2) return; const s = E3.proj(p); if (s[0] < R11.BOX[0] - 5 || s[0] > R11.BOX[2] + 5 || s[1] < R11.BOX[1] || s[1] > R11.BOX[3]) return; byA.push([s, Math.max(0.55, Math.min(r0 * 3, r0 * k / d))]); });
     if (!byA.length) return;
-    ctx.save(); ctx.globalCompositeOperation = BLEND; ctx.fillStyle = col;
+    const lit = glow && OPT.colour;
+    ctx.save(); ctx.globalCompositeOperation = lit ? 'screen' : BLEND; ctx.fillStyle = col;
     if (halo > 0) { ctx.globalAlpha = SA * halo; ctx.beginPath(); byA.forEach(([s, r]) => { ctx.moveTo(s[0] + r * 2.6, s[1]); ctx.ellipse(s[0], s[1], r * 2.6, r * 1.6, 0, 0, TAU); }); ctx.fill(); }
+    if (lit) ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = SA * a; ctx.beginPath(); byA.forEach(([s, r]) => { ctx.moveTo(s[0] + r, s[1]); ctx.arc(s[0], s[1], r, 0, TAU); }); ctx.fill();
     ctx.restore();
   }
@@ -1049,7 +1053,7 @@ const B789 = (() => {
         if (dot(n, sub(m, ax)) < 0) n = [-n[0], -n[1], -n[2]];
         if (T.inward) n = [-n[0], -n[1], -n[2]];
         const v = sub(C, m), dv = Math.hypot(v[0], v[1], v[2]), ndv = dot(n, v) / dv, lit = Math.max(0, dot(n, sun));
-        const dark = clamp((look.tone ?? st.tone) + (look.shade ?? st.shade) * (1 - lit) - (st.sky || 0) * Math.max(0, n[2]) + (st.under ?? 0.16) * Math.max(0, -n[2]) * (1 - lit));
+        const dark = clamp((look.tone ?? st.tone) + (look.shade ?? st.shade) * (o.shadeK ?? 1) * (1 - lit) - (st.sky || 0) * Math.max(0, n[2]) + (st.under ?? 0.16) * Math.max(0, -n[2]) * (1 - lit));
         row.push({ n, front: ndv > 0, ndv, lit, dark, pxm: cam.f / Math.max(1, E3.depth(m)) });
       }
       Q.push(row);
@@ -1751,21 +1755,52 @@ scene({
     // 9 m apart; their lamps face the approach, so from the eye beside them they show only their housings
     this.papi = [];
     [-1, 1].forEach(s => { for (let k = 0; k < 4; k++) this.papi.push({ u: 400, v: s * (45 + 9 * k) }); });
-    // the parallel taxiway (210 m to the right), its link at the threshold end, a rapid exit, and the far runway 31R
-    this.twy = [q(-80, 3950, 198.5, 221.5), q(-34, -11, 30, 205)];
+    // the parallel taxiway (210 m to the right: OpenStreetMap's taxiway D lies there), its link at the threshold end, a
+    // rapid exit, and the far runway 31R; and (round 4) a link 23 m wide (Code E/F) crossing the runway 480 m in, past
+    // the aiming point, its runway-holding positions 90 m either side of the centreline (ICAO Annex 14 Table 3-2: code 4,
+    // precision approach category II/III), each marked across the link with pattern A (two solid lines on the taxiway's
+    // side, two dashed on the runway's: §5.2.10 and Fig. 5-6), a stop bar of steady red lights just short of it
+    this.twy = [q(-80, 3950, 198.5, 221.5), q(-34, -11, 30, 205), q(468.5, 491.5, 30, 205), q(468.5, 491.5, -320, -30)];
     this.exitL = [W3(1330, 22, 0.02), W3(1530, 200, 0.02)];
     this.far = q(-200, 4100, 1970, 2030);
+    // the taxiways' yellow centrelines
+    this.tcl = [[W3(-80, 210, 0.03), W3(3950, 210, 0.03)], [W3(-22.5, 37.5, 0.03), W3(-22.5, 198.5, 0.03)], [W3(480, 37.5, 0.03), W3(480, 198.5, 0.03)], [W3(480, -37.5, 0.03), W3(480, -320, 0.03)]];
+    this.hold = [];
+    [-1, 1].forEach(sg => {
+      [88.4, 88.8].forEach(v => { for (let u = 468.5; u < 491.4; u += 1.8) this.hold.push([W3(u, sg * v, 0.03), W3(Math.min(491.5, u + 0.9), sg * v, 0.03)]); });
+      [89.2, 89.6].forEach(v => this.hold.push([W3(468.5, sg * v, 0.03), W3(491.5, sg * v, 0.03)]));
+    });
+    this.stopBar = []; [-1, 1].forEach(sg => { for (let u = 470; u <= 490.1; u += 3) this.stopBar.push(W3(u, sg * 90.3, 0.25)); });
+    // the taxiways' edge lights, steady blue: along the links every 15 m, along the parallel taxiway every 60 m
+    this.twyEdge = [];
+    [[468.5, 491.5], [-34, -11]].forEach(([u0, u1]) => [u0 - 1.5, u1 + 1.5].forEach(u => { for (let v = 45; v <= 195; v += 15) this.twyEdge.push(W3(u, v, 0.3)); }));
+    [467, 493].forEach(u => { for (let v = -45; v >= -315; v -= 15) this.twyEdge.push(W3(u, v, 0.3)); });
+    [197, 223].forEach(v => { for (let u = -60; u <= 2400; u += 60) this.twyEdge.push(W3(u, v, 0.3)); });
+    // the taxiway guidance signs, in their real colours and without legible inscriptions (each legend a plain band): at
+    // the near holding position a mandatory instruction sign (white on red) on each side of the link, facing the
+    // taxiing aircraft; at the far one the backs of its mandatory signs, which carry location signs (yellow on black: FAA
+    // AC 150/5340-18), facing the runway; a runway exit sign (black on yellow) each side 60 m before the link (Annex 14
+    // §5.4.3), facing the landing aircraft; each 13.5-22 m off the pavement's edge, its face 1.1 m tall on frangible legs
+    this.signs = [[455, -90, 0, -1, 'mand'], [505, -90, 0, -1, 'mand'], [455, 90, 0, -1, 'loc'], [505, 90, 0, -1, 'loc'], [408, 52, -1, 0, 'dir'], [408, -52, -1, 0, 'dir']]
+      .map(([u, v, fu, fv, kind]) => ({ u, v, f: [fu, fv], kind, w: kind === 'loc' ? 2.2 : 3.4 }));
+    // a second 787-9 (unmarked) holding short on the far side of the crossing link, its nose 7 m short of the holding
+    // position's marking, flaps up: it waits for the arrival to pass before it is cleared to cross
+    this.holdPose = AUH.poser({ u: 480, v: 97 + B789.SMG, z: B789.Z0, psi: -90 });
+    this.holdM = B789.model({ key: 'gate1', lod: 1, flex: -0.6 });
     // the runway's instruments: RVR sensors 120 m right of the centreline at 385, 1,520, 2,620 and 3,760 m, a cup
     // anemometer on a 10 m mast 300 m in; the met enclosure 350 m left (south-west) of the centreline, 1,200 m from 13R
     this.rvr = [385, 1520, 2620, 3760].map(u => ({ u, v: 120 }));
     this.anemo = { u: 300, v: 165 };
     this.enclosure = { u: 2906, v: -350 };
-    // the eye: 3.5 m up on the sand left of the runway (its perimeter track beside it), abeam 250 m past the threshold
-    this.CAM = [240, -150, 3.5];
+    // the eye (round 4): 12 m up on the platform of a survey mast beside the perimeter track, 240 m left of the
+    // centreline and abeam 240 m past the threshold: outside the runway strip (140 m either side of the centreline: ICAO
+    // Annex 14 §3.4.3, code 4 precision approach) and under its transitional surface, which rises 1:7 from the strip's
+    // edge to 14.3 m over the mast (§4.1.17-4.1.20)
+    this.CAM = [240, -240, 12];
     this.track = [[W3(-400, -238, 0.01), W3(1400, -238, 0.01)], [W3(-400, -243.5, 0.01), W3(1400, -243.5, 0.01)]];
     // the ground's grain and the fog's, laid out over the whole of the pan's field (strokes lying square to the line of
     // sight, uniform on the screen), and kept off the pavement
-    const onPave = (u, v) => (u > -62 && u < rw.L + 2 && Math.abs(v) < 39) || (u > -82 && u < 3952 && Math.abs(v - 210) < 14) || (u > -36 && u < -9 && v > 28 && v < 207) || (u > -205 && Math.abs(v - 2000) < 34);
+    const onPave = (u, v) => (u > -62 && u < rw.L + 2 && Math.abs(v) < 39) || (u > -82 && u < 3952 && Math.abs(v - 210) < 14) || (u > -36 && u < -9 && v > 28 && v < 207) || (u > 466 && u < 494 && v > -322 && v < 207) || (u > -205 && Math.abs(v - 2000) < 34);
     this.sandSk = this.wedge(9000, 6601, 9, 4200, 2600, 15).filter(([a]) => !onPave(a[1], a[0]));
     this.fogSk = this.wedge(2600, 5501, 25, 4500, 2600, 55);
     this.near = this.wedge(900, 6611, 9, 60, 2600, 22).filter(([a]) => !onPave(a[1], a[0]));
@@ -1832,9 +1867,10 @@ scene({
     const sm = (a, k) => { const m = k > 0 ? Math.max(...a) : Math.min(...a); return m + Math.log(a.reduce((s, v) => s + Math.exp(k * (v - m)), 0)) / k; };
     const x0 = sm(xs, -kk), x1 = sm(xs, kk), y0 = sm(ys, -kk), y1 = sm(ys, kk);
     const d = Math.hypot(aim[0] - C[0], aim[1] - C[1], aim[2] - C[2]), fd = 2350 * Math.pow(d / 150, 0.2), fm = 0.84 * (B[2] - B[0]) / (x1 - x0);
-    const f = Math.pow(Math.pow(fd, -6) + Math.pow(fm, -6), -1 / 6), k = AUH.smooth(clamp((lt - 0.45) / 5.3));
+    // (and over the last 1.5 s the operator eases the zoom back a little, so the tower and Terminal A come in behind)
+    const f = Math.pow(Math.pow(fd, -6) + Math.pow(fm, -6), -1 / 6) * lerp(1, 0.86, AUH.smooth(clamp((lt - 4.2) / 1.55))), k = AUH.smooth(clamp((lt - 0.45) / 5.3));
     this.fl = fl;
-    return E3.camera(C, aim, f, lerp(590, 680, k) - f * (x0 + x1) / 2, 600 - f * (y0 + y1) / 2);
+    return E3.camera(C, aim, f, lerp(590, 790, k) - f * (x0 + x1) / 2, 600 - f * (y0 + y1) / 2);
   },
   frame(lt) {
     const cam = this.view(lt), h = E3.projDir([cam.F[0], cam.F[1], 0]);
@@ -1844,10 +1880,10 @@ scene({
     this.frame(lt);
     const B = R11.BOX, hy = this.hy, q = easeInOut(prog(lt, 0.4, 0.8));
     // the clear morning sky away from the sun: blue overhead, paling to a warm haze along the horizon
-    washFade([B[0], B[1] - 200, B[2], hy + 2], [[0, HUE.deep, 0.3], [0.26, HUE.sky, 0.64], [0.6, HUE.sky, 0.46], [0.82, HUE.sky, 0.28], [0.93, HUE.sail, 0.28], [1, HUE.dawn, 0.24]], 0, q);
-    // the ground: the graded strip's pale desert sand, lit by the low sun behind the eye's right shoulder, a little warmer
-    // toward the eye
-    washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sail, 0.34], [0.2, HUE.sail, 0.46], [0.6, HUE.sand, 0.3], [1, HUE.sand, 0.4]], 0, q);
+    washFade([B[0], B[1] - 200, B[2], hy + 2], [[0, HUE.deep, 0.46], [0.26, HUE.water, 0.5], [0.5, HUE.sky, 0.56], [0.78, HUE.sky, 0.34], [0.92, HUE.sail, 0.32], [1, HUE.dawn, 0.3]], 0, q);
+    // the ground: the graded strip's desert sand, honey-coloured in the low sun behind the eye's right shoulder, paler
+    // into the distance
+    washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.sail, 0.4], [0.12, HUE.sand, 0.34], [0.5, HUE.sand, 0.46], [1, HUE.gold, 0.5]], 0, q);
   },
   draw(lt) {
     // 46 minutes after sunrise (13 after the dawn shot ends): 9.2° up at 121.1°
@@ -1862,19 +1898,25 @@ scene({
       // low wind ripples of the graded strip; its grain
       AUH.groundRules(hy, this.CAM[2], (wu, wv, t) => {
         const rip = 0.5 + 0.5 * Math.sin((wu * 0.8 + wv * 0.35) / 2.1 + 2.4 * AUH.noise(wu / 30, wv / 24, 1.3));
-        return ink * (0.35 + 0.65 * AUH.smooth(clamp((rip - 0.2) * 1.6))) * (0.55 + 0.45 * AUH.noise(wu / 90, wv / 70, 3.1));
-      }, { pitch: y => lerp(2.0, 4.4, clamp((y - hy) / (B[3] - hy))), lw: y => lerp(0.5, 1.35, clamp((y - hy) / (B[3] - hy))), a: OPT.colour ? 0.46 : 0.62, col: OPT.colour ? '#AE8F66' : SEPIA });
-      E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.16 + 0.3 * k : 0.14 + 0.32 * k) * ink]), OPT.colour ? '#9C7B54' : SEPIA, 0.85);
-      E3.segments(this.near.map(([a, b, k]) => [a, b, (0.2 + 0.35 * k) * ink]), OPT.colour ? '#9C7B54' : SEPIA, 1.2);
-      this.track.forEach(t => E3.line(t, OPT.colour ? '#9C7B54' : SEPIA, 1.0, 0.3 * ink));
+        // (in colour the ripples' troughs hatched deeper, so the honey sand reads rippled)
+        const r0 = OPT.colour ? 0.18 : 0.35;
+        return ink * (r0 + (1 - r0) * AUH.smooth(clamp((rip - 0.2) * 1.6))) * (0.55 + 0.45 * AUH.noise(wu / 90, wv / 70, 3.1));
+      }, { pitch: y => lerp(2.0, 4.4, clamp((y - hy) / (B[3] - hy))), lw: y => lerp(0.5, 1.35, clamp((y - hy) / (B[3] - hy))), a: OPT.colour ? 0.56 : 0.62, col: OPT.colour ? '#A5773A' : SEPIA });
+      E3.segments(this.sandSk.map(([a, b, k]) => [a, b, (OPT.colour ? 0.16 + 0.3 * k : 0.14 + 0.32 * k) * ink]), OPT.colour ? '#956A35' : SEPIA, 0.85);
+      E3.segments(this.near.map(([a, b, k]) => [a, b, (0.2 + 0.35 * k) * ink]), OPT.colour ? '#956A35' : SEPIA, 1.2);
+      this.track.forEach(t => E3.line(t, OPT.colour ? '#956A35' : SEPIA, 1.0, 0.3 * ink));
       // the pavement: asphalt darker than the sand, so its paint shows white
       const along = [0, 1, 0], dk = OPT.colour ? 0 : 0.2;
       const pave = (pts, tone, seed, col, fa = 0.42) => E3.face(pts, { n: [0, 0, 1], tone, shade: 0, hdir: along, fillCol: OPT.colour ? col : tone > 0.3 ? INK : null, fillA: OPT.colour ? fa : 0.16 * tone, lw: 0.9, edgeA: 0.5 * ink }, seed);
       pave(this.far, 0.3 + dk, 501, '#5E646C', 0.5);
-      this.twy.forEach((t, i) => pave(t, 0.26 + dk, 510 + i, '#5E646C', 0.5));
+      pave(this.twy[0], 0.26 + dk, 510, '#5A6068', 0.55);
       E3.line(this.exitL, INK, 0.9, 0.4 * ink);
       pave(this.q(-60, this.rw.L, -37.5, 37.5, 0), 0.08, 520, '#C2BBAE', 0.38);
+      this.twy.slice(1).forEach((t, i) => pave(t, 0.26 + dk, 511 + i, '#5A6068', 0.55));
       pave(this.q(0, this.rw.L, -30, 30, 0.01), 0.62 + dk, 521, '#3A3F46', 0.72);
+      // the taxiways' paint: yellow centrelines and the holding positions' markings (in colour, the paint laid on as it is,
+      // brighter than the asphalt)
+      this.paint(this.tcl.concat(this.hold), OPT.colour ? '#EAB422' : OCHRE, 1.1, 0.9 * ink);
       // its markings: paper, and in colour a crisp white laid on as light
       const mk = this.marks.filter(p => p.every(x => E3.depth(x) > 2)).map(p => new P(p.map(E3.proj), true));
       mask(mk, 0.88 * ink);
@@ -1883,13 +1925,25 @@ scene({
       const fl = this.fl, pose = AUH.poser(fl), m = B789.build(fl.cfg);
       m.decals = this.decals;
       AUH.unionFill(B789.shadow(m, pose, E3.sun(), []), OPT.colour ? '#56616E' : INK, (OPT.colour ? 0.4 : 0.62) * ink, OPT.colour ? 0 : 2.2);
-      // the runway's lights, steady; the edge lights' fittings
-      AUH.lights(this.thr, OPT.colour ? HUE.leaf : OCHRE, { r0: 1.6, k: 230, a: 0.95 * ink, halo: 0.13 * ink });
-      AUH.lights(this.rwl, OPT.colour ? '#E2B868' : OCHRE, { r0: 1.0, k: 200, a: 0.8 * ink, halo: 0.06 * ink });
+      // the runway's lights in their own colours, steady: the threshold's green, the touchdown zone's and the centreline's
+      // white, the edge lights' white on their fittings
+      AUH.lights(this.thr, OPT.colour ? '#2CBF66' : OCHRE, { r0: 1.6, k: 230, a: 0.95 * ink, halo: 0.13 * ink, glow: true });
+      AUH.lights(this.rwl, OPT.colour ? '#FFF6E2' : OCHRE, { r0: 1.0, k: 200, a: 0.8 * ink, halo: 0.06 * ink, glow: true });
       E3.segments(this.edge.map(p => [p, [p[0], p[1], 0.45], 0.7 * ink]), INK, 0.9);
-      AUH.lights(this.edge.map(p => [p[0], p[1], 0.45]), OPT.colour ? '#F0D9A0' : OCHRE, { r0: 1.1, k: 200, a: 0.85 * ink, halo: 0.07 * ink });
-      // the painter's list: the far terminal and tower, the instruments, the approach lights, the aircraft, the fog
+      AUH.lights(this.edge.map(p => [p[0], p[1], 0.45]), OPT.colour ? '#FFFBF0' : OCHRE, { r0: 1.1, k: 200, a: 0.9 * ink, halo: 0.1 * ink, glow: true });
+      // the painter's list: the far terminal and tower, the instruments, the approach lights, the taxiways' lights and
+      // signs, the aircraft holding short, the arrival, the fog
       const list = [];
+      // the taxiways' blue edge lights and the stop bars' red, each a steady lamp at its own depth (a near one can stand
+      // in front of the arrival)
+      const lampItems = (pts, col, o) => { const by = new Map(); pts.forEach(p => { const d = R11.dep(p); if (d < 3) return; const k = Math.round(d / 12); if (!by.has(k)) by.set(k, []); by.get(k).push(p); }); by.forEach((g, k) => list.push({ d: k * 12, draw: () => AUH.lights(g, col, o) })); };
+      lampItems(this.twyEdge, OPT.colour ? '#3E6DF2' : OCHRE, { r0: 1.0, k: 200, a: 0.9 * ink, halo: 0.1 * ink, glow: true });
+      lampItems(this.stopBar, OPT.colour ? '#EE4229' : OCHRE, { r0: 1.0, k: 200, a: 0.9 * ink, halo: 0.12 * ink, glow: true });
+      this.signs.forEach(g => { const d = R11.dep(AUH.W3(g.u, g.v, 1.2)); if (d > 3) list.push({ d, draw: () => this.drawSign(g, ink) }); });
+      // the 787 holding short, and its shadow
+      const dH = R11.dep(this.holdPose.toW([0, 0, 0]));
+      AUH.unionFill(B789.shadow(this.holdM, this.holdPose, E3.sun(), []), OPT.colour ? '#56616E' : INK, (OPT.colour ? 0.36 : 0.55) * ink, OPT.colour ? 0 : 2.2);
+      list.push({ d: dH, draw: () => B789.draw(this.holdM, this.holdPose, Object.assign({ air: R11.air(dH, 3000) * ink }, this.look(ink, false))) });
       const dT = R11.dep(W3(AUH.TWR[0], AUH.TWR[1], 40));
       list.push({ d: dT, draw: () => AUH.drawTower(this.tower, R11.air(dT, 2600) * ink, OPT.colour ? HUE.dawn : null, 0.12, 0.3) });
       AUH.terminalItems(list, this.term, ink, { k: 2600, noHatch: true, warm: OPT.colour ? HUE.dawn : null, warmA: 0.14, warmAll: 0.03, glint: 0.16 });
@@ -1910,7 +1964,7 @@ scene({
       } }); });
       this.bars.forEach(b => { const p = W3(b.u, 0, b.z), d = R11.dep(p); if (d > 1) { const s = E3.proj(p); if (s[0] > B[0] - 80 && s[0] < B[2] + 80) list.push({ d, draw: () => this.drawBar(b, ink) }); } });
       const dP = R11.dep(pose.toW([0, 0, 0]));
-      list.push({ d: dP, draw: () => B789.draw(m, pose, { air: R11.air(dP, 3000) * ink, warm: OPT.colour ? HUE.dawn : null, warmA: 0.16, warmAll: 0.015, white: 0.18, shine: 0.24, coolK: 1.5, hatchA: 1.25, inkFill: 0.16, lights: ink, lw: 0.85 }) });
+      list.push({ d: dP, draw: () => B789.draw(m, pose, Object.assign({ air: R11.air(dP, 3000) * ink }, this.look(ink, true))) });
       // the fog's last lenses, 1.5 m deep, over the infield's sand, cleared from the runway's asphalt and its shoulders;
       // in real time it only settles 0.1 m and drifts at 1.5 m/s toward the north-west
       const w = clamp((lt - 0.45) / 5.3), slide = 1.5 * (lt - 0.6), dv = AUH.dirAz(300), C2 = cam.C[2], hF = lerp(1.0, 0.92, w), Vf = 55;
@@ -1934,6 +1988,47 @@ scene({
       R11.paint(list);
     });
     E3.sunAt();
+  },
+  // the 787's look on this morning: in colour its white paint over lighter hatching, blue-grey in shade, its belly light
+  // grey, the low sun's warmth and sheen where it strikes; its landing lights steady (lights: the arrival only)
+  look(ink, lights) {
+    return OPT.colour ? { warm: HUE.dawn, warmA: 0.14, warmAll: 0.015, white: 0.3, shine: 0.26, coolK: 1.0, hatchA: 0.72, shadeK: 0.55, inkFill: 0.16, lights: lights ? ink : 0, lw: 0.85 }
+      : { warm: null, coolK: 1.5, hatchA: 1.25, inkFill: 0.16, lights: lights ? ink : 0, lw: 0.85 };
+  },
+  // paint on the pavement: world segments stroked in the paint's colour (in colour laid on as it is, brighter than the
+  // asphalt under it; in monochrome as a light ochre line)
+  paint(segs, col, lw, a) {
+    const runs = []; segs.forEach(([p, q]) => { const r = E3.clipSeg(p, q); if (r) runs.push(r); });
+    if (!runs.length) return;
+    ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = OPT.colour ? 'source-over' : BLEND; ctx.strokeStyle = col; ctx.lineCap = 'butt';
+    ctx.beginPath(); runs.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); });
+    ctx.lineWidth = lw; ctx.stroke(); ctx.restore();
+  },
+  // a taxiway guidance sign: a panel 1.1 m tall on two frangible legs, its face toward f in its colours (white on red, a
+  // mandatory instruction; yellow on black with a yellow border, a location; black on yellow, a direction), its legend a
+  // plain band with no letters or figures; in monochrome in tones of ink
+  drawSign(g, ink) {
+    const W3 = AUH.W3, c = W3(g.u, g.v, 1.15), d = R11.dep(c), al = R11.air(d, 2600) * ink, t = [-g.f[1], g.f[0]], hw = g.w / 2;
+    const at = (a, z, b = 0) => W3(g.u + t[0] * a + g.f[0] * b, g.v + t[1] * a + g.f[1] * b, z);
+    [-0.7, 0.7].forEach(k => R11.member(at(k * hw, 0), at(k * hw, 0.6), 0.9, 0.85 * al));
+    const ua = g.f[0] ? [g.u - 0.12, g.u + 0.12] : [g.u - hw, g.u + hw], va = g.f[0] ? [g.v - hw, g.v + hw] : [g.v - 0.12, g.v + 0.12];
+    E3.solid(E3.box(va[0], va[1], ua[0], ua[1], 0.6, 1.7), { tone: 0.3, shade: 0.4, lw: 0.8, edgeA: 0.85 * al, noHatch: true, fillCol: OPT.colour ? '#4E5256' : null, fillA: 0.4 }, 4300);
+    const C = E3.cam().C, nf = [g.f[1], g.f[0], 0];
+    if (E3.dot(nf, E3.sub(C, c)) <= 0) return;
+    const quad = (a0, a1, z0, z1) => new P([at(a0, z0, 0.13), at(a1, z0, 0.13), at(a1, z1, 0.13), at(a0, z1, 0.13)].map(E3.proj), true);
+    const face = quad(-hw, hw, 0.6, 1.7), band = quad(-hw * 0.62, hw * 0.62, 0.98, 1.32);
+    const col = { mand: ['#C42B1D', '#FFFFFF', 0.55], loc: ['#1C1B1A', '#F2C21E', 0.85], dir: ['#F2C21E', '#1C1B1A', 0.22] }[g.kind];
+    if (OPT.colour) {
+      fill(face, col[0], 0.95 * al);
+      if (g.kind === 'dir') fill(band, col[1], 0.9 * al);
+      else {
+        mask(band, al);
+        if (g.kind === 'loc') wash(band, col[1], 0.95 * al);
+        else { ctx.save(); ctx.globalAlpha = SA * 0.6 * al; ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); band.trace(ctx, 1); ctx.fill(); ctx.restore(); }
+      }
+      if (g.kind === 'loc') stroke(quad(-hw * 0.92, hw * 0.92, 0.68, 1.62), 1, col[1], 0.8, 0.9 * al);
+    } else { fill(face, INK, col[2] * al); if (g.kind === 'dir') fill(band, INK, 0.8 * al); else mask(band, al); }
+    stroke(face, 1, INK, 0.7, 0.8 * al);
   },
   // one barrette: its bar across the centreline on two legs, its lamps (steady), a crossbar's long bar on more legs
   drawBar(b, ink) {
