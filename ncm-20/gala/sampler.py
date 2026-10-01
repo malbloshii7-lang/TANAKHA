@@ -5,23 +5,24 @@
 score.py imports this module only when --samples is given. Without it the score renders exactly as before, byte for
 byte. install() swaps the orchestral voices for recorded ones: in audio.py strings() (and so chord(), which plays its
 notes through strings()), horn(), timpani(), pizz(), bell() and shimmer(); in score.py harmonic() and orch_bloom().
-The Emirati and Arabic instruments (the rababa, the oud, the drums of Al Ayyala, the tus, the mirwas, the claps, the
-jahla), the voices (the choir, the hummed answers, the nahham's call) and the sound effects stay synthesized: VSCO has
-none of them.
+The Emirati and Arabic instruments (the rababa, the oud that pluck() plays, the drums of Al Ayyala, the tus, the mirwas,
+the claps, the jahla), the voices (the choir, the hummed answers, the nahham's call) and the sound effects stay
+synthesized: VSCO has none of them.
 
 The samples are VSCO-2 Community Edition by Versilian Studios, released under CC0 1.0 (a public-domain dedication), from
 https://github.com/sgossner/VSCO-2-CE at commit 440300901dfe9275fd84e0b7763af1f8443ae62e (4 August 2020). Only the
 folders named in FOLDERS, TIMPANI and SWELL are read.
 
 How a note is played:
-  - by the section whose register fits it: the solo bass doubled by the cellos an octave up below C2, the cellos with the
-    bass under them to F#2 and alone to F#3, the violas to C#4, the violins above;
+  - by the section whose register fits it: below C2 the solo bass, doubled by the cellos an octave up; the cellos,
+    doubled by the bass to F#2 and alone to F#3; the violas to C#4; the violins above;
   - from the nearest sampled pitch, repitched and brought to 48 kHz in one polyphase resampling, from the pitch measured
     in the file itself (the libraries sit a few cents off A440). Shifts stay within 3 semitones, except where the
-    library leaves a wider gap (the horn above C4, the glockenspiel's fourths and fifths): up to 4;
+    library leaves a wider gap (the horn's E4 from its C4, the glockenspiel's fourths and fifths): about 4 at most;
   - on the dynamic layer that suits the synthesized voice's brightness (strings) or gain (horn, timpani, pizzicato);
-  - at the loudness of the synthesized voice it replaces (K-weighted, as BS.1770 measures), so every gain, fader ride and
-    per-beat level in score.py keeps its meaning and the Emirati instruments keep their balance with the orchestra;
+  - at the loudness of the synthesized voice it replaces (K-weighted, as BS.1770 measures, on each note as it plays), so
+    every gain, fader ride and per-beat level in score.py keeps its meaning and the Emirati instruments keep their
+    balance with the orchestra;
   - held, when it outlasts its sample, on equal-power crossfades between stretches of the sample's steady middle;
   - under the synthesized voice's own envelope, so every swell and release lands where the score puts it;
   - in stereo as recorded (strings, horn, timpani), with the glockenspiel and the harp in mono, so that the score's pans
@@ -81,7 +82,6 @@ ROBIN = re.compile(r'_(?:rr|RR)?(\d)(?:_Sum)?\.wav$')
 DYNAMIC = {'pp': 1, 'p': 2, 'mp': 3, 'mf': 4, 'f': 5, 'ff': 6}
 PC = {'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11}
 
-ROOT = None
 INDEX = {}
 ORIG = {}
 ROUND = {}
@@ -96,11 +96,10 @@ class Sample:
         self.path, self.art, self.midi, self.layer, self.robin, self.tune = path, art, midi, layer, robin, tune
         self.x = None
         self.at_ = {}
-        self.power_ = {}
 
     def load(self):
-        """the file as float stereo at its own rate, from its first sound (for a struck or plucked note, from just
-        before its attack, so the attack lands on the beat), and its steady stretch"""
+        """the file as float stereo at its own rate, from its first sound (for a struck, plucked or bounced note, from
+        10 ms before its attack reaches half its peak, so that the attack lands on the beat), and its steady stretch"""
         if self.x is not None:
             return self.x
         # some files carry chunks scipy does not read (loop points, instrument data); the audio is unaffected
@@ -111,8 +110,8 @@ class Sample:
         x = (np.vstack([x, x]) if x.ndim == 1 else x.T)
         e = rms(x, int(0.005 * sr))
         struck = self.art in STRUCK
-        i = int(np.argmax(e >= e.max() * 10 ** ((-12 if struck else -30) / 20)))
-        lead = max(0, i - int((0.025 if struck else 0.005) * sr))
+        i = int(np.argmax(e >= e.max() * 10 ** ((-6 if struck else -30) / 20)))
+        lead = max(0, i - int((0.010 if struck else 0.005) * sr))
         x = x[:, lead:].copy()
         k = min(x.shape[1], int(0.002 * sr))
         x[:, :k] *= np.linspace(0, 1, k)
@@ -149,7 +148,7 @@ class Sample:
 
     def at(self, m):
         """the file sounding MIDI pitch m at 48 kHz (float32 stereo), with its steady stretch (a, b) and the end of its
-        rise (where it first reaches half its steady level), in samples there"""
+        rise (where it first reaches its steady level), in samples there"""
         key = round(float(m), 3)
         if key not in self.at_:
             x = self.load()
@@ -158,16 +157,6 @@ class Sample:
             y = resample_poly(x, r.numerator, r.denominator, axis=1).astype(np.float32)
             self.at_[key] = (y, int(self.a * q), int(self.b * q), int(self.rise * q))
         return self.at_[key]
-
-    def steady_power(self, m, fc):
-        """K-weighted power of the steady stretch at pitch m, through the brightness filter fc"""
-        key = (round(float(m), 3), fc)
-        if key not in self.power_:
-            y, a, b, _ = self.at(m)
-            pre = min(a, int(0.1 * SR))
-            seg = y[:, a - pre:min(b, a + 3 * SR)].astype(np.float64)
-            self.power_[key] = kpow(lp1(seg, fc), pre)
-        return self.power_[key]
 
 
 # ---------- helpers ----------
@@ -180,7 +169,7 @@ def rms(x, w):
 
 def steady(x, sr):
     """the stretch of a sustained sample that holds its level (within 3 dB of its median, after its attack and before
-    its release), and where its rise first reaches half that level (a soft bowing can take two seconds to get there)"""
+    its release), and where its rise first reaches that level (a soft bowing can take two seconds to get there)"""
     e = rms(x, int(0.05 * sr))
     on = np.where(e > 0.3 * e.max())[0]
     lvl = np.median(e[on[0]:on[-1] + 1])
@@ -188,7 +177,7 @@ def steady(x, sr):
     a, b = max(int(ok[0]), int(0.3 * sr)), int(ok[-1]) - int(0.2 * sr)
     if b - a < sr:
         a, b = x.shape[1] // 4, 3 * x.shape[1] // 4
-    return a, b, min(int(np.argmax(e >= 0.5 * lvl)), a)
+    return a, b, min(int(ok[0]), a)
 
 
 def kpow(x, skip=0):
@@ -239,6 +228,16 @@ def hold(y, a, b, n, start=0):
     return out[:, :n]
 
 
+def match(x, env, dur, settle, want):
+    """the gain that gives a held note (x, already under its envelope env) the synthesized voice's loudness: `want` is
+    that voice's steady power at full envelope, and the two are compared over the part of the note that is held, from
+    `settle` (its attack done) to the release. Measured on the note itself, since a recording's level drifts over its
+    length (a soft horn fades, a soft bowing keeps growing)"""
+    i1 = int(dur * SR)
+    i0 = min(int(settle * SR), i1 // 2)
+    return np.sqrt(want * np.mean(env[i0:i1] ** 2) / kpow(x[:, :i1], i0))
+
+
 def pick(inst, art, m, inten):
     """the sample for pitch m: the nearest sampled pitch (between two, the one above: a sample pitched down keeps its
     colour better), the layer nearest the intensity 0..1, and the next of its round robins"""
@@ -258,6 +257,13 @@ def pick(inst, art, m, inten):
 
 def mono(y):
     return y.mean(axis=0)
+
+
+def glint(m, n, fade):
+    """a glockenspiel note at pitch m, n samples long, in mono, its mallet's tick softened (a one-pole low-pass at
+    6 kHz) toward the celesta-like glint the score asks for"""
+    s = pick('glock', 'hit', m, 0.5)
+    return lp1(take(mono(s.at(m)[0]), n, fade), 6000)
 
 
 class aside:
@@ -308,23 +314,26 @@ def strings(m, dur, bright=2600, attack=0.9, release=1.6, voices=7, detune=0.09)
     inten = float(np.clip((bright - 1500) / 1500, 0, 1))
     parts = sections(m, art)
     norm = np.sqrt(sum(w * w for _, _, w in parts))
+    # the level references render the synthesized section with one voice: strings() scales its voices by 1/sqrt(voices),
+    # so one voice carries the section's expected power, without the slow beating of the detuned voices against each
+    # other (periods of a second and more) that throws a short measurement of the whole section off by up to 2 dB
     out = np.zeros((2, n))
     for sec, mm, w in parts:
         s = pick(sec, art, mm, inten)
         y, a, b, rise = s.at(mm)
         if short:
             x = lp1(take(y, n), fc) * env
-            want = ref(('strings', m, dur, bright, attack, release, voices),
-                       lambda: ORIG['strings'](m, dur, bright=bright, attack=attack, release=release, voices=voices))
+            want = ref(('strings', m, dur, bright, attack, release),
+                       lambda: ORIG['strings'](m, dur, bright=bright, attack=attack, release=release, voices=1))
             g = np.sqrt(want / kpow(x))
         else:
             # a soft layer swells in by itself; when the score asks for a quicker attack, the note starts that much
             # into its rise, and the score's own attack shapes the entry
             x = lp1(hold(y, a, b, n, max(0, rise - int(attack * SR))), fc) * env
-            # the synthesized section's steady level (its envelope holds at 0.85), against the sample's steady stretch
-            synth = lambda: ORIG['strings'](m, 1.6, bright=bright, attack=0.05, release=0.1, voices=voices)
-            want = ref(('strings', m, bright, voices), lambda: synth()[:, :int(1.5 * SR)], int(0.6 * SR)) / 0.85 ** 2
-            g = np.sqrt(want / s.steady_power(mm, fc))
+            # the synthesized section's steady level (its envelope holds at 0.85)
+            synth = lambda: ORIG['strings'](m, 1.6, bright=bright, attack=0.05, release=0.1, voices=1)
+            want = ref(('strings', m, bright), lambda: synth()[:, :int(1.5 * SR)], int(0.6 * SR)) / 0.85 ** 2
+            g = match(x, env, dur, attack, want)
         out += x * g * (w / norm)
     return out
 
@@ -336,10 +345,19 @@ def horn(m, dur, gain=1.0):
     n = int((dur + 1.0) * SR)
     s = pick('horn', 'sus', m, float(np.clip((gain - 0.5) / 0.6, 0, 1)))
     y, a, b, rise = s.at(m)
-    # the synthesized horn holds at 0.8 of its envelope
-    want = ref(('horn', m), lambda: ORIG['horn'](m, 2.4)[:int(2.3 * SR)], int(1.2 * SR)) / 0.8 ** 2
-    g = np.sqrt(want / s.steady_power(m, None))
-    return hold(y, a, b, n, max(0, rise - int(0.35 * SR))) * g * A.adsr(n, 0.35, 0.4, 0.8, 1.0) * gain
+    # the synthesized horn holds at 0.8 of its envelope; its two oscillators beat once every 1 / (0.002 f) s, so its
+    # level is measured over whole beats
+    T = 1 / (0.002 * A.hz(m))
+    L = 1.2 + T * max(1, int(10 / T))
+    want = ref(('horn', m), lambda: ORIG['horn'](m, L + 0.1)[:int(L * SR)], int(1.2 * SR)) / 0.8 ** 2
+    env = A.adsr(n, 0.35, 0.4, 0.8, 1.0)
+    x = hold(y, a, b, n, max(0, rise - int(0.35 * SR)))
+    # as in the synthesized horn, the tone opens as it swells and darkens as it dies away (a real horn does the same)
+    e = np.minimum(env / 0.8, 1.0)
+    x = (lp1(x, 900) * (1 - e) + x * e) * env
+    # matched over the whole note, its attack included: the horn's notes are short motif notes, whose loudness is mostly
+    # in their attack
+    return x * match(x, env, dur, 0.0, want) * gain
 
 
 def timpani(m, gain=1.0, roll=0.0):
@@ -350,8 +368,9 @@ def timpani(m, gain=1.0, roll=0.0):
     s = pick('timpani', 'hit', m, float(np.clip(gain / 0.9, 0, 1)))
     y = s.at(m)[0]
     x = take(y, min(y.shape[1], int(6.0 * SR)), fade=0.4)
-    want = ref(('timpani', m), lambda: ORIG['timpani'](m)[:SR])
-    return x * np.sqrt(want / kpow(x[:, :SR])) * gain
+    # the same energy as the synthesized stroke over its three seconds (the drum rings on beyond them, as it would)
+    want = ref(('timpani', m), lambda: ORIG['timpani'](m))
+    return x * np.sqrt(want / kpow(x[:, :3 * SR])) * gain
 
 
 def pizz(m, gain=1.0):
@@ -366,23 +385,21 @@ def pizz(m, gain=1.0):
 
 def bell(m, dur=4.0, gain=1.0):
     """the starlight glint (audio.bell()), recorded: a glockenspiel note, in mono for the score to place"""
-    s = pick('glock', 'hit', m, 0.5)
-    x = take(mono(s.at(m)[0]), int(dur * SR), fade=0.3)
+    x = glint(m, int(dur * SR), 0.3)
     want = ref(('bell', m), lambda: ORIG['bell'](m, 1.0)[:int(0.6 * SR)])
     return x * np.sqrt(want / kpow(x[:int(0.6 * SR)])) * gain
 
 
 def shimmer(dur, gain=1.0, base=84):
-    """starlight (audio.shimmer()), recorded: the synthesized cluster's five pitches as soft glockenspiel notes, scattered
-    at random across the stereo field, under the cluster's own slow swell and at its loudness"""
+    """starlight (audio.shimmer()), recorded: the synthesized cluster's five pitches as soft glockenspiel notes,
+    scattered at random across the stereo field, under the cluster's own slow swell and at its loudness"""
     n = int(dur * SR)
     out = np.zeros((2, n + 3 * SR))
     pitches = [base, base + 7, base + 12, base + 16, base + 19]
     t = 0.2 + srng.uniform(0, 0.4)
     while t < dur - 0.3:
         m = pitches[srng.choice(5, p=[0.3, 0.25, 0.2, 0.15, 0.1])]
-        s = pick('glock', 'hit', m, 0.0)
-        x = take(mono(s.at(m)[0]), 3 * SR, fade=0.6) * srng.uniform(0.45, 1.0)
+        x = glint(m, 3 * SR, 0.6) * srng.uniform(0.45, 1.0)
         a = (srng.uniform(-0.7, 0.7) + 1) * np.pi / 4
         i = int(t * SR)
         out[0, i:i + len(x)] += x * np.cos(a)
@@ -411,7 +428,7 @@ def orch_bloom(t, bus, gain=1.0, root=38):
     peak = int(np.argmax(rms(y, int(0.05 * SR))))
     x = take(y, peak + int(4.0 * SR), fade=1.5)
     near = x[:, max(0, peak - SR // 4):peak + SR // 4]
-    want = ref(('timpani', root + 12), lambda: ORIG['timpani'](root + 12)[:SR]) * (0.9 * gain) ** 2 * 10 ** (-0.9)
+    want = ref(('timpani 1 s', root + 12), lambda: ORIG['timpani'](root + 12)[:SR]) * (0.9 * gain) ** 2 * 10 ** (-0.9)
     bus.add(x * np.sqrt(want / kpow(near)), t - peak / SR)
 
 
