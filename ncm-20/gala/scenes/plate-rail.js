@@ -194,19 +194,31 @@ scene({
     stroke(crown, q, INK, 1, 0.6);
   },
   // Revision 11 (?rev11): one side's camels ('near': outside the near fence, painted over the train; 'far': out on the far
-  // plain, painted before the bank), with the shrubs the near ones browse, far to near
+  // plain, painted before the bank) and that side's plants, far to near. A feeder is painted with its food plant: the
+  // plant's far culms, the camel, then the near culms and what the camel holds in its mouth, so its muzzle is in the plant
   camels11(psi, lt, q, side) {
     const items = [];
     this.herd11.forEach((cm, i) => {
       if (cm.side !== side) return;
       const fr = this.camelFrame11(cm, lt), p = this.proj(fr.P[0], fr.P[1], 0, psi);
       if (!p) return;
-      items.push({ d: p[2], draw: () => this.camel11(cm, i, fr, psi, lt, q) });
-      // the shrub a grazer browses, under its muzzle when its head is down
-      if (side === 'near' && cm.act !== 'walk') { const g = fr.W(1.82, 0, 0); items.push({ d: this.proj(g[0], g[1], 0, psi)[2], draw: () => this.shrub11(g, 0.42 * cm.sc, psi, q, 880 + i) }); }
+      const pl = cm.act === 'feed' ? this.flora11.find(f => f.food === i) : null;
+      items.push({ d: p[2], draw: () => {
+        if (!pl) { this.camel11(cm, i, fr, psi, lt, q); return; }
+        const st = this.eaten11(pl, cm, fr, psi, lt);
+        this.plant11(pl, psi, q, 'back', st);
+        this.camel11(cm, i, fr, psi, lt, q);
+        this.plant11(pl, psi, q, 'front', st);
+      } });
     });
-    if (side === 'near') this.shrubs11.forEach(([s, o, h], k) => { const [X, Y] = this.at(s, o), p = this.proj(X, Y, 0, psi); if (p) items.push({ d: p[2], draw: () => this.shrub11([X, Y], h, psi, q, 890 + k) }); });
+    this.flora11.forEach(pl => { if (pl.side === side && pl.food < 0) { const p = this.proj(pl.X, pl.Y, 0, psi); if (p) items.push({ d: p[2], draw: () => this.plant11(pl, psi, q, 'all', null) }); } });
     items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
+  },
+  // Revision 11 (?rev11): one region's plants alone ('row': inside the right of way), far to near
+  plants11(psi, lt, q, side) {
+    const items = [];
+    this.flora11.forEach(pl => { if (pl.side === side) { const p = this.proj(pl.X, pl.Y, 0, psi); if (p) items.push({ d: p[2], pl }); } });
+    items.sort((a, b) => b.d - a.d).forEach(it => this.plant11(it.pl, psi, q, 'all', null));
   },
   // a camel's place and frame this frame: P its ground point (a walker moves on at v), f forward and l to its left on the
   // ground, W(a, b, c) a point of its body (a forward, b left, c up, in a cow's metres) in the world
@@ -215,13 +227,265 @@ scene({
     const [X0, Y0] = this.at(cm.s, cm.o), m = cm.act === 'walk' ? cm.v * (lt - 3.0) : 0, P = [X0 + f[0] * m, Y0 + f[1] * m], k = cm.sc;
     return { P, f, l, W: (a, b, c) => [P[0] + (a * f[0] + b * l[0]) * k, P[1] + (a * f[1] + b * l[1]) * k, c * k] };
   },
-  // a dromedary in true 3D (see the notes at the top), built as rings round its trunk, neck, head, legs and tail: each pair
-  // of neighbouring rings, projected, gives a convex hull, and the hulls of a part together give its silhouette. The legs
-  // on the far side are drawn first, in shade; then the trunk, neck, head, tail and near legs as one figure: its hulls
-  // inked with a doubled line and then masked with paper, which leaves only the figure's outer contour, then toned in its
-  // coat and hatched under the belly (light from above; no sun direction is implied, as for the ghaf)
+  // smoothstep on 0..1
+  ss11(u) { u = clamp(u); return u * u * (3 - 2 * u); },
+  // Revision 11 (?rev11): a feeding camel's plan, fixed once: its bites (each: tA the lips start to work in, tG they
+  // grip, tC the bite or the tear, tR the pull is over; pm the pull's lift of the head (rad), pl its pull to the side
+  // (m)), its chewing between bites, and gF, the neck's lowering that brings its lips to the bite's height on its plant
+  plan11(cm) {
+    if (cm.act !== 'feed') return;
+    cm.chew0 = cm.ev ? 0 : 0.7;
+    if (!cm.ev) {
+      cm.ev = [];
+      const t0 = cm.lower ? cm.lower[1] : -2 * cm.P;
+      for (let k = 0, tA = t0 + (cm.ph % 1) * cm.P; tA < 8; k++, tA += cm.P) {
+        cm.ev.push({ tA, tG: tA + 0.32 * cm.P, tC: tA + 0.6 * cm.P, tR: tA + 0.95 * cm.P, pm: cm.bite === 'browse' ? 0.07 : 0.1, pl: (k % 2 ? 1 : -1) * 0.03, kind: cm.bite });
+      }
+    }
+    // the lips at 0.8 of the plant's height (a shrub's: 0.85); they fall as the neck lowers, so bisect
+    const zt = (cm.food === 'rimth' ? 0.85 : 0.8) * cm.fh / cm.sc;
+    let a = 0, b = 1;
+    for (let k = 0; k < 30; k++) { const m = (a + b) / 2; if (this.neck11(m, 0).lip[1] > zt) a = m; else b = m; }
+    cm.gF = (a + b) / 2;
+  },
+  // Revision 11 (?rev11): the neck and head for a lowering g (0 carried, 1 at the ground) and a lift of the head (rad,
+  // muzzle up): the neck's five segments keep their lengths, their angles (deg, up positive) blended from carried to
+  // grazing; the head 0.48 m from the poll to the muzzle, carried a little nose-down, near vertical when grazing. lip:
+  // where the lips hold a mouthful, near the muzzle's end a little below the head's axis
+  neck11(g, pitch) {
+    const rad = Math.PI / 180, segL = [0.30, 0.27, 0.27, 0.26, 0.18], up = [-28, 0, 40, 68, 80], dn = [-38, -44, -48, -52, -55];
+    const nk = [[0.78, 1.50]];
+    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
+    const HA = lerp(-18, -65, g) * rad + pitch, [pa, pc] = nk[5], hv = [Math.cos(HA), Math.sin(HA)], nv = [-Math.sin(HA), Math.cos(HA)];
+    return { nk, HA, pa, pc, hv, nv, lip: [pa + 0.45 * hv[0] - 0.035 * nv[0], pc + 0.45 * hv[1] - 0.035 * nv[1]] };
+  },
+  // Revision 11 (?rev11): a camel's pose at lt. A walker carries its head (g 0.22, nodding with its stride). A feeder
+  // holds its lips at its plant (gF) and, at each bite, dips them in, grips, pulls up and to the side (the neck rising a
+  // little) and lets the pull go; after a tear it lifts its head to gL and lowers it again; its head sways slowly over
+  // the plant, so each bite takes other culms. sway: the head's sideways offset (m); chew 0..1, and the lower jaw's
+  // swing jawL (m, to the camel's left) and drop jawO (m): the jaw swings to one side and back with each stroke and to
+  // the other side with the next, a stroke in 0.85 s of the scene clock, opening a little at mid-stroke
+  pose11(cm, lt) {
+    let g = 0.22, pitch = 0, sway = 0, chew = 0, G = 0;
+    if (cm.act === 'walk') g = 0.22 + 0.03 * Math.sin(2 * TAU * (lt / (2.0 * Math.pow(cm.sc, 0.8)) + cm.ph));
+    if (cm.act === 'feed') {
+      const ss = u => this.ss11(u);
+      let lat = 0;
+      g = cm.gF; chew = cm.chew0;
+      if (cm.lower) { const [t0, t1, gH] = cm.lower; g = lerp(gH, cm.gF, ss((lt - t0) / (t1 - t0))); }
+      cm.ev.forEach(e => {
+        if (lt <= e.tA) return;
+        const uA = (lt - e.tA) / (e.tG - e.tA), pull = lt < e.tC ? ss((lt - e.tG) / (e.tC - e.tG)) : 1 - ss((lt - e.tC) / (e.tR - e.tC));
+        G += lt < e.tG ? ss(uA) : lt < e.tC ? 1 : 0;
+        g += 0.035 * Math.sin(Math.PI * clamp(uA)) - 0.04 * pull;
+        pitch += e.pm * pull; lat += e.pl * pull;
+        if (e.gL !== undefined) g -= (cm.gF - e.gL) * (ss((lt - e.up[0]) / (e.up[1] - e.up[0])) - ss((lt - e.dn[0]) / (e.dn[1] - e.dn[0])));
+        if (e.chew) chew += clamp((lt - e.chew[0]) / 0.3) - clamp((lt - e.chew[1] + 0.3) / 0.3);
+      });
+      sway = 0.07 * Math.sin(TAU * lt / 4.6 + cm.ph * 3) + lat;
+    }
+    const ps = this.neck11(g, pitch), cp = Math.PI * lt / 0.85 + cm.ph * 5;
+    chew = clamp(chew);
+    return Object.assign(ps, { g, pitch, sway, chew, G: Math.min(1, G), jawL: 0.035 * chew * Math.sin(cp), jawO: 0.014 * chew * Math.pow(Math.sin(2 * cp), 2) });
+  },
+  // Revision 11 (?rev11): where a camel's lips are at lt, in the world
+  mouth11(cm, fr, lt) { const ps = this.pose11(cm, lt); return fr.W(ps.lip[0], ps.sway + 0.6 * ps.jawL, ps.lip[1]); },
+  // Revision 11 (?rev11): the plants of the plain, sown once from their own seeded stream (9101): each feeder's food
+  // plant just beyond its lips at its feeding pose; a patch where the near herd feeds; a sparse scatter over the near
+  // plain outside the fence; a few taller, ungrazed ones inside the right of way; the far plain's scatter, with a patch
+  // round each far feeder. All kept clear of the camels' bodies and of each other. Each: its kind, its ground point (X,
+  // Y), its height h and width w (m), its distance D from the eye and hp, its height in pixels there (its style is fixed
+  // from them, so nothing switches mid-beat), the camel that eats it (food) and, for the grasses, its culms
+  sow11() {
+    const r = rng(9101), out = [];
+    const axes = this.herd11.map(cm => { const fr = this.camelFrame11(cm, 3.0); return [-1.1, -0.4, 0.3, 1.0, 1.7, 2.3].map(a => fr.W(a, 0, 0)); });
+    const free = (X, Y, rad) => axes.every(ax => ax.every(([x, y]) => Math.hypot(X - x, Y - y) > rad + 0.9)) && out.every(p => Math.hypot(X - p.X, Y - p.Y) > (rad + p.w / 2) * 1.2);
+    const size = (kind, grazed) => {
+      if (kind === 'thumam') { const h = grazed ? 0.4 + 0.3 * r() : 0.7 + 0.3 * r(); return [h, h * (0.95 + 0.3 * r())]; }
+      if (kind === 'thanda') { const h = 0.26 + 0.18 * r(); return [h, h * (1.1 + 0.3 * r())]; }
+      if (kind === 'rimth') { const h = 0.3 + 0.25 * r(); return [h, 1.8 * h]; }
+      const h = 1.0 + 0.6 * r(); return [h, 1.15 * h];
+    };
+    const pick = mix => { let u = r(), k = 0; while (k < mix.length - 1 && u > mix[k][1]) { u -= mix[k][1]; k++; } return mix[k][0]; };
+    const add = (kind, X, Y, h, w, side, food = -1) => {
+      const D = Math.hypot(X, Y), hp = RAIL.f * h / D, seed = 9200 + out.length, p = { kind, X, Y, h, w, D, hp, side, food, seed };
+      const n = kind === 'thumam' ? (hp > 22 ? 24 : hp > 9 ? 12 : 5) : kind === 'thanda' ? (hp > 12 ? 18 : hp > 6 ? 10 : 5) : 0;
+      if (n) p.culms = this.culms11(kind, h, w, n, rng(seed), side !== 'row');
+      out.push(p);
+    };
+    this.herd11.forEach((cm, i) => {
+      if (cm.act !== 'feed') return;
+      const fr = this.camelFrame11(cm, 3.0), [X, Y] = fr.W(this.neck11(cm.gF, 0).lip[0] + 0.1 / cm.sc, 0, 0), h = cm.fh;
+      add(cm.food, X, Y, h, h * { thumam: 1.05, thanda: 1.2, rimth: 1.8 }[cm.food], cm.side, i);
+    });
+    // a region's scatter: n tries over s0..s1 and o0..o1, each kind drawn from its mix
+    const scatter = (n, s0, s1, o0, o1, side, mix, grazed = true) => {
+      for (let k = 0; k < n; k++) {
+        const s = lerp(s0, s1, r()), o = lerp(o0, o1, r()), kind = pick(mix), [h, w] = size(kind, grazed), [X, Y] = this.at(s, o);
+        if (Math.hypot(X, Y) < 340 && free(X, Y, w / 2)) add(kind, X, Y, h, w, side);
+      }
+    };
+    const plain = [['thumam', 0.38], ['thanda', 0.3], ['rimth', 0.24], ['arta', 0.08]];
+    scatter(34, 27, 52, -39, -23.6, 'near', [['thumam', 0.5], ['thanda', 0.3], ['rimth', 0.2]]);
+    scatter(80, -90, 72, -52, -23.6, 'near', plain);
+    scatter(30, -260, 75, -20.5, -10.5, 'row', [['thumam', 0.55], ['thanda', 0.45]], false);
+    this.herd11.forEach(cm => { if (cm.side === 'far' && cm.act === 'feed') scatter(8, cm.s - 9, cm.s + 9, cm.o - 7, cm.o + 7, 'far', plain); });
+    scatter(460, -420, 160, 27, 230, 'far', plain);
+    return out;
+  },
+  // Revision 11 (?rev11): a grass's culms, each nine points [dx, dy, z] (m) from the plant's ground point, rising from
+  // a base narrower than its crown and leaning out more toward the rim. Thumam: stiff, a little bowed, the tops of a
+  // grazed tussock cropped even, an ungrazed one's taller and uneven, some in seed (pan); thanda: a fountain of arching
+  // leaves round a few straighter flowering culms, each with its small head (head). bk: where a pulled culm breaks (a
+  // node), as a fraction of its length; sw: its own phase
+  culms11(kind, h, w, n, r, grazed) {
+    const th = kind === 'thanda', rb0 = (th ? 0.07 : 0.17) * w, out = [];
+    for (let i = 0; i < n; i++) {
+      const u = Math.sqrt(r()), ab = r() * TAU, rb = rb0 * u, bx = rb * Math.cos(ab), by = rb * Math.sin(ab), flower = th && r() < 0.3, az = ab + (r() - 0.5) * 0.9;
+      let a0, a1, top;
+      if (th && !flower) { a0 = 0.15 + 0.45 * u + 0.15 * r(); a1 = a0 + 0.45 + 0.45 * r(); top = h * (0.55 + 0.35 * r()); }
+      else if (th) { a0 = 0.05 + 0.2 * u * r(); a1 = a0 + 0.12; top = h * (0.85 + 0.15 * r()); }
+      else { a0 = 0.05 + 0.5 * u + 0.1 * r(); a1 = a0 + 0.12 + 0.25 * r(); top = h * (grazed ? 0.86 + 0.14 * r() : 0.65 + 0.35 * r()); }
+      let cz = 0;
+      for (let j = 0; j < 8; j++) cz += Math.cos(a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5)) / 8;
+      const L = top / Math.max(0.35, cz), pts = [[bx, by, 0]];
+      for (let j = 0; j < 8; j++) { const a = a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5), p = pts[j]; pts.push([p[0] + L / 8 * Math.sin(a) * Math.cos(az), p[1] + L / 8 * Math.sin(a) * Math.sin(az), p[2] + L / 8 * Math.cos(a)]); }
+      out.push({ pts, L, bk: 0.42 + 0.2 * r(), head: flower, pan: !th && !grazed && r() < 0.5, sw: r() });
+    }
+    return out;
+  },
+  // Revision 11 (?rev11): a food plant as its feeder eats it at lt. A shrub (rimth): where the lips are on screen and how
+  // hard they grip. A grass (see bites11): its culms and what the mouth holds, as world polylines
+  eaten11(pl, cm, fr, psi, lt) {
+    if (pl.kind === 'rimth') { const m = this.mouth11(cm, fr, lt), p = this.proj(m[0], m[1], m[2], psi); return p ? { m: [p[0], p[1]], G: this.pose11(cm, lt).G } : null; }
+    return pl.culms && pl.hp > 9 ? this.bites11(pl, cm, fr, lt) : null;
+  },
+  // Revision 11 (?rev11): a grass's culms at lt as its feeder bites it. For each bite begun, the culms near the lips
+  // (weight w by their distance from where the lips grip) bend toward the lips as they work in, grip and pull; at the
+  // bite the gripped ones (w over 0.7) are cut where the lips hold them (a nibble) or torn at a node lower down (a tear),
+  // and the rest are let go; every culm let go or cut springs back from where it was (a damped swing of about 0.4 s:
+  // nothing jumps). What is torn off stays in the mouth: a nibble's tops are drawn in at once; a tear's culms hang from
+  // the lips, swing with the jaw and are chewed in until its chewing ends. Returns { stubs, held }: world polylines
+  bites11(pl, cm, fr, lt) {
+    const ss = u => this.ss11(u), tuft = pl.kind === 'thanda' ? [0.05, 0.15] : [0.09, 0.24], R1 = tuft[0], R2 = tuft[1];
+    const spring = t => Math.exp(-t / 0.12) * Math.cos(TAU * t / 0.42);
+    cm.ev.forEach(e => { if (!e.M) { e.M = this.mouth11(cm, fr, e.tG); e.Mc = this.mouth11(cm, fr, e.tC); } });
+    const Mt = this.mouth11(cm, fr, lt), ps = this.pose11(cm, lt), down = [0, 0, -1], stubs = [], held = [];
+    pl.culms.forEach(c => {
+      // the culm's rest point at fraction u of its first length
+      const P = u => { const x = clamp(u) * 8, j = Math.min(7, Math.floor(x)), f = x - j, a = c.pts[j], b = c.pts[j + 1]; return [pl.X + lerp(a[0], b[0], f), pl.Y + lerp(a[1], b[1], f), lerp(a[2], b[2], f)]; };
+      const sB = (u, ug) => (u >= ug ? 1 : (u / ug) * (u / ug));
+      let lam = 1;
+      const fields = [];
+      for (const e of cm.ev) {
+        if (lt <= e.tA) break;
+        // where the lips take it: at their height, or by its tip if that is only just below them
+        const zm = e.M[2];
+        if (P(lam)[2] < zm - 0.05) continue;
+        let ug = lam;
+        if (P(lam)[2] > zm) { let a = 0, b = lam; for (let k = 0; k < 14; k++) { const m = (a + b) / 2; if (P(m)[2] < zm) a = m; else b = m; } ug = (a + b) / 2; }
+        const pg = P(ug), w = 1 - ss((Math.hypot(pg[0] - e.M[0], pg[1] - e.M[1], pg[2] - e.M[2]) - R1) / (R2 - R1));
+        if (w < 0.002) continue;
+        if (lt < e.tC) {
+          const k = w * (lt < e.tG ? ss((lt - e.tA) / (e.tG - e.tA)) : 1);
+          fields.push([[(Mt[0] - pg[0]) * k, (Mt[1] - pg[1]) * k, (Mt[2] - pg[2]) * k], ug]);
+          continue;
+        }
+        const Dc = [(e.Mc[0] - pg[0]) * w, (e.Mc[1] - pg[1]) * w, (e.Mc[2] - pg[2]) * w], tau = lt - e.tC, sp = spring(tau);
+        if (w > 0.7) {
+          const tear = e.kind === 'tear', cut = tear ? Math.max(0.15, Math.min(ug - 0.12, c.bk * lam)) : ug;
+          // the piece in the mouth: its shape at the bite, carried by the lips; a tear's lower part swings down to hang
+          // and is chewed in with its tops; a nibble's tops are drawn straight in
+          const life = tear ? ss((tau - 0.35) / (e.chew[1] - e.tC - 0.35)) : ss(tau / 0.35), lifeTop = tear ? ss(tau / 1.3) : life;
+          if (life < 1 || lifeTop < 1) {
+            const Pc = u => { const p = P(u), s = sB(u, ug); return [p[0] + Dc[0] * s, p[1] + Dc[1] * s, p[2] + Dc[2] * s]; };
+            const anc = Pc(ug), off = [anc[0] - e.Mc[0], anc[1] - e.Mc[1], anc[2] - e.Mc[2]], hold = 1 - ss(tau / 0.3);
+            const fan = (c.sw - 0.5) * 1.1, hd = [0.3 * fr.f[0] + fan * fr.l[0], 0.3 * fr.f[1] + fan * fr.l[1], -1], hn = Math.hypot(hd[0], hd[1], hd[2]);
+            const at = u => {
+              const p = Pc(u), v = [p[0] - anc[0], p[1] - anc[1], p[2] - anc[2]];
+              let o;
+              if (u < ug) {
+                const e2 = ss(tau / 0.45), hang = (ug - u) * c.L * (1 - life), swing = 1.6 * ps.jawL * e2 * (1 - life) * (ug - u) / Math.max(0.05, ug - cut);
+                o = v.map((x, i) => lerp(x * (1 - life), hang * hd[i] / hn, e2) + (i < 2 ? swing * fr.l[i] * cm.sc : 0));
+              } else o = v.map(x => x * (1 - lifeTop));
+              return [Mt[0] + off[0] * hold + o[0], Mt[1] + off[1] * hold + o[1], Mt[2] + off[2] * hold + o[2]];
+            };
+            if (tear && life < 1) held.push([0, 0.25, 0.5, 0.75, 1].map(j => at(lerp(cut, ug, j))));
+            if (lifeTop < 1 && lam - ug > 0.01) held.push([0, 0.5, 1].map(j => at(lerp(ug, lam, j))));
+          }
+          lam = cut;
+        }
+        fields.push([[Dc[0] * sp, Dc[1] * sp, Dc[2] * sp], ug]);
+      }
+      stubs.push(Array.from({ length: 9 }, (_, j) => {
+        const u = lam * j / 8, p = P(u);
+        fields.forEach(([D, ug]) => { const s = sB(u, ug); p[0] += D[0] * s; p[1] += D[1] * s; p[2] += D[2] * s; });
+        return p;
+      }));
+    });
+    return { stubs, held };
+  },
+  // Revision 11 (?rev11): a plant of the plain, by kind; part 'back', 'front' or 'all' (see camels11), st how it is eaten
+  plant11(pl, psi, q, part, st) {
+    if (pl.kind === 'thumam' || pl.kind === 'thanda') this.tuft11(pl, psi, q, part, st);
+    else if (pl.kind === 'rimth') this.shrub11([pl.X, pl.Y], pl.h, psi, q, pl.seed, part, st);
+    else if (part !== 'front') this.broom11([pl.X, pl.Y], pl.h, psi, q, pl.seed);
+  },
+  // ink lines (screen polylines) in one stroke
+  ink11(lines, lw, a, col = INK) {
+    const ls = lines.filter(l => l.length > 1 && l.every(Boolean));
+    if (!ls.length || a <= 0) return;
+    ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ls.forEach(l => { ctx.moveTo(l[0][0], l[0][1]); for (let i = 1; i < l.length; i++) ctx.lineTo(l[i][0], l[i][1]); }); ctx.stroke(); ctx.restore();
+  },
+  // Revision 11 (?rev11): a thumam tussock or a thanda tuft at true size, its culms in 3D: the low hummock of sand it has
+  // caught and its shade; its body, paper and a pale wash inside the hull of its culms; the culms, darker and denser at
+  // the sheathed base; a thumam's nodes, and the lax panicles of one in seed; thanda's small brown heads. st: its culms
+  // as its feeder bites them (else at rest); part 'back' draws the shade, the body and the culms on the far side,
+  // 'front' the near culms and what the mouth holds
+  tuft11(pl, psi, q, part, st) {
+    const b = this.proj(pl.X, pl.Y, 0, psi);
+    if (!b || b[0] < RAIL.x0 - 40 || b[0] > RAIL.x1 + 40 || b[1] > RAIL.y1 + 70) return;
+    const th = pl.kind === 'thanda', kp = RAIL.f / b[2], full = pl.hp > 22 || (th && pl.hp > 12);
+    const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
+    const lines = (st ? st.stubs : pl.culms.map(c => c.pts.map(p => [pl.X + p[0], pl.Y + p[1], p[2]]))).map(l => l.map(pr));
+    const front = pl.culms.map(c => c.pts[0][0] * pl.X + c.pts[0][1] * pl.Y < 0);
+    const ink = OPT.colour ? '#4E4C32' : INK, lw = clamp(0.012 * kp, 0.45, 0.85);
+    if (part !== 'front') {
+      const rx = 0.62 * pl.w * kp, ry = Math.max(0.8, rx * RAIL.eye / b[2]);
+      fill(el(b[0], b[1] + 0.25 * ry, rx, ry, 0, TAU, pl.seed, 0), SEPIA, 0.13 * q);
+      const pts = lines.flat().filter(Boolean);
+      if (pts.length > 2) {
+        const body = new P(this.hull11(pts), true);
+        if (pl.hp > 9) mask(body, 0.4 * q);
+        if (OPT.colour) wash(body, th ? '#8C9560' : '#A4A679', 0.42 * q); else fill(body, SEPIA, 0.09 * q);
+      }
+    }
+    const sel = lines.filter((_, i) => part === 'all' || (part === 'front') === front[i]);
+    this.ink11(sel, lw, 0.62 * q, ink);
+    this.ink11(sel.map(l => l.slice(0, 3)), lw * 1.7, 0.45 * q, ink);
+    if (full) {
+      pl.culms.forEach((c, i) => {
+        const l = lines[i];
+        if (!(part === 'all' || (part === 'front') === front[i]) || !l[8] || !l[7]) return;
+        if (th && c.head) disc(l[8][0], l[8][1], Math.max(0.7, 0.022 * kp), OPT.colour ? '#5C4128' : INK, 0.75 * q);
+        if (!th && kp > 35 && l[3] && l[6]) [3, 6].forEach(j => disc(l[j][0], l[j][1], Math.max(0.45, 0.006 * kp), ink, 0.5 * q));
+        if (c.pan && kp > 25) {
+          const tip = l[8], dx = tip[0] - l[7][0], dy = tip[1] - l[7][1];
+          this.ink11([-0.5, 0, 0.5].map(a => [tip, [tip[0] + dx * 0.9 + a * 0.05 * kp, tip[1] + dy * 0.9 - 0.02 * kp]]), lw * 0.7, 0.45 * q, ink);
+        }
+      });
+    }
+    if (st && part !== 'back') this.ink11(st.held.map(l => l.map(pr)), lw * 1.05, 0.72 * q, ink);
+  },
+  // a dromedary in true 3D (see the notes at the top), built as rings round its trunk, neck, head, lower jaw, legs and
+  // tail: each pair of neighbouring rings, projected, gives a convex hull, and the hulls of a part together give its
+  // silhouette. The legs on the far side are drawn first, in shade; then the trunk, neck, head, jaw, tail and near legs
+  // as one figure: its hulls inked with a doubled line and then masked with paper, which leaves only the figure's outer
+  // contour, then toned in its coat and hatched under the belly (light from above; no sun direction is implied, as for
+  // the ghaf). Its neck and head take their pose from pose11
   camel11(cm, idx, fr, psi, lt, q) {
-    const W = fr.W, G0 = fr.P, rad = Math.PI / 180;
+    const W = fr.W, G0 = fr.P;
     const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
     const p0 = this.proj(G0[0], G0[1], 0, psi);
     if (!p0 || p0[0] < RAIL.x0 - 60 || p0[0] > RAIL.x1 + 60) return;
@@ -229,13 +493,9 @@ scene({
     const px = RAIL.f * cm.sc / Math.hypot(G0[0], G0[1]);
     // which side faces the eye (the eye is at the world's origin)
     const near = fr.l[0] * -G0[0] + fr.l[1] * -G0[1] > 0 ? 1 : -1;
-    // the pose: g lowers the neck from carried (0) to grazing (1); the head's slow sway; the tail's swing; the gait
-    const bump = (c, w) => (Math.abs(lt - c) < w ? 0.5 * (1 + Math.cos(Math.PI * (lt - c) / w)) : 0);
+    // the pose (pose11): the neck's joints, the head's angle and sway, the jaw; the tail's swing; the gait
     const walk = cm.act === 'walk', T = 2.0 * Math.pow(cm.sc, 0.8), ph = lt / T + cm.ph;
-    let g = 0.22, sway = 0;
-    if (cm.act === 'graze') { g = 1 - 0.62 * bump(cm.lift, 1.4); sway = 0.1 * Math.sin(TAU * lt / 4.6 + cm.ph * 3) * g; }
-    if (cm.act === 'settle') g = 0.12 + 0.86 * easeInOut(clamp((lt - cm.t0) / (cm.t1 - cm.t0)));
-    if (walk) g = 0.22 + 0.03 * Math.sin(2 * TAU * ph);
+    const ps = this.pose11(cm, lt), sway = ps.sway, HA = ps.HA, pa = ps.pa, pc = ps.pc;
     const tail = 0.07 * Math.sin(TAU * lt / 3.1 + cm.ph * 2);
     // rings: a list of local points; tube rings (horizontal circles) for the legs and tail
     const N = 16, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAU));
@@ -254,22 +514,22 @@ scene({
       [-0.05, 2.10, 1.10, 0.28, 0.38], [0.22, 2.01, 1.06, 0.28, 0.32], [0.45, 1.90, 1.00, 0.27, 0.18], [0.62, 1.84, 1.00, 0.25, 0.12], [0.78, 1.70, 1.12, 0.21, 0.1], [0.88, 1.55, 1.26, 0.15, 0.1]], 2);
     const body = trunk.map(([a, t, b, w, k]) => ring(th => [a, w * Math.cos(th) * (1 - k * Math.max(0, Math.sin(th))), (t + b) / 2 + (t - b) / 2 * Math.sin(th)]));
     const belly = trunk.map(([a, t, b, w]) => ring(th => [a, w * Math.cos(th / 2), (t + b) / 2 - (t - b) / 2 * Math.sin(th / 2) * 0.98]));
-    // the neck: five segments from its root at the breast, their angles (deg, up positive) blended from carried to grazing,
-    // so it keeps its length; its rings across the curve through their joints
-    const segL = [0.30, 0.27, 0.27, 0.26, 0.18], up = [-28, 0, 40, 68, 80], dn = [-38, -44, -48, -52, -55];
-    const nk = [[0.78, 1.50]];
-    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
-    const nr = [[0.23, 0.15], [0.18, 0.12], [0.14, 0.1], [0.115, 0.085], [0.1, 0.08], [0.095, 0.075]];
+    // the neck: its rings across the curve through its joints (neck11)
+    const nk = ps.nk, nr = [[0.23, 0.15], [0.18, 0.12], [0.14, 0.1], [0.115, 0.085], [0.1, 0.08], [0.095, 0.075]];
     const tube = (pts, rr, bOff) => pts.map(([a, c], k) => {
       const p = pts[Math.max(0, k - 1)], n = pts[Math.min(pts.length - 1, k + 1)], A = Math.atan2(n[1] - p[1], n[0] - p[0]), [hv, hw] = rr[k], b0 = bOff(k / (pts.length - 1));
       return ring(th => [a - Math.sin(A) * hv * Math.sin(th), b0 + hw * Math.cos(th), c + Math.cos(A) * hv * Math.sin(th)]);
     });
     const nks = spl(nk.map((v, k) => v.concat(nr[k])), 3);
     const neck = tube(nks.map(v => [v[0], v[1]]), nks.map(v => [v[2], v[3]]), u => sway * u * u);
-    // the head: from the poll, 0.48 m to the muzzle, carried a little nose-down, near vertical when grazing
-    const HA = lerp(-18, -65, g) * rad, [pa, pc] = nk[5], hu = [0, 0.14, 0.32, 0.48];
+    // the head: from the poll, 0.48 m to the muzzle
+    const hu = [0, 0.14, 0.32, 0.48];
     const hpts = hu.map(u => [pa + u * Math.cos(HA), pc + u * Math.sin(HA)]);
     const head = tube(hpts, [[0.1, 0.085], [0.115, 0.085], [0.08, 0.065], [0.06, 0.05]], () => sway);
+    // the lower jaw, from its angle under the eye to the chin and the hanging lower lip: as it chews it drops a little and
+    // swings to the side, the chin most
+    const jpts = [0.14, 0.3, 0.45].map(u => { const dz = 0.055 + ps.jawO * u / 0.45; return [pa + u * ps.hv[0] - dz * ps.nv[0], pc + u * ps.hv[1] - dz * ps.nv[1]]; });
+    const jaw = tube(jpts, [[0.055, 0.06], [0.045, 0.05], [0.035, 0.04]], u => sway + ps.jawL * u);
     // the tail: from its root under the croup, hanging, its tip swinging
     const tl = [[-0.89, 0, 1.56], [-0.93, tail * 0.4, 1.32], [-0.95, tail, 1.06]];
     const tailR = tl.map(([a, b, c], k) => hoop(a, b, c, [0.04, 0.03, 0.045][k]));
@@ -300,7 +560,7 @@ scene({
     const P2 = rs => rs.map(r => r.map(v => pr(W(v[0], v[1], v[2]))));
     const hulls = rs => { const sp = P2(rs), out = []; for (let k = 0; k < sp.length - 1; k++) { const pts = sp[k].concat(sp[k + 1]); if (pts.some(v => !v)) return []; out.push(new P(this.hull11(pts), true)); } return out; };
     const farLegs = legs.filter(L => !L.near).flatMap(L => hulls(L.rings)), nearLegs = legs.filter(L => L.near).flatMap(L => hulls(L.rings));
-    const fig = hulls(body).concat(hulls(neck), hulls([neck[neck.length - 1]].concat(head)), hulls(tailR), nearLegs);
+    const fig = hulls(body).concat(hulls(neck), hulls([neck[neck.length - 1]].concat(head)), hulls(jaw), hulls(tailR), nearLegs);
     if (!fig.length) return;
     const lw = clamp(px * 0.025, 0.55, 1.1), al = clamp(px / 40, 0.7, 1) * q;
     const coat = { tan: ['#B08752', 0.5, 0.16], dark: ['#5E4532', 0.62, 0.42], pale: ['#D8C29C', 0.45, 0.06] }[cm.coat];
@@ -320,32 +580,69 @@ scene({
       const bl = hulls(belly);
       hatch(bl, bbOf(bl), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.5, 0.3, 860 + idx);
       if (nearLegs.length) hatch(nearLegs, bbOf(nearLegs), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.45, 0.22, 870 + idx);
-      // the eye, and the small ears behind it
-      const hv = [Math.cos(HA), Math.sin(HA)], nv = [-Math.sin(HA), Math.cos(HA)];
+      // the eye, and the small ears behind it; the line of the mouth between the muzzle and the lower lip
+      const hv = ps.hv, nv = ps.nv;
       const eye = pr(W(pa + 0.13 * hv[0] + 0.035 * nv[0], sway + near * 0.075, pc + 0.13 * hv[1] + 0.035 * nv[1]));
       if (eye && px > 22) disc(eye[0], eye[1], clamp(px * 0.012, 0.6, 1.0), INK, 0.8 * q);
       const e0 = pr(W(pa + 0.02 * hv[0] + 0.09 * nv[0], sway + near * 0.05, pc + 0.02 * hv[1] + 0.09 * nv[1])), e1 = pr(W(pa - 0.06 * hv[0] + 0.17 * nv[0], sway + near * 0.07, pc - 0.06 * hv[1] + 0.17 * nv[1]));
       if (e0 && e1) stroke(new P([e0, e1]), 1, INK, lw * 1.3, al);
+      if (px > 30) {
+        const m0 = pr(W(pa + 0.3 * hv[0] - 0.05 * nv[0], sway + near * 0.045 + 0.5 * ps.jawL, pc + 0.3 * hv[1] - 0.05 * nv[1]));
+        const m1 = pr(W(pa + 0.47 * hv[0] - (0.04 + ps.jawO) * nv[0], sway + near * 0.03 + ps.jawL, pc + 0.47 * hv[1] - (0.04 + ps.jawO) * nv[1]));
+        if (m0 && m1) stroke(new P([m0, m1]), 1, INK, lw * 0.9, 0.7 * al);
+      }
     }
   },
   // a low desert shrub of the gravel plain (rimth, Haloxylon salicornicum: a rounded cushion of thin jointed grey-green
-  // twigs on a little mound of trapped sand) at ground point G, h tall: a lumpy dome, its twigs drawn upright
-  shrub11(G, h, psi, q, seed) {
+  // twigs on a little mound of trapped sand) at ground point G, h tall: a lumpy dome, its twigs drawn upright. Revision
+  // 11: browsed (st: the lips' screen point m and their grip G), the twigs by the lips bend toward them, and part
+  // 'front' draws those twigs again over the muzzle; a small one far off is drawn without its hatching and twigs
+  shrub11(G, h, psi, q, seed, part = 'all', st = null) {
     const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
-    if (!b || !t) return;
+    if (!b || !t || b[0] < RAIL.x0 - 50 || b[0] > RAIL.x1 + 50 || b[1] > RAIL.y1 + 60) return;
     const k = RAIL.f / b[2], w = 1.8 * h * k, hh = b[1] - t[1], r = rng(seed), ry = w / 2 * RAIL.eye / b[2], pts = [];
     for (let j = 0; j <= 18; j++) { const a = Math.PI * j / 18, lump = 0.82 + 0.18 * Math.abs(Math.sin(a * 5 + seed)) + 0.06 * r(); pts.push([b[0] - w / 2 * Math.cos(a) * (0.95 + 0.08 * r()), b[1] - ry * 0.2 - hh * Math.pow(Math.sin(a), 0.7) * lump]); }
     for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; pts.push([b[0] + w / 2 * Math.cos(a), b[1] + ry * Math.sin(a) * 0.5]); }
     const clump = new P(pts, true);
+    const tw = [];
+    for (let j = 0; j < 16; j++) { const x = b[0] + (r() - 0.5) * w * 0.8, y0 = b[1] + (r() - 0.3) * ry * 0.4, L = hh * (0.35 + 0.5 * r()) * (1 - Math.pow(2 * (x - b[0]) / w, 2)), lean = (x - b[0]) * 0.35 + (r() - 0.5) * w * 0.08; tw.push([[x, y0], [x + lean * L / Math.max(1, hh), y0 - L]]); }
+    // the twigs by the lips: drawn toward them as they grip
+    const rr = 0.3 * w, bit = [];
+    if (st) tw.forEach(tg => { const p = tg[1], d = Math.hypot(p[0] - st.m[0], p[1] - st.m[1]); if (d < rr) { const kk = 0.55 * st.G * (1 - d / rr); tg[1] = [p[0] + (st.m[0] - p[0]) * kk, p[1] + (st.m[1] - p[1]) * kk]; bit.push(tg); } });
+    if (part === 'front') { bit.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.55, 0.5 * q)); return; }
     // the sand mound and the shade under it
     fill(el(b[0], b[1] + ry * 0.2, w * 0.62, ry * 0.95, 0, TAU, seed, 0), SEPIA, 0.13 * q);
     mask(clump, q);
     if (OPT.colour) wash(clump, '#8C8A5E', 0.42 * q); else fill(clump, SEPIA, 0.14 * q);
-    const tw = [];
-    for (let j = 0; j < 16; j++) { const x = b[0] + (r() - 0.5) * w * 0.8, y0 = b[1] + (r() - 0.3) * ry * 0.4, L = hh * (0.35 + 0.5 * r()) * (1 - Math.pow(2 * (x - b[0]) / w, 2)), lean = (x - b[0]) * 0.35 + (r() - 0.5) * w * 0.08; tw.push([[x, y0], [x + lean * L / Math.max(1, hh), y0 - L]]); }
-    hatch(clump, [b[0] - w / 2 - 1, b[1] - hh - 2, b[0] + w / 2 + 1, b[1] + ry + 1], 1.25, Math.max(1.4, w * 0.09), q, INK, 0.45, 0.22, seed);
-    tw.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.5, 0.4 * q));
+    if (w > 7) {
+      hatch(clump, [b[0] - w / 2 - 1, b[1] - hh - 2, b[0] + w / 2 + 1, b[1] + ry + 1], 1.25, Math.max(1.4, w * 0.09), q, INK, 0.45, 0.22, seed);
+      tw.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.5, 0.4 * q));
+    }
     stroke(clump, 1, INK, 0.65, 0.5 * q);
+  },
+  // Revision 11 (?rev11): arta (Calligonum comosum) at ground point G, h tall: a leafless broom of thin jointed green
+  // branches rising and spreading from a short woody base, on the low mound of sand it has caught
+  broom11(G, h, psi, q, seed) {
+    const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
+    if (!b || !t || b[0] < RAIL.x0 - 60 || b[0] > RAIL.x1 + 60 || b[1] > RAIL.y1 + 90) return;
+    const k = RAIL.f / b[2], w = 1.15 * h * k, hh = b[1] - t[1], r = rng(seed), ry = 0.8 * w * RAIL.eye / b[2], mh = Math.max(0.8, 0.16 * hh);
+    // the mound, a low dome of sand wider than the bush, and its shade
+    const dome = [];
+    for (let j = 0; j <= 16; j++) { const a = Math.PI * j / 16; dome.push([b[0] - 0.8 * w * Math.cos(a), b[1] - mh * Math.sin(a)]); }
+    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; dome.push([b[0] + 0.8 * w * Math.cos(a), b[1] + ry * Math.sin(a)]); }
+    const mound = new P(dome, true);
+    fill(mound, SEPIA, 0.12 * q);
+    stroke(new P(dome.slice(0, 17)), 1, INK, 0.5, 0.35 * q);
+    // the branches: from the base, each bowed outward to its tip
+    const br = [], tips = [];
+    for (let j = 0; j < 24; j++) {
+      const s = (r() - 0.5) * 2, x0 = b[0] + s * w * 0.08, y0 = b[1] - mh * 0.7, L = hh * (0.65 + 0.35 * r()) * (1 - 0.25 * s * s);
+      const x1 = x0 + s * w * 0.5 * (0.6 + 0.4 * r()), y1 = y0 - L, cx = x0 + (x1 - x0) * 0.15, cy = y0 - L * 0.6;
+      const pts = []; for (let i = 0; i <= 6; i++) { const u = i / 6, v = 1 - u; pts.push([v * v * x0 + 2 * v * u * cx + u * u * x1, v * v * y0 + 2 * v * u * cy + u * u * y1]); }
+      br.push(pts); tips.push(...pts);
+    }
+    if (tips.length > 2) { const crown = new P(this.hull11(tips), true); mask(crown, 0.3 * q); if (OPT.colour) wash(crown, '#7E8A56', 0.34 * q); else fill(crown, SEPIA, 0.07 * q); }
+    this.ink11(br, w > 12 ? 0.55 : 0.5, 0.55 * q, OPT.colour ? '#4E4C32' : INK);
   },
   // a convex hull of screen points (monotone chain)
   hull11(pts) {
