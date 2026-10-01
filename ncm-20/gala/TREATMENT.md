@@ -6,7 +6,7 @@ Final treatment by the head of media and PR lead. Draft for NCM and protocol app
 
 | | |
 |---|---|
-| Runtime | **2:43.3** (163.3 s = 49 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop (Revision 6). 3:00.0 with April 2024 (`?april2024`); 2:38.3 with the tanker beat pulled. Revision 11 (`?rev11`, a draft): 3:15.0 (58.5 bars), 3:08.3 with the tanker pulled, 3:31.7 with April 2024 |
+| Runtime | **2:43.3** (163.3 s = 49 bars at 72 BPM; one bar = 3.333 s), then a 20 s seamless stage-hold loop (Revision 6). 3:00.0 with April 2024 (`?april2024`); 2:38.3 with the tanker beat pulled. Revision 11 (`?rev11`, a draft): 3:15.0 in design time (58.5 bars), played 10% slower at the requester's direction: 3:34.5 on screen, 3:27.2 with the tanker pulled, 3:52.8 with April 2024 |
 | Screen | Large LED wall in a dark hall. The event master is 50p, rendered to the wall's native pixel map (3840×2160 if the wall is 16:9) with the LED grade (`?grade=led`) |
 | Sound | 5.1 cinema mix (7.1 if the hall has it), an original score recorded live, and an Arabic voice-over by an Emirati narrator |
 | Language | Arabic leads everywhere: the voice-over, the first and larger line of every text block, the right-hand text column. English comes second |
@@ -64,6 +64,8 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
   - Etihad Towers stand 1.96 km away on a bearing of 183.6°; the 305 m tower is 8.9° high.
   - Emirates Palace stands 1.76 km away on a bearing of 199.6°.
   - Suhail, at 12.2°, clears the towers just to their right.
+  - Revision 11 adds ADNOC HQ (1.67 km, bearing 174.2°, 11.6° high) and Qasr Al Watan (2.37 km, bearing 226.6°).
+    See its notes of 1 October.
 
 **Sound and build.**
 - The seeding aircraft is a distant turboprop.
@@ -546,7 +548,8 @@ Everything is behind a switch, `?rev11`, which works with `?colour` and `?herita
 approved Revision 8: the cue list, the cue sheet and the score are byte-identical, and 20 stills (one per beat) are
 identical to the pixel.
 
-**The cut: 3:15.0** (58.5 bars; 3:08.3 with the tanker pulled; 3:31.7 with `?april2024`). The beats keep the bar grid.
+**The cut: 3:34.5 on screen** (58.5 bars, 3:15.0 at the design tempo, played at a pace of 1.1: see the notes of 1 October
+below; 3:27.2 with the tanker pulled; 3:52.8 with `?april2024`). The beats keep the bar grid.
 The working day now runs from dawn to sunset, and the Center's watch leads into the world.
 
 | Beat | Revision 8 | Revision 11 |
@@ -670,10 +673,9 @@ CENTER OF METEOROLOGY; headline, echoing the end of the narration and giving the
 الأخير» / FORECASTERS HAVE THE FINAL WORD. No figure: the only one to hand, the supercomputer's 2.8 petaflops
 theoretical peak of 2021 (HPE), would read as modest to WMO guests beside peer services in 2027, so it stays off screen
 until NCM gives a current, dated figure (§11 row 11). New narration VO-13b, the weather named as the object so nothing
-reads as air-defence language: «وعلى مَدارِ السّاعة،
-ترصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.» /
-"Around the clock, stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters
-have the final word." (WAM, 29 Jun 2026: outputs are reviewed and approved by specialists before issue.) Music: the
+reads as air-defence language (trimmed on 1 October; see below): «وتَرصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ
+الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.» / "Stations, radars and satellites observe the weather,
+a supercomputer runs the models, and forecasters have the final word." (WAM, 29 Jun 2026: outputs are reviewed and approved by specialists before issue.) Music: the
 Center's pulse (B07) returns and rises into the world's F major. No station or radar count is shown: the published
 counts conflict (radars: 5, 6, 7 or 9 by source and year).
 
@@ -683,10 +685,33 @@ President; "first Arab" would be false (Egypt's M. F. Taha, 1971–1979). The te
 **One frame.** The new plates are drawn in true 3D, but they sit in the approved plates' frame (x 96–1027, y 60–990 on
 a 1920 × 1080 screen), so the picture keeps one format from cut to cut and the words keep a clear gutter.
 
-**The runtime.** 3:15.0 is 15 s over the earlier ~3:00 instruction (which the approved 2:43.3 cut met). Every added
-second answers a named ask. If a tighter cut is wanted, one that keeps every ask is ready to build: the founding 4.5 →
-3.5 bars, the two airport shots 3 → 2, Jebel Ali 2.5 → 2, the jetty 2 → 1.5, the watch 2.5 → 2 and the solar beat 2 →
-1.5, which saves 4 bars and gives 3:01.7 (§11 row 43).
+**The runtime.** 3:34.5 on screen is 34.5 s over the earlier ~3:00 instruction (which the approved 2:43.3 cut met). Every
+added second answers a named ask, and the last 19.5 s are the pace the requester asked for on 1 October. If a tighter cut
+is wanted, one that keeps every ask is ready to build: the founding 4.5 → 3.5 bars, the two airport shots 3 → 2, Jebel Ali
+2.5 → 2, the jetty 2 → 1.5, the watch 2.5 → 2 and the solar beat 2 → 1.5, which saves 4 bars and gives 3:19.8 at this
+pace (§11 row 43).
+
+**The requester's notes on the review copy (1 October 2026).**
+- *"The landscape in the final scene needs ADNOC HQ and Qasr Al Watan beside Emirates Palace."* Both now stand in the
+  finale's skyline, computed from the same real viewpoint as the rest (the Marina by Marina Mall, 24.4769 N, 54.3225 E,
+  looking south), at their true bearing and angular size:
+  - ADNOC HQ (24.46194 N, 54.32417 E; 342 m, 76 floors; HOK, 2017): 1.67 km at bearing 174.2°, so its crown stands 11.6°
+    up, below Suhail (12.2°) and well to its left, between the Nation Towers and the Etihad Towers. It is the slab the
+    Corniche plate already draws, with the open square at its crown, its windows lit; no name or logo (§9.5; §11 row 48).
+    The finale's earlier note that it stood east of the frame was wrong.
+  - Qasr Al Watan (24.462251 N, 54.305509 E): 2.37 km at bearing 226.6°, to the right of Emirates Palace. Its central dome
+    (37 m across) stands 60 m above the ground over the 100 m Great Hall, with a wing to each side; floodlit, as it is at
+    night. At that distance it is about 25 px high on a 1080-line screen, its true size; the wings' extent and their
+    small domes follow the palace's published massing and are to be checked against a photograph from the Marina before
+    lock. It is the Presidential Palace, so its depiction goes to the Presidential Court with the charter's credits
+    (§11 rows 43 and 48).
+- *"Make it a bit slower so the audience can scan the texts in the subtitles."* The whole of Revision 11 now plays at a
+  pace of 1.1 (10% slower; 72 BPM becomes 65.5): picture, words, dissolves and subtitles slow together, and the score is
+  stretched by the same factor without changing its pitch (`pace.py`; the live recording will simply be played at 65.5
+  BPM). The densest lines are also given more of their own beats (VO-02, VO-03, VO-04, VO-05, VO-07, VO-09, VO-13,
+  VO-14a, VO-14b, VO-15a, VO-16; never across the next line), and VO-13b loses its «وعلى مدار الساعة», which repeated
+  the airport's watch. Every subtitle now reads at 15.4 characters a second or less in English (it was up to 22.1, the
+  list of professions in VO-15a) and 13.8 or less in Arabic (it was up to 20.0).
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
@@ -1704,11 +1729,12 @@ Every number on screen, its qualifier and its source:
 | 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
 | 41 | **The colour pass (Revision 9, `?colour`):** adopt it for the ceremony masters, and if so as drafted or more restrained. Management asked for the film to be "More colorful" | The look of the whole film in the hall; the LED grade is calibrated on the wall with it | Requester and NCM | The approved Revision 8 look; the colour pass is delivered as a subtitled review copy |
 | 42 | **The Emirati crafts and skills (Revision 10, `?heritage`):** adopt them for the ceremony masters, all or some (the «الدِّيرة» card, the nahham, Al Sadu on the cards, the ghaf, al-Shi'ra above Suhail) | Heritage shown before the Vice President must be true and dignified; the cards carry the leaders' words | Requester, NCM, the cultural adviser (row 37) and the protocol office | The approved Revision 8 look; the touches are delivered in a subtitled review copy |
-| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 3:15.0, 15 s over the earlier ~3:00 instruction; a tighter cut that keeps every ask (3:01.7, minus 4 bars) is ready to build. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2 | The requester asked for them; they lengthen the film by 31.7 s; the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
+| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 3:34.5 on screen at the pace the requester asked for (3:15.0 at the design tempo), 34.5 s over the earlier ~3:00 instruction; a tighter cut that keeps every ask (minus 4 bars: 3:19.8 at this pace) is ready to build. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2 | The requester asked for them; they lengthen the film by 31.7 s; the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
 | 44 | **The Fujairah jetty in the 2026 context.** The oil zone and the port's manifolds were struck in March and May 2026. The plate shows only the jetty, the breakwater, the sea and the Hajar, calm and in morning light, bow south | A terminal picture can read as a target or damage | NCM, the protocol office and MoFA; the go/no-go checks as for the tanker beat | Built as requested; removable with `?pull=tanker` |
 | 45 | **The operators' figures on screen (Revision 11).** 32.5 million passengers at Zayed International in 2025 (Abu Dhabi Airports); Jebel Ali's annual capacity of 19.4 million TEU (DP World; not its 2025 throughput, the last before the 2026 fall); Al Dhafra Solar PV, 2 GW, 2023 (Masdar; "the world's largest single-site solar plant at its inauguration" goes to the programme); Shams 1, the region's first operational utility-scale CSP plant (Shams Power); the first nation in the Middle East and North Africa to commit to net zero (Masdar, 2021). Each is its owner's fact, with its year and every qualifier, set under the place's name, never under an NCM "we" headline | Every number on screen carries its source and year; the owners may wish to see them | NCM communications, with each owner | As built, with the sources in Revision 11 and §9.3 |
 | 46 | **VO-10t in the approved cut.** It says NCM's AI drafts the east-coast bulletin; WAM (29 June 2026) says the Forecaster Assistant helps prepare weather and marine bulletins in general, without naming the east-coast one. Revision 11 uses WAM's own verb | The narration is not yet recorded, so it can be corrected before the session | NCM and the Arabic editor | Revision 11's wording, «…نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،» |
 | 47 | **The Operations Centre and the forecasters (Revision 11, B18b).** Reference photographs of NCM's Operations Centre, and of consenting staff at work, so the room can be drawn as it is and named; the cultural adviser (row 37) to confirm the ghutra, agal and shayla as drawn from behind. Until then the room is generic and unnamed, and the supercomputer appears only in the register | H.H. Sheikh Mansour toured the real room on 4 Aug 2025, and NCM's staff work in it; an invented interior must not be labelled as theirs | NCM communications and the cultural adviser | A generic room, not named; three anonymous forecasters seen from behind |
+| 48 | **The finale's two new landmarks (Revision 11, 1 October).** ADNOC HQ in the closing skyline, in the 2026 context (ADNOC's Ruwais complex and its Fujairah terminal were struck in March 2026, and ADNOC vessels attacked in Hormuz); and Qasr Al Watan, the Presidential Palace, whose depiction the Presidential Court approves | The requester asked for both. Each is drawn as the other landmarks are, a quiet lit silhouette at its true size with no name, logo, beam or glow beyond its own floodlights; the closing frame is the film's calm last image | The protocol office and the Presidential Court | As built; without approval, the finale returns to the approved skyline (both are drawn only under `?rev11`) |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

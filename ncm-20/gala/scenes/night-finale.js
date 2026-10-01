@@ -9,7 +9,14 @@
 //   Emirates Palace (24.4619 N, 54.3167 E): 1.76 km at bearing 199.6°, 0.553 px a metre, a long low front (about 1 km).
 //   Nation Towers (24.4639 N, 54.3281 E): 1.55 km at bearing 158.8°, 0.627 px a metre; 268 m and 233 m, bridge at 202 m.
 // These are the tall landmarks in the frame (bearings 129.5°-242.5°); the lower towers of Khalidiya and Al Bateen are
-// left out, and The Landmark, ADNOC HQ and the World Trade Center stand east of the frame.
+// left out, and The Landmark and the World Trade Center stand east of the frame.
+// Revision 11 (?rev11) adds, at the requester's direction, the two landmarks beside them:
+//   ADNOC HQ (24.46194 N, 54.32417 E): 1.67 km at bearing 174.2°, 0.582 px a metre; 342 m, so its crown stands 11.6°
+//   (199 px) high, below Suhail and well to its left, between the Nation Towers and the Etihad Towers.
+//   Qasr Al Watan (24.462251 N, 54.305509 E): 2.37 km at bearing 226.6°, 0.411 px a metre, west of Emirates Palace; its
+//   central dome (37 m across) stands 60 m above the ground over the 100 m Great Hall, with a wing to each side (the wings'
+//   extent and their small domes are drawn to the palace's published massing, to be checked against a photograph from
+//   the Marina before lock). Both are drawn as the other landmarks are: dark silhouettes against the sky, lit windows.
 const FINALE_VIEW = { az0: 186, pxDeg: 17, hz: 905 };
 scene({
   id: 'finale', night: true, ringT: 2.47,
@@ -44,6 +51,24 @@ scene({
       return lights;
     });
     this.palaceLights = Array.from({ length: 70 }, () => [pcx - half * 0.95 + r() * half * 1.9, m(4 + r() * 10), r()]);
+    // Revision 11 (?rev11): ADNOC HQ (borrowed from the homes plate, as the Etihad and Nation Towers are) and Qasr Al Watan.
+    // Their lights use their own random stream, so the approved frame's own lights are unchanged.
+    this.r11 = typeof REV11 !== 'undefined' && REV11;
+    const r2 = rng(2027);
+    const ab = tmp.sky.find(b => b.adnoc);
+    this.adnoc = { k: 0.582 / 1.155, px: 1586, base: tmp.base, sx: skyXY(0, 174.2, V)[0], b: ab,
+      // the slab with the open square at its crown (the pale side walls rise past the glass to a lintel)
+      hole: new P([[1569, tmp.base - 334 * 1.155], [1603, tmp.base - 334 * 1.155], [1603, tmp.base - 312 * 1.155], [1569, tmp.base - 312 * 1.155]], true) };
+    this.adnocWin = []; for (let y = tmp.base - 12; y > tmp.base - 312 * 1.155 + 8; y -= 11) for (let xx = 1572; xx < 1601; xx += 7) if (r2() < 0.34) this.adnocWin.push([xx, y, r2()]);
+    const qk = 0.411, qcx = skyXY(0, 226.6, V)[0], qm = h => hz - h * qk, X = mm => qcx + mm * qk;
+    this.qasr = new P([[X(-150), hz], [X(-150), qm(15)], [X(-112), qm(15)], [X(-112), qm(19)], [X(-50), qm(19)], [X(-50), qm(24)],
+      [X(-18.5), qm(24)], [X(-18.5), qm(41.5)], [X(18.5), qm(41.5)], [X(18.5), qm(24)], [X(50), qm(24)], [X(50), qm(19)],
+      [X(112), qm(19)], [X(112), qm(15)], [X(150), qm(15)], [X(150), hz]], true);
+    this.qasrDome = el(qcx, qm(41.5), 18.5 * qk, 18.5 * qk, Math.PI, TAU, 760, 0); // the great dome: 37 m across, its crown 60 m up
+    this.qasrFinial = new P([[qcx - 0.6, qm(60)], [qcx, qm(64)], [qcx + 0.6, qm(60)]], true);
+    this.qasrDomes = [-86, -64, 64, 86].map((x, i) => el(X(x), qm(19), 6 * qk, 6.5 * qk, Math.PI, TAU, 761 + i, 0));
+    this.qasr.cx = qcx; this.qasr.k = qk;
+    this.qasrLights = Array.from({ length: 56 }, () => { const x = -146 + r2() * 292; return [X(x), qm(3 + r2() * (Math.abs(x) < 50 ? 18 : 11)), r2()]; });
   },
   J(t) { return jdUTC(2027, 3, 15, 15.75 + 0.5 * clamp(this.hold ? 1 : t / (this.dur * (this.speed || 1)))); },
   // the azimuth gap between Sirius and Canopus (deg) at the moment the film's gold ring closes (the same sky in the holds)
@@ -114,9 +139,31 @@ scene({
     const lamp = (x, y, a, w = 2, h = 3) => { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a; ctx.fillStyle = '#F2C97A'; ctx.fillRect(x, y, w, h); ctx.restore(); };
     // the low shore across the water
     sil(new P([[0, hz], [0, hz - 5], [W, hz - 4], [W, hz]], true), 0.8);
+    // Revision 11: Qasr Al Watan, the farthest (2.37 km): its floodlit dome glows softly, its arcades are lit
+    if (this.r11) {
+      const Q = this.qasr, dq = cq * easeOut(prog(t, 0.6, 2.0));
+      sil(Q); sil(this.qasrDome); sil(this.qasrFinial, 0.6); this.qasrDomes.forEach(d => sil(d, 0.7));
+      // floodlit at night, as the palace is: its white granite pale against the sky, the dome brightest
+      ctx.save(); ctx.globalCompositeOperation = 'screen';
+      const fl = ctx.createLinearGradient(0, hz - 64 * Q.k, 0, hz); fl.addColorStop(0, '#E9DCC0'); fl.addColorStop(1, '#B9A07A');
+      ctx.fillStyle = fl; ctx.globalAlpha = 0.5 * dq; ctx.beginPath(); Q.trace(ctx, 1); this.qasrDomes.forEach(d => d.trace(ctx, 1)); ctx.fill();
+      ctx.globalAlpha = 0.68 * dq; ctx.fillStyle = '#F1E6CC'; ctx.beginPath(); this.qasrDome.trace(ctx, 1); this.qasrFinial.trace(ctx, 1); ctx.fill();
+      ctx.restore();
+      this.qasrLights.forEach(([x, y, v]) => { const on = prog(t, 0.9 + v * 2.5, 0.6); if (on > 0) lamp(x, y, 0.5 * on * (0.5 + 0.5 * v), 2, 2); });
+    }
     // Emirates Palace, then the Etihad Towers in front of it (they stand nearer)
     sil(this.palace); sil(this.palaceDome); this.palaceDomes.forEach(d => sil(d, 0.8));
     this.palaceLights.forEach(([x, y, v]) => { const on = prog(t, 0.8 + v * 2.5, 0.6); if (on > 0) lamp(x, y, 0.5 * on * (0.5 + 0.5 * v), 2, 2); });
+    // Revision 11: ADNOC HQ (1.67 km), the slab with the open square at its crown, its windows lit
+    if (this.r11) {
+      const A = this.adnoc;
+      ctx.save(); ctx.translate(A.sx - A.px * A.k, hz - A.base * A.k); ctx.scale(A.k, A.k);
+      ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = cq; ctx.fillStyle = OPT.colour ? '#070A18' : '#05060B';
+      ctx.beginPath(); A.b.body.trace(ctx, 1); A.hole.trace(ctx, 1); ctx.fill('evenodd'); ctx.restore();
+      stroke(A.b.body, cq, INK, 2.4, 0.2);
+      this.adnocWin.forEach(([x, y, v]) => { const on = prog(t, 1.1 + v * 3, 0.6); if (on > 0) lamp(x, y, 0.6 * on * (0.6 + 0.4 * v), 4, 6); });
+      ctx.restore();
+    }
     const N = this.nation;
     ctx.save(); ctx.translate(N.sx - N.px * N.k, hz - N.base * N.k); ctx.scale(N.k, N.k);
     this.nationT.forEach(b => sil(b.body, 2.0));
@@ -133,6 +180,11 @@ scene({
     const rq = cq * easeOut(prog(t, 2.0, 2.0));
     this.windows.forEach((ws, i) => ws.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(E.sx + (x - E.px) * E.k, 0.16 * rq, 40 + 60 * v, v * 6.28); }));
     this.palaceLights.forEach(([x, y, v], j) => { if (j % 4 === 0) refl(x, 0.1 * rq, 25 + 30 * v, v * 6.28); });
+    if (this.r11) {
+      const A = this.adnoc;
+      this.adnocWin.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(A.sx + (x - A.px) * A.k, 0.16 * rq, 40 + 60 * v, v * 6.28 + 2); });
+      this.qasrLights.forEach(([x, y, v], j) => { if (j % 4 === 0) refl(x, 0.1 * rq, 22 + 26 * v, v * 6.28 + 3); });
+    }
     this.nationWin.forEach(ws => ws.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(N.sx + (x - N.px) * N.k, 0.16 * rq, 40 + 60 * v, v * 6.28 + 1); }));
     // hold C (behind speeches): the whole frame dimmed
     if (this.dim) { ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = this.dim; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore(); }

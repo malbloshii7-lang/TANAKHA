@@ -53,7 +53,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 
 | Path | What it is |
 |---|---|
-| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) · `?heritage` the Emirati crafts and skills (Revision 10, a draft) · `?rev11` the founding decree, the working day in full and the Center's watch (Revision 11, a draft: 3:15.0) |
+| `film.html` | The film, live in a browser (silent). Query options: `?t=60` start at 1:00 · `?scale=2` 4K · `?grade=led` LED-wall grade · `?vo` scratch narration as subtitles · `?tc` burned-in timecode · `?hold=A\|B\|C\|W` a stage hold · `?pull=tanker` the cut without the tanker beat (2:38.3) · `?april2024` April 2024 after the seven emirates (3:00.0) · `?colour` the hand-coloured pass (Revision 9, a draft for approval) · `?heritage` the Emirati crafts and skills (Revision 10, a draft) · `?rev11` the founding decree, the working day in full and the Center's watch (Revision 11, a draft: 3:34.5, at a pace 10% slower than its design) · `?pace=1` the design pace (for the score build), or any other factor |
 | `engine.js` | Drawing, type, camera, transitions (fade, dawn, dusk, iris), themes (parchment and night), text recording, the frame loop |
 | `timeline.js` | The cut: every beat, its words and their film times, the narration (`VO`), the stage holds |
 | `scenes/` | One file per scene. `plate-*.js` are the v3 plates (drawing only). `night-*.js`, `map-nation.js` and `cards.js` are new. `r11-*.js` are Revision 11's plates (only with `?rev11`): `r11-founding.js` (the decree's charter and the Center's instruments), `r11-airport.js` (dawn fog at Zayed International, the arrival), `r11-jebelali.js` (the container quay), `r11-jetty.js` (Fujairah's VLCC jetty), `r11-solar.js` (Al Dhafra Solar PV), `r11-watch.js` (forecasters at work at night, a generic room; the full-disk satellite image that lands on the world globe, its coasts outside the UAE's box from Natural Earth 1:50m land, public domain); `r11-kit.js` holds their shared helpers, including the camera that sets every Revision 11 plate in the approved plates' frame. All but the founding and the watch are drawn in true 3D with `engrave3d.js`. `plate-energy.js` and `plate-world.js` carry small `?rev11`-only changes for the dissolves into and out of the new beats (the approved cut is unchanged) |
@@ -83,9 +83,13 @@ FILM_QUERY='vo&tc' node render.js film out/review-vo.mp4 out/mix.wav --jobs 3   
 node render.js film out/review.mp4 out/mix.wav --jobs 3                         # clean 1080p 30 fps
 FILM_QUERY='vo&colour&fadeout=2.5' node render.js film out/review-colour.mp4 out/mix.wav --jobs 3   # the colour pass (Revision 9), narration as subtitles
 FILM_QUERY='vo&colour&heritage&fadeout=2.5' node render.js film out/review-heritage.mp4 out/mix.wav --jobs 3   # with the Emirati touches (Revision 10)
-# Revision 11 (?rev11) has its own cut, so its own cues and score: every query that changes the cut goes on each step
-FILM_QUERY=rev11 node render.js cues out/r11/cues.json && python3 score.py out/r11/cues.json out/r11/
-FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix.wav --jobs 3
+# Revision 11 (?rev11) has its own cut, so its own cues and score: every query that changes the cut goes on each step.
+# It also runs 10% slower than its design (timeline.js PACE 1.1), so the score is built from the design cut (pace=1),
+# then stretched to the pace without changing its pitch; the cue list itself (cue sheet, subtitle files) is in real time
+FILM_QUERY='rev11&pace=1' node render.js cues out/r11/cues-design.json && python3 score.py out/r11/cues-design.json out/r11/
+python3 pace.py out/r11/mix.wav out/r11/mix-paced.wav 1.1
+FILM_QUERY=rev11 node render.js cues out/r11/cues.json
+FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix-paced.wav --jobs 3
 
 # every master in one go (about 2.7 hours at --jobs 3), then the show deliverables, the QC report and its page
 sh masters.sh out/audio out/masters                   # gathers the WAVs from out/ and out/pull/ if out/audio has none

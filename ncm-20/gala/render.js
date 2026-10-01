@@ -65,10 +65,13 @@ async function openPage(browser) {
   if (mode === 'cues') { // the timeline as JSON, for score.py and the subtitle files
     const browser = await chromium.launch(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {});
     const page = await openPage(browser);
-    const cues = await page.evaluate(() => ({ duration: DURATION, scenes: SCENES.map(s => ({ id: s.id, start: s.start, dur: s.dur, speed: s.speed || 1, offset: s.offset || 0, night: !!s.night, xf: s.xf ?? XF, enter: (s.enter && s.enter.type) || 'fade', t20: s.id === 'gauge' ? s.t20 : undefined, dt: s.id === 'gauge' ? s.dt : undefined, role: s.role || null, text: s.text || null, sub: s.sub || null })),
+    // with a pace (timeline.js: Revision 11 runs slower than its design) every time is given in real seconds
+    const cues = await page.evaluate(() => { const K = typeof PACE !== 'undefined' ? PACE : 1, k = x => K === 1 ? x : +(x * K).toFixed(4); const c = ({ duration: k(DURATION), scenes: SCENES.map(s => ({ id: s.id, start: k(s.start), dur: k(s.dur), speed: s.speed || 1, offset: s.offset || 0, night: !!s.night, xf: k(s.xf ?? XF), enter: (s.enter && s.enter.type) || 'fade', t20: s.id === 'gauge' ? k(s.t20) : undefined, dt: s.id === 'gauge' ? k(s.dt) : undefined, role: s.role || null, text: s.text || null, sub: s.sub || null })),
       // every words block with its film times (recorded by calling each scene's words once), and the narration
       text: (() => { TEXT_REC = []; SCENES.forEach(s => { if (s.words) { ctx.save(); try { s.words.call(s, 0.5 * s.dur); } catch (e) { TEXT_REC.push({ error: s.id + ': ' + e.message }); } ctx.restore(); } }); const r = TEXT_REC; TEXT_REC = null; return r; })(),
-      vo: typeof VO === 'undefined' ? [] : VO.map(v => ({ id: v.id, in: v.in, out: v.out, ar: v.ar, sub: voSubAr(v), en: v.en })) }));
+      vo: typeof VO === 'undefined' ? [] : VO.map(v => ({ id: v.id, in: k(v.in), out: k(v.out), ar: v.ar, sub: voSubAr(v), en: v.en })) });
+      if (K !== 1) { c.pace = K; c.text.forEach(r => { if (r.tin != null) { r.tin = k(r.tin); r.tout = k(r.tout); } }); }
+      return c; });
     fs.writeFileSync(out, JSON.stringify(cues, null, 1)); console.log('wrote', out, cues.scenes.length, 'scenes,', cues.duration, 's');
     await browser.close(); return;
   }

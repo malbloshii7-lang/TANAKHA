@@ -2,8 +2,8 @@
 // The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 to 6): 20 beats, 49 bars at 72 BPM, 2:43.3
 // (19 beats and 2:38.3 with the tanker pulled: ?pull=tanker). ?april2024 puts April 2024 on the national map back
 // after the seven emirates (B09): 21 beats, 54 bars, 3:00.0.
-// Revision 11 (?rev11, a draft): 23 beats, 58.5 bars, 3:15.0 (3:08.3 with the tanker pulled; 3:31.7 with ?april2024);
-// see REV11_BEATS below.
+// Revision 11 (?rev11, a draft): 23 beats, 58.5 bars, 3:15.0 in design time, played at a pace of 1.1 (PACE below):
+// 3:34.5 on screen (3:27.2 with the tanker pulled; 3:52.8 with ?april2024); see REV11_BEATS below.
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -320,6 +320,13 @@ function REV11_BEATS() {
   };
 }
 
+// The pace: Revision 11 runs 10% slower than its design (pace 1.1; the score's 72 BPM becomes 65.5), at the requester's
+// direction, so the audience can read every subtitle. Every time in this file stays in design seconds: start.js maps the
+// real clock onto the design clock (film time = real time / PACE), so picture, words, dissolves and subtitles all slow
+// together, and the cue export gives real times. The score is built from the design cut (?pace=1) and stretched by the
+// same factor without changing its pitch (README). ?pace= overrides; without ?rev11 the pace is 1.
+const PACE = (() => { const q = new URLSearchParams(location.search).get('pace'); return q ? Number(q) : REV11 ? 1.1 : 1; })();
+
 // ?pull=tanker (or any beat ids, comma-separated) takes beats out and closes the cut up behind them: every later beat
 // moves up by the pulled beat's length, and its narration goes with it, so nothing needs re-timing.
 const PULLED = (new URLSearchParams(location.search).get('pull') || '').split(',').filter(Boolean);
@@ -373,30 +380,30 @@ const RING = [
 // The narration (TREATMENT.md §6), for the scratch subtitles (?vo), the VO subtitle files and the score's ducking.
 const VO = [
   { id: 'VO-01', in: 2.2, out: 7.8, ar: 'قبلَ الراداراتِ والأقمارِ الاصطناعيّةِ بزمنٍ طويل، قرَأَ أهلُ هذهِ الأرضِ السماءَ… ليَعيشوا.', en: 'Long before radar and satellites, the people of this land read the sky… to live.' },
-  { id: 'VO-02', in: 12.3, out: 17.8, ar: 'ومِن طُلوعِ سُهَيلٍ عَدُّوا أيّامَ السَّنة، وعرَفوا مواسِمَ الزَّرعِ والبحرِ والمطَر.', en: "From Suhail's rising they counted the days of the year, and knew the seasons for planting, the sea and rain." },
-  { id: 'VO-03', in: 18.6, out: 24.2, ar: 'ومِن جُلْفار، وقَّتَ ابنُ ماجدٍ أسفارَهُ برياحِ الموسِم، وقاسَ ارتفاعَ النُّجومِ بالأصابِع.', en: 'From Julfar, Ahmed bin Majid timed his voyages by the monsoon winds and measured star heights in fingers.' },
-  { id: 'VO-04', in: 24.6, out: 27.0, ar: 'وعرَفَ البحّارةُ كلَّ ريحٍ باسمِها.', en: 'Sailors knew every wind by name.' },
-  { id: 'VO-05', in: 29.0, out: 36.6, ar: 'وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه.', en: 'In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them.' },
+  { id: 'VO-02', in: 12.3, out: 17.8, r11: { in: 11.2, out: 18.0 }, ar: 'ومِن طُلوعِ سُهَيلٍ عَدُّوا أيّامَ السَّنة، وعرَفوا مواسِمَ الزَّرعِ والبحرِ والمطَر.', en: "From Suhail's rising they counted the days of the year, and knew the seasons for planting, the sea and rain." },
+  { id: 'VO-03', in: 18.6, out: 24.2, r11: { in: 18.4, out: 24.6 }, ar: 'ومِن جُلْفار، وقَّتَ ابنُ ماجدٍ أسفارَهُ برياحِ الموسِم، وقاسَ ارتفاعَ النُّجومِ بالأصابِع.', en: 'From Julfar, Ahmed bin Majid timed his voyages by the monsoon winds and measured star heights in fingers.' },
+  { id: 'VO-04', in: 24.6, out: 27.0, r11: { in: 25.0, out: 27.4 }, ar: 'وعرَفَ البحّارةُ كلَّ ريحٍ باسمِها.', en: 'Sailors knew every wind by name.' },
+  { id: 'VO-05', in: 29.0, out: 36.6, r11: { in: 28.6, out: 37.1 }, ar: 'وفي العَين، تقاسَموا الماءَ بالأفلاج، وأحياها المغفورُ لهُ الشيخُ زايد بن سلطان آل نَهْيان، طيَّبَ اللهُ ثَراه.', en: 'In Al Ain they shared out the water through the aflaj, and the Founding Father, the late Sheikh Zayed bin Sultan Al Nahyan, restored them.' },
   { id: 'VO-06', beat: 'centre', in: 0.3, out: 6.7, r11: { in: 6.2, out: 12.6 }, ar: 'في عامِ ألفَينِ وسبعة، جمَعَتِ الدولةُ خدَماتِ الأرصادِ وأبحاثَ الغِلافِ الجوّيِّ في مركزٍ وطنيٍّ واحد،', sub: 'في عام ' + ltr('2007') + '، جمعت الدولة خدمات الأرصاد وأبحاث الغلاف الجوّيّ في مركز وطني واحد،', en: 'In 2007 the nation brought its weather service and atmospheric research together in one national center,' },
-  { id: 'VO-07', beat: 'nation', in: 0.267, out: 9.867, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
+  { id: 'VO-07', beat: 'nation', in: 0.267, out: 9.867, r11: { out: 11.0 }, ar: 'أسَّسَهُ بمرسومٍ بقانونٍ اتّحاديٍّ المغفورُ لهُ الشيخُ خليفة بن زايد آل نَهْيان، طيَّبَ اللهُ ثَراه، والمركزُ اليومَ المرجعُ الرسميُّ للطقسِ في الإماراتِ السَّبْع.', en: 'which the late Sheikh Khalifa bin Zayed Al Nahyan established by federal decree-law. Today it is the official source of weather information for all seven emirates.' },
   { id: 'VO-08a', beat: 'homes', in: 1.0, out: 7.0, ar: 'وفي أبريلَ ألفَينِ وأربعةٍ وعشرين، شهِدَتِ الدولةُ أغزرَ أمطارٍ في سِجِلّاتِها.', sub: 'وفي أبريل ' + ltr('2024') + '، شهدت الدولة أغزر أمطار في سجلّاتها.', en: 'In April 2024 the country saw the heaviest rainfall on record.' },
   { id: 'VO-08b', beat: 'homes', in: 7.2, out: 12.4, ar: 'وكانَ المركزُ قد توقَّعَ تزايُدَ عدمِ الاستقرارِ قبلَ يومَين، ثمَّ أصدرَ إنذاراً أحمرَ.', en: 'Two days before, the Center had forecast growing instability; then it issued a red alert.' },
   { id: 'VO-08c', beat: 'homes', in: 12.6, out: 17.2, ar: 'نستحضِرُ تلكَ الأيّامَ العصيبة، ونُحيّي كلَّ مَن سهِرَ على سلامةِ الناس.', en: "We remember those difficult days, and we honour all who kept watch over people's safety." },
   { id: 'VO-09a', beat: 'airport-dawn', only11: true, in: 1.2, out: 4.3, ar: 'وحتّى حينَ يغشى الضَّبابُ المَدارِجَ عندَ الفَجر،', en: 'Even when fog settles on the runways at dawn,' },
-  { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, r11: { in: 0.5, out: 2.9, en: 'for every flight, a watch that never sleeps;' }, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
+  { id: 'VO-09', beat: 'airport', in: 1.1, out: 3.5, r11: { in: 0.5, out: 4.4, en: 'for every flight, a watch that never sleeps;' }, ar: 'لكلِّ رحلةٍ رصدٌ لا ينقطِع،', en: 'For every flight, a watch that never sleeps;' },
   { id: 'VO-09r', beat: 'rail', in: 0.4, out: 3.8, ar: 'وعلى امتدادِ البَرِّ تحذيراتٌ من الغبارِ والضَّباب،', en: 'across the land, warnings of dust and fog;' },
   { id: 'VO-10', beat: 'port', in: 0.433, out: 3.133, ar: 'ولكلِّ سفينةٍ تنبُّؤاتٌ بحريّةٌ لخمسةِ أيّام،', en: 'for every ship, a five-day marine forecast;' },
   { id: 'VO-10t', beat: 'tanker', in: 0.3, out: 4.2, r11: { in: 0.4, out: 5.9, ar: 'وللساحلِ الشرقيِّ نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, marine bulletins that AI helps prepare and forecasters approve;' }, ar: 'وللساحلِ الشرقيِّ نشرةٌ يقترحُها الذكاءُ الاصطناعيّ، ويعتمدُها المتنبِّئون،', en: 'for the East Coast, a bulletin that AI drafts and forecasters approve;' },
   { id: 'VO-11', beat: 'energy', in: 0.433, out: 3.733, ar: 'وللطاقةِ النظيفةِ تنبُّؤاتٌ بسُطوعِ الشمسِ وهُبوبِ الرياح.', en: 'for clean energy, forecasts of sunshine and wind.' },
   { id: 'VO-11b', beat: 'solar', only11: true, in: 0.3, out: 6.3, ar: 'والإماراتُ أوّلُ دولةٍ في الشرقِ الأوسطِ وشمالِ أفريقيا تلتزمُ بالحيادِ المناخيِّ بحلولِ عامِ ألفَينِ وخمسين.', sub: 'والإمارات أوّل دولة في الشرق الأوسط وشمال أفريقيا تلتزم بالحياد المناخيّ بحلول عام ' + ltr('2050') + '.', en: 'And the UAE is the first nation in the Middle East and North Africa to commit to net zero by 2050.' },
   { id: 'VO-12', beat: 'seeding', in: 0.5, out: 7.4, ar: 'وفي أرضٍ يقِلُّ مطرُها عن مِئةِ مِلّيمترٍ في العامِ المُعتاد، سعَينا إلى استمطارِ السَّحاب.', sub: 'وفي أرض يقلّ مطرها عن ' + ltr('100') + ' ملّيمتر في العام المعتاد، سعينا إلى استمطار السحاب.', en: 'In a land with less than 100 millimetres of rain in a typical year, we sought more rain from the clouds.' },
-  { id: 'VO-13', beat: 'science', in: 1.333, out: 5.333, ar: 'ثمَّ استثمَرْنا في العلمِ نفسِه، للدُّوَلِ التي تُواجِهُ شُحَّ المياه.', en: 'Then we invested in the science itself, for the countries facing water scarcity.' },
-  { id: 'VO-13b', beat: 'watch', only11: true, in: 0.3, out: 7.9, ar: 'وعلى مَدارِ السّاعة، ترصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.', en: 'Around the clock, stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters have the final word.' },
-  { id: 'VO-14a', beat: 'world', in: 0.6, out: 3.8, ar: 'واليومَ، مِن سماءِ الإماراتِ إلى العالَم:', en: 'And today, from the skies of the Emirates to the world,' },
-  { id: 'VO-14b', beat: 'world', in: 4.0, out: 11.6, ar: 'يرأَسُ المنظّمةَ العالميّةَ للأرصادِ الجوّيّة، لأوّلِ مرّةٍ من دُوَلِ مجلسِ التعاوُنِ الخليجيّ، معالي الدكتور عبدالله أحمد المَنْدوس.', en: 'the first President of the World Meteorological Organization from the GCC: His Excellency Dr Abdulla Ahmed Al Mandous.' },
-  { id: 'VO-15a', beat: 'gauge', in: 2.133, out: 6.033, ar: 'إلى المتنبِّئينَ الجوّيّينَ والراصِدينَ وعلماءِ الزلازل، والطيّارينَ والمهندسينَ والعلماء…', en: 'To the forecasters, observers and seismologists, the pilots, engineers and scientists…' },
+  { id: 'VO-13', beat: 'science', in: 1.333, out: 5.333, r11: { out: 6.3 }, ar: 'ثمَّ استثمَرْنا في العلمِ نفسِه، للدُّوَلِ التي تُواجِهُ شُحَّ المياه.', en: 'Then we invested in the science itself, for the countries facing water scarcity.' },
+  { id: 'VO-13b', beat: 'watch', only11: true, in: 0.3, out: 8.1, ar: 'وتَرصُدُ المحطّاتُ والراداراتُ والأقمارُ الاصطناعيّةُ الطقسَ، ويُشغِّلُ الحاسوبُ الفائقُ النماذجَ، وللمتنبِّئينَ القرارُ الأخير.', en: 'Stations, radars and satellites observe the weather, a supercomputer runs the models, and forecasters have the final word.' },
+  { id: 'VO-14a', beat: 'world', in: 0.6, out: 3.8, r11: { in: 0.4 }, ar: 'واليومَ، مِن سماءِ الإماراتِ إلى العالَم:', en: 'And today, from the skies of the Emirates to the world,' },
+  { id: 'VO-14b', beat: 'world', in: 4.0, out: 11.6, r11: { out: 11.9 }, ar: 'يرأَسُ المنظّمةَ العالميّةَ للأرصادِ الجوّيّة، لأوّلِ مرّةٍ من دُوَلِ مجلسِ التعاوُنِ الخليجيّ، معالي الدكتور عبدالله أحمد المَنْدوس.', en: 'the first President of the World Meteorological Organization from the GCC: His Excellency Dr Abdulla Ahmed Al Mandous.' },
+  { id: 'VO-15a', beat: 'gauge', in: 2.133, out: 6.033, r11: { in: 1.3, out: 6.45 }, ar: 'إلى المتنبِّئينَ الجوّيّينَ والراصِدينَ وعلماءِ الزلازل، والطيّارينَ والمهندسينَ والعلماء…', en: 'To the forecasters, observers and seismologists, the pilots, engineers and scientists…' },
   { id: 'VO-15b', beat: 'gauge', in: 6.733, out: 8.933, ar: 'عِشرونَ عاماً من رَصْدِ السماء…', en: 'twenty years of watching the sky…' },
-  { id: 'VO-16', beat: 'finale', in: 1.667, out: 4.467, ar: 'ليُخطِّطَ الوطنُ لغدِهِ بثِقة.', en: 'so the nation can plan for tomorrow with confidence.' },
+  { id: 'VO-16', beat: 'finale', in: 1.667, out: 4.467, r11: { out: 5.6 }, ar: 'ليُخطِّطَ الوطنُ لغدِهِ بثِقة.', en: 'so the nation can plan for tomorrow with confidence.' },
 ];
 // narration lines tied to a beat are timed from that beat's start, so the cut can change without retiming them; a
 // pulled beat's lines go with it
