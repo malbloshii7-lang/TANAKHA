@@ -266,6 +266,11 @@ def main(cues_path, out_dir):
     en = lambda i: S[i]['start'] + S[i]['dur']
     vo_end = lambda t: max([v['out'] for v in cues['vo'] if v['in'] < t] + [0])  # the narration still running at t
     R11 = 'watch' in S  # Revision 11 (?rev11): its new beats are in the cue list
+    # Revision 11's slower detail beats (1 Oct 2026; timeline.js REV11_SLOW): each gained a bar and its plate's clock
+    # slowed, so a sound tied to something in a plate (the arrival's jet, the seeding aircraft, the rain from its cloud)
+    # follows the plate's clock: sc(id, x) is the film time at which that plate's clock reads x
+    SLOW = R11 and S['airport']['dur'] > 6.0
+    sc = lambda i, x: st(i) + (x - S[i]['offset']) / S[i]['speed']
 
     # B01 · night: the drone, wind, starlight; a hummed lead and its answer; the rababa states the motif as Suhail
     # clears the dunes; the ring tone. No drums at night.
@@ -406,17 +411,17 @@ def main(cues_path, out_dir):
             play(perc, pat, d0, max(d0, st(sid)), min(en(sid), d1), 'mf')
     for sid in ['rail', 'port', 'energy'] + (['solar'] if R11 else []):
         stroke(perc, 'tus', st(sid), 0.7)
-    sfx.add(A.jet_far(4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
+    sfx.add(A.jet_far(4.5 / S['airport']['speed'] if SLOW else 4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
     if R11:
-        sfx.add(A.wind(5.0, gain=0.25, gust=0.04), w0)  # the still air of a fog morning
-        sfx.add(A.wind(5.0, gain=0.3, gust=0.08), st('solar'))
+        sfx.add(A.wind(en('airport-dawn') - w0 if SLOW else 5.0, gain=0.25, gust=0.04), w0)  # the still air of a fog morning
+        sfx.add(A.wind(0.75 * (en('solar') - st('solar')) if SLOW else 5.0, gain=0.3, gust=0.08), st('solar'))
     sfx.add(diesel_far(en('rail') - st('rail') + 0.6, gain=1.0), st('rail') - 0.3, pan=0.25)
     if 'tanker' in S:  # the laden tanker under way: calm sea, the crew's drone again; no horn, nothing that waits
         tk = st('tanker')
         sfx.add(A.sea(en('tanker') - tk + 1.0, gain=0.6, period=7.5), tk - 0.3)
         music.add(A.lp(A.chant(D2, en('tanker') - tk, men=10, vowel='o'), 700, 2), tk - 0.1, 0.6)
         music.add(A.strings(D2, en('tanker') - tk, bright=600, attack=0.8, release=1.5, voices=5), tk, 0.5)
-    sfx.add(A.wind(5.0, gain=0.35, gust=0.12), st('energy'))
+    sfx.add(A.wind(en('energy') - st('energy') if SLOW else 5.0, gain=0.35, gust=0.12), st('energy'))
     for m in [55, 59, 62]:  # a brass swell on the last chord of the day, into the President's card
         music.add(A.horn(m, 2.6, gain=0.6), d0 + (k - 1) * BAR)
 
@@ -439,8 +444,14 @@ def main(cues_path, out_dir):
                         music.add(A.pluck(m, 0.6, bright=0.6), te + q * BEAT / 2, 0.22, pan=0.4 * np.sin(e))
         k, t = k + 1, t + BAR
     play(perc, [(4, 'muted', 0.5), (12, 'muted', 0.5), (14, 'muted', 0.3)], r0, r0 + 0.5, r1 - 0.8, 'mp')
-    sfx.add(turboprop_far(6.0, gain=0.9), r0 + 0.4, pan=-0.1)  # the seeding aircraft, distant, held near the screen
-    sfx.add(A.rain(3.0, gain=0.4), r0 + 3.6)  # the rain from the seeded cloud
+    if SLOW:
+        # the same moments on the seeding plate's slower clock (its clock read 0.94 and 4.46 at them in the faster cut)
+        k_ = S['seeding']['speed']
+        sfx.add(turboprop_far(6.0 * 1.1 / k_, gain=0.9), sc('seeding', 0.94), pan=-0.1)
+        sfx.add(A.rain(3.0 * 1.1 / k_, gain=0.4), sc('seeding', 4.46))
+    else:
+        sfx.add(turboprop_far(6.0, gain=0.9), r0 + 0.4, pan=-0.1)  # the seeding aircraft, distant, held near the screen
+        sfx.add(A.rain(3.0, gain=0.4), r0 + 3.6)  # the rain from the seeded cloud
     for k in range(6):
         music.add(A.bell(86 + [0, 4, 7, 12, 7, 4][k], 1.2, gain=0.35), st('science') + 0.2 + k * 0.17)  # celesta particles
 
@@ -453,7 +464,8 @@ def main(cues_path, out_dir):
         # landing; no drums (the Ayyala waits for the national line)
         a0, a1 = st('watch'), st('world')
         k, t = 0, a0
-        for ch in [Dm7, [34, 41, 58, 62, 65], [36, 43, 60, 64, 67]]:
+        # the slower watch (3.5 bars) walks D minor - B flat - G minor - C, the same landing a bar later
+        for ch in [Dm7, [34, 41, 58, 62, 65]] + ([[43, 50, 58, 62, 65]] if SLOW else []) + [[36, 43, 60, 64, 67]]:
             if t >= a1 - 0.1:
                 break
             chord(music, ch, t, min(BAR * 1.05, a1 - t + 0.4), gain=0.28 + 0.03 * k, bright=1800 + 300 * k, attack=0.4, release=0.6)

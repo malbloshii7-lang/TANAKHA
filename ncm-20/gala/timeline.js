@@ -2,8 +2,9 @@
 // The cut, from TREATMENT.md (§4, §5, §7, Appendix A.1, Revisions 2 to 6): 20 beats, 49 bars at 72 BPM, 2:43.3
 // (19 beats and 2:38.3 with the tanker pulled: ?pull=tanker). ?april2024 puts April 2024 on the national map back
 // after the seven emirates (B09): 21 beats, 54 bars, 3:00.0.
-// Revision 11 (?rev11, a draft): 23 beats, 58.5 bars, 3:15.0 in design time, played at a pace of 1.1 (PACE below):
-// 3:34.5 on screen (3:27.2 with the tanker pulled; 3:52.8 with ?april2024); see REV11_BEATS below.
+// Revision 11 (?rev11, a draft): 23 beats, 68.5 bars, 3:48.3 in design time, played at a pace of 1.1 (PACE below):
+// 4:11.2 on screen (4:00.2 with the tanker pulled; 4:29.5 with ?april2024); see REV11_BEATS and REV11_SLOW below.
+// ?slow=0 gives its earlier cut, before the detail beats were slowed: 58.5 bars, 3:34.5 on screen (3:27.2; 3:52.8).
 // From B10 on, words and narration are timed from their beat's start (s + ...), so beats can move without retiming.
 // Each entry places a scene: start and dur in film seconds on the bar grid, speed (the scene's own clock rate; set it
 // on every plate entry, or the v3 plate's own speed is inherited),
@@ -51,10 +52,10 @@ const B9 = APRIL2024 ? 5 : 0; // the bars April 2024 takes after the seven emira
 const RAIL_NAME = { ar: 'قطارات الاتحاد', en: 'ETIHAD RAIL' }; // or { ar: 'شبكة السكك الحديدية الوطنية', en: 'NATIONAL RAIL NETWORK' }
 const RAIL_BEAT = { id: 'rail', start: at(22 + B9), dur: at(1.5), speed: 1, offset: 1.0, xf: 0.5, cam: PLATE_LEFT(1.0, 1.04, 1.0 + at(1.5)),
   words(t) {
-    const f = filmT(this, t), s = this.start;
+    const f = filmT(this, t), s = this.start, e = this.ext || 0;
     // every label here is up for at least 3 s plus 0.3 s a word (critique M1), inside the beat's own dissolves
-    levelB(f, s + 0.25, s + 4.75, RAIL_NAME.ar + ' · الذيد، الشارقة', RAIL_NAME.en + ' · AL DHAID, SHARJAH', { y: 330 });
-    levelA(f, s + 0.7, s + 4.75, 'على امتداد البر', 'ACROSS THE LAND', { y: 520 });
+    levelB(f, s + 0.25, s + 4.75 + e, RAIL_NAME.ar + ' · الذيد، الشارقة', RAIL_NAME.en + ' · AL DHAID, SHARJAH', { y: 330 });
+    levelA(f, s + 0.7, s + 4.75 + e, 'على امتداد البر', 'ACROSS THE LAND', { y: 520 });
   } };
 // The tanker beat can be pulled at the go/no-go checks (two weeks and 72 hours before the ceremony) with ?pull=tanker;
 // it never goes into a cut-down, a social clip or the international version.
@@ -165,18 +166,18 @@ const TIMELINE = [
   // B16 · More rain from the clouds
   { id: 'seeding', start: at(31.5 + B9), dur: at(2), speed: SP.seeding, offset: 0.5, xf: 1.2, cam: t => PLATE_LEFT(1.0, 1.06, 0.5 + at(2) * SP.seeding)(t),
     words(t) {
-      const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.8, s + 6.3, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
+      const f = filmT(this, t), s = this.start, e = this.ext || 0;
+      levelB(f, s + 0.8, s + 6.3 + e, 'جبال الحجر · رأس الخيمة', 'HAJAR MOUNTAINS · RAS AL KHAIMAH', { y: 330 });
       // below the King Air's line of flight (screen y about 530-600; its nose reaches x 1120 by s + 6.3)
-      levelA(f, s + 1.2, s + 6.3, 'واستمطرنا السحاب', 'WE ASKED THE CLOUDS FOR MORE', { y: 720, maxW: COLW });
+      levelA(f, s + 1.2, s + 6.3 + e, 'واستمطرنا السحاب', 'WE ASKED THE CLOUDS FOR MORE', { y: 720, maxW: COLW });
     } },
   // B17 · The science of rain: its iris opens from the seeded droplet
   { id: 'science', start: at(33.5 + B9), dur: at(2), speed: SP.science, offset: 1.8, xf: 1.2, enter: { type: 'iris', x: 576, y: 458 },
     cam: t => camPath([{ t: 1.8, s: 2.2, px: 1210, py: 318, sx: 576, sy: 458 }, { t: 1.8 + 2.6 * SP.science, s: 1.0, px: 1435, py: 585, sx: 560, sy: 560 }, { t: 1.8 + at(2) * SP.science, s: 1.02, px: 1435, py: 585, sx: 560, sy: 560 }], t),
     words(t) {
-      const f = filmT(this, t), s = this.start;
-      levelB(f, s + 0.533, s + 6.3, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17, patch: true }); // on paper: the pull-out sweeps FIG. II's rules and droplets under it
-      levelA(f, s + 1.2, s + 6.2, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
+      const f = filmT(this, t), s = this.start, e = this.ext || 0;
+      levelB(f, s + 0.533, s + 6.3 + e, 'برنامج الإمارات لبحوث علوم الاستمطار · منذ ' + ltr('2015'), 'UAE RESEARCH PROGRAM FOR RAIN ENHANCEMENT SCIENCE · SINCE 2015', { y: 330, enSize: 17, patch: true }); // on paper: the pull-out sweeps FIG. II's rules and droplets under it
+      levelA(f, s + 1.2, s + 6.2 + e, ['ودعمنا', 'علوم الاستمطار'], 'WE FUNDED THE SCIENCE OF RAIN', { y: 520, maxW: COLW });
     } },
   // B18 · Card: HH Sheikh Mansour bin Zayed (no VO)
   { id: 'quote-mansour', use: 'quote', quote: 'mansour_iref', start: at(35.5 + B9), dur: at(3.5), xf: 1.2 },
@@ -205,6 +206,13 @@ const TIMELINE = [
 // existing beat; then the cut is laid out again on the bar grid (every beat keeps its length in bars plus any extra
 // seconds, as the world beat's 0.5 s). Without ?rev11 nothing here runs and the approved cut is unchanged.
 const REV11 = new URLSearchParams(location.search).has('rev11');
+// The detail beats, slower (1 October 2026): the requester found that the audience could not catch the details (the
+// solar trackers following the sun), so each of the ten detail beats gains one bar and its plate's clock slows in the
+// same proportion: every motion, camera move and draw-in spans the longer beat as it spanned the shorter one, and the
+// beat's words stay up to its end (ext, the seconds added; each words() adds it to its outs). Cards, the opening, the
+// founding, the map, the world and the finale keep their lengths. ?slow=0 returns the 3:34.5 cut.
+const SLOW11 = REV11 && new URLSearchParams(location.search).get('slow') !== '0';
+const REV11_SLOW = ['airport-dawn', 'airport', 'rail', 'port', 'tanker', 'energy', 'solar', 'seeding', 'science', 'watch'];
 if (REV11) {
   const R = REV11_BEATS();
   const seq = [];
@@ -217,6 +225,10 @@ if (REV11) {
   let bars = 0, extra = 0;
   seq.forEach(e => {
     if (e.bars === undefined) { e.bars = Math.round(e.dur / BAR72 * 2) / 2; e.extra = +(e.dur - at(e.bars)).toFixed(3); }
+    if (SLOW11 && REV11_SLOW.includes(e.id)) {
+      const d0 = at(e.bars) + (e.extra || 0);
+      e.bars += 1; e.ext = at(1); e.speed = +((e.speed || 1) * d0 / (d0 + e.ext)).toFixed(6);
+    }
     e.start = +(at(bars) + extra).toFixed(3); e.dur = +(at(e.bars) + (e.extra || 0)).toFixed(3);
     bars += e.bars; extra += e.extra || 0;
   });
@@ -249,8 +261,8 @@ function REV11_BEATS() {
       // crescent tower at their true size beyond. The approved headline and VO-09
       airport: { use: 'arrival', bars: 1.5, speed: 1, offset: 0.6, xf: 0.5, cam: R11.CAM,
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelA(f, s + 0.4, s + 4.75, ['ونقرأ السماء', 'لكل رحلة'], 'WE READ THE SKY FOR EVERY FLIGHT', { y: 520, maxW: COLW - 60 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelA(f, s + 0.4, s + 4.75 + e, ['ونقرأ السماء', 'لكل رحلة'], 'WE READ THE SKY FOR EVERY FLIGHT', { y: 520, maxW: COLW - 60 });
         } },
       // B12 · Jebel Ali in its might (2.5 bars; was 1.5): the long container quay under a line of ship-to-shore cranes,
       // ultra-large ships berthed nose to tail, the yard behind; the camera rises along the line. Its figure is the port's
@@ -258,20 +270,20 @@ function REV11_BEATS() {
       // capacity (DP World, 19 Feb 2025, restated 22 Jul 2026), not a year's throughput
       port: { use: 'jebelali', bars: 2.5, speed: 1, offset: 1.1, xf: 0.5, cam: R11.CAM,
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.333, s + 7.6, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
-          levelB(f, s + 1.2, s + 7.6, ['طاقة استيعابية سنوية ' + ltr('19.4') + ' مليون حاوية نمطية', 'موانئ دبي العالمية · ' + ltr('2026')], '19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD, 2026', { y: 404, maxW: COLW - 60 });
-          levelA(f, s + 0.9, s + 7.6, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 620, maxW: COLW - 60 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.333, s + 7.6 + e, 'ميناء جبل علي · دبي', 'JEBEL ALI PORT · DUBAI', { y: 330 });
+          levelB(f, s + 1.2, s + 7.6 + e, ['طاقة استيعابية سنوية ' + ltr('19.4') + ' مليون حاوية نمطية', 'موانئ دبي العالمية · ' + ltr('2026')], '19.4 MILLION TEU ANNUAL CAPACITY · DP WORLD, 2026', { y: 404, maxW: COLW - 60 });
+          levelA(f, s + 0.9, s + 7.6 + e, ['ونقرأ البحر', 'لكل سفينة'], 'WE READ THE SEA FOR EVERY SHIP', { y: 620, maxW: COLW - 60 });
         } },
       // B14 · Shams 1 (the plate stays, 1.5 bars): its label gains the operator's own record, with its year (Shams Power:
       // "the first operational utility-scale CSP plant in the MENA region"; inaugurated 17 March 2013)
       energy: { use: 'energy', bars: 1.5, speed: SP.energy, offset: 1.0, xf: 0.5,
         cam: t => camPath([{ t: 1.0, s: 1.0, px: 1435, py: 620, sx: 560, sy: 560 }, { t: 1.0 + at(1.5) * SP.energy, s: 1.05, px: 1435, py: 540, sx: 560, sy: 560 }], t),
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.2, s + 4.4, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 300 });
-          levelB(f, s + 1.0, s + 4.4, ['أول محطة تشغيلية للطاقة الشمسية المركّزة', 'على نطاق المرافق في المنطقة · ' + ltr('2013')], ["THE REGION'S FIRST OPERATIONAL", 'UTILITY-SCALE CSP PLANT · 2013'], { y: 374, maxW: COLW - 60 });
-          levelA(f, s + 0.4, s + 4.4, ['ونتنبأ بسطوع الشمس', 'وهبوب الرياح'], 'WE FORECAST THE SUN AND THE WIND', { y: 620, maxW: COLW - 60 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.2, s + 4.4 + e, 'شمس ' + ltr('1') + ' · منطقة الظفرة', 'SHAMS 1 · AL DHAFRA', { y: 300 });
+          levelB(f, s + 1.0, s + 4.4 + e, ['أول محطة تشغيلية للطاقة الشمسية المركّزة', 'على نطاق المرافق في المنطقة · ' + ltr('2013')], ["THE REGION'S FIRST OPERATIONAL", 'UTILITY-SCALE CSP PLANT · 2013'], { y: 374, maxW: COLW - 60 });
+          levelA(f, s + 0.4, s + 4.4 + e, ['ونتنبأ بسطوع الشمس', 'وهبوب الرياح'], 'WE FORECAST THE SUN AND THE WIND', { y: 620, maxW: COLW - 60 });
         } },
       // B13 · the east coast with its jetty (2 bars; was 1.5): an oil terminal's jetty off Fujairah, a tanker alongside
       // on the loading platform's arms, the Hajar close behind; calm water, no smoke, no flare, bow to the south (away
@@ -279,9 +291,9 @@ function REV11_BEATS() {
       // it is not said to draft the east-coast one). Still removable with ?pull=tanker
       tanker: { use: 'jetty', bars: 2, speed: 1, offset: 1.0, xf: 0.5, cam: R11.CAM,
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.3, s + 6.1, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
-          levelA(f, s + 0.5, s + 6.1, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.3, s + 6.1 + e, 'الفجيرة · بحر عُمان', 'FUJAIRAH · SEA OF OMAN', { y: 330 });
+          levelA(f, s + 0.5, s + 6.1 + e, 'للساحل الشرقي', 'FOR THE EAST COAST', { y: 520 });
         } },
     },
     before: {
@@ -289,9 +301,9 @@ function REV11_BEATS() {
       // hour, December-January), the crescent tower and Terminal A's roof above it, widebodies at the piers
       airport: [{ id: 'airport-dawn', use: 'airportdawn', bars: 1.5, speed: 1, offset: 0.8, xf: 1.0, cam: R11.CAM,
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.55, s + 4.75, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
-          levelB(f, s + 1.6, s + 4.75, ltr('32.5') + ' مليون مسافر في ' + ltr('2025'), '32.5 MILLION PASSENGERS IN 2025', { y: 430 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.55, s + 4.75 + e, 'مطار زايد الدولي · أبوظبي', 'ZAYED INTERNATIONAL AIRPORT · ABU DHABI', { y: 330 });
+          levelB(f, s + 1.6, s + 4.75 + e, ltr('32.5') + ' مليون مسافر في ' + ltr('2025'), '32.5 MILLION PASSENGERS IN 2025', { y: 430 });
         } }],
       // B18b · the Center's watch (2.5 bars), after HH Sheikh Mansour's card and before the world: forecasters at work
       // (a generic room: the real Operations Centre is drawn only from NCM's photographs, when they come), then the push
@@ -299,9 +311,9 @@ function REV11_BEATS() {
       world: [{ id: 'watch', use: 'watch', bars: 2.5, speed: 1, offset: 1.3, xf: 1.2,
         cam: t => R11.camLand(t, typeof R11_WATCH_PUSH !== 'undefined' ? R11_WATCH_PUSH : [98, 99]),
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.6, s + 7.6, 'المركز الوطني للأرصاد', 'NATIONAL CENTER OF METEOROLOGY', { y: 330 });
-          levelA(f, s + 1.4, s + 7.6, ['وللمتنبئين', 'القرار الأخير'], 'FORECASTERS HAVE THE FINAL WORD', { y: 520, maxW: COLW - 60 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.6, s + 7.6 + e, 'المركز الوطني للأرصاد', 'NATIONAL CENTER OF METEOROLOGY', { y: 330 });
+          levelA(f, s + 1.4, s + 7.6 + e, ['وللمتنبئين', 'القرار الأخير'], 'FORECASTERS HAVE THE FINAL WORD', { y: 520, maxW: COLW - 60 });
         } }],
     },
     after: {
@@ -311,10 +323,10 @@ function REV11_BEATS() {
       // (overtaken since) goes to the programme, so the headline can be read for 4 s
       energy: [{ id: 'solar', use: 'solar', bars: 2, speed: 1, offset: 0.6, xf: 0.8, cam: R11.CAM,
         words(t) {
-          const f = filmT(this, t), s = this.start;
-          levelB(f, s + 0.4, s + 6.4, 'محطة الظفرة للطاقة الشمسية · ' + ltr('2') + ' جيجاواط · ' + ltr('2023'), 'AL DHAFRA SOLAR PV · 2 GW · 2023', { y: 330, maxW: COLW - 60 });
-          levelA(f, s + 0.8, s + 6.4, ['الحياد المناخي', 'بحلول ' + ltr('2050')], 'NET ZERO BY 2050', { y: 560, maxW: COLW - 60 });
-          levelB(f, s + 1.6, s + 6.4, 'أول دولة في الشرق الأوسط وشمال أفريقيا · ' + ltr('2021'), 'FIRST NATION IN THE MIDDLE EAST AND NORTH AFRICA · 2021', { y: 800, maxW: COLW - 60 });
+          const f = filmT(this, t), s = this.start, e = this.ext || 0;
+          levelB(f, s + 0.4, s + 6.4 + e, 'محطة الظفرة للطاقة الشمسية · ' + ltr('2') + ' جيجاواط · ' + ltr('2023'), 'AL DHAFRA SOLAR PV · 2 GW · 2023', { y: 330, maxW: COLW - 60 });
+          levelA(f, s + 0.8, s + 6.4 + e, ['الحياد المناخي', 'بحلول ' + ltr('2050')], 'NET ZERO BY 2050', { y: 560, maxW: COLW - 60 });
+          levelB(f, s + 1.6, s + 6.4 + e, 'أول دولة في الشرق الأوسط وشمال أفريقيا · ' + ltr('2021'), 'FIRST NATION IN THE MIDDLE EAST AND NORTH AFRICA · 2021', { y: 800, maxW: COLW - 60 });
         } }],
     },
   };
