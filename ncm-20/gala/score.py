@@ -2,6 +2,7 @@
 """Temp score for the gala edition of "Reading the Sky", to the music brief in TREATMENT.md §8.
 
     python3 score.py cues.json out-dir/      (cues.json: `node render.js cues cues.json`)
+    python3 score.py cues.json out-dir/ --samples DIR      (the orchestra recorded: VSCO-2 CE samples, see sampler.py)
 
 It writes 48 kHz 24-bit WAVs:
   mix.wav (-16 LUFS integrated, -1 dBTP, for review and online) and mix-r128.wav (-23 LUFS, for broadcast);
@@ -648,4 +649,12 @@ def seamless(x, L, xfade=1.5):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else '.')
+    args = sys.argv[1:]
+    if '--samples' in args:
+        # opt-in: the strings, horn, timpani, harp and glockenspiel play recorded samples instead of synthesis
+        # (sampler.py). Without the flag sampler.py is never imported, and the score renders exactly as before
+        k = args.index('--samples')
+        import sampler
+        sampler.install(args[k + 1], sys.modules[__name__])
+        del args[k:k + 2]
+    main(args[0], args[1] if len(args) > 1 else '.')

@@ -63,6 +63,7 @@ and keeps that film's engraved-plate language, rebuilt for the room:
 | `masters.sh` | Builds every 4K 50p LED master: parts 1 and 2, the no-tanker part 1, the five loops, the safety slate, the restrained versions |
 | `qc/` | The show deliverables and the checks, run by `qc/deliver.sh`: LTC (`ltc.py`), WebVTT and EBU-STL (`subs.py`), the show caller's reference (`caller_ref.py`), `masters_qc.py` → `QC.md` and `qc-report.json` (with `pse.py`, a BT.1702-model photosensitivity pre-check, and `mp4info.py`), and `dossier.py` → `QC.html` |
 | `audio.py`, `score.py` | The synthesized temp score, placed from the timeline: stems (music, Emirati percussion, sfx), the mixes (with a restrained mix without percussion), the stage loop and the applause bed. The build fails if any leader's card measures quieter than the world beat |
+| `sampler.py` | Opt-in (`score.py … --samples DIR`): the orchestra (strings, horn, timpani, pizzicato, harp, glockenspiel, a cymbal swell into the two blooms) plays recorded samples from VSCO-2 Community Edition (Versilian Studios, CC0), each note at the loudness of the synthesized voice it replaces. The Emirati and Arabic instruments, the voices and the effects stay synthesized. Without the flag the score is byte-identical |
 | `subtitles.py` | On-screen text and narration as Arabic and English SRT files |
 | `cuesheet.py` | The show-control cue sheet (cue to cue, with SMPTE timecode) |
 | `script.py` → `SCRIPT.md` | The as-built script for approval: every narration line and every words block, with its times |
@@ -88,6 +89,9 @@ FILM_QUERY='vo&colour&heritage&fadeout=2.5' node render.js film out/review-herit
 # then stretched to the pace without changing its pitch; the cue list itself (cue sheet, subtitle files) is in real time
 FILM_QUERY='rev11&pace=1' node render.js cues out/r11/cues-design.json && python3 score.py out/r11/cues-design.json out/r11/
 python3 pace.py out/r11/mix.wav out/r11/mix-paced.wav 1.1
+# the same score with the orchestra recorded instead of synthesized (a draft for comparison), from a checkout of
+# https://github.com/sgossner/VSCO-2-CE (the folders sampler.py lists, about 0.5 GB)
+mkdir -p out/r11s && python3 score.py out/r11/cues-design.json out/r11s/ --samples ../VSCO-2-CE && python3 pace.py out/r11s/mix.wav out/r11s/mix-paced.wav 1.1
 FILM_QUERY=rev11 node render.js cues out/r11/cues.json
 FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix-paced.wav --jobs 3
 
