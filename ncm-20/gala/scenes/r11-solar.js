@@ -1,31 +1,48 @@
 'use strict';
-// Revision 11 · the clean-energy record (B14b, after Shams 1): Al Dhafra Solar PV, Abu Dhabi, at the end of the day.
+// Revision 11 · the clean-energy record (B14b, after Shams 1): Al Dhafra Solar PV, Abu Dhabi, an afternoon in time-lapse.
 // 2 GW in a single phase (inaugurated 16 November 2023; at its inauguration the world's largest single-site solar
 // plant): almost 4 million bifacial modules on single-axis trackers over more than 20 km² of desert, 35 km from the city.
 // True 3D (engrave3d.js), metres: x east, y north, z up, the sand at z 0. The eye stands in an aisle of a northern block,
 // 4 m from the east-west service road, and looks south-south-west over the road down the aisles; it cranes up from 2.9 m
-// to 10.5 m and draws back 6 m, turning 3.5° toward the sun, so the rows open out to the horizon (f 580 px: 84° across the
-// picture box). A pyranometer stands on its post at the road's edge (NCM forecasts the sun for solar plants).
+// to 10.5 m and draws back 6 m, turning 3.5° toward the sun and tilting from level to 10.5° down, so the rows open out to
+// the horizon (f 580 px: 84° across the picture box). A pyranometer stands on its post at the road's edge (NCM forecasts
+// the sun for solar plants).
 //   modules: a 2023 bifacial module is about 2.28 × 1.13 m; two deep in portrait, a strip 4.6 m across; 56 modules
 //   along a tracker (four strings of 28), about 65 m; three trackers end to end make a block, 10 m service roads
 //   between blocks, a wider north-south road every 36 rows; the torque tube (the axis, north-south) 2.5 m up on piles
 //   about 8 m apart, the drive at the middle pile; rows 10.5 m apart (the sources give no pitch: a plausible one, a
 //   ground-cover ratio of 0.44). Inverter/transformer stations stand in the roads about 200 × 190 m apart (about 4 MW
 //   each over 20 km²; the sources give no layout: a plausible spacing).
-//   tracking: a tracker follows the sun up to about ±60°; at a low sun it backtracks (turns back toward flat so no row
-//   shades the next, the standard on flat ground). At this hour true tracking would ask 73-77° west, beyond the limit,
-//   so the rows lean west by 25° going to 18° (computed each frame from the sun below), and the shade of each row just
-//   meets the next: the aisles lie in shade, and the sun reaches the sand in the roads and between trackers, in long
-//   shadows.
-//   sun: 16 November (the plant's inauguration date) at 24.2° N, altitude 15.2° sinking to 11.5°, azimuth 241-243°
-//   (77 and 59 minutes before sunset). The disc is drawn at 24 px, about four and a half times its true 0.53°
-//   (5 px through this lens), so it reads; it enters where the Shams 1 plate's sun stands at the dissolve's midpoint.
+//   tracking: Arctech's SkySmart II (2.1 GW supplied through the EPC, CMEC: Arctech, 7 Sep 2021), a two-in-portrait
+//   horizontal single-axis tracker, tracking range ±60°, run by an astronomical algorithm with backtracking (Arctech's
+//   SkySmart II specification; pv magazine's visit, 15 Jan 2025: "auto-tracking (follows the sun's path with
+//   astronomical algorithm along with backtracking)"). Each frame the rows take the true-tracking angle for a
+//   horizontal north-south axis, the sun's angle from the zenith in the east-west plane, atan2(-sx, sz) (sx the sun's
+//   east component, west positive), held at the ±60° stop, and backtracked (turned back toward flat until a row's
+//   shadow just meets the next row) only when cos(true angle) < ground-cover ratio, which at 0.44 is past 64°.
+//   the beat, a time-lapse (Revision 11, slower: the requester's "the solar panels following the sun"): 16 November
+//   (the plant's inauguration date) at the plant, 24.141° N 54.517° E (OpenStreetMap's outline, way 1087124530; Global
+//   Energy Monitor), UTC+4, the sun from NOAA's solar-position equations (after Meeus): solar noon 12:06:35, sunset
+//   17:35. The clock runs from 13:50 (sun 40.3° up at azimuth 212.8°, rows 32.6° west) to 15:27:49, when the true angle
+//   reaches the 60° stop (sun 24.9° up at 233.4°), and stops there: the beat ends as the rows reach their stop, before
+//   they would rest at it and then, from 15:43 (true angle 64°), backtrack east toward flat, which would read as the
+//   rows turning away from the sun. So all the rows turn west together through 27° as the sun sinks 15° and swings 21°
+//   west; the shadows of the piles, the stations and the pyranometer swing from 33° to 53° (north-east by north to
+//   north-east by east) and nearly double; the rows' shade widens from half the aisle to nine-tenths; the light warms
+//   (w, from the sun's height: the low sky, the glow round the sun, the disc's edge, the sky in the glass). The clock,
+//   and the crane on the same clock, runs at an even pace, about 12 minutes of afternoon to a second of the beat,
+//   easing in and out over its first and last fifth; the crane's cubic ease used to tilt the view down faster than the
+//   sun sinks mid-beat, which with this sun would lift the disc on screen. A lower sun is out of reach: below about 25°
+//   the rows stand at their stop or backtrack.
+//   sun: the disc is drawn at 24 px, about four and a half times its true 0.53° (5 px through this lens), so it reads;
+//   at 13:50 it stands high, so the camera starts level (it started 2° down) to hold the disc whole in the frame. (It no
+//   longer meets the Shams 1 plate's sun in the dissolve, which stands lower and further west on its diagram arc.)
 scene({
   id: 'solar',
   start: 0, dur: 5,
   init() {
     const r = rng(1116);
-    Object.assign(this, { PITCH: 10.5, WS: 4.6, HUB: 2.5, OFF: 0.15, MOD: 1.154, NM: 56, TG: 1.0, RD: 10 });
+    Object.assign(this, { PITCH: 10.5, WS: 4.6, HUB: 2.5, OFF: 0.15, MOD: 1.154, NM: 56, TG: 1.0, RD: 10, LIM: 60 });
     this.UL = this.NM * this.MOD + 0.6; // one tracker: 56 modules along, a gap at the drive
     this.BL = 3 * this.UL + 2 * this.TG; // a block of three trackers end to end
     this.GCR = this.WS / this.PITCH;
@@ -61,25 +78,67 @@ scene({
     this.near = Array.from({ length: 1400 }, () => [r(), r(), r()]);
     this.dunes = Array.from({ length: 500 }, () => [r(), r(), r()]);
   },
-  // this frame's sun (16 November at 24.2° N: its azimuth from its altitude) and the trackers' tilt
+  // the sun at local time h (hours, UTC+4) on 16 November 2023 at the plant: NOAA's solar-position equations (after
+  // Meeus), geometric altitude and azimuth (degrees, azimuth clockwise from north)
+  sunPos(h) {
+    const D = Math.PI / 180, lat = 24.141 * D, lon = 54.517, TZ = 4;
+    // Julian centuries from J2000 (16 November 2023 at 0h UT is JD 2460264.5)
+    const T = (2460264.5 + (h - TZ) / 24 - 2451545) / 36525;
+    const L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360, M = (357.52911 + T * (35999.05029 - 0.0001537 * T)) * D;
+    const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+    const C = Math.sin(M) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * M) * (0.019993 - 0.000101 * T) + Math.sin(3 * M) * 0.000289;
+    const om = (125.04 - 1934.136 * T) * D, lam = (L0 + C - 0.00569 - 0.00478 * Math.sin(om)) * D;
+    const eps = (23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60 + 0.00256 * Math.cos(om)) * D;
+    const dec = Math.asin(Math.sin(eps) * Math.sin(lam)), y = Math.tan(eps / 2) ** 2, l2 = 2 * L0 * D;
+    // the equation of time (minutes), then the hour angle from the true solar time
+    const eot = 4 / D * (y * Math.sin(l2) - 2 * e * Math.sin(M) + 4 * e * y * Math.sin(M) * Math.cos(l2) - 0.5 * y * y * Math.sin(2 * l2) - 1.25 * e * e * Math.sin(2 * M));
+    const ha = ((h * 60 + eot + 4 * lon - 60 * TZ) / 4 - 180) * D;
+    const alt = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha));
+    const az = Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(lat) - Math.tan(dec) * Math.cos(lat)) + Math.PI;
+    return { alt: alt / D, az: az / D };
+  },
+  // the rows' true-tracking angle (radians, west positive) for a sun at alt, az (degrees)
+  trueTrack(alt, az) { const D = Math.PI / 180; return Math.atan2(-Math.cos(alt * D) * Math.sin(az * D), Math.sin(alt * D)); },
+  // the time-lapse's clock (0-1), shared by the crane: an even pace, easing in and out over its first and last fifth
+  // (the speed rises and falls as a smoothstep, so it never jerks), from the dissolve in to the dissolve out
+  clock(lt) {
+    const x = clamp((lt - 0.3) / 6.9), e = 0.2, sm = t => t * t * t - t * t * t * t / 2;
+    return (x < e ? e * sm(x / e) : x > 1 - e ? 1 - e - e * sm((1 - x) / e) : e / 2 + x - e) / (1 - e);
+  },
+  // the clock's hours: 13:50, and the moment the true-tracking angle reaches the 60° stop (found once, by bisection);
+  // the sun's altitude at each, for the warming light
+  hours() {
+    if (!this.H) {
+      const D = Math.PI / 180, tt = h => { const p = this.sunPos(h); return this.trueTrack(p.alt, p.az) - this.LIM * D; };
+      let a = 13, b = 17;
+      for (let i = 0; i < 50; i++) { const m = (a + b) / 2; if (tt(m) < 0) a = m; else b = m; }
+      this.H = [13 + 50 / 60, (a + b) / 2];
+      this.ALT = this.H.map(h => this.sunPos(h).alt);
+    }
+    return this.H;
+  },
+  // this frame's sun and the trackers' tilt
   sun(lt) {
-    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6.8)), alt = lerp(15.2, 11.5, u) * D, lat = 24.2 * D, dec = -18.8 * D;
-    const az = TAU - Math.acos((Math.sin(dec) - Math.sin(alt) * Math.sin(lat)) / (Math.cos(alt) * Math.cos(lat)));
+    const D = Math.PI / 180, H = this.hours(), h = lerp(H[0], H[1], this.clock(lt)), p = this.sunPos(h), alt = p.alt * D, az = p.az * D;
     const s = [Math.cos(alt) * Math.sin(az), Math.cos(alt) * Math.cos(az), Math.sin(alt)];
-    // backtracking: the true-tracking angle in the plane across the rows, turned back until the rows just clear
+    // backtracking: the true-tracking angle in the plane across the rows, turned back until the rows just clear (only
+    // past 64° at this ground-cover ratio, so never in this beat); then the tracker's ±60° stop
     const tT = Math.atan2(-s[0], s[2]), c = Math.cos(tT) / this.GCR;
     let th = Math.abs(c) < 1 ? tT - Math.sign(tT) * Math.acos(Math.abs(c)) : tT;
-    th = clamp(th, -60 * D, 60 * D);
+    th = clamp(th, -this.LIM * D, this.LIM * D);
     const ct = Math.cos(th), st = Math.sin(th);
-    this.S = s; this.alt = alt / D; this.az = az / D;
+    this.S = s; this.alt = p.alt; this.az = p.az; this.hour = h;
+    // the light's warmth: 0 with the sun at 13:50's height, 1 at the end
+    this.w = clamp((this.ALT[0] - p.alt) / (this.ALT[0] - this.ALT[1]));
     this.T = { th, ct, st, n: [-st, 0, ct], nb: [st, 0, -ct], hw: this.WS / 2 };
     return s;
   },
   view(lt) {
     // in the aisle among the northern block's rows, eye height 2.9 m, looking out over the road to the southern
-    // blocks; it rises to 10.5 m and draws back north along the aisle, with a slight turn toward the sun
-    const D = Math.PI / 180, u = easeInOut(clamp((lt - 0.2) / 6.8));
-    const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 212.3, u) * D, pt = lerp(2.0, 10.5, u) * D;
+    // blocks; it rises to 10.5 m and draws back north along the aisle, with a slight turn toward the sun, on the
+    // time-lapse's clock; it starts level, so the early afternoon's high sun stands whole in the frame
+    const D = Math.PI / 180, u = this.clock(lt);
+    const C = [lerp(0.4, 1.5, u), lerp(9.2, 15.5, u), lerp(2.9, 10.5, u)], az = lerp(208.8, 212.3, u) * D, pt = lerp(0, 10.5, u) * D;
     return E3.camera(C, [C[0] + 100 * Math.cos(pt) * Math.sin(az), C[1] + 100 * Math.cos(pt) * Math.cos(az), C[2] - 100 * Math.sin(pt)], 580, 540, 560);
   },
   // the camera, and where the horizon and the sun fall on screen (the colour washes follow them)
@@ -142,7 +201,9 @@ scene({
   skyCol(r) {
     if (r[2] < 0) return this.mix(HUE.steel, HUE.dune, 0.35);
     const el = Math.asin(clamp(r[2], -1, 1)), g = Math.acos(clamp(E3.dot(r, this.S), -1, 1));
-    return this.mix(this.mix(HUE.sky, HUE.dawn, Math.exp(-el / 0.25) * 0.8), HUE.dawn, Math.exp(-g / 0.4) * 0.7);
+    // the low sky and the sky round the sun warm as the sun lowers (w)
+    const w = this.w;
+    return this.mix(this.mix(HUE.sky, HUE.dawn, Math.exp(-el / 0.25) * (0.45 + 0.35 * w)), HUE.dawn, Math.exp(-g / 0.4) * (0.4 + 0.3 * w));
   },
   // glass: a mirror at grazing angles (Fresnel), the dark cells behind it when seen steeply
   glass(p, front) {
@@ -153,19 +214,21 @@ scene({
     // the tone as the eye reads it (lightness goes as about the square root of the light)
     return { tone: clamp(1.02 - 1.05 * Math.sqrt(B), 0.1, 0.8), col: this.mix(front ? HUE.deep : HUE.steel, this.skyCol(r), clamp(0.1 + 1.2 * Math.pow(F, 0.7))), F };
   },
-  // colour: the evening sky warming low toward the sun, the sand (all inside the picture box)
+  // colour: the afternoon sky, warming low toward the sun as it lowers (w, from the sun's height), the sand (all
+  // inside the picture box)
   under(lt) {
     this.frame(lt);
-    const q = easeInOut(prog(lt, 0, 0.8)), w = easeInOut(clamp((lt - 0.2) / 6.8)), B = R11.BOX, hy = this.hy;
+    const q = easeInOut(prog(lt, 0, 0.8)), w = this.w, B = R11.BOX, hy = this.hy;
     R11.clipped(() => {
-      washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.46], [0.55, HUE.sky, 0.3], [0.85, HUE.dawn, 0.18 + 0.1 * w], [1, HUE.rose, 0.3 + 0.12 * w]], 0, q);
+      washFade([B[0], B[1] - 300, B[2], hy + 2], [[0, HUE.sky, 0.48 - 0.04 * w], [0.55, HUE.sky, 0.34 - 0.06 * w], [0.85, HUE.dawn, 0.08 + 0.14 * w], [1, HUE.rose, 0.1 + 0.24 * w]], 0, q);
       if (this.sp) {
-        const [sx, sy] = this.sp, R = 300;
+        // the glow round the sun: a pale cream while it stands high, warming to apricot
+        const [sx, sy] = this.sp, R = 300, c = [lerp(246, 242, w), lerp(214, 163, w), lerp(170, 107, w)].map(Math.round).join(',');
         ctx.save(); const g = ctx.createRadialGradient(sx, sy, 10, sx, sy, R);
-        g.addColorStop(0, `rgba(242,163,107,${0.5 + 0.15 * w})`); g.addColorStop(0.5, `rgba(242,163,107,${0.18 + 0.08 * w})`); g.addColorStop(1, 'rgba(242,163,107,0)');
+        g.addColorStop(0, `rgba(${c},${0.4 + 0.16 * w})`); g.addColorStop(0.5, `rgba(${c},${0.13 + 0.07 * w})`); g.addColorStop(1, `rgba(${c},0)`);
         ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.fillRect(sx - R, sy - R, 2 * R, 2 * R); ctx.restore();
       }
-      washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.dune, 0.42 + 0.08 * w], [0.12, HUE.sand, 0.36], [1, HUE.sand, 0.3 + 0.06 * w]], 0, q);
+      washFade([B[0], hy - 1, B[2], B[3]], [[0, HUE.dune, 0.36 + 0.1 * w], [0.12, HUE.sand, 0.34], [1, HUE.sand, 0.28 + 0.06 * w]], 0, q);
     });
   },
   draw(lt) {
@@ -197,14 +260,15 @@ scene({
       ctx.save(); ctx.globalAlpha = SA * 0.62 * i / NB; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.75; ctx.lineCap = 'butt';
       ctx.beginPath(); segs.forEach(([x0, y, x1]) => { ctx.moveTo(x0, y); ctx.lineTo(x1, y); }); ctx.stroke(); ctx.restore();
     });
-    // the sun, low in the south-west: the lightest thing in the frame (a paper-cream core laid over the sky, a warm
-    // edge, a soft paper glow round it) and no ink outline, so it reads as light, never as a ring or a target
+    // the sun in the south-west: the lightest thing in the frame (a paper-cream core laid over the sky, an edge that
+    // warms as it lowers, a soft paper glow round it) and no ink outline, so it reads as light, never as a ring or a
+    // target
     if (sp) {
       const [sx, sy] = sp, R = 12;
       mask(el(sx, sy, R + 12, R + 12, 0, TAU, 1161, 0), 0.5);
       mask(el(sx, sy, R + 5, R + 5, 0, TAU, 1163, 0), 0.85);
       disc(sx, sy, R, OPT.colour ? '#FFF3D6' : '#FBF4E4', 0.96, 'source-over');
-      stroke(el(sx, sy, R, R, 0, TAU, 1162, 0), 1, OPT.colour ? '#E8A45C' : OCHRE, 1.8, 0.4);
+      stroke(el(sx, sy, R, R, 0, TAU, 1162, 0), 1, OPT.colour ? this.mix('#EFD3A0', '#E8A45C', this.w) : OCHRE, 1.8, 0.3 + 0.1 * this.w);
     }
     stroke(new P([[B[0], hy], [B[2], hy]]), 1, INK, 1, 0.45);
   },
@@ -241,7 +305,7 @@ scene({
         b.units.forEach(([ya, yb]) => {
           const c4 = [this.corner(w.x, -hw, ya), this.corner(w.x, hw, ya), this.corner(w.x, hw, yb), this.corner(w.x, -hw, yb)];
           const q = c4.map(shp);
-          q[1][0] += 0.3; q[2][0] += 0.3; // a hair of overlap, so the backtracked shadows close without seams
+          q[1][0] += 0.3; q[2][0] += 0.3; // a hair of overlap, so shadows that meet close without seams
           toPath(q, shade);
           if (ax < 260 && C[1] - b.y1 < 260) toPath([[c4[0][0] - 0.5, ya, 0], [c4[1][0] + 0.5, ya, 0], [c4[2][0] + 0.5, yb, 0], [c4[3][0] - 0.5, yb, 0]], umbra);
         });
@@ -259,7 +323,7 @@ scene({
       if (umbra.length) hatch(umbra, box, 0.05, 2.7, q, INK, 0.7, OPT.colour ? 0.16 : 0.22, 1172);
       ctx.restore();
     }
-    // the piles' long shadows, where they fall on sunlit sand (the rest lie inside the rows' shade)
+    // the piles' shadows, where they fall on sunlit sand (the rest lie inside the rows' shade)
     const inQuad = (pt, q) => { let sg = 0; for (let i = 0; i < 4; i++) { const a = q[i], b = q[(i + 1) % 4], c = (b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0]); if (c !== 0) { if (sg && Math.sign(c) !== sg) return false; sg = Math.sign(c); } } return true; };
     const quadOf = (x, ya, yb) => [this.corner(x, -hw, ya), this.corner(x, hw, ya), this.corner(x, hw, yb), this.corner(x, -hw, yb)].map(shp);
     const pshad = [], step = (this.UL - 0.6) / 8;
@@ -431,7 +495,7 @@ scene({
       }
     } else if (ppm > 1) E3.line([[xr, y0, H], [xr, y1, H]], INK, clamp(0.9 * 120 / d, 0.4, 1.2), 0.6 * a);
   },
-  // an inverter and transformer station on its pad in a road, with its long shadow
+  // an inverter and transformer station on its pad in a road, with its shadow
   station(st, d, i) {
     const a = R11.air(d, 1800), s = this.S, x = st.x, y = st.y;
     const sh = (p) => [p[0] - s[0] * p[2] / s[2], p[1] - s[1] * p[2] / s[2], 0];

@@ -1,5 +1,32 @@
 'use strict';
 // VIII · Al Taqa — Shams 1: parabolic troughs turn to follow the sun; a pyranometer and an anemometer measure sun and wind
+// Revision 11 (?rev11 only; the approved cut draws exactly as before): Shams 1's collectors track the sun, as a
+// time-lapse over the beat, from one sun-position model that also places the sun on the plate's dial.
+//   The plant (NREL SolarPACES project page "Shams 1"; Shams Power, "Technology"; Masdar factsheet): Madinat Zayed,
+//   23.569 N 53.714 E (Wikipedia); 192 loops of 4 solar collector assemblies, 768 in all, each 150 m of 12 modules;
+//   Abengoa ASTRO (ET-150 class) collectors with Flabeg RP3 mirrors (258,048 in all: 28 a module, 4 across and 7 along)
+//   and 27,648 Schott PTR 70 receivers (70 mm absorber in a 125 mm glass envelope, about 4 m each). ET-150 geometry
+//   (DLR/CIEMAT EuroTrough qualification, ISES 2003; Hennecke, DLR 2016): aperture 5.77 m, focal length 1.71 m (the
+//   plate's parabola already has f = 0.3 W and its four facets), 12 m modules, three receiver supports a module. Rows on
+//   north-south axes, level (Khalifa University's Shams 1 performance model, HEFAT 2014: orientation 0, tilt 0, rows
+//   17.2 m apart, a 0.32 m gap at the vertex); the plant defocuses collectors (turns them a few degrees off the sun) when
+//   the field has more heat than the power block takes, and brings them back on sun.
+//   The day: 17 March, the inauguration (17 March 2013): declination -1.68 deg, equation of time -9.1 min (NOAA), so
+//   solar noon is 12:34 Gulf time. The plate's clock runs from 12:55 to 15:35 solar time (13:29 to 16:09 GST) and eases
+//   to rest as Al Dhafra dissolves in; the sun then stands where the approved plate's sun stood at lt 7.0 (Al Dhafra's
+//   sun enters there). The collectors' tracking angle is the sun's angle across the rows (a north-south axis turns by
+//   atan2 of the sun's west and up components), 15 deg west going to 57 deg: about 42 deg over the beat, plus the last
+//   3 deg as the collectors come on sun at the start. Seen down the rows, the sun's image lies on the ray from their
+//   vanishing point at exactly that angle (only its distance is the dial's), so the sun is placed on the dial there and
+//   every trough's axis is parallel to the ray to it.
+//   The eye: a frame every 2 z is a 12 m module, so the plate's lens is 319 px (a row from z 0.15 to 26 is one 150 m
+//   assembly) and the eye stands 27.6 m up, 24 m above the torque tubes. The mirrors' tone is what each facet reflects
+//   toward that eye (deeper high sky near, pale warm horizon far; the shaded back of the mirror where the eye sees it),
+//   and where the eye looks down a trough's optical axis the receiver's magnified image (the dark absorber, the lit tube
+//   at its centre) crosses the mirror as the trough turns: it sweeps over the near-left row in the second half.
+//   The receivers: a steady warm glow (the concentrated light on the glass) that grows as the collectors come on sun
+//   (the intercept falls off over about a degree of tracking error), the rays drawn from the model's sun, reflected
+//   off the parabola onto the tube.
 scene({
   id: 'energy', // plate carried over from the v3 film (drawing only; words, timing and camera come from timeline.js)
   start: 62, dur: 8, num: 'VIII', name: 'AL TAQA', ar: 'الطاقة', readout: 'UAE RENEWABLES · 6 GW · 2024',
@@ -39,13 +66,132 @@ scene({
     this.tripod = [ln(990, 1000, 1004, 944, 630, 0.2), ln(1018, 1000, 1004, 944, 631, 0.2), ln(1004, 1004, 1004, 944, 632, 0.2)];
     this.plate = ln(988, 944, 1020, 944, 633, 0.1);
     this.dome = el(1004, 942, 13, 13, Math.PI, TAU, 634, 0.1);
+    // Revision 11: the sun-position model, the tracking clock and the eye (see the header)
+    if (typeof REV11 !== 'undefined' && REV11) this.init11();
   },
-  // colour: a sky warming toward the horizon, a warm halo about the sun, desert under the rows, the mirrors holding the sky
+  init11() {
+    const D = Math.PI / 180, lat = 23.569 * D, dec = -1.68 * D;
+    // the sun's direction at hour angle w (afternoon positive): [west, up, south]
+    this.sunVec = w => [Math.cos(dec) * Math.sin(w), Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(w),
+      Math.sin(lat) * Math.cos(dec) * Math.cos(w) - Math.cos(lat) * Math.sin(dec)];
+    const rho = w => { const s = this.sunVec(w); return Math.atan2(s[0], s[1]); };
+    // where the approved plate's sun stands at lt 7.0 (Al Dhafra's sun enters there), as an angle from the zenith seen
+    // from the rows' vanishing point; the hour whose tracking angle that is (bisection)
+    const sa7 = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(7.0, 0.6, 7.2))), r7 = Math.atan2(420 * Math.cos(sa7), -372 * Math.sin(sa7));
+    let lo = 0, hi = Math.PI / 2;
+    for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (rho(m) < r7) lo = m; else hi = m; }
+    // 40 deg of hour angle (2 h 40 min) between lt 1.0 and 7.0
+    this.W7 = (lo + hi) / 2; this.WK = 40 * D / (this.clk11(7.0) - this.clk11(1.0));
+    // metres to plate px at s 1 (the aperture), and the lens: a frame every 2 z is a 12 m module
+    this.PXM = this.W0 / 5.77; this.F11 = 12 * this.PXM / (2 * this.K);
+    // the receiver: absorber and glass envelope radii (Schott PTR 70: 70 and 125 mm)
+    this.RA = 0.035 * this.PXM; this.RG = 0.0625 * this.PXM;
+    // the section's focal length and vertex (as in init), and the eye above each row's torque tube
+    this.f11 = 0.3 * this.W0; this.v11 = -0.1 * this.W0; this.EY = this.YG - this.HY - this.H0;
+    // receiver supports every 4 m, between the module ends (fixed places along the row, so none moves as a row draws in)
+    this.sup = []; for (let z = this.Z1 - 1 / 3; z > 0.5; z -= 2 / 3) this.sup.push(z);
+  },
+  // the time-lapse clock: steady to lt 5.4, then easing to rest by lt 7.6 (the sun all but still through the dissolve)
+  clk11(lt) {
+    const a = 5.4, L = 2.2;
+    if (lt <= a) return lt;
+    if (lt >= a + L) return a + L / 2;
+    return a + (lt - a) / 2 + L / (2 * Math.PI) * Math.sin(Math.PI * (lt - a) / L);
+  },
+  // this frame's sun (hour angle, direction, tracking angle, its place on the dial) and the collectors' tilt: they come on
+  // sun from 3 deg east of it over lt 1.0-4.0; G is the share of the concentrated light the receivers catch
+  sun11(lt) {
+    if (this.S11 && this.S11.lt === lt) return this.S11;
+    const D = Math.PI / 180, w = this.W7 + this.WK * (this.clk11(lt) - this.clk11(7.0)), S = this.sunVec(w), rho = Math.atan2(S[0], S[1]);
+    const r = 1 / Math.hypot(Math.sin(rho) / 420, Math.cos(rho) / 372), eps = 3 * D * Math.pow(1 - prog(lt, 1.0, 3.0), 3);
+    this.S11 = { lt, w, S, rho, eps, tilt: rho - eps, G: Math.exp(-0.5 * Math.pow(eps / D, 2)), sun: [this.VX + r * Math.sin(rho), this.HY - r * Math.cos(rho)] };
+    return this.S11;
+  },
+  // Revision 11 · the section in world terms, from the row's torque tube (x right = west, y down, plate px at s 1): a
+  // section point turned by the tilt, the mirror's point and its normal (toward the focus) at u across the aperture,
+  // and a world point on screen at depth z
+  turn11(c, sn, [x, y]) { return [x * c - y * sn, x * sn + y * c]; },
+  pt11(c, sn, u) { return this.turn11(c, sn, [u, this.v11 - u * u / (4 * this.f11)]); },
+  nrm11(c, sn, u) { const k = Math.hypot(u / (2 * this.f11), 1); return this.turn11(c, sn, [-u / (2 * this.f11) / k, -1 / k]); },
+  scr11(z, off, [X, Y]) { const s = 1 / (1 + this.K * z); return [this.VX + (off + X) * s, this.HY + (this.EY + Y) * s]; },
+  // the eye's ray to the mirror at u, reflected: how squarely the eye sees the front (cv, negative on the back), the
+  // reflected direction [west, down, south], and its signed miss distance at the focal line (the receiver's image)
+  look11(c, sn, off, u, z) {
+    const p = this.pt11(c, sn, u), n = this.nrm11(c, sn, u), d = [p[0] + off, p[1] + this.EY], dl = Math.hypot(d[0], d[1]), dn = d[0] * n[0] + d[1] * n[1];
+    const r = [d[0] - 2 * dn * n[0], d[1] - 2 * dn * n[1]], f = this.turn11(c, sn, [0, this.v11 - this.f11]), q = [f[0] - p[0], f[1] - p[1]], rl = Math.hypot(r[0], r[1]);
+    const miss = dn < 0 && q[0] * r[0] + q[1] * r[1] > 0 ? (r[0] * q[1] - r[1] * q[0]) / rl : Infinity;
+    return { cv: -dn / dl, R: [r[0], r[1], this.F11 * (1 + this.K * z)], miss };
+  },
+  // the sky as the mirror shows it: lightness (1 = the pale haze at the horizon) and warmth, from the reflected
+  // direction's elevation and its angle from the sun; below the horizon the sand, continuous with the horizon's tone
+  sky11(R, S) {
+    const l = Math.hypot(R[0], R[1], R[2]), el = Math.asin(-R[1] / l);
+    const g = Math.acos(clamp((R[0] * S[0] - R[1] * S[1] + R[2] * S[2]) / l, -1, 1)), aur = 0.16 * Math.exp(-g / 0.5);
+    if (el < 0) { const h = 0.82 + aur, k = Math.exp(el / 0.08); return { L: lerp(0.55, h, k), warm: 1 }; }
+    return { L: clamp(0.4 + 0.42 * Math.exp(-el / 0.2) + aur), warm: Math.exp(-el / 0.15) };
+  },
+  // a fill graded between two screen points
+  grad11(path, p0, p1, col, a0, a1, mode = BLEND) {
+    if (a0 <= 0 && a1 <= 0) return;
+    const n = parseInt(col.slice(1), 16), rgb = `${n >> 16},${(n >> 8) & 255},${n & 255}`, g = ctx.createLinearGradient(p0[0], p0[1], p1[0], p1[1]);
+    g.addColorStop(0, `rgba(${rgb},${Math.max(0, a0)})`); g.addColorStop(1, `rgba(${rgb},${Math.max(0, a1)})`);
+    ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = mode; ctx.fillStyle = g; ctx.beginPath(); path.trace(ctx, 1); ctx.fill(); ctx.restore();
+  },
+  // the mirror of one row: its four facets (the RP3 panels, four across), each toned by what it reflects toward the eye,
+  // near and far, painted from the farthest from the eye (a facet seen from behind is the mirror's shaded back); then
+  // the receiver's magnified image where the eye looks down the optical axis: the dark absorber in its glass envelope,
+  // and at its centre the lit tube
+  mirror11(S11, off, zn, zf, near, far, c, sn) {
+    const W = this.W0, facets = [0, 1, 2, 3].map(k => {
+      const i0 = 4 * k, i1 = i0 + 4, u = -W / 2 + W * (k + 0.5) / 4, a = this.look11(c, sn, off, u, zn), b = this.look11(c, sn, off, u, zf);
+      const p = this.pt11(c, sn, u);
+      return { i0, i1, a, b, dist: Math.hypot(p[0] + off, p[1] + this.EY) };
+    }).sort((x, y) => y.dist - x.dist);
+    const tone = lk => {
+      const front = clamp(0.5 + lk.cv / 0.16), s = this.sky11(lk.R, S11.S);
+      return { blue: lerp(0.2, 0.4 - 0.34 * s.L, front), ink: 0.12 * (1 - front), warm: s.warm * front, front };
+    };
+    facets.forEach(f => {
+      const path = new P(near.slice(f.i0, f.i1 + 1).concat(far.slice(f.i0, f.i1 + 1).reverse()), true);
+      const m0 = near[f.i0 + 2], m1 = far[f.i0 + 2], A = tone(f.a), B = tone(f.b);
+      mask(path);
+      this.grad11(path, m0, m1, BLUE, A.blue, B.blue);
+      this.grad11(path, m0, m1, INK, A.ink, B.ink);
+      if (OPT.colour) {
+        this.grad11(path, m0, m1, HUE.sky, 0.35 * A.front * (1 - 0.6 * A.warm), 0.35 * B.front * (1 - 0.6 * B.warm), 'multiply');
+        this.grad11(path, m0, m1, HUE.dawn, 0.3 * A.warm, 0.3 * B.warm, 'multiply');
+        this.grad11(path, m0, m1, HUE.steel, 0.3 * (1 - A.front), 0.3 * (1 - B.front), 'multiply');
+      }
+    });
+    // the receiver's image: the stretches of the aperture whose reflected ray passes within the glass envelope, the
+    // absorber, and the inner quarter of the absorber (where the eye sees the sun again, twice reflected)
+    const N = 64, us = Array.from({ length: N + 1 }, (_, i) => -W / 2 + W * i / N), ms = us.map(u => Math.abs(this.look11(c, sn, off, u, zn).miss));
+    const spans = th => {
+      const out = []; let a = null;
+      for (let i = 0; i <= N; i++) {
+        const inside = ms[i] < th;
+        if (inside && a === null) a = i === 0 ? us[0] : lerp(us[i - 1], us[i], isFinite(ms[i - 1]) ? (ms[i - 1] - th) / (ms[i - 1] - ms[i]) : 1);
+        if (!inside && a !== null) { out.push([a, lerp(us[i - 1], us[i], isFinite(ms[i]) ? (th - ms[i - 1]) / (ms[i] - ms[i - 1]) : 0)]); a = null; }
+      }
+      if (a !== null) out.push([a, us[N]]);
+      return out;
+    };
+    const band = ([u0, u1]) => {
+      const k = Math.max(2, Math.ceil((u1 - u0) / 3)), uu = Array.from({ length: k + 1 }, (_, i) => lerp(u0, u1, i / k));
+      return new P(uu.map(u => this.scr11(zn, off, this.pt11(c, sn, u))).concat(uu.slice().reverse().map(u => this.scr11(zf, off, this.pt11(c, sn, u)))), true);
+    };
+    spans(this.RG).forEach(s => fill(band(s), INK, 0.1));
+    spans(this.RA).forEach(s => fill(band(s), INK, 0.3));
+    spans(0.25 * this.RA).forEach(s => fill(band(s), '#FFE6B8', 0.55 * S11.G));
+  }, toward the horizon, a warm halo about the sun, desert under the rows, the mirrors holding the sky
   under(lt) {
     const q = easeInOut(prog(lt, 0.2, 1.2));
     washFade([985, -300, 1885, this.HY], [[0, HUE.sky, 0.4], [0.7, HUE.sky, 0.3], [1, HUE.dawn, 0.34]], 150, q);
     washFade([985, this.HY, 1885, 1010], [[0, HUE.sand, 0.34], [1, HUE.dune, 0.5]], 150, q);
-    const sa = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(lt, 0.6, 7.2))), sx = 1430 + 420 * Math.cos(sa), sy = this.HY + 372 * Math.sin(sa), sq = easeOut(prog(lt, 0.8, 0.6));
+    // Revision 11: the sun from the sun-position model
+    const S11 = typeof REV11 !== 'undefined' && REV11 ? this.sun11(lt) : null;
+    const sa = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(lt, 0.6, 7.2))), sq = easeOut(prog(lt, 0.8, 0.6));
+    const sx = S11 ? S11.sun[0] : 1430 + 420 * Math.cos(sa), sy = S11 ? S11.sun[1] : this.HY + 372 * Math.sin(sa);
     if (sq > 0) {
       ctx.save(); const g = ctx.createRadialGradient(sx, sy, 20, sx, sy, 190);
       g.addColorStop(0, `rgba(242,163,107,${0.5 * sq})`); g.addColorStop(1, 'rgba(242,163,107,0)');
@@ -57,8 +203,10 @@ scene({
     stroke(this.horizon, easeInOut(prog(lt, 0.2, 1.0)), INK, 1.4, 0.7);
     stroke(this.arc, easeInOut(prog(lt, 0.4, 1.6)), INK, 1.2, 0.55, [4, 9], 0);
     this.ticks.forEach((t, i) => stroke(t, prog(lt, 1.0 + i * 0.06, 0.3), INK, 1.1, 0.6));
-    // the sun travels its arc
-    const sa = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(lt, 0.6, 7.2))), sx = 1430 + 420 * Math.cos(sa), sy = HY + 372 * Math.sin(sa), sq = easeOut(prog(lt, 0.8, 0.6));
+    // the sun travels its arc (Revision 11: placed by the sun-position model)
+    const S11 = typeof REV11 !== 'undefined' && REV11 ? this.sun11(lt) : null;
+    const sa = Math.PI + Math.PI * (0.25 + 0.55 * easeInOut(prog(lt, 0.6, 7.2))), sq = easeOut(prog(lt, 0.8, 0.6));
+    const sx = S11 ? S11.sun[0] : 1430 + 420 * Math.cos(sa), sy = S11 ? S11.sun[1] : HY + 372 * Math.sin(sa);
     if (sq > 0) {
       mask(el(sx, sy, 64 * sq, 64 * sq, 0, TAU, 641, 0)); // the sun hides the path behind it
       // Revision 11 (?rev11): Al Dhafra's sun follows at nearly this point, so the rays and the red centre leave before the
@@ -73,7 +221,7 @@ scene({
     fill(this.acc, INK, 0.1 * pb); stroke(this.acc, pb, INK, 1.2); this.accRibs.forEach(l => stroke(l, pb, INK, 0.7, 0.6));
     this.accLegs.forEach(l => stroke(l, pb, INK, 0.9, 0.8)); this.fans.forEach(fn => stroke(fn, pb, INK, 0.9, 0.8));
     // the troughs turn with the sun: tilt 0 faces straight up; east (left) is negative
-    const tilt = sa - 1.5 * Math.PI, c = Math.cos(tilt), sn = Math.sin(tilt);
+    const tilt = S11 ? S11.tilt : sa - 1.5 * Math.PI, c = Math.cos(tilt), sn = Math.sin(tilt);
     const { VX, K, YG, H0, Z0, Z1 } = this;
     const at = (z, off, [x, y]) => { const s = 1 / (1 + K * z); return [VX + (off + x * c - y * sn) * s, HY + (YG - HY - H0 + x * sn + y * c) * s]; };
     const gnd = (z, off) => { const s = 1 / (1 + K * z); return [[VX + off * s, HY + (YG - HY - H0) * s], [VX + off * s, HY + (YG - HY) * s]]; };
@@ -84,7 +232,10 @@ scene({
       const zf = lerp(Z1, Z0, 1), zNear = Z0, zFar = lerp(Z0 + 2, Z1, q);
       const near = this.sec.map(p => at(zNear, off, p)), far = this.sec.map(p => at(zFar, off, p));
       const surf = new P(near.concat(far.slice().reverse()), true);
-      mask(surf); fill(surf, BLUE, 0.22); if (OPT.colour) wash(surf, HUE.sky, 0.35);
+      mask(surf);
+      // Revision 11: each facet's tone from what it reflects toward the eye, and the receiver's image in the mirror
+      if (S11) this.mirror11(S11, off, zNear, zFar, near, far, c, sn);
+      else { fill(surf, BLUE, 0.22); if (OPT.colour) wash(surf, HUE.sky, 0.35); }
       // mirror facets run along the row
       [0, 4, 8, 12, 16].forEach(i => stroke(new P([near[i], far[i]]), 1, INK, i % 8 ? 0.7 : 1.2, i % 8 ? 0.45 : 0.85));
       // frames and pylons every few metres, far to near
@@ -94,9 +245,15 @@ scene({
         stroke(new P(this.sec.map(p => at(z, off, p))), 1, INK, 1.4 / (1 + K * z) + 0.3, 0.6);
         stroke(new P([top, at(z, off, this.arms[0]), at(z, off, this.arms[3]), top]), 1, INK, 0.8 / (1 + K * z) + 0.3, 0.5);
       }
+      // Revision 11: the receiver supports, three a module (hidden behind the mirror when the eye sees its back)
+      if (S11) this.supports11(off, zNear, zFar, c, sn, at);
       // the receiver tube along the focal line, hot while the sun is up
       const fN = at(zNear, off, this.focus), fF = at(zFar, off, this.focus);
-      stroke(new P([fN, fF]), 1, RED, 3.2, 0.25 * sq); stroke(new P([fN, fF]), 1, INK, 1.6, 0.9);
+      // Revision 11: a steady warm glow round the tube as the collectors come on sun, and the lit glass along it
+      if (S11) this.tube11(fN, fF, zNear, zFar, 4.2, OCHRE, 0.42 * S11.G * q, BLEND);
+      else stroke(new P([fN, fF]), 1, RED, 3.2, 0.25 * sq);
+      stroke(new P([fN, fF]), 1, INK, 1.6, 0.9);
+      if (S11) this.tube11(fN, fF, zNear, zFar, 0.55, '#FFEBC2', 0.9 * S11.G * q, 'source-over');
       // the near end: the U of the mirror, its torque tube, pylon, receiver support, and sunlight folding onto the tube
       const [top, foot] = gnd(zNear, off);
       stroke(new P([top, foot]), 1, INK, 2.2); stroke(new P([[foot[0] - 12, foot[1]], [foot[0] + 12, foot[1]]]), 1, INK, 1.6, 0.8);
@@ -104,8 +261,13 @@ scene({
       disc(top[0], top[1], 4.5, INK, 0.9);
       stroke(new P(near), 1, INK, 2.2);
       stroke(new P([at(zNear, off, [0, -0.1 * this.W0]), fN]), 1, INK, 1, 0.7);
-      disc(fN[0], fN[1], 4.2, INK, 0.9); disc(fN[0], fN[1], 2.2, RED, 0.9 * sq, 'source-over');
-      if (sq > 0) this.rays.forEach(p => {
+      disc(fN[0], fN[1], 4.2, INK, 0.9);
+      // Revision 11: the tube's end glows as the receivers catch the light; the rays come from the model's sun and are
+      // reflected by the parabola (onto the tube once the collectors are on sun)
+      if (S11) disc(fN[0], fN[1], 2.2, '#F7D79A', 0.95 * S11.G, 'source-over');
+      else disc(fN[0], fN[1], 2.2, RED, 0.9 * sq, 'source-over');
+      if (S11 && sq > 0) this.rays11(S11, off, zNear, c, sn, sq, lt);
+      else if (sq > 0) this.rays.forEach(p => {
         const hit = at(zNear, off, p), from = at(zNear, off, [p[0], p[1] - 0.4 * this.W0]);
         stroke(new P([from, hit, fN]), 1, OCHRE, 1.2, 0.8 * sq, [5, 4], -lt * 30);
       });

@@ -13,6 +13,25 @@
 //   match it to Etihad Rail's photographs before the master.
 //   The embankment: sand trapped in the ditch on the windward side, clean ballast; the fence along the right of way.
 //   Speed 80 km/h (22.2 m/s). The beat shows the head end only.
+// Revision 11 (?rev11) also sets dromedaries on the plain outside the right of way (camel11; the approved cut draws none):
+//   Etihad Rail fences its corridor, with a wire "camel fence" along each side of the railway where the land is grazed
+//   (Technical Specification CE01.1 General Civil Works, X0231-UAE-EGE-FS-00001-03, s7.6; cattle grids at its gates,
+//   s7.10.4), and built camel, gazelle and reptile crossings under the line: 16 camel underpasses "in alignment with
+//   camel farms", with drift fences leading the animals to them (Gulf News, 11 Sep 2023; The National, 12 Aug 2021: 10
+//   on Stage Two's Package A, 6 on Package B); on the Sharjah-Fujairah line the viaducts also carry the line over camel
+//   crossings (Moreno, Joy and Catalan, IABSE Nanjing 2022) and its last package has 20 animal crossings (Fujairah
+//   Observer, 13 Oct 2022). No crossing is drawn here: this stretch runs on a 2.5 m bank, too low for an underpass (a
+//   camel underpass is about 3.6 m high: The National, 7 Jan 2016). So the camels graze and walk outside the fence, calm
+//   beside a line they know: three cows and a calf beyond the near fence, between it and the eye's dune; a cow and calf,
+//   then three more, far out on the far side, past where that side's fence would stand (it is not drawn).
+//   The dromedary, from body measurements of adult camels (Elbashir et al. 2011, Butana, 256 camels: 1.81 m at the
+//   withers, body 1.57 m from the point of the shoulder to the pin bone, neck 1.19 m, face 0.48 m; Dich et al. 2023,
+//   Algeria: tail 0.58 m) and the brief's 1.8-2.0 m at the shoulder and 2.1 m at the hump: drawn 1.90 m at the withers
+//   and 2.10 m at the hump, the trunk deep and narrow, the hump mid-back, the rump falling to a thin tail, the long neck
+//   dipping forward from the chest and rising to a small head, long legs with knobbed knees and a backward hock, broad
+//   flat pads. A calf is drawn at 0.68 of a cow. Their walk is the camel's lateral gait (both legs of a side together, the
+//   hind a little ahead), slow (0.55 m/s); a grazing camel browses a low shrub and lifts its head once to chew; the tail
+//   swings slowly. Coats: tan, a dark (majaheem) and a pale (maghateer) camel. Nothing about them reacts to the train.
 const RAIL = { cx: 1435, hz: 430, f: 1805, eye: 12.0, azC: 90, x0: 985, x1: 1885, y0: 100, y1: 1000 };
 scene({
   id: 'rail',
@@ -35,6 +54,27 @@ scene({
     this.ghaf = [[95.5, 640, 6.5], [98.5, 700, 7], [101.5, 660, 6.5], [117.5, 310, 7], [121, 335, 6.5], [145, 520, 7], [148.5, 545, 6.5]]
       .map(([b, d, h], i) => ({ X: d * Math.sin((b - 90) * Math.PI / 180), Y: d * Math.cos((b - 90) * Math.PI / 180), h, i,
         full: RAIL.f * h / d >= 16 })); // its style is fixed from its size, so nothing switches mid-beat
+    // Revision 11 (?rev11): the camels (see camel11). Each: s along the track and o across it (metres; the near fence
+    // stands at o -22, the eye at o -52.8), hd its heading (radians from the train's direction of travel, toward the far
+    // side positive; each is turned near broadside to the eye, as camels are most often seen and read), sc its size (a
+    // cow 1), its coat, what it does (graze: browses with one slow lift of the head at lift; settle: lowers its head to
+    // graze between t0 and t1; walk: at v m/s), ph its own phase. The near group is in view to about t 3.9 (the pan then
+    // leaves it), the far cow and calf from about t 2.2 to 4.6, the far three from t 4.7 to the end, all over the train
+    if (typeof REV11 !== 'undefined' && REV11) {
+      this.herd11 = [
+        { s: 28.5, o: -27.2, hd: Math.PI + 0.75, sc: 1, coat: 'tan', act: 'graze', lift: 2.5, ph: 0.3, side: 'near' },
+        { s: 36.5, o: -31.5, hd: 0.7, sc: 1.03, coat: 'dark', act: 'settle', t0: 1.9, t1: 3.4, ph: 1.1, side: 'near' },
+        { s: 44, o: -27.4, hd: Math.PI + 0.55, sc: 0.98, coat: 'pale', act: 'walk', v: 0.55, ph: 0.15, side: 'near' },
+        { s: 46.6, o: -29.6, hd: Math.PI + 0.6, sc: 0.68, coat: 'pale', act: 'walk', v: 0.55, ph: 0.62, side: 'near' },
+        { s: -112, o: 118, hd: 0.84, sc: 1, coat: 'tan', act: 'walk', v: 0.55, ph: 0.4, side: 'far' },
+        { s: -109, o: 120.5, hd: 0.9, sc: 0.68, coat: 'tan', act: 'walk', v: 0.55, ph: 0.9, side: 'far' },
+        { s: 30, o: 138, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'graze', lift: 5.2, ph: 0.7, side: 'far' },
+        { s: 37, o: 142, hd: 0.2, sc: 1, coat: 'tan', act: 'graze', lift: 4.4, ph: 1.6, side: 'far' },
+        { s: 45, o: 136, hd: 0.3, sc: 0.97, coat: 'pale', act: 'settle', t0: 5.0, t1: 6.2, ph: 2.2, side: 'far' }
+      ];
+      // low shrubs on the near plain besides the ones the grazers browse ([s, o, height m])
+      this.shrubs11 = [[33.4, -29.4, 0.35], [41.8, -25.4, 0.3], [24.5, -30.5, 0.3]];
+    }
   },
   // the head's position along the track (metres from Q) at scene time t, and the camera's pan that keeps it in view
   headS(t) { return -55 + 22.2 * t; },
@@ -80,6 +120,8 @@ scene({
     // the plain: sparse ground hatching that closes up toward the horizon
     for (let k = 0; k < 26; k++) { const Y = 9 + Math.pow(k, 1.9) * 2.2, y = RAIL.hz + RAIL.f * RAIL.eye / Y; if (y > RAIL.y1) continue; const w = 30 + 200 * (9 / Y); for (let x = RAIL.x0 + (k * 37) % 90; x < RAIL.x1; x += w * 1.9) stroke(new P([[x, y], [x + w, y]]), q, SEPIA, 0.8, 0.28); }
     if (OPT.heritage) this.ghaf.forEach(g => this.ghafTree(g, psi, q));
+    // Revision 11 (?rev11): the far camels, before the bank and the train that pass in front of them
+    if (typeof REV11 !== 'undefined' && REV11 && this.herd11) this.camels11(psi, lt, q, 'far');
     // the embankment (formation 2.5 m high, 12 m wide at the top, slopes 1:2) and the ditch on the far, windward side
     const S0 = -2600, S1 = 500, ez = 2.5;
     // drawn in 40 m strips so the part behind the camera simply drops out
@@ -109,6 +151,8 @@ scene({
     const R11R = typeof REV11 !== 'undefined' && REV11, carLen = c => (R11R && c.kind === 'hopper' ? 13.7 : c.len), gapAfter = c => (R11R && c.kind === 'hopper' ? 0 : 1.0);
     this.cars.forEach(c => { boxes.push({ c, s1: s, s0: s - carLen(c) }); s -= carLen(c) + gapAfter(c); });
     boxes.reverse().forEach(b => this.vehicle(b, psi, zr, tq));
+    // Revision 11 (?rev11): the near camels, outside the near fence, nearer the eye than anything else
+    if (typeof REV11 !== 'undefined' && REV11 && this.herd11) this.camels11(psi, lt, q, 'near');
     ctx.restore();
   },
   // a ghaf tree at its true size from the viewpoint, drawn as a ghaf and not the flat-topped samr: one crooked grey-brown
@@ -140,6 +184,152 @@ scene({
     if (OPT.colour) wash(crown, '#6E7F5A', 0.45 * q); else fill(crown, SEPIA, 0.15 * q);
     if (g.full) hatch(crown, [xc - w / 2, yt - 2, xc + w / 2, yb + 2], -0.2, 3, q, INK, 1, 0.28, 850 + g.i);
     stroke(crown, q, INK, 1, 0.6);
+  },
+  // Revision 11 (?rev11): one side's camels ('near': outside the near fence, painted over the train; 'far': out on the far
+  // plain, painted before the bank), with the shrubs the near ones browse, far to near
+  camels11(psi, lt, q, side) {
+    const items = [];
+    this.herd11.forEach((cm, i) => {
+      if (cm.side !== side) return;
+      const fr = this.camelFrame11(cm, lt), p = this.proj(fr.P[0], fr.P[1], 0, psi);
+      if (!p) return;
+      items.push({ d: p[2], draw: () => this.camel11(cm, i, fr, psi, lt, q) });
+      // the shrub a grazer browses, under its muzzle when its head is down
+      if (side === 'near' && cm.act !== 'walk') { const g = fr.W(1.82, 0, 0); items.push({ d: this.proj(g[0], g[1], 0, psi)[2], draw: () => this.shrub11(g, 0.42 * cm.sc, psi, q, 880 + i) }); }
+    });
+    if (side === 'near') this.shrubs11.forEach(([s, o, h], k) => { const [X, Y] = this.at(s, o), p = this.proj(X, Y, 0, psi); if (p) items.push({ d: p[2], draw: () => this.shrub11([X, Y], h, psi, q, 890 + k) }); });
+    items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
+  },
+  // a camel's place and frame this frame: P its ground point (a walker moves on at v), f forward and l to its left on the
+  // ground, W(a, b, c) a point of its body (a forward, b left, c up, in a cow's metres) in the world
+  camelFrame11(cm, lt) {
+    const f = [Math.cos(cm.hd) * this.d[0] + Math.sin(cm.hd) * this.n[0], Math.cos(cm.hd) * this.d[1] + Math.sin(cm.hd) * this.n[1]], l = [-f[1], f[0]];
+    const [X0, Y0] = this.at(cm.s, cm.o), m = cm.act === 'walk' ? cm.v * (lt - 3.0) : 0, P = [X0 + f[0] * m, Y0 + f[1] * m], k = cm.sc;
+    return { P, f, l, W: (a, b, c) => [P[0] + (a * f[0] + b * l[0]) * k, P[1] + (a * f[1] + b * l[1]) * k, c * k] };
+  },
+  // a dromedary in true 3D (see the notes at the top), built as rings round its trunk, neck, head, legs and tail: each pair
+  // of neighbouring rings, projected, gives a convex hull, and the hulls of a part together give its silhouette. The legs
+  // on the far side are drawn first, in shade; then the trunk, neck, head, tail and near legs as one figure: its hulls
+  // inked with a doubled line and then masked with paper, which leaves only the figure's outer contour, then toned in its
+  // coat and hatched under the belly (light from above; no sun direction is implied, as for the ghaf)
+  camel11(cm, idx, fr, psi, lt, q) {
+    const W = fr.W, G0 = fr.P, TAUq = TAU, rad = Math.PI / 180;
+    const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
+    const p0 = this.proj(G0[0], G0[1], 0, psi);
+    if (!p0 || p0[0] < RAIL.x0 - 60 || p0[0] > RAIL.x1 + 60) return;
+    const px = RAIL.f * cm.sc / p0[2];
+    // which side faces the eye (the eye is at the world's origin)
+    const near = fr.l[0] * -G0[0] + fr.l[1] * -G0[1] > 0 ? 1 : -1;
+    // the pose: g lowers the neck from carried (0) to grazing (1); the head's slow sway; the tail's swing; the gait
+    const bump = (c, w) => (Math.abs(lt - c) < w ? 0.5 * (1 + Math.cos(Math.PI * (lt - c) / w)) : 0);
+    const walk = cm.act === 'walk', T = 2.0 * Math.pow(cm.sc, 0.8), ph = lt / T + cm.ph;
+    let g = 0.22, sway = 0;
+    if (cm.act === 'graze') { g = 1 - 0.62 * bump(cm.lift, 1.4); sway = 0.1 * Math.sin(TAUq * lt / 4.6 + cm.ph * 3) * g; }
+    if (cm.act === 'settle') g = 0.12 + 0.86 * easeInOut(clamp((lt - cm.t0) / (cm.t1 - cm.t0)));
+    if (walk) g = 0.22 + 0.03 * Math.sin(2 * TAUq * ph);
+    const tail = 0.07 * Math.sin(TAUq * lt / 3.1 + cm.ph * 2);
+    // rings: a list of local points; tube rings (horizontal circles) for the legs and tail
+    const N = 12, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAUq));
+    const hoop = (a, b, c, r) => ring(t => [a + r * Math.cos(t), b + r * Math.sin(t), c]);
+    // the trunk: [a, top, bottom, half-width, narrowing of its upper half] from the tail root to the breast
+    const trunk = [[-0.88, 1.60, 1.36, 0.15, 0.1], [-0.74, 1.73, 1.22, 0.21, 0.1], [-0.52, 1.84, 1.16, 0.25, 0.15], [-0.30, 1.99, 1.13, 0.27, 0.3],
+      [-0.05, 2.10, 1.10, 0.28, 0.38], [0.22, 2.01, 1.06, 0.28, 0.32], [0.45, 1.90, 1.00, 0.27, 0.18], [0.62, 1.84, 1.00, 0.25, 0.12], [0.78, 1.70, 1.12, 0.21, 0.1], [0.88, 1.55, 1.26, 0.15, 0.1]];
+    const body = trunk.map(([a, t, b, w, k]) => ring(th => [a, w * Math.cos(th) * (1 - k * Math.max(0, Math.sin(th))), (t + b) / 2 + (t - b) / 2 * Math.sin(th)]));
+    const belly = trunk.map(([a, t, b, w]) => ring(th => [a, w * Math.cos(th / 2), (t + b) / 2 - (t - b) / 2 * Math.sin(th / 2) * 0.98]));
+    // the neck: five segments from its root at the breast, their angles (deg, up positive) blended from carried to grazing
+    const segL = [0.30, 0.27, 0.27, 0.26, 0.18], up = [-28, 0, 40, 68, 80], dn = [-38, -44, -48, -52, -55];
+    const nk = [[0.78, 1.50]], ang = [];
+    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; ang.push(A); nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
+    const nr = [[0.23, 0.15], [0.18, 0.12], [0.14, 0.1], [0.115, 0.085], [0.1, 0.08], [0.095, 0.075]];
+    const tube = (pts, angs, rr, bOff) => pts.map(([a, c], k) => {
+      const A = angs[Math.min(k, angs.length - 1)] * 0.5 + angs[Math.max(0, k - 1)] * 0.5, [hv, hw] = rr[k], b0 = bOff(k);
+      return ring(th => [a - Math.sin(A) * hv * Math.sin(th), b0 + hw * Math.cos(th), c + Math.cos(A) * hv * Math.sin(th)]);
+    });
+    const swayAt = k => sway * Math.pow(k / 5, 2);
+    const neck = tube(nk, ang, nr, swayAt);
+    // the head: from the poll, 0.48 m to the muzzle, carried a little nose-down, near vertical when grazing
+    const HA = lerp(-18, -65, g) * rad, [pa, pc] = nk[5], hu = [0, 0.14, 0.32, 0.48];
+    const hpts = hu.map(u => [pa + u * Math.cos(HA), pc + u * Math.sin(HA)]);
+    const head = tube(hpts, [HA, HA, HA, HA], [[0.1, 0.085], [0.115, 0.085], [0.08, 0.065], [0.06, 0.05]], () => sway);
+    // the tail: from its root under the croup, hanging, its tip swinging
+    const tl = [[-0.89, 0, 1.56], [-0.93, tail * 0.4, 1.32], [-0.95, tail, 1.06]];
+    const tailR = tl.map(([a, b, c], k) => hoop(a, b, c, [0.04, 0.03, 0.045][k]));
+    // the legs: top (inside the trunk), joint, fetlock, pad. Front: the knee (carpus) bends forward; hind: the hock bends
+    // back. A walker's feet move by the lateral gait (stance 0.68 of a stride, the hind of a side 0.1 ahead of the fore)
+    const legs = [];
+    [[1, 0.5, 1.2, 0.5, 0.13, 0.61, 0.54, 0.2, -0.1, [0.085, 0.065, 0.058, 0.04, 0.05]], [-1, -0.52, 1.25, -0.68, 0.13, 0.72, 0.55, 0.16, 0, [0.13, 0.08, 0.06, 0.04, 0.05]]].forEach(([bend, ta, tc, fa, fc, L1, L2, lift, lag, rr]) => {
+      [1, -1].forEach(sd => {
+        let dx = 0, dz = 0;
+        if (walk) {
+          const vl = cm.v / cm.sc, Sh = vl * 0.68 * T / 2, u0 = ph + (sd > 0 ? 0 : 0.5) + lag, u = u0 - Math.floor(u0);
+          if (u < 0.68) dx = Sh * (1 - 2 * u / 0.68);
+          else { const w = (u - 0.68) / 0.32; dx = -Sh + 2 * Sh * (w - Math.sin(TAUq * w) / TAUq); dz = lift * (1 - Math.cos(TAUq * w)) / 2; }
+        }
+        const Tp = [ta, tc], F = [fa + dx, fc + dz], da = F[0] - Tp[0], dc = F[1] - Tp[1], dd = Math.hypot(da, dc);
+        let J;
+        if (dd >= L1 + L2 - 1e-4) J = [Tp[0] + da * L1 / (L1 + L2), Tp[1] + dc * L1 / (L1 + L2)];
+        else { const A = bend * Math.acos(clamp((L1 * L1 + dd * dd - L2 * L2) / (2 * L1 * dd), -1, 1)), ux = da / dd, uc = dc / dd; J = [Tp[0] + L1 * (ux * Math.cos(A) - uc * Math.sin(A)), Tp[1] + L1 * (ux * Math.sin(A) + uc * Math.cos(A))]; }
+        const bT = sd * 0.17, bF = sd * 0.145, mid = (p, r) => [(p[0] + r[0]) / 2, (p[1] + r[1]) / 2];
+        const pts = [Tp, mid(Tp, J), J, mid(J, F), F], bs = [bT, bT, (bT + bF) / 2, bF, bF];
+        const rings = pts.map(([a, c], k) => hoop(a, bs[k], c, rr[k]));
+        // the pad: broad and flat, a little ahead of the fetlock
+        rings.push(ring(t => [F[0] + 0.05 + 0.12 * Math.cos(t), bF + 0.085 * Math.sin(t), F[1] - 0.11]));
+        legs.push({ near: sd === near, rings });
+      });
+    });
+    // project; a part's hulls
+    const P2 = rs => rs.map(r => r.map(v => pr(W(v[0], v[1], v[2]))));
+    const hulls = rs => { const sp = P2(rs), out = []; for (let k = 0; k < sp.length - 1; k++) { const pts = sp[k].concat(sp[k + 1]); if (pts.some(v => !v)) return []; out.push(new P(this.hull11(pts), true)); } return out; };
+    const farLegs = legs.filter(L => !L.near).flatMap(L => hulls(L.rings)), nearLegs = legs.filter(L => L.near).flatMap(L => hulls(L.rings));
+    const fig = hulls(body).concat(hulls(neck), hulls([neck[5]].concat(head)), hulls(tailR), nearLegs);
+    if (!fig.length) return;
+    const lw = clamp(px * 0.025, 0.55, 1.1), al = clamp(px / 40, 0.7, 1) * q;
+    const coat = { tan: ['#B08752', 0.5, 0.16], dark: ['#5E4532', 0.62, 0.42], pale: ['#D8C29C', 0.45, 0.06] }[cm.coat];
+    const inkAll = (polys, w, a) => { ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.beginPath(); polys.forEach(p => p.trace(ctx, 1)); ctx.stroke(); ctx.restore(); };
+    const tone = (polys, k) => { if (OPT.colour) wash(polys, coat[0], coat[1] * k * q); else wash(polys, SEPIA, (0.1 + coat[2]) * k * q); };
+    const bbOf = polys => { const xs = polys.flatMap(p => p.pts.map(v => v[0])), ys = polys.flatMap(p => p.pts.map(v => v[1])); return [Math.min(...xs) - 1, Math.min(...ys) - 1, Math.max(...xs) + 1, Math.max(...ys) + 1]; };
+    // its shadow on the ground, under the trunk
+    const sh = Array.from({ length: 20 }, (_, j) => pr(W(-0.05 + 1.05 * Math.cos(j / 20 * TAUq), 0.45 * Math.sin(j / 20 * TAUq), 0)));
+    if (sh.every(Boolean)) fill(new P(sh, true), SEPIA, 0.16 * q);
+    // the far legs, in shade
+    if (farLegs.length) { inkAll(farLegs, 2 * lw, al); mask(farLegs, q); tone(farLegs, 1); wash(farLegs, INK, 0.22 * q); }
+    // the figure
+    inkAll(fig, 2 * lw, al);
+    mask(fig, q);
+    tone(fig, 1);
+    if (px > 14) {
+      const bl = hulls(belly);
+      hatch(bl, bbOf(bl), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.5, 0.3, 860 + idx);
+      if (nearLegs.length) hatch(nearLegs, bbOf(nearLegs), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.45, 0.22, 870 + idx);
+      // the eye, and the small ears behind it
+      const hv = [Math.cos(HA), Math.sin(HA)], nv = [-Math.sin(HA), Math.cos(HA)];
+      const eye = pr(W(pa + 0.13 * hv[0] + 0.035 * nv[0], sway + near * 0.075, pc + 0.13 * hv[1] + 0.035 * nv[1]));
+      if (eye && px > 22) disc(eye[0], eye[1], clamp(px * 0.012, 0.6, 1.0), INK, 0.8 * q);
+      const e0 = pr(W(pa + 0.02 * hv[0] + 0.09 * nv[0], sway + near * 0.05, pc + 0.02 * hv[1] + 0.09 * nv[1])), e1 = pr(W(pa - 0.06 * hv[0] + 0.17 * nv[0], sway + near * 0.07, pc - 0.06 * hv[1] + 0.17 * nv[1]));
+      if (e0 && e1) stroke(new P([e0, e1]), 1, INK, lw * 1.3, al);
+    }
+  },
+  // a low desert shrub (the gravel plain's rimth and markh) at ground point G, h tall: a rounded clump of twigs
+  shrub11(G, h, psi, q, seed) {
+    const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
+    if (!b || !t) return;
+    const k = RAIL.f / b[2], w = 1.9 * h * k, hh = b[1] - t[1], r = rng(seed), ry = w / 2 * 12 / b[2], pts = [];
+    for (let j = 0; j <= 14; j++) { const u = j / 14, a = Math.PI * u; pts.push([b[0] - w / 2 * Math.cos(a), b[1] - ry * 0.3 - hh * Math.sin(a) * (0.8 + 0.3 * r())]); }
+    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; pts.push([b[0] + w / 2 * Math.cos(a), b[1] + ry * Math.sin(a) * 0.6]); }
+    const clump = new P(pts, true);
+    fill(el(b[0], b[1] + ry * 0.3, w * 0.55, ry * 0.9, 0, TAU, seed, 0), SEPIA, 0.12 * q);
+    mask(clump, q);
+    if (OPT.colour) wash(clump, '#8C8A5E', 0.5 * q); else fill(clump, SEPIA, 0.16 * q);
+    for (let j = 0; j < 9; j++) { const a = Math.PI * (0.15 + 0.7 * j / 8), L = hh * (0.6 + 0.4 * r()); stroke(new P([[b[0] + (j - 4) * w * 0.03, b[1]], [b[0] - Math.cos(a) * w * 0.45, b[1] - Math.sin(a) * L]]), 1, INK, 0.55, 0.45 * q); }
+    stroke(clump, 1, INK, 0.7, 0.55 * q);
+  },
+  // a convex hull of screen points (monotone chain)
+  hull11(pts) {
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], hi = [];
+    p.forEach(v => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], v) <= 0) lo.pop(); lo.push(v); });
+    p.slice().reverse().forEach(v => { while (hi.length > 1 && cr(hi[hi.length - 2], hi[hi.length - 1], v) <= 0) hi.pop(); hi.push(v); });
+    return lo.slice(0, -1).concat(hi.slice(0, -1));
   },
   // a box on the track from s0 to s1 (along), o0 to o1 (across; the camera is on the o0 side), z0 to z1: its visible faces
   box(s0, s1, o0, o1, z0, z1, psi) {

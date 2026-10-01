@@ -197,7 +197,7 @@ scene({
     this.panel2(sl, sq);
     const box = (b, m = 6) => (a, c) => [b[0] + m + a * (b[2] - b[0] - 2 * m), b[1] + m + c * (b[3] - b[1] - 2 * m)];
     ['meteo', 'skewt', 'winds', 'waves'].forEach((k, i) => this.product(k, box(this.P3[i], 8), sq, 740 + i, false, this.P3[i][2] - this.P3[i][0]));
-    ['table', 'cams', 'meteo', 'field', 'text', 'skewt', 'meteo', 'table'].forEach((k, i) => this.product(k, box(this.small[i], 5), sq, 750 + i, false, 90));
+    ['table', 'cams', 'meteo', 'field', 'text', 'skewt', 'meteo', 'table'].forEach((k, i) => this.product(k, box(this.small[i], 5), sq, 750 + i, false, 90, sl));
     this.clocks(sl, sq);
     // the desk: its top, its edge, the dark under it
     const dq = easeInOut(prog(sl, T0 - 0.6, 0.9));
@@ -230,8 +230,9 @@ scene({
     });
   },
   // a forecasting product on a screen. M(a, c) maps the screen's unit square (a across, c down) to the page; dark
-  // screens are drawn in light lines. Charts only: meteograms, soundings, model fields, wave strips, tables, text
-  product(kind, M, q, seed, dark, wpx) {
+  // screens are drawn in light lines. Charts only: meteograms, soundings, model fields, wave strips, tables, text. t: the
+  // scene clock, for the products that live (the camera feeds and the satellite crop)
+  product(kind, M, q, seed, dark, wpx, t = 0) {
     if (q <= 0) return;
     const r = rng(seed), ph = r() * TAU, col = dark ? '#E6DCC6' : INK, acc = dark ? '#A9C0E8' : BLUE;
     const L = (pts, lw, a, c2 = col) => {
@@ -282,16 +283,21 @@ scene({
         for (let f = 0; f < Math.min(2, Math.round(sp / 8)); f++) { const fx = tip[0] - ux * f * 0.01, fy = tip[1] - uy * f * 0.012; L([[fx, fy], [fx + uy * 0.018, fy - ux * 0.022]], 0.5, 0.65, acc); }
       });
     } else if (kind === 'cams') { // live camera feeds from 26 sites: a mosaic of small views, each a horizon and its sky
+      // Live, quietly: in every third view the cloud over the horizon drifts slowly along it, and over three views the
+      // sky's light changes slowly (a soft tone that deepens and clears over 9-13 s), never faster
       for (let k = 0; k < 26; k++) {
         const col = k % 6, row = Math.floor(k / 6), a0 = 0.02 + col * 0.163, c0 = 0.03 + row * 0.195, a1 = a0 + 0.15, c1 = c0 + 0.17;
         L([[a0, c0], [a1, c0], [a1, c1], [a0, c1], [a0, c0]], 0.5, 0.45);
         const hz = c0 + 0.17 * (0.45 + 0.25 * r());
+        if (!dark && [4, 11, 19].includes(k)) fill(new P([M(a0, c0), M(a1, c0), M(a1, hz), M(a0, hz)], true), INK, (0.05 + 0.09 * (0.5 - 0.5 * Math.cos(TAU * t / (9 + k % 5) + k))) * q);
         L(line(a0 + 0.01, hz, a1 - 0.01, hz + 0.02 * (r() - 0.5), 4), 0.6, 0.6);
-        if (r() > 0.5) L(curve(a => hz - 0.03 - 0.02 * Math.sin(a * 40 + k), a0 + 0.02, a1 - 0.02, 8), 0.5, 0.4);
+        const dr = k % 3 ? 0 : 0.45 * t;
+        if (r() > 0.5) L(curve(a => hz - 0.03 - 0.02 * Math.sin(a * 40 + k - dr), a0 + 0.02, a1 - 0.02, 8), 0.5, 0.4);
       }
-    } else if (kind === 'ir') { // a satellite crop: a coast and cloud streaks, light on dark
+    } else if (kind === 'ir') { // a satellite crop: a coast and cloud streaks, light on dark; the streaks drift slowly east
       L(curve(a => 0.62 + 0.1 * Math.sin(a * 5 + ph) + 0.04 * Math.sin(a * 17)), 0.8, 0.45);
-      for (let k = 0; k < 6; k++) { const c0 = 0.15 + k * 0.12; L(curve(a => c0 + 0.05 * Math.sin(a * 3 + k), 0.1 + r() * 0.3, 0.6 + r() * 0.35, 20), 2.4, 0.28); }
+      const d = 0.008 * t;
+      for (let k = 0; k < 6; k++) { const c0 = 0.15 + k * 0.12, s0 = 0.1 + r() * 0.3, s1 = 0.6 + r() * 0.35; L(curve(a => c0 + 0.05 * Math.sin((a - d) * 3 + k), s0 + d, Math.min(0.985, s1 + d), 20), 2.4, 0.28); }
     }
   },
   monitor(m, sl, q) {
@@ -304,7 +310,7 @@ scene({
     if (m.dark) { fill(S, OPT.colour ? '#1C2B47' : INK, (OPT.colour ? 0.9 : 0.8) * q); hatch(S, [0, 400, 1120, 700], 0, 2, q, INK, 0.6, 0.25, m.seed); }
     const [a, b, c, d] = m.S, M = (u, v) => { const t = [lerp(a[0], b[0], u), lerp(a[1], b[1], u)], bo = [lerp(d[0], c[0], u), lerp(d[1], c[1], u)]; return [lerp(t[0], bo[0], v), lerp(t[1], bo[1], v)]; };
     const inset = (u, v) => M(0.05 + 0.9 * u, 0.07 + 0.86 * v);
-    this.product(m.kind, inset, q, m.seed, m.dark, Math.hypot(b[0] - a[0], b[1] - a[1]));
+    this.product(m.kind, inset, q, m.seed, m.dark, Math.hypot(b[0] - a[0], b[1] - a[1]), sl);
     if (m.dark) this.lite(new P([M(0.08, 0.08), M(0.3, 0.08)]), '#F1E4C8', 1, 0.12 * q); // glass
   },
   // the printed forecast on the desk top, and the signature it takes (drawn by the pen in the woman's hand)
@@ -354,12 +360,16 @@ scene({
     stroke(back, q, INK, 1.4, 0.9);
   },
   // the figure's view: weak perspective about its C7 point, sized from its depth, turned psa from the line of sight
-  // (+: to its right, so its right side shows) and seen from al above
-  view(o) {
+  // (+: to its right, so its right side shows) and seen from al above. hd: the head turned that much further to the
+  // figure's right (a yaw about the neck), blended in from the shoulders (v -0.04) to under the agal (v 0.13), so the
+  // ghutra turns with the head while its fall over the shoulders stays with the body
+  view(o, hd = 0) {
     const [cx, cy] = this.pj(o.X, o.y7, o.Z), k = 1100 / o.Z * o.sc, psa = o.psi - Math.atan2(o.X, o.Z), al = Math.atan2(1.6 - o.y7, Math.hypot(o.X, o.Z));
     const c = Math.cos(psa), s = Math.sin(psa), ca = Math.cos(al), sa = Math.sin(al);
-    const V = (u, v, w = 0) => [cx + k * (u * c + w * s), cy - k * (v * ca + (-u * s + w * c) * sa)];
-    return Object.assign(V, { k, c, s, cx, cy });
+    const cs = hd ? v => { const a = psa + hd * this.ss(-0.04, 0.13, v); return [Math.cos(a), Math.sin(a)]; } : () => [c, s];
+    const V = hd ? (u, v, w = 0) => { const [c2, s2] = cs(v); return [cx + k * (u * c2 + w * s2), cy - k * (v * ca + (-u * s2 + w * c2) * sa)]; }
+      : (u, v, w = 0) => [cx + k * (u * c + w * s), cy - k * (v * ca + (-u * s + w * c) * sa)];
+    return Object.assign(V, { k, c, s, cx, cy, cs });
   },
   // a body of elliptical cross-sections [v, aR, aL, b, cw] (height; half-widths to the figure's right and left;
   // half-depth; depth of the centre), as seen: its right and left edges, and points on its surface. Between the edges,
@@ -370,8 +380,8 @@ scene({
       for (let i = 1; i < secs.length; i++) if (v >= secs[i][0]) { const a = secs[i - 1], b = secs[i], f = (v - a[0]) / (b[0] - a[0]); return a.map((x, j) => lerp(x, b[j], f)); }
       return secs[secs.length - 1];
     };
-    const eR = v => { const [, aR, , b] = at(v); return Math.atan2((b + off) * V.s, (aR + off) * V.c); };
-    const eL = v => { const [, , aL, b] = at(v); return Math.atan2((b + off) * V.s, (aL + off) * V.c) - Math.PI; };
+    const eR = v => { const [, aR, , b] = at(v), [c, s] = V.cs(v); return Math.atan2((b + off) * s, (aR + off) * c); };
+    const eL = v => { const [, , aL, b] = at(v), [c, s] = V.cs(v); return Math.atan2((b + off) * s, (aL + off) * c) - Math.PI; };
     const pt = (v, th, o2 = 0) => { const [, aR, aL, b, cw] = at(v), a = (Math.cos(th) >= 0 ? aR : aL) + off + o2; return V(a * Math.cos(th), v, cw + (b + off + o2) * Math.sin(th)); };
     const across = (v, t, o2 = 0) => pt(v, lerp(eR(v), eL(v), t), o2); // t 0 at the right edge, 1 at the left, round the back
     const spine = v => (eR(v) + Math.PI / 2) / (eR(v) - eL(v)); // t of the back's middle
@@ -803,9 +813,6 @@ scene({
     this.lite(open(edgeIn.map(([x, y]) => [x + 1, y])), '#EFE5CF', 0.9, 0.4 * q);
     this.rim(end, 1.6, 0.45 * q); stroke(end, q, INK, 1.2, 0.9);
   },
-  // the national picture: the seven emirates and the faint neighbours, and the night's weather as a chart draws it: a
-  // frontal rain band crossing from the Gulf onto the western coast (three hatch densities, the heavier cores denser, as
-  // a radar composite chart hatches them), with its legend. Static; nothing near the Hajar or the east coast.
   // the station-wind map's geometry in the screen's unit square, once: the UAE's coast and borders from the film's own
   // map data, and about 110 stations spread over its land (a seeded draw)
   windMap() {
@@ -826,6 +833,13 @@ scene({
     this._wm = { lines, st };
     return this._wm;
   },
+  // the radar composite's reflectivity at scene time t, as a function of the panel's grid: a frontal band lying SW-NE
+  // over the Gulf north-west of Abu Dhabi's coast, broken into cells of every shape (lon, lat, half-length and half-width
+  // in degrees, turn in degrees, peak), a light shield joining them. The whole band advects ESE toward the western coast
+  // (0.06 degree of longitude and -0.03 of latitude a second of scene clock, about 28 px over the beat), its cells
+  // growing and decaying slowly about their peaks (periods of 9-15 s), one new cell building at the band's south-western
+  // end and one decaying at its north-eastern end; the cells' texture evolves slowly as they move. Nothing reaches the
+  // Hajar or the east coast
   nationalChart() {
     const [x0, y0, x1, y1] = this.P2, cs = 2.5, nx = Math.ceil((x1 - x0) / cs) + 3, ny = Math.ceil((y1 - y0) / cs) + 3;
     const hs = (i, j, s) => { let h = Math.imul(i, 374761393) + Math.imul(j, 668265263) + Math.imul(s, 1442695041) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -833,26 +847,42 @@ scene({
       return lerp(lerp(hs(i, j, s), hs(i + 1, j, s), ux), lerp(hs(i, j + 1, s), hs(i + 1, j + 1, s), ux), uy); };
     const fb = (x, y, s) => 0.55 * vn(x, y, s) + 0.3 * vn(x * 2.1, y * 2.1, s + 1) + 0.15 * vn(x * 4.3, y * 4.3, s + 2);
     const K = Math.cos(24.4 * Math.PI / 180);
-    // rain: a front lying SW-NE over the Gulf, north-west of Abu Dhabi's coast, broken into cells of every shape (lon,
-    // lat, half-length and half-width in degrees, turn in degrees, peak); a light shield joins them
     const cells = [[51.95, 24.25, 0.26, 0.16, 50, 0.55], [52.25, 24.62, 0.3, 0.2, 35, 0.85], [52.62, 25.02, 0.36, 0.22, 20, 1.0], [53.02, 25.3, 0.2, 0.17, 70, 0.72],
       [53.45, 25.5, 0.38, 0.2, 28, 1.0], [53.92, 25.72, 0.24, 0.22, 0, 0.66], [54.32, 25.98, 0.3, 0.14, 38, 0.58], [52.85, 24.7, 0.18, 0.1, 80, 0.5], [54.0, 26.15, 0.16, 0.1, -15, 0.45],
-      [52.02, 24.95, 0.14, 0.1, 0, 0.42], [53.2, 25.78, 0.18, 0.1, 20, 0.45]];
+      [52.02, 24.95, 0.14, 0.1, 0, 0.42], [53.2, 25.78, 0.18, 0.1, 20, 0.45], [51.72, 24.55, 0.16, 0.12, 40, 0.7]];
+    // each cell's slow life (its own seeded stream): peak and size breathing about their means, phases spread
+    const r = rng(2051), life = cells.map(() => [TAU / (9 + 6 * r()), TAU * r(), TAU / (10 + 5 * r()), TAU * r()]);
     const A = [51.75, 24.0], B = [54.55, 26.05], ang = Math.atan2(B[1] - A[1], (B[0] - A[0]) * K), Lb = Math.hypot((B[0] - A[0]) * K, B[1] - A[1]);
-    const rain = (lon, lat) => {
-      const wx = lon + 0.3 * (fb(lon * 2.6, lat * 2.6, 5) - 0.5), wy = lat + 0.22 * (fb(lon * 2.6, lat * 2.6, 9) - 0.5);
+    const U = 0.06, Vv = -0.03, tc = 4.6;
+    const rain = (lon, lat, t, cl) => {
+      const dt = t - tc, x = lon - U * dt, y = lat - Vv * dt;
+      const wx = x + 0.3 * (fb(x * 2.6 + 0.03 * t, y * 2.6, 5) - 0.5), wy = y + 0.22 * (fb(x * 2.6, y * 2.6 - 0.02 * t, 9) - 0.5);
       const dx = (wx - A[0]) * K, dy = wy - A[1], al = dx * Math.cos(ang) + dy * Math.sin(ang), ac = -dx * Math.sin(ang) + dy * Math.cos(ang);
       let v = 0.3 * Math.exp(-((ac / 0.24) ** 2)) * Math.exp(-((Math.max(0, Math.abs(al / Lb - 0.5) - 0.4) / 0.08) ** 2));
-      cells.forEach(([cx, cy, a, c, r, pk]) => {
-        const ex = (wx - cx) * K, ey = wy - cy, rr = r * Math.PI / 180, p = ex * Math.cos(rr) + ey * Math.sin(rr), q2 = -ex * Math.sin(rr) + ey * Math.cos(rr);
+      cl.forEach(([cx, cy, a, c, cc, ss2, pk]) => {
+        const ex = (wx - cx) * K, ey = wy - cy, p = ex * cc + ey * ss2, q2 = -ex * ss2 + ey * cc;
         v = 1 - (1 - v) * (1 - pk * Math.exp(-((p / a) ** 2) - ((q2 / c) ** 2)));
       });
-      return v * (0.9 + 0.8 * (fb(lon * 5, lat * 5, 3) - 0.5));
+      return v * (0.9 + 0.8 * (fb(x * 5 + 0.02 * t, y * 5, 3) - 0.5));
     };
-    const grid = f => { const G = new Float32Array(nx * ny); for (let j = 1; j < ny - 1; j++) for (let i = 1; i < nx - 1; i++) { const [lon, lat] = this.inv2(x0 + (i - 1) * cs, y0 + (j - 1) * cs); G[j * nx + i] = f(lon, lat); } return G; };
-    const R = grid(rain), gx = x0 - cs, gy = y0 - cs;
-    const loops = (G, L) => this.contours(G, nx, ny, gx, gy, cs, L).map(l => new P(this.crs(l, true, 2), true));
-    return { rain: [0.2, 0.42, 0.66].map(L => loops(R, L)) };
+    const G = new Float32Array(nx * ny), gx = x0 - cs, gy = y0 - cs, ll = [];
+    for (let j = 1; j < ny - 1; j++) for (let i = 1; i < nx - 1; i++) ll.push([j * nx + i, ...this.inv2(x0 + (i - 1) * cs, y0 + (j - 1) * cs)]);
+    const loops = L => this.contours(G, nx, ny, gx, gy, cs, L).map(l => new P(this.crs(l, true, 2), true));
+    // the bands' thresholds (light to very heavy)
+    const levels = [0.16, 0.32, 0.5, 0.68, 0.86];
+    return t => {
+      const cl = cells.map(([cx, cy, a, c, rt, pk], n) => {
+        const [w1, p1, w2, p2] = life[n], br = 1 + 0.08 * Math.sin(w2 * t + p2), rr = rt * Math.PI / 180;
+        let k = 1 + 0.2 * Math.sin(w1 * t + p1);
+        // the new cell at the band's south-western end builds; the north-eastern one decays
+        if (n === 11) k *= this.ss(1.5, 7.5, t);
+        if (n === 6) k *= 1 - 0.55 * this.ss(2.5, 8.5, t);
+        return [cx, cy, a * br, c * br, Math.cos(rr), Math.sin(rr), clamp(pk * k, 0, 1)];
+      });
+      G.fill(0);
+      ll.forEach(([o, lon, lat]) => { G[o] = rain(lon, lat, t, cl); });
+      return levels.map(loops);
+    };
   },
   // marching squares: the closed loops of level L over a grid with a zero border
   contours(G, nx, ny, gx, gy, cs, L) {
@@ -882,20 +912,34 @@ scene({
     });
     return out;
   },
+  // the radar composite (the national picture): the seven emirates and the faint neighbours, and over them the night's
+  // echoes as a radar display draws them, in nested bands of reflectivity from light to very heavy, each band a level
+  // contour of the field, laid one inside another in the plate's own blues (washes darkening inward in colour; in black
+  // and white, hatching ever closer) and edged with a fine line; a legend of the bands. No range rings, no radar sites
+  // and no sweep: the composite shows the echoes only
+  BANDS: [['sky', 0.24, 6, 0.42], ['sky', 0.24, 4, 0.48], ['sea', 0.3, 2.8, 0.55], ['deep', 0.36, 1.9, 0.6], ['ink', 0.42, 1.35, 0.7]],
   panel2(sl, q) {
     if (q <= 0) return;
-    const P2 = this.P2, C = this.chart;
+    const P2 = this.P2, R = this.chart(sl), col = b => (b === 'ink' ? BLUE : HUE[b]);
     ctx.save(); ctx.beginPath(); boxP(...P2).trace(ctx, 1); ctx.clip();
+    this.BANDS.forEach(([c, wa, gap, ha], i) => {
+      if (!R[i].length) return;
+      if (OPT.colour) { wash(R[i], col(c), wa * q, 'evenodd'); if (i >= 3) this.hatchEO(R[i], P2, 0.75, gap * 1.3, q, BLUE, 0.6, ha * 0.6, 770 + i); }
+      else this.hatchEO(R[i], P2, 0.75, gap, q, BLUE, 0.7, ha, 770 + i);
+    });
+    R.forEach((ls, i) => ls.forEach(l => stroke(l, q, BLUE, i ? 0.55 : 0.8, i ? 0.42 : 0.7)));
+    // the map over the echoes, as a radar display lays it
     this.ctxLand.forEach(pg => stroke(pg, q, INK, 0.6, 0.35));
     this.uae.forEach(pg => stroke(pg, q, INK, 1, 0.85));
-    // rain: light, moderate and heavy, hatched ever closer, as a radar composite chart hatches them
-    [[5, 0.55], [3, 0.6], [1.7, 0.7]].forEach(([gap, a], i) => this.hatchEO(C.rain[i], P2, 0.75, gap, q, BLUE, 0.8, a, 770 + i));
-    C.rain[0].forEach(l => stroke(l, q, BLUE, 1, 0.75)); C.rain[1].forEach(l => stroke(l, q, BLUE, 0.6, 0.45)); C.rain[2].forEach(l => stroke(l, q, BLUE, 0.6, 0.45));
     ctx.restore();
-    // the legend strip: three densities of rain
+    // the legend strip: the five bands
     const lx = P2[0] + 8, ly = P2[3] - 18;
-    wordPatch([[lx - 3, ly - 3, 52, 14]], q);
-    [5, 3, 1.7].forEach((gap, i) => { const b = [lx + i * 16, ly, lx + i * 16 + 12, ly + 8]; this.hatchEO([boxP(...b)], b, 0.75, gap, q, BLUE, 0.8, 0.65, 775 + i); stroke(boxP(...b), q, BLUE, 0.6, 0.6); });
+    wordPatch([[lx - 3, ly - 3, 70, 14]], q);
+    this.BANDS.forEach(([c, wa, gap, ha], i) => {
+      const b = [lx + i * 13, ly, lx + i * 13 + 10, ly + 8], bp = boxP(...b);
+      for (let j = 0; j <= i; j++) { const [cj, waj, gj, haj] = this.BANDS[j]; if (OPT.colour) { wash(bp, col(cj), waj * q); if (j >= 3) this.hatchEO([bp], b, 0.75, gj * 1.3, q, BLUE, 0.6, haj * 0.6, 775 + j); } else if (j === i) this.hatchEO([bp], b, 0.75, gj, q, BLUE, 0.7, haj, 775 + j); }
+      stroke(bp, q, BLUE, 0.6, 0.6);
+    });
   },
   // the disc's land (Natural Earth) as rings, and an equirectangular land mask (0.25 degree), built once
   buildLand() {
@@ -945,7 +989,9 @@ scene({
     let d = 0;
     // the ITCZ: clusters strung along a wavering band south of the equator (March)
     const lc = -6 + 4 * Math.sin((lo - 20) * 0.035), bI = Math.exp(-(((la - lc) / 6.5) ** 2));
-    if (bI > 0.03) d = Math.max(d, bI * ss(0.44, 0.7, fbm(lo * 0.1, la * 0.24, t * 0.02 + 1)) * (0.5 + 0.5 * ss(0.3, 0.7, n3(lo * 0.55, la * 2.4, 5))));
+    // (the clusters drift west on the easterlies, 0.45 degree a second of scene clock, and build and fade slowly)
+    const lw = lo + 0.45 * t;
+    if (bI > 0.03) d = Math.max(d, bI * ss(0.44, 0.7, fbm(lw * 0.1, la * 0.24, t * 0.04 + 1)) * (0.5 + 0.5 * ss(0.3, 0.7, n3(lw * 0.55, la * 2.4, 5 + 0.03 * t))));
     // fronts: streaks along the band, a little cirrus to its warm side
     const band = (pts, w, sd, drift) => {
       let best = 1e9, sAt = 0, acc = 0;
@@ -957,16 +1003,17 @@ scene({
         acc += Ls;
       }
       if (best > w * 3) return 0;
-      const streak = 0.5 * n3(sAt * 0.32, best * 1.3, sd) + 0.5 * n3(sAt * 0.9, best * 2.6, sd + 5);
+      const streak = 0.5 * n3(sAt * 0.32, best * 1.3, sd + 0.05 * t) + 0.5 * n3(sAt * 0.9, best * 2.6, sd + 5 + 0.05 * t);
       return (Math.exp(-((best / w) ** 2)) * ss(0.22, 0.66, streak) + 0.35 * Math.exp(-((best / (2.2 * w)) ** 2)) * ss(0.45, 0.8, n3(sAt * 1.6, best * 0.5, sd + 9))) * (0.6 + 0.4 * Math.exp(-sAt / 70));
     };
-    d = Math.max(d, band([[-18, 29], [-6, 32], [6, 36.5], [15, 41.5], [22, 47], [27, 52.5], [28, 57.5], [22, 61], [13, 61.5]], 3.2, 31, t * 0.25));
-    d = Math.max(d, band([[-5, -33], [10, -37], [25, -41], [40, -45], [55, -47], [70, -47.5], [85, -46]], 2.8, 37, t * 0.25));
+    // (the fronts move east on the westerlies, 0.8 degree a second of scene clock, their streaks evolving as they go)
+    d = Math.max(d, band([[-18, 29], [-6, 32], [6, 36.5], [15, 41.5], [22, 47], [27, 52.5], [28, 57.5], [22, 61], [13, 61.5]], 3.2, 31, t * 0.8));
+    d = Math.max(d, band([[-5, -33], [10, -37], [25, -41], [40, -45], [55, -47], [70, -47.5], [85, -46]], 2.8, 37, t * 0.8));
     // trade cumulus over the southern Indian Ocean and the tropical Atlantic, and the deck off Namibia and Angola
     const cuR = Math.max(ss(0, 4, la + 32) * ss(0, 4, -11 - la) * ss(0, 5, lo - 52) * ss(0, 5, 108 - lo), ss(0, 4, la - 6) * ss(0, 4, 24 - la) * ss(0, 4, lo + 45) * ss(0, 4, -18 - lo));
-    if (cuR > 0) d = Math.max(d, 0.7 * cuR * ss(0.56, 0.8, n3(lo * 1.1, la * 1.1, t * 0.05 + 11)));
+    if (cuR > 0) d = Math.max(d, 0.7 * cuR * ss(0.56, 0.8, n3((lo + 0.5 * t) * 1.1, la * 1.1, t * 0.08 + 11)));
     const scR = ss(0, 4, la + 27) * ss(0, 4, -8 - la) * ss(0, 4, lo + 4) * ss(0, 4, 13 - lo);
-    if (scR > 0) d = Math.max(d, 0.75 * scR * ss(0.34, 0.6, fbm(lo * 0.5, la * 0.5, 17)));
+    if (scR > 0) d = Math.max(d, 0.75 * scR * ss(0.34, 0.6, fbm((lo + 0.3 * t) * 0.5, la * 0.5, 17 + 0.03 * t)));
     return d * ex;
   },
   // the disc's projection: centred on (la0, lo0), seen from u (earth radii / distance: 0.151 from geostationary orbit,
