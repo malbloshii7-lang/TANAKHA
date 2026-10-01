@@ -781,8 +781,8 @@ const B789 = (() => {
   // the fuselage: [s, crown z, keel z, half-width] (5.77 m wide and 5.97 m deep; the radome's tip at the cabin floor's
   // level, the nose rounding up to the flight deck's windows; the tail cone sweeping up from the main gear to the APU's
   // exhaust, the crown line falling only behind the fin)
-  const FUS = spline([[0, -0.50, -0.62, 0.06], [0.25, -0.06, -0.99, 0.50], [0.6, 0.36, -1.34, 0.86], [1.0, 0.72, -1.63, 1.13], [1.6, 1.14, -1.96, 1.46],
-    [2.3, 1.55, -2.25, 1.79], [3.0, 1.94, -2.49, 2.09], [3.8, 2.33, -2.69, 2.37], [4.8, 2.67, -2.85, 2.61], [6.0, 2.89, -2.95, 2.79], [7.4, 2.975, -2.985, 2.875],
+  const FUS = spline([[0, -0.40, -0.70, 0.10], [0.25, 0.12, -1.12, 0.62], [0.6, 0.55, -1.48, 1.02], [1.0, 0.92, -1.76, 1.30], [1.6, 1.35, -2.07, 1.62],
+    [2.3, 1.75, -2.34, 1.94], [3.0, 2.10, -2.56, 2.21], [3.8, 2.45, -2.74, 2.45], [4.8, 2.74, -2.88, 2.66], [6.0, 2.92, -2.96, 2.81], [7.4, 2.98, -2.985, 2.88],
     [9.0, 2.985, -2.985, 2.885], [40.0, 2.985, -2.985, 2.885], [42.0, 2.985, -2.955, 2.88], [45.0, 2.985, -2.82, 2.83], [48.0, 2.96, -2.52, 2.70], [51.0, 2.88, -2.08, 2.48],
     [54.0, 2.70, -1.52, 2.15], [57.0, 2.38, -0.84, 1.68], [59.5, 1.98, -0.20, 1.14], [61.2, 1.58, 0.40, 0.62], [62.0, 1.32, 0.80, 0.24]]);
   const fz = s => { const zt = FUS(s, 1), zb = FUS(s, 2); return { zc: (zt + zb) / 2, hh: (zt - zb) / 2, hw: FUS(s, 3) }; };
@@ -856,7 +856,18 @@ const B789 = (() => {
       // the wing, its raked tip closed
       const span = lod < 2 ? SPAN : SPAN.filter((_, i) => i % 2 === 0 || i === SPAN.length - 1);
       const sec = y => { const w = wingAt(y), c = w.st - w.sl, z = zRef(y, flex); return AFL.map(([f, k]) => [X(w.sl + f * c), sg * y, z + k * w.t]); };
-      P('wing', side, 'wing', tube(span.map(sec), { capEnd: 'skin' }), 'wing');
+      // its control surfaces' seams on the upper surface: the hinge line of the flaps and ailerons (stowed), the spoilers'
+      // outlines, the slats' rear edge
+      const kUp = f => { for (let i = 1; i <= 10; i++) if (AF[i][0] <= f) { const a = AF[i - 1], b = AF[i], t = (f - b[0]) / (a[0] - b[0]); return b[1] + (a[1] - b[1]) * t; } return 0; };
+      const upAt = (y, f) => { const w = wingAt(y), c = w.st - w.sl; return [X(w.sl + f * c), sg * y, zRef(y, flex) + kUp(f) * w.t + 0.01]; };
+      const run = (y0, y1, fy) => { const pts = []; for (let k = 0; k <= 8; k++) { const y = lerp(y0, y1, k / 8); pts.push(upAt(y, fy(y))); } return pts; };
+      const lines = [];
+      const fs = y => { const w = wingAt(y), c = w.st - w.sl; return 0.75 - (y < 9 ? 1.5 : 0.21 * c) / c; };
+      if (!((cfg.flap || 0) > 0.5)) lines.push(run(3.4, 26.4, () => 0.75));
+      if (!((cfg.spoiler || 0) > 0.5)) SPOIL.forEach(([y0, y1]) => { lines.push(run(y0, y1, fs)); [y0, y1].forEach(y => lines.push([upAt(y, fs(y)), upAt(y, 0.75)])); });
+      if (!((cfg.slat || 0) > 0.01)) lines.push(run(SLAT[0], SLAT[1], () => 0.13));
+      [21.8, 26.4].forEach(y => lines.push([upAt(y, 0.75), upAt(y, 0.99)]));
+      P('wing', side, 'wing', tube(span.map(sec), { capEnd: 'skin' }), 'wing', { lines: lod < 2 ? lines : [], ln: [0, 0, 1] });
       // the flaps (single-slotted, Fowler): out only at the landing setting, run aft and turned down about their noses
       if ((cfg.flap || 0) > 0.5) FLAPS.forEach(([y0, y1, cf, k], i) => {
         const del = cfg.flap * k * D, ys = [y0, (y0 + y1) / 2, y1];
@@ -882,10 +893,10 @@ const B789 = (() => {
       });
       // the flap-track fairings: slender canoes under the trailing edge, their tails turning down with the flaps
       if (lod < 2) CANOE.forEach((y, i) => {
-        const w = wingAt(y), z = zRef(y, flex), zl = z - 0.42 * w.t, xt = X(w.st), del = (cfg.flap || 0) * 0.8 * D, piv = [xt + 0.2, sg * y, zl];
-        const xs = [2.9, 2.0, 1.0, 0.2, -0.8, -1.8, -2.7], dep = [0.05, 0.38, 0.55, 0.6, 0.5, 0.3, 0.06];
-        const rings = xs.map((dx, k) => { const r = Math.max(0.04, dep[k]) / 2, c = [xt + dx, sg * y, zl - r]; const ring = Array.from({ length: 10 }, (_, m) => { const a = m / 10 * TAU; return [c[0], c[1] + 0.24 * Math.cos(a) * (0.3 + 0.7 * Math.min(1, dep[k] / 0.3)), c[2] + r * Math.sin(a)]; }); return dx < 0.2 ? ring.map(p => rotXZ(p, piv, del)) : ring; });
-        P('canoe' + i, side, 'under', tube(rings), 'wing', { lod1: true });
+        const w = wingAt(y), z = zRef(y, flex), zl = z - 0.42 * w.t, xt = X(w.st), del = (cfg.flap || 0) * 0.55 * D, piv = [xt + 0.2, sg * y, zl];
+        const xs = [2.6, 1.8, 0.9, 0.1, -0.6, -1.3, -1.75], dep = [0.08, 0.38, 0.55, 0.58, 0.5, 0.36, 0.2];
+        const rings = xs.map((dx, k) => { const r = Math.max(0.04, dep[k]) / 2, c = [xt + dx, sg * y, zl - r]; const ring = Array.from({ length: 10 }, (_, m) => { const a = m / 10 * TAU; return [c[0], c[1] + 0.27 * Math.cos(a) * (0.3 + 0.7 * Math.min(1, dep[k] / 0.3)), c[2] + r * Math.sin(a)]; }); return dx < 0.2 ? ring.map(p => rotXZ(p, piv, del)) : ring; });
+        P('canoe' + i, side, 'under', tube(rings, { capEnd: 'skin' }), 'wing', { lod1: true });
       });
       // the engine: its nacelle (the reverser's sleeve run aft on the runway, opening the cascades), the inlet, the fan
       // nozzle with its chevrons, the core cowl and the plug; its pylon
@@ -921,10 +932,14 @@ const B789 = (() => {
         P('gear', side, 'under', [], 'strut', { gear: { legs, beam, wheels: g, brace, door, piv }, c: [0, yg, piv[2] + 0.6] });
       }
       // the horizontal stabiliser
-      P('stab', side, 'stab', tube(STABY.map(y => { const s0 = lin(STAB, y, 1), s1 = lin(STAB, y, 2), t = lin(STAB, y, 3), z = zStab(y); return AFS.map(([f, k]) => [X(s0 + f * (s1 - s0)), sg * y, z + k * t]); }), { capEnd: 'skin' }), 'wing');
+      const el = []; for (let k = 0; k <= 6; k++) { const y = lerp(2.6, 9.6, k / 6), s0 = lin(STAB, y, 1), s1 = lin(STAB, y, 2), t = lin(STAB, y, 3); el.push([X(s0 + 0.7 * (s1 - s0)), sg * y, zStab(y) + 0.42 * t]); }
+      P('stab', side, 'stab', tube(STABY.map(y => { const s0 = lin(STAB, y, 1), s1 = lin(STAB, y, 2), t = lin(STAB, y, 3), z = zStab(y); return AFS.map(([f, k]) => [X(s0 + f * (s1 - s0)), sg * y, z + k * t]); }), { capEnd: 'skin' }), 'wing', { lines: lod < 2 ? [el] : [], ln: [0, 0, 1] });
     });
     // the fin
-    P('fin', 'C', 'fin', tube(FINZ.map(z => { const s0 = lin(FIN, z, 1), s1 = lin(FIN, z, 2), t = lin(FIN, z, 3); return AFS.map(([f, k]) => [X(s0 + f * (s1 - s0)), k * t, z]); }), { capEnd: 'skin' }), 'wing');
+    // the fin, its rudder's hinge line on either side
+    const rud = sg => { const pts = []; for (let k = 0; k <= 6; k++) { const z = lerp(3.0, 12.0, k / 6), s0 = lin(FIN, z, 1), s1 = lin(FIN, z, 2), t = lin(FIN, z, 3); pts.push([X(s0 + 0.68 * (s1 - s0)), sg * (0.42 * t + 0.01), z]); } return pts; };
+    P('fin', 'C', 'fin', tube(FINZ.map(z => { const s0 = lin(FIN, z, 1), s1 = lin(FIN, z, 2), t = lin(FIN, z, 3); return AFS.map(([f, k]) => [X(s0 + f * (s1 - s0)), k * t, z]); }), { capEnd: 'skin' }), 'wing',
+      { lines: lod < 2 ? [rud(1), rud(-1)] : [], lnOf: [[0, 1, 0], [0, -1, 0]] });
     // the nose gear: a leg under the flight deck and two wheels (40 × 16 in), its taxi light on the leg
     {
       const en = cfg.gear ? (cfg.gear.extN ?? ext) : 0, xn = X(SNG), ax = -Z0 + 0.47 - 0.3 * en, r = 0.47 + 0.04 * en;
@@ -964,9 +979,9 @@ const B789 = (() => {
       DOORS.forEach(s => out.lines.push({ pts: onSide(rrect(s - 0.535, s + 0.535, -0.45, 1.45, 0.24), sg), n: skinN(s, angAt(s, 0.5, sg)), c: skin(s, angAt(s, 0.5, sg)), a: 0.62, closed: true }));
       (sg < 0 ? [[11.0, 1.35], [43.31, 0.9]] : [[47.75, 0.45]]).forEach(([s, hw]) => out.lines.push({ pts: onSide(rrect(s - hw, s + hw, -2.35, -0.95, 0.15), sg), n: skinN(s, angAt(s, -1.6, sg)), c: skin(s, angAt(s, -1.6, sg)), a: 0.45, closed: true }));
       // the flight deck's side window
-      out.glass.push({ pts: onSide([[3.02, 1.10], [3.55, 1.0], [4.32, 1.03], [4.42, 1.36], [4.02, 1.52], [3.32, 1.66], [3.06, 1.5]], sg), n: skinN(3.7, angAt(3.7, 1.3, sg)), c: skin(3.7, angAt(3.7, 1.3, sg)) });
+      out.glass.push({ pts: onSide([[3.17, 1.12], [3.7, 1.07], [4.25, 1.06], [4.45, 1.25], [4.25, 1.56], [3.3, 1.76], [3.14, 1.55]], sg), n: skinN(3.8, angAt(3.8, 1.35, sg)), c: skin(3.8, angAt(3.8, 1.35, sg)) });
       // the windshield's pane on this side: from the centre post to the side window, its lower edge sweeping down and back
-      const ws = [[2.42, 82], [2.52, 64], [2.7, 48], [2.92, 38], [3.0, 47], [3.0, 62], [2.96, 82]].map(([s, a]) => { const q = sg > 0 ? a * D : Math.PI - a * D; return skin(s, q, 0.01); });
+      const ws = [[2.45, 86], [2.58, 68], [2.78, 50], [3.02, 36], [3.1, 51], [3.03, 70], [2.95, 86]].map(([s, a]) => { const q = sg > 0 ? a * D : Math.PI - a * D; return skin(s, q, 0.01); });
       out.glass.push({ pts: ws, n: skinN(2.7, sg > 0 ? 62 * D : Math.PI - 62 * D), c: skin(2.75, sg > 0 ? 62 * D : Math.PI - 62 * D), front: true });
     });
     // the radome's joint, a ring just ahead of the flight deck
@@ -986,8 +1001,8 @@ const B789 = (() => {
   // wings and the tail), thicker and closer where the surface turns from the light and crossed in deep shade, then
   // outlined at its silhouette and its creases with a weight that falls with the distance
   const ST = {
-    skin: { tone: 0.02, shade: 0.5, sky: 0.16, fill: '#F4EFE6', fillA: 0.42, cool: '#8E9CB3', coolA: 0.5, ink: 1, lw: 1.15, warm: 1 },
-    wing: { tone: 0.04, shade: 0.5, sky: 0.14, fill: '#F2EDE4', fillA: 0.42, cool: '#8E9CB3', coolA: 0.5, ink: 1, lw: 1.05, warm: 1, crease: 0.35 },
+    skin: { tone: 0.02, shade: 0.5, sky: 0.16, fill: '#F4EFE6', fillA: 0.42, cool: '#8E9CB3', coolA: 0.62, ink: 1, lw: 1.15, warm: 1 },
+    wing: { tone: 0.04, shade: 0.5, sky: 0.14, fill: '#F2EDE4', fillA: 0.42, cool: '#8E9CB3', coolA: 0.62, ink: 1, lw: 1.05, warm: 1, crease: 0.35 },
     strut: { tone: 0.3, shade: 0.42, sky: 0.08, fill: '#A7ABAE', fillA: 0.42, cool: '#6F7884', coolA: 0.3, ink: 0.8, lw: 0.85 },
     tyre: { tone: 0.6, shade: 0.3, sky: 0.06, fill: '#35302C', fillA: 0.58, ink: 0.55, lw: 0.8 },
     hub: { tone: 0.24, shade: 0.4, sky: 0.05, fill: '#A19E99', fillA: 0.45, ink: 0.6, lw: 0.6 },
@@ -1213,6 +1228,12 @@ const B789 = (() => {
       if (p.eng) return drawEngine(p, pose, o, eyeB);
       if (p.gear) return drawGear(p, pose, o, eyeB);
       p.tubes.forEach(T => drawTube(toWorld(T, W), ST[p.st], o));
+      if (p.lines && p.lines.length) {
+        // the seams, where the surface they lie on faces the eye
+        const segs = [], h = AUH.clipZ(), pxm = E3.cam().f / Math.max(1, E3.depth(W(p.tubes[0].cen[0])));
+        p.lines.forEach((ln, k) => { const n = dirW(pose, p.lnOf ? p.lnOf[k] : p.ln); for (let i = 0; i + 1 < ln.length; i++) { const a = W(ln[i]), b = W(ln[i + 1]); if (dot(n, sub(C, a)) > 0) { const sg = segS(a, b, h); if (sg) segs.push(sg); } } });
+        strokeSegs(segs, INK, clamp(lwAt(ST.wing, o, pxm) * 0.45, 0.35, 0.9), 0.55 * (o.air ?? 1) * clamp(pxm / 4));
+      }
     };
     const wingSide = side => {
       const up = above(side), under = part(side, 'under').map(p => ({ p, d: E3.depth(W(p.c || p.tubes[0].cen[0])) })).sort((x, y) => y.d - x.d).map(x => x.p);
@@ -1321,76 +1342,67 @@ scene({
   id: 'airportdawn',
   start: 0, dur: 5,
   init() {
-    const r = rng(2027);
     this.term = AUH.terminal(1);
     this.tower = AUH.tower();
     const A = AUH.TA, D = AUH.D;
-    // stands on a pier's face: pier angle g (terminal frame), face side, station s; the nose 7 m off the glazing, noses
-    // to the pier; a jet bridge to the forward door (and the upper deck's) on each aircraft's left side
-    const planes = [];
-    const stand = (gd, side, s, type, seed, bridges = 1) => {
-      const g = gd * D, d = [Math.cos(g), Math.sin(g)], n = [-Math.sin(g) * side, Math.cos(g) * side], k = AUH.TYPES[type];
-      const off = 31 + 7 + k.fus[0][0], a = d[0] * s + n[0] * off, b = d[1] * s + n[1] * off;
-      const pose = AUH.poser({ u: A[0] + a, v: A[1] + b, z: k.z0, psi: Math.atan2(-n[1], -n[0]) / D });
-      const wall = (t, o = 0) => [d[0] * t + n[0] * (31 + o), d[1] * t + n[1] * (31 + o)];
-      planes.push({ type, pose, parts: AUH.airframe(type, false), seed, s, d, n, wall, south: gd === -135, bridges: this.bridgesFor(type, pose, d, n, s, bridges) });
-    };
-    // the south pier's east face: the hero (a 787-9) and an A380 beyond it toward the tip; the east pier's south face
-    // across the courtyard (right), noses to the pier, tails toward the courtyard
-    stand(-135, -1, 200, 'twin', 11000, 1);
-    stand(-135, -1, 115, 'a380', 11200, 2);
-    stand(-135, -1, 385, 'twin', 11400, 1);
-    stand(135, -1, 215, 'twin', 12000, 1);
-    stand(135, -1, 300, 'a380', 12500, 1);
-    stand(135, -1, 385, 'twin', 13000, 1);
-    this.planes = planes;
-    // apron floodlight masts (30 m) on the courtyard's service road behind the eye, toward the sun; their shadows, 500 m
-    // long at this sun, run out across the fog toward the point opposite the sun
-    const dS = [-0.7071, -0.7071], nE = [-0.7071, 0.7071];
-    const c0 = [dS[0] * 330 + nE[0] * 150, dS[1] * 330 + nE[1] * 150], sh = AUH.dirAz(296), rt = AUH.dirAz(26);
-    this.masts = [];
-    this.behind = [[70, 16], [120, 52]].map(([k, x0]) => AUH.W3(A[0] + c0[0] - sh[0] * k + rt[0] * x0, A[1] + c0[1] - sh[1] * k + rt[1] * x0, 0));
     // the south pier's east-side apron in pier coordinates: s out along the pier from the hub, w off its axis toward
-    // the courtyard (its glazing at w 31); the hero's stand at s 200, its left wingtip at s 230
-    const g = -135 * D, pd = [Math.cos(g), Math.sin(g)], pn = [Math.sin(g), -Math.cos(g)];
+    // the courtyard (its glazing at w 31)
+    const g0 = -135 * D, pd = [Math.cos(g0), Math.sin(g0)], pn = [Math.sin(g0), -Math.cos(g0)];
     this.PW = (s, w, z = 0) => AUH.W3(A[0] + pd[0] * s + pn[0] * w, A[1] + pd[1] * s + pn[1] * w, z);
+    // stands on a pier's face: pier angle g (terminal frame), face side, station s; noses to the pier, 7 m off its
+    // glazing; 787-9s throughout (the hero drawn in full, the rest in less detail as they stand further off)
+    const planes = [];
+    const stand = (gd, side, s, lod, seed, bridges = 1) => {
+      const g = gd * D, d = [Math.cos(g), Math.sin(g)], n = [-Math.sin(g) * side, Math.cos(g) * side];
+      const off = 31 + 7 + B789.SMG, a = d[0] * s + n[0] * off, b = d[1] * s + n[1] * off;
+      const pose = AUH.poser({ u: A[0] + a, v: A[1] + b, z: B789.Z0, psi: Math.atan2(-n[1], -n[0]) / D });
+      const m = B789.model({ key: 'gate' + lod, lod, flex: -0.6 });
+      planes.push({ pose, m, seed, s, d, n, lod, south: gd === -135, bridges: gd === -135 ? this.bridgesFor(s, bridges) : [] });
+    };
+    // the south pier's east face: the hero at s 200 with its two bridges, a sister ship beyond it toward the hub; the stand
+    // toward the tip stands empty (the eye is there); across the courtyard, the east pier's south face
+    stand(-135, -1, 200, 0, 11000, 2);
+    stand(-135, -1, 118, 1, 11200, 2);
+    stand(135, -1, 215, 2, 12000, 1);
+    stand(135, -1, 300, 2, 12500, 1);
+    stand(135, -1, 385, 2, 13000, 1);
+    this.planes = planes;
     this.hero = planes[0];
+    // apron floodlight masts (30 m) behind the eye, toward the sun; their shadows, hundreds of metres long at this sun,
+    // run out across the fog toward the point opposite the sun
+    this.masts = [];
+    this.behind = [[338, 96], [372, 150]].map(([s, w]) => this.PW(s, w, 0));
     this.tug = this.tugParts(this.hero.pose);
     this.apron();
-    // every face of the south pier's aircraft, for their shadows on the ground
-    this.castOf = planes.filter(p => p.south).map(p => {
-      const P_ = p.parts, f = [];
-      P_.fus.forEach(sg => sg.forEach(q => f.push(q)));
-      ['L', 'R'].forEach(s => P_.side[s].forEach(q => { [q.f, q.nac, q.pyl].forEach(fs => fs && fs.forEach(x => f.push(x))); }));
-      P_.fin.forEach(q => f.push(q));
-      return f.map(q => q.map(p.pose.toW));
-    });
     // the fog's strokes, laid out from the eye in the middle of its move, a little wider than the frame
     this.view(3.3);
-    this.fogSk = AUH.fogStrokes(2600, 4401, { t0: 30, t1: 3000, half: 0.42, len: 70, jit: 0.12 });
+    this.fogSk = AUH.fogStrokes(2600, 4401, { t0: 20, t1: 3000, half: 0.62, len: 70, jit: 0.12 });
   },
-  // jet bridges on the aircraft's left side: a cab at the door, a tunnel to a rotunda standing off the pier's glazing
-  bridgesFor(type, pose, d, n, s, count) {
-    const k = AUH.TYPES[type], out = [];
-    const doors = type === 'a380' ? [[k.fus[0][0] - 8.5, -1.8, 5.2], [k.fus[0][0] - 17, 1.1, 8.0]] : [[k.fus[0][0] - 6.5, -0.3, 4.9]];
-    doors.slice(0, count).forEach(([xd, zb, sill], i) => {
-      const hw = k.fus[5][1] * Math.sqrt(Math.max(0, 1 - (zb / k.fus[5][2]) ** 2)) + 0.2;
-      const W3 = AUH.W3, box = (x0, x1, y0, y1, z0, z1) => E3.box(0, 1, 0, 1, 0, 1).map(f => f.map(([x, y, z]) => pose.toW([x0 + (x1 - x0) * x, y0 + (y1 - y0) * y, z0 + (z1 - z0) * z])));
-      const cab = box(xd - 1.8, xd + 1.8, hw, hw + 3.8, zb, zb + 3.1);
-      const p0 = pose.toW([xd, hw + 3.8, zb]);
-      // the rotunda: on the pier, 12 m (and 24 m for the upper deck's) along the glazing toward the aircraft's left
-      const q = pose.toW([xd + 4, hw + 12 + 10 * i, 0]), qa = [q[1] - AUH.TA[0], q[0] - AUH.TA[1]];
-      const t = qa[0] * d[0] + qa[1] * d[1], ra = [d[0] * t + n[0] * 34.5, d[1] * t + n[1] * 34.5];
-      const R = W3(AUH.TA[0] + ra[0], AUH.TA[1] + ra[1], sill);
-      out.push({ cab, tunnel: AUH.walkway(p0, R, 1.6, 3.0), rot: E3.box(R[0] - 2.4, R[0] + 2.4, R[1] - 2.4, R[1] + 2.4, 0, sill + 3.4), legs: [AUH.lerp3(p0, R, 0.25), AUH.lerp3(p0, R, 0.3)], R, p0 });
+  // the jet bridges at the hero's left doors (L1 and L2; Boeing's door table: 6.30 and 18.36 m aft of the nose, the sill
+  // at the cabin floor, 4.3 m over the apron): an apron-drive bridge to each, its cab closed round the door, its tunnel
+  // (two telescoping sections) running back to a rotunda that stands off the pier on its column, its drive column on
+  // two wheels under the outer section, and a fixed link from the rotunda into the pier's glazing; in pier coordinates
+  bridgesFor(s0, count) {
+    const PW = this.PW, out = [], sill = B789.Z0 - 0.45;
+    [[6.30, 12, 36], [18.36, 22, 40]].slice(0, count).forEach(([xd, dsR, wR]) => {
+      const sR = s0 + dsR;
+      const wd = 38 + xd, hw = B789.fz(xd).hw + 0.05, c0 = s0 + hw, c1 = c0 + 3.2;
+      const B = (sa, sb, wa, wb, za, zb) => E3.box(0, 1, 0, 1, 0, 1).map(f => f.map(([x, y, z]) => PW(sa + (sb - sa) * x, wa + (wb - wa) * y, za + (zb - za) * z)));
+      const cab = B(c0, c1, wd - 1.6, wd + 1.6, sill - 0.2, sill + 2.6);
+      const p0 = PW(c1, wd, sill - 0.15), R = PW(sR, wR, sill), mid = AUH.lerp3(p0, R, 0.5);
+      const tun = [AUH.walkway(p0, mid, 1.25, 2.5), AUH.walkway(AUH.lerp3(p0, R, 0.47), R, 1.4, 2.7)];
+      const leg = AUH.lerp3(p0, R, 0.2), rot = R11.cylinder(R, 1.9, sill - 0.3, sill + 2.9, 10), col = R11.cylinder(R, 0.55, 0, sill - 0.3, 8);
+      const link = B(sR - 1.35, sR + 1.35, 29.5, wR - 1.7, sill - 0.1, sill + 2.6);
+      out.push({ cab, tun, rot, col, link, leg, R, p0, sill });
     });
     return out;
   },
   // the towbarless tug at the hero's nose gear, in the hero's body frame (x forward, y left) at ground heights: the nose
-  // wheels (x 24.2) held in the cradle between its two rear arms, its body forward under the nose (to 3.7 m short of the
-  // glazing), its low cab at the front on the right, a wheel at each corner
+  // wheels held in the cradle between its two rear arms, its body forward under the nose (to 3.7 m short of the
+  // glazing), its low cab at the front on the right, a wheel at each corner (laid out about a nose gear at x 24.2, then
+  // carried onto the 787-9's)
   tugParts(pose) {
-    const z0 = AUH.TYPES.twin.z0, T = q => pose.toW([q[0], q[1], q[2] - z0]);
+    const z0 = B789.Z0, dx = B789.X(B789.SNG) - 0.12 - 24.2, T = q => pose.toW([q[0] + dx, q[1], q[2] - z0]);
     const B = (x0, x1, y0, y1, za, zb) => E3.box(x0, x1, y0, y1, za, zb).map(f => f.map(T));
     const wheels = [];
     [26.7, 31.7].forEach(x => [-1, 1].forEach(s => wheels.push({ y: s * 1.98, f: AUH.wheel(x, s * 1.98, 0.56, 0.56, 0.52, 12).map(f => f.map(T)) })));
@@ -1419,28 +1431,22 @@ scene({
   // asphalt, with white edge lines and a dashed centre line, from the pier out toward the courtyard
   apron() {
     const PW = this.PW, j = [];
-    for (let s = 60; s <= 262; s += 5) for (let w = 31; w < 160; w += 8) j.push([PW(s, w), PW(s, Math.min(160, w + 8))]);
-    for (let w = 31; w <= 160; w += 5) for (let s = 60; s < 262; s += 8) j.push([PW(s, w), PW(Math.min(262, s + 8), w)]);
+    for (let s = 60; s <= 330; s += 5) for (let w = 31; w < 160; w += 8) j.push([PW(s, w), PW(s, Math.min(160, w + 8))]);
+    for (let w = 31; w <= 160; w += 5) for (let s = 60; s < 330; s += 8) j.push([PW(s, w), PW(Math.min(330, s + 8), w)]);
     this.joints = j;
     this.road = [PW(237.5, 31, 0.01), PW(237.5, 175, 0.01), PW(244.5, 175, 0.01), PW(244.5, 31, 0.01)];
     const strip = (s0, s1, w0, w1) => [PW(s0, w0, 0.02), PW(s0, w1, 0.02), PW(s1, w1, 0.02), PW(s1, w0, 0.02)];
     this.roadPaint = [strip(237.75, 237.95, 31, 175), strip(244.05, 244.25, 31, 175)];
     for (let w = 33; w < 172; w += 6) this.roadPaint.push(strip(240.92, 241.08, w, w + 3));
-    // the lead-in lines run in to the nose-gear stop (twin: 43.3 m off the axis; A380: 44.1 m)
-    this.leadIn = this.planes.filter(p => p.south).map(p => { const k = AUH.TYPES[p.type], ws = 31 + 7 + k.fus[0][0] - k.gear.nx; return { line: [PW(p.s, 170), PW(p.s, ws)], bar: [PW(p.s - 1.5, ws), PW(p.s + 1.5, ws)] }; });
+    // the lead-in lines run in to the nose-gear stop (44 m off the pier's axis), the empty stand's too
+    this.leadIn = [118, 200, 282].map(s => { const ws = 38 + B789.SNG; return { line: [PW(s, 170), PW(s, ws)], bar: [PW(s - 1.5, ws), PW(s + 1.5, ws)] }; });
   },
-  // over the courtyard between the south and east piers, 28 m up (rising 2 m), 330 m out along the south pier and 150 m
-  // east of its axis (155 m from the hero's stand); a long lens (2150 px) turned left far enough to hold the hero whole,
-  // nose to tail, from the first frame; the eye drifts 10 m left and the view tilts a little up the roof over the beat
+  // the eye: VIEW (pier coordinates s, w, z of the eye at the beat's start and end, the point it looks at, the lens)
+  VIEW: { c0: [281, 60, 34], c1: [275, 57, 36], t0: [195, 73, 3], t1: [194, 72, 3.5], f: 1010, cx: 560, cy: 590 },
   view(lt) {
-    const u = easeInOut(clamp((lt - 0.7) / 5.2)), A = AUH.TA;
-    const dS = [-0.7071, -0.7071], nE = [-0.7071, 0.7071], lf = AUH.dirAz(238);
-    const P0 = [dS[0] * 330 + nE[0] * 150, dS[1] * 330 + nE[1] * 150];
-    const ca = P0[0] + lf[0] * 10 * u, cb = P0[1] + lf[1] * 10 * u, z = lerp(28, 30, u);
-    const f = 2150, hyT = 500, pitch = -Math.atan((562 - hyT) / f), a = lerp(323.4, 322.4, u), ax = AUH.dirAz(a), far = 5000;
-    const C = AUH.W3(A[0] + ca, A[1] + cb, z), L = AUH.W3(A[0] + ca + far * ax[0] * Math.cos(pitch), A[1] + cb + far * ax[1] * Math.cos(pitch), z + far * Math.sin(pitch));
-    this.ax = a;
-    return E3.camera(C, L, f, 560, 562);
+    const u = easeInOut(clamp((lt - 0.7) / 5.2)), V = window.DAWNTEST ? Object.assign({}, this.VIEW, window.DAWNTEST) : this.VIEW;
+    const c = V.c0.map((x, k) => lerp(x, V.c1[k], u)), t = V.t0.map((x, k) => lerp(x, V.t1[k], u));
+    return E3.camera(this.PW(c[0], c[1], c[2]), this.PW(t[0], t[1], t[2]), V.f, V.cx, V.cy);
   },
   // the morning's clock: minutes after sunrise, 3 to 33 over the seen beat (lt 0.5-5.95), steadily
   minutes(lt) { return 3 + 30 * clamp((lt - 0.5) / 5.45); },
@@ -1456,7 +1462,7 @@ scene({
     const [az, alt] = AUH.sunMin(this.minutes(lt));
     this.sunT = AUH.sunVec(az, alt);
     AUH.sunAt(116, 3);
-    const hz = E3.projDir(AUH.W3(AUH.dirAz(this.ax)[0], AUH.dirAz(this.ax)[1], 0));
+    const F = E3.cam().F, hz = E3.projDir([F[0], F[1], 0]);
     this.hy = hz ? hz[1] : 470;
   },
   under(lt) {
@@ -1492,17 +1498,19 @@ scene({
       if (dT > 5) list.push({ d: dT, draw: () => AUH.drawTower(this.tower, R11.air(dT, 3400) * ink, OPT.colour ? HUE.dawn : null, 0.2, 0.3) });
       AUH.terminalItems(list, this.term, ink, { warm: OPT.colour ? HUE.dawn : null, warmAll: lerp(0.1, 0.2, L), k: 3000 });
       // the aircraft: the warm light on them strengthens and their shade lightens as the sun climbs
-      const look = { fill: OPT.colour ? '#F1ECE2' : null, fillA: 0.35, warm: OPT.colour ? HUE.dawn : null, warmA: lerp(0.22, 0.4, L), warmAll: lerp(0.05, 0.13, L), tone: 0.04, shade: lerp(0.56, 0.46, L), inkFill: lerp(0.24, 0.16, L), lw: 1.3 };
+      const look = { warm: OPT.colour ? HUE.dawn : null, warmA: lerp(0.24, 0.42, L), warmAll: lerp(0.04, 0.1, L), coolK: lerp(1.15, 0.85, L), inkFill: lerp(0.14, 0.1, L), lw: 1.1 };
+      // the hero's tug stands under its nose: drawn after the nose gear and before the fuselage that hangs over it
+      const lookOf = (p, d) => Object.assign({ air: R11.air(d, 3000) * ink }, look, p === this.hero ? { beforeFus: () => this.drawTug(ink, L) } : {});
       this.planes.forEach(p => {
         const c = p.pose.toW([0, 0, 0]), d = R11.dep(c);
         if (d < 5) return;
-        list.push({ d, draw: () => AUH.drawPlane(p, Object.assign({ air: R11.air(d, 3000) * ink }, look)) });
-        p.bridges.forEach((bg, i) => list.push({ d: R11.dep(AUH.lerp3(bg.p0, bg.R, 0.5)) - 2, draw: () => this.drawBridge(bg, ink, d, p.seed + 700 + i * 20) }));
+        list.push({ d, draw: () => B789.draw(p.m, p.pose, lookOf(p, d)) });
+        p.bridges.forEach((bg, i) => list.push({ d: R11.dep(AUH.lerp3(bg.p0, bg.R, 0.5)) - 2, draw: () => this.drawBridge(bg, ink, p.seed + 700 + i * 20, L) }));
       });
       this.masts.forEach((m, i) => list.push({ d: R11.dep(m), draw: () => this.drawMast(m, ink, i) }));
       this.behind.forEach((m, i) => { if (R11.dep(m) > 3) list.push({ d: R11.dep(m), draw: () => this.drawMast(m, ink, 10 + i) }); });
-      // the ground crew: the tug docked at the hero's nose gear; the baggage train on the road, 3 m/s toward the pier
-      list.push({ d: R11.dep(this.tug.centre), draw: () => this.drawTug(ink, L) });
+      // the ground crew: the tug docked at the hero's nose gear (drawn with the hero); the baggage train on the road,
+      // 3 m/s toward the pier
       const tr = this.train(this.trainAt(lt));
       tr.units.forEach((un, i) => list.push({ d: R11.dep(un.c), draw: () => this.drawUnit(un, tr.pose, ink, L, i) }));
       // the fog at this minute: its top settling, thinning, burning off from its rims; it slides with the dawn air (3 m/s
@@ -1511,8 +1519,8 @@ scene({
       const slide = [dv[1] * drift, dv[0] * drift, 0];
       // the long shadows the low sun lays on the fog's top (from 92 times the height they stand above it at first to 9
       // times by the end), away from the eye
-      const casters = this.term.casters.concat(this.tower.casters, this.planes.map(p => p.parts.fin.flat().map(p.pose.toW)),
-        this.planes.map(p => p.parts.fus.flat().flat().filter((q, i) => i % 3 === 0).map(p.pose.toW)),
+      const casters = this.term.casters.concat(this.tower.casters, this.planes.map(p => p.m.parts.find(q => q.name === 'fin').tubes[0].rings.flat().map(p.pose.toW)),
+        this.planes.map(p => p.m.parts.find(q => q.name === 'fus').tubes[0].rings.flat().filter((q, i) => i % 3 === 0).map(p.pose.toW)),
         // a mast's shadow: its pole a line that widens to its lamp head's patch at the far end
         this.masts.concat(this.behind).map(m => [[m[0] - 0.7, m[1] - 0.7, 29.4], [m[0] + 0.7, m[1] + 0.7, 29.4], [m[0] - 0.7, m[1] - 0.7, 6], [m[0] + 0.7, m[1] + 0.7, 6]]),
         this.masts.concat(this.behind).map(m => [[m[0] - 2.2, m[1] - 0.5, 29.4], [m[0] + 2.2, m[1] + 0.5, 29.4], [m[0] - 2.2, m[1] - 0.5, 31.4], [m[0] + 2.2, m[1] + 0.5, 31.4], [m[0] + 2.2, m[1] - 0.5, 31.4], [m[0] - 2.2, m[1] + 0.5, 29.4]]).map(c => Object.assign(c, { noFeet: true })));
@@ -1544,8 +1552,8 @@ scene({
       // above the fog can be hidden by it (one painter's depth per aircraft would let the fog's nearer bands cross a wing)
       const again = [];
       this.planes.forEach(p => { const d = R11.dep(p.pose.toW([0, 0, 0])); if (d > 5 && d < 420) {
-        again.push({ d, draw: () => AUH.drawPlane(p, Object.assign({ air: R11.air(d, 3000) * ink, gear: false }, look)) });
-        p.bridges.forEach((bg, i) => again.push({ d: R11.dep(AUH.lerp3(bg.p0, bg.R, 0.5)) - 2, draw: () => this.drawBridge(bg, ink, d, p.seed + 700 + i * 20) }));
+        again.push({ d, draw: () => B789.draw(p.m, p.pose, lookOf(p, d)) });
+        p.bridges.forEach((bg, i) => again.push({ d: R11.dep(AUH.lerp3(bg.p0, bg.R, 0.5)) - 2, draw: () => this.drawBridge(bg, ink, p.seed + 700 + i * 20, L) }));
       } });
       this.masts.forEach((m, i) => again.push({ d: R11.dep(m), draw: () => this.drawMast(m, ink, i) }));
       AUH.setClipZ(hF);
@@ -1571,7 +1579,7 @@ scene({
     // the shadows on the ground, cast along the true sun: the aircraft at the south pier, the masts behind the eye, the tug
     // and the train; firmer as the sun climbs out of the horizon's haze
     const polys = [];
-    this.castOf.forEach(fs => AUH.castFaces(fs, sunT, polys));
+    this.planes.filter(p => p.south).forEach(p => B789.shadow(p.m, p.pose, sunT, polys));
     this.masts.concat(this.behind).forEach(m => AUH.castFaces(E3.frustum(m[0] - 0.5, m[0] + 0.5, m[1] - 0.5, m[1] + 0.5, 0, 30, -0.2, -0.2).concat(E3.box(m[0] - 2.2, m[0] + 2.2, m[1] - 0.5, m[1] + 0.5, 29.4, 31.4)), sunT, polys));
     AUH.castFaces([].concat(...this.tug.body, this.tug.cab), sunT, polys);
     this.train(this.trainAt(lt)).units.forEach(un => AUH.castFaces([].concat(...un.parts, un.box || []), sunT, polys));
@@ -1606,12 +1614,35 @@ scene({
     if (un.box) AUH.solid(un.box, { tone: 0.05, shade: 0.45, lw: 0.9, edgeA: 0.85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? '#C4C8CA' : null, fillA: 0.36, inkFill: 0.16, warmA: lerp(0.15, 0.32, L) }, seed + 30, OPT.colour ? HUE.dawn : null, null, true);
     un.wheels.filter(near).forEach((w, k) => AUH.solid(w.f, wst, seed + 20 + k, null, null, true));
   },
-  drawBridge(bg, ink, dPlane, seed) {
-    const d = R11.dep(bg.R), a = R11.air(d, 3000) * ink, st = { tone: 0.1, shade: 0.5, lw: 1.1, edgeA: 0.85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? '#DDD6CA' : null, fillA: 0.4, inkFill: 0.2 };
-    AUH.solid(bg.rot, st, seed, OPT.colour ? HUE.dawn : null, null, true);
-    if (!AUH.clipZ()) bg.legs.forEach(p => R11.member([p[0], p[1], 0], p, 1.4, 0.85 * a));
-    AUH.solid(bg.tunnel, Object.assign({}, st, { tone: 0.14 }), seed + 5, OPT.colour ? HUE.dawn : null, null, true);
-    AUH.solid(bg.cab, Object.assign({}, st, { tone: 0.18 }), seed + 11, OPT.colour ? HUE.dawn : null, null, true);
+  // a jet bridge: its rotunda on its column and the fixed link into the pier, the tunnel's two sections, the drive column's
+  // legs and wheels, the cab at the door
+  drawBridge(bg, ink, seed, L) {
+    const d = R11.dep(bg.R), a = R11.air(d, 3000) * ink, st = { tone: 0.1, shade: 0.5, lw: 1.0, edgeA: 0.85 * a, hdir: [0, 0, 1], fillCol: OPT.colour ? '#DCD5C8' : null, fillA: 0.42, inkFill: 0.2, warmA: lerp(0.18, 0.32, L) };
+    const warm = OPT.colour ? HUE.dawn : null;
+    AUH.solid(bg.col, Object.assign({}, st, { tone: 0.3 }), seed + 1, null, null, true);
+    AUH.solid(bg.link, Object.assign({}, st, { tone: 0.16 }), seed + 2, warm, null, true);
+    AUH.solid(bg.rot, st, seed, warm, null, true);
+    const legs = () => { if (AUH.clipZ() !== null) return; const p = bg.leg; [-1.1, 1.1].forEach(o => { const q = [p[0] + o * 0.6, p[1] - o * 0.8, p[2]]; R11.member([q[0], q[1], 0.6], q, 1.5, 0.85 * a); }); AUH.solid(E3.box(p[0] - 1.6, p[0] + 1.6, p[1] - 1.2, p[1] + 1.2, 0.25, 0.75), Object.assign({}, st, { tone: 0.35 }), seed + 3, null, null, true); };
+    // the outer section's drive column stands nearer the eye than the tunnel's middle when the eye is on the cab's side
+    const near = R11.dep(bg.leg) < R11.dep(AUH.lerp3(bg.p0, bg.R, 0.5));
+    if (!near) legs();
+    // each tunnel section with the band of glazing along its sides
+    const glaze = (faces, k0 = 0.42, k1 = 0.8) => {
+      const C = E3.cam().C, out = [];
+      [faces[3], faces[5]].forEach(f => {
+        const c = E3.centroid(f), n = E3.sub(c, E3.centroid(faces.map(E3.centroid)));
+        if (E3.dot(n, E3.sub(C, c)) <= 0) return;
+        // the side face runs v[a], v[b] along the floor and w[b], w[a] along the roof
+        const band = [AUH.lerp3(f[0], f[3], k0), AUH.lerp3(f[1], f[2], k0), AUH.lerp3(f[1], f[2], k1), AUH.lerp3(f[0], f[3], k1)];
+        if (AUH.clipZ() !== null && band.some(q => q[2] < AUH.clipZ())) return;
+        if (band.every(q => E3.depth(q) > 1)) out.push(new P(band.map(E3.proj), true));
+      });
+      if (out.length) { wash(out, OPT.colour ? '#3A4656' : INK, (OPT.colour ? 0.42 : 0.3) * a); out.forEach(q => stroke(q, 1, INK, 0.6, 0.5 * a)); }
+    };
+    AUH.solid(bg.tun[1], Object.assign({}, st, { tone: 0.12 }), seed + 5, warm, null, true); glaze(bg.tun[1]);
+    AUH.solid(bg.tun[0], Object.assign({}, st, { tone: 0.14 }), seed + 7, warm, null, true); glaze(bg.tun[0]);
+    if (near) legs();
+    AUH.solid(bg.cab, Object.assign({}, st, { tone: 0.2 }), seed + 11, warm, null, true);
   },
   // an apron floodlight mast: a tapering pole to 30 m, a head frame of lamps (off by day)
   drawMast(m, ink, i) {
@@ -1695,7 +1726,7 @@ scene({
     this.anemo = { u: 300, v: 165 };
     this.enclosure = { u: 2906, v: -350 };
     // the eye: 3.5 m up on the sand left of the runway (its perimeter track beside it), abeam 250 m past the threshold
-    this.CAM = [120, -230, 6.0];
+    this.CAM = [285, -150, 3.5];
     this.track = [[W3(-400, -238, 0.01), W3(1400, -238, 0.01)], [W3(-400, -243.5, 0.01), W3(1400, -243.5, 0.01)]];
     // the ground's grain and the fog's, laid out over the whole of the pan's field (strokes lying square to the line of
     // sight, uniform on the screen), and kept off the pavement
@@ -1752,15 +1783,24 @@ scene({
     const t = th * D, xn = B789.X(B789.SNG) - 0.12, extN = clamp((z + xn * Math.sin(t) - Z * Math.cos(t)) / (0.34 * Math.cos(t)), 0, 1);
     return { u, v: 0, z, psi: 0, theta: th, cfg: { lod: 0, flex: lt < this.TTD ? 1.6 : lerp(1.6, 0.2, AUH.smooth(clamp((lt - this.TTD) / 1.2))), flap: 30, slat: 1, spoiler: sp, rev, gear: { ext, tilt, extN } } };
   },
-  // the eye pans with the aircraft: the lens on a point 2.5 m ahead of its main gear and 2.6 m over its axis (its
-  // position only, not its attitude, as an operator follows it), the zoom growing with the distance
+  // the eye pans with the aircraft, as an operator follows it: the lens turns on a point just ahead of its main gear
+  // (its position, not its attitude), the zoom grows gently with the distance (as its 0.4 power), never so far that the
+  // airframe (its nose, tail, fin, wing tips and wheels, softly bounded) fills more than 84% of the frame's width, and
+  // the frame is shifted so that the airframe's middle sits a little right of the frame's, leaving room ahead of its nose
   view(lt) {
-    const fl = this.flight(lt), aim = AUH.W3(fl.u + 2.5, 0, fl.z + 2.6), C = AUH.W3(this.CAM[0], this.CAM[1], this.CAM[2]);
+    const fl = this.flight(lt), aim = AUH.W3(fl.u + 2.5, 0, fl.z + 2.6), C = AUH.W3(this.CAM[0], this.CAM[1], this.CAM[2]), B = R11.BOX;
     if (window.AIRTEST) { const A = window.AIRTEST, D = AUH.D; this.fl = fl; return E3.camera(AUH.W3(fl.u + A.d * Math.sin(A.az * D) * Math.cos(A.el * D), -A.d * Math.cos(A.az * D) * Math.cos(A.el * D), fl.z + A.d * Math.sin(A.el * D)), aim, A.f, 560, 560); }
-    const d = Math.hypot(aim[0] - C[0], aim[1] - C[1], aim[2] - C[2]), f = 3300 * Math.pow(d / 230, 0.8);
-    const k = AUH.smooth(clamp((lt - 0.45) / 5.3));
+    E3.camera(C, aim, 1, 0, 0);
+    const pose = AUH.poser(fl), X = B789.X, zt = B789.zRef(30.06, fl.cfg.flex), Z = B789.Z0;
+    const key = [[X(0), 0, -0.5], [X(62), 0, 1.0], [X(55.9), 0, 12.25], [X(59.3), 0, 12.25], [X(43.1), 30.06, zt], [X(43.95), 30.06, zt], [X(43.1), -30.06, zt], [X(43.95), -30.06, zt],
+      [X(57.8), 9.9, 2.1], [X(57.8), -9.9, 2.1], [-0.75, 5.6, -Z - 0.4], [-0.75, -5.6, -Z - 0.4], [X(6), 0, -Z - 0.4], [X(21.65), 9.8, -4.0], [X(21.65), -9.8, -4.0]].map(q => E3.proj(pose.toW(q)));
+    const xs = key.map(p => p[0]), ys = key.map(p => p[1]), w0 = Math.max(...xs) - Math.min(...xs), kk = 60 / w0;
+    const sm = (a, k) => { const m = k > 0 ? Math.max(...a) : Math.min(...a); return m + Math.log(a.reduce((s, v) => s + Math.exp(k * (v - m)), 0)) / k; };
+    const x0 = sm(xs, -kk), x1 = sm(xs, kk), y0 = sm(ys, -kk), y1 = sm(ys, kk);
+    const d = Math.hypot(aim[0] - C[0], aim[1] - C[1], aim[2] - C[2]), fd = 2500 * Math.pow(d / 150, 0.5), fm = 0.84 * (B[2] - B[0]) / (x1 - x0);
+    const f = Math.pow(Math.pow(fd, -6) + Math.pow(fm, -6), -1 / 6), k = AUH.smooth(clamp((lt - 0.45) / 5.3));
     this.fl = fl;
-    return E3.camera(C, aim, f, lerp(565, 690, k), 560);
+    return E3.camera(C, aim, f, lerp(600, 640, k) - f * (x0 + x1) / 2, 545 - f * (y0 + y1) / 2);
   },
   frame(lt) {
     const cam = this.view(lt), h = E3.projDir([cam.F[0], cam.F[1], 0]);
