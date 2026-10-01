@@ -7,7 +7,12 @@
 // forecast is approved by a forecaster: WAM, 29 June 2026). On the wall: a full-disk image from a geostationary
 // satellite over the Indian Ocean (sub-satellite point 45.5 E), the coasts faint and the seven emirates in gold; the
 // national picture as a chart draws the night (a frontal rain band crossing from the Gulf); forecast charts and tables;
-// two clocks, UTC and the Emirates' time (19:05 and 23:05). No red anywhere, and nothing that could read as a target:
+// two clocks, UTC and the Emirates' time (19:05 and 23:05). What the wall shows follows the public descriptions of NCM's
+// Operations Centre («مركز العمليات», NCM headquarters, Al Shawamekh; staffed around the clock): satellite and radar
+// pictures and station reports (The National, 2017), live camera feeds from 26 sites across the UAE (2023), and the
+// winds from about 110 stations, updated every 15 minutes, on the UAE map (CNBC, 2024): so one screen is a mosaic of 26
+// camera feeds and one the station winds, drawn as wind barbs alone. The room's layout is not public, so the room stays
+// generic and unnamed. No red anywhere, and nothing that could read as a target:
 // no rings or arcs spreading from a point, no sweeps, no pins or point symbols over any map.
 // Then the camera pushes into the full disc while the room fades to paper. The disc turns from the satellite's view to
 // the world beat's globe: centre, projection and place on screen are read from the world beat itself (its clock, its
@@ -191,8 +196,8 @@ scene({
     });
     this.panel2(sl, sq);
     const box = (b, m = 6) => (a, c) => [b[0] + m + a * (b[2] - b[0] - 2 * m), b[1] + m + c * (b[3] - b[1] - 2 * m)];
-    ['meteo', 'skewt', 'field', 'waves'].forEach((k, i) => this.product(k, box(this.P3[i], 8), sq, 740 + i, false, this.P3[i][2] - this.P3[i][0]));
-    ['table', 'waves', 'meteo', 'field', 'text', 'skewt', 'meteo', 'table'].forEach((k, i) => this.product(k, box(this.small[i], 5), sq, 750 + i, false, 90));
+    ['meteo', 'skewt', 'winds', 'waves'].forEach((k, i) => this.product(k, box(this.P3[i], 8), sq, 740 + i, false, this.P3[i][2] - this.P3[i][0]));
+    ['table', 'cams', 'meteo', 'field', 'text', 'skewt', 'meteo', 'table'].forEach((k, i) => this.product(k, box(this.small[i], 5), sq, 750 + i, false, 90));
     this.clocks(sl, sq);
     // the desk: its top, its edge, the dark under it
     const dq = easeInOut(prog(sl, T0 - 0.6, 0.9));
@@ -265,6 +270,25 @@ scene({
     } else if (kind === 'text') { // a forecast bulletin, being drafted
       L(line(0.05, 0.1, 0.55, 0.1, 2), 2, 0.6);
       for (let i = 0; i < 9; i++) { const c = 0.24 + i * 0.08 + (i > 4 ? 0.05 : 0); L(line(0.05, c, (i === 4 || i === 8) ? 0.4 + r() * 0.2 : 0.9 - r() * 0.08, c, 2), 1, 0.5); }
+    } else if (kind === 'winds') { // the station winds on the UAE map: the coast and borders, a wind barb at each of
+      // about 110 stations (the network's size; their places here are spread over the land, not surveyed), every
+      // barb from the north-west (the night's shamal), stronger offshore and in the west; no station circles
+      const W = this.windMap();
+      W.lines.forEach(ln => L(ln, 0.9, 0.85));
+      W.st.forEach(([a, c, sp]) => {
+        const ang = (305 + 20 * Math.sin(a * 7 + c * 5)) * Math.PI / 180, len = 0.045, ux = Math.sin(ang), uy = -Math.cos(ang);
+        const tip = [a + ux * len, c + uy * len * 1.2];
+        L([[a, c], tip], 0.55, 0.7, acc);
+        for (let f = 0; f < Math.min(2, Math.round(sp / 8)); f++) { const fx = tip[0] - ux * f * 0.01, fy = tip[1] - uy * f * 0.012; L([[fx, fy], [fx + uy * 0.018, fy - ux * 0.022]], 0.5, 0.65, acc); }
+      });
+    } else if (kind === 'cams') { // live camera feeds from 26 sites: a mosaic of small views, each a horizon and its sky
+      for (let k = 0; k < 26; k++) {
+        const col = k % 6, row = Math.floor(k / 6), a0 = 0.02 + col * 0.163, c0 = 0.03 + row * 0.195, a1 = a0 + 0.15, c1 = c0 + 0.17;
+        L([[a0, c0], [a1, c0], [a1, c1], [a0, c1], [a0, c0]], 0.5, 0.45);
+        const hz = c0 + 0.17 * (0.45 + 0.25 * r());
+        L(line(a0 + 0.01, hz, a1 - 0.01, hz + 0.02 * (r() - 0.5), 4), 0.6, 0.6);
+        if (r() > 0.5) L(curve(a => hz - 0.03 - 0.02 * Math.sin(a * 40 + k), a0 + 0.02, a1 - 0.02, 8), 0.5, 0.4);
+      }
     } else if (kind === 'ir') { // a satellite crop: a coast and cloud streaks, light on dark
       L(curve(a => 0.62 + 0.1 * Math.sin(a * 5 + ph) + 0.04 * Math.sin(a * 17)), 0.8, 0.45);
       for (let k = 0; k < 6; k++) { const c0 = 0.15 + k * 0.12; L(curve(a => c0 + 0.05 * Math.sin(a * 3 + k), 0.1 + r() * 0.3, 0.6 + r() * 0.35, 20), 2.4, 0.28); }
@@ -782,6 +806,26 @@ scene({
   // the national picture: the seven emirates and the faint neighbours, and the night's weather as a chart draws it: a
   // frontal rain band crossing from the Gulf onto the western coast (three hatch densities, the heavier cores denser, as
   // a radar composite chart hatches them), with its legend. Static; nothing near the Hajar or the east coast.
+  // the station-wind map's geometry in the screen's unit square, once: the UAE's coast and borders from the film's own
+  // map data, and about 110 stations spread over its land (a seeded draw)
+  windMap() {
+    if (this._wm) return this._wm;
+    const D2R = Math.PI / 180, b = UAE_MAP.projection.bbox_array, KX = Math.cos(24.4 * D2R), w = (b[2] - b[0]) * KX, h = b[3] - b[1], sc = Math.min(0.94 / w, 0.94 / h);
+    const ox = (1 - w * sc) / 2, oy = (1 - h * sc) / 2, U = ([lon, lat]) => [ox + (lon - b[0]) * KX * sc, oy + (b[3] - lat) * sc];
+    const lines = UAE_MAP.arcs.items.filter(a => a.type === 'coast' || a.type === 'land_border').map(a => (a.closed ? a.points.concat([a.points[0]]) : a.points).map(U));
+    const polys = UAE_MAP.emirates.flatMap(e => e.polygons);
+    const inside = (x, y, pg) => { let c = false; for (let i = 0, j = pg.length - 1; i < pg.length; j = i++) { const [xi, yi] = pg[i], [xj, yj] = pg[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
+    const r = rng(2033), st = [];
+    for (let n = 0; st.length < 110 && n < 20000; n++) {
+      const lon = b[0] + r() * (b[2] - b[0]), lat = b[1] + r() * (b[3] - b[1]);
+      if (!polys.some(pg => inside(lon, lat, pg))) continue;
+      const [a, c] = U([lon, lat]);
+      if (st.some(([a2, c2]) => Math.hypot(a - a2, c - c2) < 0.045)) continue;
+      st.push([a, c, 8 + 10 * (1 - (lon - b[0]) / (b[2] - b[0])) + 4 * r()]);
+    }
+    this._wm = { lines, st };
+    return this._wm;
+  },
   nationalChart() {
     const [x0, y0, x1, y1] = this.P2, cs = 2.5, nx = Math.ceil((x1 - x0) / cs) + 3, ny = Math.ceil((y1 - y0) / cs) + 3;
     const hs = (i, j, s) => { let h = Math.imul(i, 374761393) + Math.imul(j, 668265263) + Math.imul(s, 1442695041) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };

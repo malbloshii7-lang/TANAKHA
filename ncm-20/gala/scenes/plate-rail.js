@@ -105,7 +105,9 @@ scene({
     // the train: vehicles from the far end forward (painter's order), each a box on the near track
     const tq = easeOut(prog(lt, 0.4, 0.8)), head = this.headS(lt), zr = ez + 0.3;
     let s = head; const boxes = [];
-    this.cars.forEach(c => { boxes.push({ c, s1: s, s0: s - c.len }); s -= c.len + 1.0; });
+    // Revision 11 (?rev11): the CRRC aggregate wagons are 13.7 m over their couplers
+    const R11R = typeof REV11 !== 'undefined' && REV11, carLen = c => (R11R && c.kind === 'hopper' ? 13.7 : c.len), gapAfter = c => (R11R && c.kind === 'hopper' ? 0 : 1.0);
+    this.cars.forEach(c => { boxes.push({ c, s1: s, s0: s - carLen(c) }); s -= carLen(c) + gapAfter(c); });
     boxes.reverse().forEach(b => this.vehicle(b, psi, zr, tq));
     ctx.restore();
   },
@@ -161,16 +163,21 @@ scene({
   // an isolated wide-nose cab under a tropical roof (IRJ 2015), the long hood with a walkway and handrail along each side,
   // the radiator section at the rear wider than the hood with its two big fans on the roof, two three-axle trucks with
   // their side frames outside the 1,067 mm wheels, the fuel tank slung between them, and sand ploughs at the pilot (two
-  // fixed and a movable one; IRJ 2015). Lengths and heights the sources do not give (truck centres 15.2 m, the deck at
-  // 1.7 m, the nose, cab and hood lengths) are estimated from the SD70ACe's proportions and rounded: match them to Etihad
-  // Rail's photographs before the master. No livery and no logo, as before. Distances x are metres back from the front
-  // coupler's face; o across the track (negative toward the camera); z above the rail head.
+  // fixed and a movable one; IRJ 2015). From the references gathered on 1 October 2026 (the maker's brochure and
+  // railfan data): 22.63 m long, 4.84 m high over the tropical roof, 3.12 m wide, truck centres 14.58 m, HTSC-II trucks
+  // of 3.81 m wheelbase, the deck at 1.854 m, the coupler at 0.876 m. The nose, cab and hood lengths are not published
+  // and are scaled from the SD70ACe's proportions. Livery: Etihad Rail describes a light grey body "relieved with broad
+  // red bands" and its logo mid-body (2012); the bands' path is not yet confirmed, so no band and no logo are drawn.
+  // Distances x are metres back from the front coupler's face; o across the track (negative toward the camera); z above
+  // the rail head, written for a 1.70 m deck and a 4.94 m roof and mapped by ZB onto the measured 1.854 m and 4.84 m.
   loco11(b, psi, zr, tq) {
     const s1 = b.s1, X = x => s1 - x;
-    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + z, psi); return p ? [p[0], p[1]] : null; };
+    // the body's heights onto the measured deck (1.854 m) and roof (4.84 m); the frame's sill keeps its depth
+    const ZB = z => (z >= 1.70 ? 1.854 + (z - 1.70) * 0.9216 : z >= 1.22 ? 1.40 + (z - 1.22) * 0.946 : z);
+    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + ZB(z), psi); return p ? [p[0], p[1]] : null; };
     const line = (a, e, lw = 0.7, al = 0.7) => { if (a && e) stroke(new P([a, e]), tq, INK, lw, al); };
     const face = pts => { const p = pts.map(([x, o, z]) => L(x, z, o)); return p.some(q => !q) ? null : new P(p, true); };
-    const B = (x0, x1, o0, o1, z0, z1) => this.box(X(x1), X(x0), o0, o1, zr + z0, zr + z1, psi);
+    const B = (x0, x1, o0, o1, z0, z1) => this.box(X(x1), X(x0), o0, o1, zr + ZB(z0), zr + ZB(z1), psi);
     const bb = f => [Math.min(...f.pts.map(p => p[0])) - 1, Math.min(...f.pts.map(p => p[1])) - 1, Math.max(...f.pts.map(p => p[0])) + 1, Math.max(...f.pts.map(p => p[1])) + 1];
     // a face laid on paper, toned, finely hatched (the light grey body) and outlined
     const plate = (f, { tone = null, skin = 0, ang = 0.1, gap = 4.5, lw = 0.9, al = 0.85, seed = 0 } = {}) => {
@@ -188,25 +195,26 @@ scene({
       }
       return new P(pts, true);
     };
-    // the trucks: three axles 2.05 m apart, the wheels (1,067 mm) inside the side frames, which dip to the journal boxes
-    // at each axle and rise between them; a coil-spring nest over each box
-    [3.7, 18.9].forEach((xc, ti) => {
-      [-2.05, 0, 2.05].forEach((dx, k) => { const w = circle(xc + dx, 0.533, -0.8, 0.533); if (w) { mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.9, 0.85); } });
+    // the trucks (HTSC-II): centres 14.58 m apart, three axles 1.905 m apart, the wheels (1,067 mm) inside the side
+    // frames, which dip to the journal boxes at each axle and rise between them; a coil-spring nest over each box
+    const AX = 1.905, PS = AX / 2.05;
+    [4.025, 18.605].forEach((xc, ti) => {
+      [-AX, 0, AX].forEach((dx, k) => { const w = circle(xc + dx, 0.533, -0.8, 0.533); if (w) { mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.9, 0.85); } });
       const prof = [[-2.75, 0.75], [-2.3, 1.02], [2.3, 1.02], [2.75, 0.75], [2.55, 0.5], [2.4, 0.3], [1.7, 0.3], [1.35, 0.62], [0.7, 0.62], [0.35, 0.3], [-0.35, 0.3], [-0.7, 0.62], [-1.35, 0.62], [-1.7, 0.3], [-2.4, 0.3], [-2.55, 0.5]];
-      const sf = face(prof.map(([dx, z]) => [xc + dx, -1.08, z]));
+      const sf = face(prof.map(([dx, z]) => [xc + dx * PS, -1.08, z]));
       plate(sf, { tone: [INK, 0.5], lw: 0.9 });
-      [-2.05, 0, 2.05].forEach(dx => {
+      [-AX, 0, AX].forEach(dx => {
         plate(face([[xc + dx - 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.72], [xc + dx - 0.24, -1.14, 0.72]]), { tone: [INK, 0.62], lw: 0.7 });
         for (let z = 0.76; z < 1.0; z += 0.06) line(L(xc + dx - 0.16, z, -1.14), L(xc + dx + 0.16, z + 0.03, -1.14), 0.6, 0.7);
       });
       // the traction motors' and brake gear's shadow between the frames, seen through the gaps
-      line(L(xc - 2.3, 1.12, -1.1), L(xc + 2.3, 1.12, -1.1), 1.2, 0.6);
+      line(L(xc - 2.1, 1.12, -1.1), L(xc + 2.1, 1.12, -1.1), 1.2, 0.6);
     });
     // the fuel tank, 16,655 litres (The National, 2011), between the trucks: deep, its lower edges chamfered
-    const tank = B(6.9, 15.7, -1.35, 1.35, 0.62, 1.22);
+    const tank = B(7.1, 15.5, -1.35, 1.35, 0.62, 1.22);
     this.paintBox(tank, tq, { side: [INK, 0.28], front: [INK, 0.36], lw: 0.9 });
-    plate(face([[6.9, -1.35, 0.62], [15.7, -1.35, 0.62], [15.7, -1.0, 0.45], [6.9, -1.0, 0.45]]), { tone: [INK, 0.45], lw: 0.8 });
-    line(L(7.0, 0.92, -1.36), L(15.6, 0.92, -1.36), 0.55, 0.5);
+    plate(face([[7.1, -1.35, 0.62], [15.5, -1.35, 0.62], [15.5, -1.0, 0.45], [7.1, -1.0, 0.45]]), { tone: [INK, 0.45], lw: 0.8 });
+    line(L(7.2, 0.92, -1.36), L(15.4, 0.92, -1.36), 0.55, 0.5);
     // the rear steps (the far end is the hood's end) and the frame with its walkway, full width
     [21.3, 21.7].forEach(x => line(L(x, 0.45, -1.58), L(x, 1.7, -1.58), 0.8, 0.8));
     [0.55, 0.95, 1.35].forEach(z => line(L(21.3, z, -1.58), L(21.7, z, -1.58), 0.8, 0.8));
@@ -285,6 +293,51 @@ scene({
     [[-1.5, -0.55], [0.55, 1.5]].forEach(([a, e]) => { line(L(0.9, 2.75, a), L(0.9, 2.75, e), 0.8, 0.85); line(L(0.9, 2.25, a), L(0.9, 2.25, e), 0.6, 0.7); [a, e].forEach(o => line(L(0.9, 1.78, o), L(0.9, 2.75, o), 0.7, 0.8)); });
     line(L(0.9, 2.75, -1.5), L(1.95, 2.75, -1.5), 0.8, 0.85);
   },
+  // Revision 11 (?rev11): the aggregate wagon as CRRC built it for Etihad Rail's Stage Two (CRRC, 17 Sep 2026): an open
+  // hopper 13.7 m long and 3.212 m wide, rounded side sheets, three bottom doors, painted cool grey, 75 m3 (103 t) of
+  // crushed stone; its height is not published and is drawn at 3.75 m, inside the 4.72 m gauge. Trains from the Ras Al
+  // Khaimah and Fujairah quarries run 70 of them, about 1 km (Etihad Rail, 2021). Two three-piece freight bogies, their
+  // side frames outside the wheels. x is metres back from the wagon's leading coupler; o and z as for the locomotive.
+  hopper11(b, psi, zr, tq) {
+    const { c, s1 } = b, X = x => s1 - x, LEN = 13.7;
+    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + z, psi); return p ? [p[0], p[1]] : null; };
+    const line = (a, e, lw = 0.7, al = 0.7) => { if (a && e) stroke(new P([a, e]), tq, INK, lw, al); };
+    const face = pts => { const p = pts.map(([x, o, z]) => L(x, z, o)); return p.some(q => !q) ? null : new P(p, true); };
+    const bb = f => [Math.min(...f.pts.map(p => p[0])) - 1, Math.min(...f.pts.map(p => p[1])) - 1, Math.max(...f.pts.map(p => p[0])) + 1, Math.max(...f.pts.map(p => p[1])) + 1];
+    const grey = OPT.colour ? HUE.steel : null;
+    // the bogies: centres 9.3 m apart, axles 1.83 m apart, wheels 0.92 m
+    [2.2, 11.5].forEach(xc => {
+      [-0.915, 0.915].forEach(dx => {
+        const pts = []; for (let k = 0; k < 16; k++) { const a = k / 16 * TAU, p = L(xc + dx + 0.46 * Math.cos(a), 0.46 + 0.46 * Math.sin(a), -0.78); if (!p) return; pts.push(p); }
+        const w = new P(pts, true); mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.8, 0.8);
+      });
+      const sf = face([[xc - 1.35, -1.0, 0.55], [xc - 0.9, -1.0, 0.86], [xc + 0.9, -1.0, 0.86], [xc + 1.35, -1.0, 0.55], [xc + 1.05, -1.0, 0.3], [xc + 0.75, -1.0, 0.42], [xc - 0.75, -1.0, 0.42], [xc - 1.05, -1.0, 0.3]]);
+      if (sf) { mask(sf); fill(sf, INK, 0.5 * tq); stroke(sf, tq, INK, 0.8, 0.85); }
+    });
+    // the body's near side: straight end sills over the bogies, the floor falling to the three doors between them; its
+    // upper part bulges out (the rounded side sheet) to 1.606 m and turns back in to the top chord
+    const zt = 3.75, zb = 3.0, sill = 1.2, door = 0.62, x0 = 0.4, x1 = LEN - 0.4;
+    const lower = [[x0, -1.5, sill], [3.0, -1.5, sill], [3.7, -1.5, door], [LEN - 3.7, -1.5, door], [LEN - 3.0, -1.5, sill], [x1, -1.5, sill]];
+    const belly = face(lower.concat([[x1, -1.606, zb], [x0, -1.606, zb]]));
+    const shoulder = face([[x0, -1.606, zb], [x1, -1.606, zb], [x1, -1.52, zt], [x0, -1.52, zt]]);
+    const endF = face([[x0, -1.5, sill], [x0, 1.5, sill], [x0, 1.52, zt], [x0, -1.52, zt]]);
+    if (endF) { mask(endF); if (grey) wash(endF, grey, 0.2 * tq); fill(endF, INK, 0.2 * tq); stroke(endF, tq, INK, 0.8, 0.8); }
+    if (belly) { mask(belly); if (grey) wash(belly, grey, 0.22 * tq); fill(belly, INK, 0.2 * tq); hatch(belly, bb(belly), 1.5708, 2.6, tq, INK, 0.55, 0.3, 2120); stroke(belly, tq, INK, 0.9, 0.85); }
+    if (shoulder) { mask(shoulder); if (grey) wash(shoulder, grey, 0.18 * tq); fill(shoulder, INK, 0.07 * tq); stroke(shoulder, tq, INK, 0.9, 0.85); }
+    for (let x = x0 + 1.1; x < x1 - 0.5; x += 1.1) line(L(x, zb - 0.05, -1.606), L(x, zt - 0.05, -1.52), 0.5, 0.4);
+    // the three bottom doors, hanging between the bogies
+    [4.2, 6.55, 8.9].forEach(x => {
+      const d = face([[x, -1.35, door], [x + 1.6, -1.35, door], [x + 1.25, -1.0, door - 0.42], [x + 0.35, -1.0, door - 0.42]]);
+      if (d) { mask(d); fill(d, INK, 0.38 * tq); stroke(d, tq, INK, 0.7, 0.8); }
+    });
+    // the stone heaped a little above the top chord (the eye, 12 m up, sees over it)
+    const heap = face([[x0 + 0.5, -1.52, zt], [x1 - 0.5, -1.52, zt], [x1 - 1.4, 0, zt + c.heap], [x0 + 1.4, 0, zt + c.heap]]);
+    if (heap) {
+      const hb = bb(heap); mask(heap); fill(heap, OCHRE, 0.35 * tq); hatch(heap, hb, 0.8, 1.8, tq, SEPIA, 0.6, 0.45, 840); hatch(heap, hb, -0.7, 2.2, tq, SEPIA, 0.5, 0.35, 841);
+      stroke(heap, tq, INK, 0.7, 0.6);
+    }
+    line(L(x0, zt, -1.52), L(x1, zt, -1.52), 1, 0.85);
+  },
   vehicle(b, psi, zr, tq) {
     const { c, s0, s1 } = b;
     const probe = this.box(s0, s1, -1.6, 1.6, zr, zr + c.top, psi);
@@ -292,6 +345,7 @@ scene({
     const xs = probe.all.flatMap(p => p.pts.map(q => q[0]));
     if (Math.max(...xs) < RAIL.x0 - 10 || Math.min(...xs) > RAIL.x1 + 10) return;
     if (c.kind === 'loco' && typeof REV11 !== 'undefined' && REV11) { this.loco11(b, psi, zr, tq); return; }
+    if (c.kind === 'hopper' && typeof REV11 !== 'undefined' && REV11) { this.hopper11(b, psi, zr, tq); return; }
     const L = (s, z, o) => { const [X, Y] = this.at(s, o), p = this.proj(X, Y, z, psi); return p ? [p[0], p[1]] : null; };
     const seg = (a, e) => a && e ? new P([a, e]) : null;
     // bogies and wheels (the near side), under the frame
