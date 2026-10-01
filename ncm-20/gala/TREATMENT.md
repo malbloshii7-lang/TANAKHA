@@ -807,7 +807,14 @@ airport, Jebel Ali at work, live radar on the watch wall, Shams 1's mirrors trac
   inside the beat (Airbus and Boeing flight-crew training manuals); to keep the touchdown in frame its eye now stands
   200 m out behind the approach lights. The approach lights glow steadily through the last fog; the sequenced flashers
   are never drawn (photosensitivity), and no visibility figure is put on screen.
-- *Jebel Ali (at work).* The quay cranes, the apron traffic and the yard at work (being built; described when the plate is final).
+- *Jebel Ali (at work).* Every quay crane works the real discharge cycle (hoist off the trailer, trolley out once
+  clear of the ship's side, creep down onto the box, lock, hoist clear of the bay's highest stack, trolley in, set the box
+  on a waiting trailer, unlock, and the tractor drives off), each at its own point in the cycle, at the ZPMC crane's
+  speeds (hoist 90 m/min laden, trolley 240 m/min) in a gentle time-lapse (2.6 times life on screen). Terminal tractors
+  with trailers run the portal lanes and the roadway behind the backreach, and the yard gantries make their runs: T3,
+  whose cranes the plate draws, is semi-automated, with remote-operated quay cranes, automated rail-mounted gantries and
+  driven tractors (Port Technology, 2015; Seatrade Maritime, 19 Jan 2016; Terberg and Kalmar tractor orders, 2014-15).
+  *Simplified:* single 40-ft lifts only, no hatch covers.
 - *The watch (live radar).* The wall's rain chart is now a radar composite as NCM's network makes it (six C-band
   radars; AMS 40th Conference on Radar Meteorology, 2023): five nested reflectivity bands drift east-south-east across
   the UAE's coast, the cells growing and decaying, with the coast and borders over them and nothing else: no range
