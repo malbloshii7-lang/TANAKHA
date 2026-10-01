@@ -18,6 +18,21 @@
 //   Fog: radiation fog, commonest December–January around sunrise, a flat shallow layer: tall things stand above it.
 //   Aircraft: generic, no livery; A380 class 72.7 m long, 79.75 m span, 24.1 m high; 787-9 class 62.8 × 60.1 × 17 m.
 // The sun at AUH (24.4° N) in late December rises at azimuth ~116°.
+// The fog lifting (1 Oct 2026, the requester's choice "fog lifting at the airport", across both beats): the dawn shot is a
+// time-lapse of the first half hour after sunrise in which the radiation fog burns off and the light comes up; the
+// arrival, 13 minutes later, keeps real time, the fog thinner and broken, and the widebody now lands (threshold, flare,
+// touchdown). The morning's helpers (sunMin, fogDepth, fogShare, castFaces...) are at the end of AUH. Sources:
+//   the sun: standard solar geometry for 24.43° N at the December solstice (declination -23.44°);
+//   the fog's burning off: NWS fog guide (dissipation: heat carried up from the warming ground, mixing with drier air
+//   above; "fog lifts to stratus when the lapse rate approaches dry adiabatic"); CIMSS Satellite Blog, "Dissipation of
+//   fog" (radiation fog "will frequently erode from the outside in": it thins toward its edge, where the sun gets through);
+//   Stull, Practical Meteorology §6.8 (solar heating evaporates the fog's bottom: it "lifts"); Roach, J. Met. Soc. Japan
+//   60 (1982) (fogs seen to lift into low stratus after sunrise, or to clear from the top down); Bergot, QJRMS 2016 (the
+//   fog's patchiness as it dissipates);
+//   the ground crew: Kalmar Motor, TBL 800 towbarless tractor (9,705-10,140 × 4,500 × 2,000-2,371 mm; docks with the
+//   boarding bridge still connected); LD3/AKE containers (DSV, ANA Cargo: 156 × 153 cm base, 163 cm high, contour E);
+//   the landing: Airbus FCTM, flare and touchdown (flare at ~30 ft); Boeing FCTM (flare times 4-8 s; the flare distance
+//   about 1,000-2,000 ft beyond the threshold on a 3° path).
 const AUH = (() => {
   const D = Math.PI / 180, HEAD = 306;
   const W3 = (u, v, z = 0) => [v, u, z];
@@ -1073,19 +1088,21 @@ scene({
    approach lights, a landing. The eye stands 12 m up beside 31L's approach-light line, 200 m before the threshold and
    10 m left of the line (the 150 m crossbar large in the foreground), looking up the approach at the runway (an 1800 px
    lens). A widebody (787-9 class, no livery) on the 3.0° glide path, gear down and flaps out, is over the last
-   barrettes as the beat opens (19 m up, ~520 px span), crosses the threshold 17.4 m up (the ILS datum height, 57 ft) at
-   lt 0.95, flares and puts its main gear down 305 m past the threshold at lt 5.35, then rolls on, nose still up. Its
-   shadow runs ahead of it on the runway, nearly along it (the sun 9.2° up behind the eye at 121°, 46 minutes after
-   sunrise: AUH.sunMin), and closes on its wheels as it comes down: they meet at the touchdown. No tyre smoke. The
+   barrettes as the beat opens (19 m up, ~610 px span), crosses the threshold 17.4 m up (the ILS datum height, 57 ft) at
+   lt 0.9, flares and puts its main gear down 310 m past the threshold at lt 5.4 (~210 px span), then rolls on, nose
+   still up. Its shadow runs ahead of it on the runway, nearly along it (the sun 9.2° up behind the eye at 121°, 46
+   minutes after sunrise: AUH.sunMin), and closes on its wheels as it comes down (in the flare it slips behind the
+   aircraft from the eye); they meet at the touchdown. No tyre smoke. The
    barrettes and the crossbar burn steadily, large in the foreground (never the sequenced flashers); the runway converges
    ahead, Terminal A (4.4 km) and the crescent tower (2.6 km) stand small on the horizon at their true size, the RVR
    masts and the wind mast beside the runway.
    The motion is the aircraft's real one on the scene clock (the clock itself runs at 0.6, a gentle slow motion; never
-   faster than real): 70 m/s on the glide path; the flare from 78 m past the threshold (the main wheels ~7.6 m, 25 ft,
-   up), slowing at 0.6 m/s² on idle thrust while its sink eases from 3.7 to 0.4 m/s and its pitch rises from 2.4° to
-   5.2° (Boeing's flare: touchdown 1,000-1,500 ft in). Threshold to touchdown takes 4.4 s, so the beat holds exactly the
-   last of the approach, the threshold, the flare and the touchdown; the approach over the eye (the earlier plan) cannot
-   share a 5 s beat with them at real speed.
+   faster than real): 70 m/s on the glide path; the flare from 35 m past the threshold, the main wheels ~10 m (32 ft) up
+   (Airbus FCTM: begin the flare at about 30 ft), slowing at 0.6 m/s² on idle thrust for 4.0 s while its sink eases from
+   3.7 to 0.4 m/s and its pitch rises from 2.4° to 5.2° (Boeing FCTM: flare times typically 4-8 s, the flare distance
+   about 1,000-2,000 ft beyond the threshold). Threshold to touchdown takes 4.5 s, so the beat holds exactly the last of
+   the approach, the threshold, the flare and the touchdown (lt 0.9-5.4, before the dissolve out begins at lt 5.45); the
+   approach over the eye (the earlier plan) cannot share a 5 s beat with them at real speed.
    The fog, 13 minutes after the dawn shot: thinner and breaking. A 1.5 m layer (visibility 30 m inside it) in lenses
    over the sand of the infield, hatched, cleared from the runway's dark asphalt (which the sun heats first), opaque only
    along the horizon where the eye looks through it edgewise; the lamps that stand in it glow through it, steadily. Over
@@ -1149,11 +1166,11 @@ scene({
     this.sandSk = AUH.fogStrokes(7000, 6601, { t0: 14, t1: 3800, half: 0.62, len: 16, jit: 0.4 }).filter(([a]) => !onPave(a[1], a[0])).map(([a, b, k]) => [[a[0], a[1], 0], [b[0], b[1], 0], k]);
   },
   // the aircraft's path at its real speed on the scene clock: 70 m/s on the 3.0° glide path (17.4 m over the threshold,
-  // crossed at lt TTHR) to 78 m past it; then the flare, slowing at 0.6 m/s² while the height eases (a cubic from the
-  // glide path's slope to a 0.4 m/s sink) down to where the rear main wheels touch at 305 m, the pitch rising 2.4° to
-  // 5.2°; then the roll on the mains, nose up (the axis held so the rear main wheels stay on the runway)
+  // crossed at lt TTHR) to 35 m past it; then the flare, slowing at 0.6 m/s² while the height eases (a cubic from the
+  // glide path's slope to a 0.4 m/s sink) down to where the rear main wheels touch at 310 m, 4.0 s later, the pitch
+  // rising 2.4° to 5.2°; then the roll on the mains, nose up (the axis held so the rear main wheels stay on the runway)
   flight(lt) {
-    const D = AUH.D, tg = Math.tan(3 * D), V0 = 70, uF = 78, ac = 0.6, uTD = 305, gp = x => 17.4 - x * tg;
+    const D = AUH.D, tg = Math.tan(3 * D), V0 = 70, uF = 35, ac = 0.6, uTD = 310, gp = x => 17.4 - x * tg;
     // the axis height that puts the rear main wheels (3.94 m behind it, their bottoms 5.55 m below it) on the runway
     const zw = th => 3.94 * Math.sin(th * D) + 5.55 * Math.cos(th * D);
     const tF = this.TTHR + uF / V0, tauTD = (V0 - Math.sqrt(V0 * V0 - 2 * ac * (uTD - uF))) / ac;
@@ -1164,7 +1181,7 @@ scene({
     const z = (2 * x ** 3 - 3 * x ** 2 + 1) * h0 + (x ** 3 - 2 * x ** 2 + x) * m0 + (-2 * x ** 3 + 3 * x ** 2) * z1 + (x ** 3 - x ** 2) * m1;
     return { u, v: 0, z, psi: 0, theta: 2.4 + 2.8 * AUH.smooth(x) };
   },
-  TTHR: 0.95,
+  TTHR: 0.9,
   view(lt) {
     // 200 m before the threshold, 10 m left of the light line, 12 m up, on an 1800 px lens; the eye follows the aircraft
     // down as it recedes: the axis from 310.2° to 308.4°, the horizon from y 420 to y 390
