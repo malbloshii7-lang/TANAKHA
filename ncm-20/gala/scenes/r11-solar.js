@@ -35,8 +35,9 @@
 //   sun sinks mid-beat, which with this sun would lift the disc on screen. A lower sun is out of reach: below about 25°
 //   the rows stand at their stop or backtrack.
 //   sun: the disc is drawn at 24 px, about four and a half times its true 0.53° (5 px through this lens), so it reads;
-//   at 13:50 it stands high, so the camera starts level (it started 2° down) to hold the disc whole in the frame. (It no
-//   longer meets the Shams 1 plate's sun in the dissolve, which stands lower and further west on its diagram arc.)
+//   at 13:50 it stands high, so the camera starts level (it started 2° down) to hold the disc whole in the frame. (In the
+//   dissolve it stands straight above the Shams 1 plate's sun, about 100 px higher: Shams 1's day ends just past noon,
+//   and this one carries it on into the afternoon.)
 scene({
   id: 'solar',
   start: 0, dur: 5,

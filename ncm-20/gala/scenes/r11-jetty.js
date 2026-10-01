@@ -199,12 +199,15 @@ scene({
     this.sheetIn = new P([[X0 + 8, Y0 + 8], [X0 + 310, Y0 + 8], [X0 + 310, Y0 + 288], [X0 + 8, Y0 + 288]], true);
     this.sign = new P(wob([[X0 + 196, Y0 + 268], [X0 + 208, Y0 + 258], [X0 + 218, Y0 + 270], [X0 + 228, Y0 + 255], [X0 + 242, Y0 + 269], [X0 + 258, Y0 + 262], [X0 + 278, Y0 + 264]], 970, 0.6));
     // the gulls: each glides round a circle (centre x, y in metres, radius, height) at v m/s, counter-clockwise when w is
-    // 1, from angle a0; flap: the centre and half-length (scene s) of a bout of slow wingbeats, if any
+    // 1, from angle a0 at t 0; flap: the centre and half-length (scene s) of a bout of slow wingbeats. The two nearer ones
+    // glide on wide curves, one toward the eye and one away (so their spread wings, the gull's 'M', face it), both bearing
+    // a little east-north-east: the camera's swing round the berth carries near things left across the frame (6-7 m/s at
+    // their distance), and this holds them in it. The two farther ones circle, showing their span and then their side
     this.gulls = [
-      { c: [196, -522], R: 30, z: 50, v: 9.5, w: 1, a0: 0.6, ph: 0.2 },
-      { c: [222, -402], R: 44, z: 32, v: 10, w: -1, a0: 2.4, ph: 1.3, flap: [4.1, 0.75] },
-      { c: [70, -255], R: 36, z: 24, v: 9, w: 1, a0: 4.0, ph: 2.1 },
-      { c: [118, -118], R: 48, z: 30, v: 10, w: -1, a0: 5.2, ph: 0.7 }
+      { c: [406, -436], R: 220, z: 62, v: 9.5, w: 1, a0: -2.367, ph: 0.2 },
+      { c: [473, -578], R: 220, z: 39, v: 9.5, w: -1, a0: 3.065, ph: 1.3, flap: [4.1, 0.75] },
+      { c: [125, -368], R: 28, z: 60, v: 9, w: 1, a0: -2.953, ph: 2.1 },
+      { c: [137, -159], R: 32, z: 24, v: 9.5, w: -1, a0: 5.989, ph: 0.7 }
     ];
   },
   // is a point of the sea plane short of the shore (the computed coast along its bearing from the ranges' eye)
@@ -390,6 +393,48 @@ scene({
     JT.segs(base, OPT.colour ? HUE.deep : BLUE, 1);
     JT.segs(calm, OPT.colour ? HUE.deep : BLUE, 0.8);
     JT.segs(dark, INK, 1.1);
+  },
+  // the swell's height (metres) at a point of the sea: the two trains drawSea runs through the sea's strokes (their crests
+  // where the strokes open, their troughs where they darken), the long swell 0.3 m high from the east-south-east and a
+  // short sea 0.06 m
+  swell(x, y, lt) {
+    const a1 = 300 * Math.PI / 180, a2 = 240 * Math.PI / 180;
+    return -0.3 * Math.cos(TAU / 84 * (Math.sin(a1) * x + Math.cos(a1) * y) - TAU / 7.4 * lt + 0.25) - 0.06 * Math.cos(TAU / 23 * (Math.sin(a2) * x + Math.cos(a2) * y) - TAU / 3.8 * lt + 1.0);
+  },
+  // the gulls (see the notes at the top), each round its circle: seen from above at 450-870 m, a large gull in its glide,
+  // its two wings (the arm and the hand), body and tail, banked to its turn; inked with a doubled line and masked white
+  // (only the outer contour stays), the mantle toned grey on the side seen from above, the wingtips black
+  drawGulls(lt) {
+    const C = this.ec.C;
+    this.gulls.forEach(G => {
+      const th = G.a0 + G.w * G.v / G.R * lt, pos = [G.c[0] + G.R * Math.cos(th), G.c[1] + G.R * Math.sin(th), G.z + 1.5 * Math.sin(TAU * lt / 9 + G.ph)];
+      const h = th + G.w * Math.PI / 2, bank = G.w * Math.atan(G.v * G.v / (9.81 * G.R));
+      const fw = [Math.cos(h), Math.sin(h), 0], l0 = [-Math.sin(h), Math.cos(h)];
+      const up = [l0[0] * Math.sin(bank), l0[1] * Math.sin(bank), Math.cos(bank)], lf = [l0[0] * Math.cos(bank), l0[1] * Math.cos(bank), -Math.sin(bank)];
+      // the wings' set: the arm raised about 9 deg, the hand angled down; a slow flex, and the bout of slow wingbeats
+      let din = 9 + 2 * Math.sin(TAU * lt / 4 + G.ph);
+      if (G.flap) { const u = (lt - G.flap[0]) / G.flap[1]; if (Math.abs(u) < 1) din += 24 * 0.5 * (1 + Math.cos(Math.PI * u)) * Math.sin(TAU * 2.4 * (lt - G.flap[0])); }
+      const ti = Math.tan(din * Math.PI / 180), to = Math.tan((din - 22) * Math.PI / 180);
+      const wz = y => (Math.abs(y) <= 0.33 ? (Math.abs(y) - 0.05) * ti : 0.28 * ti + (Math.abs(y) - 0.33) * to);
+      const B = (x, y, z) => [pos[0] + x * fw[0] + y * lf[0] + z * up[0], pos[1] + x * fw[1] + y * lf[1] + z * up[1], pos[2] + x * fw[2] + y * lf[2] + z * up[2]];
+      const sp = pts => pts.map(([x, y, z]) => E3.proj(B(x, y, z === undefined ? wz(y) : z)));
+      if (E3.depth(pos) < 50) return;
+      // the wings' mid-chord line from tip to tip, and its seen width: the chord as projected, never under 1.5 px, since the
+      // eye, 50-90 m above them, sees them nearly edge-on and a real gull there is a white 'M' a few pixels deep
+      const half = [[-0.14, 0.70], [-0.06, 0.55], [0.0, 0.33], [0.0, 0.05]];
+      const wing = sp(half.concat(half.slice().reverse().map(([x, y]) => [x, -y])).map(([x, y]) => [x, y]));
+      const c0 = E3.proj(B(0.1, 0.2, wz(0.2))), c1 = E3.proj(B(-0.1, 0.2, wz(0.2))), ww = Math.max(1.5, Math.hypot(c1[0] - c0[0], c1[1] - c0[1]));
+      const body = sp([[-0.33, 0, 0.02], [0.0, 0, 0.06], [0.3, 0, 0.04]]);
+      const d = E3.depth(pos), a = R11.air(d, 2600), seen = (up[0] * (C[0] - pos[0]) + up[1] * (C[1] - pos[1]) + up[2] * (C[2] - pos[2])) > 0;
+      // inked a little wider than the bird, then the bird laid in paper over it, so a fine contour stays round it
+      stroke(new P(wing), 1, INK, ww + 1.3, 0.85 * a);
+      stroke(new P(body), 1, INK, 2.9, 0.85 * a);
+      JT.paperLine(wing, ww);
+      JT.paperLine(body, 1.7);
+      // the grey mantle across the arms (seen from above), the black wingtips
+      if (seen) stroke(new P(wing.slice(2, 6)), 1, INK, ww * 0.75, 0.14 * a);
+      [wing.slice(0, 2), wing.slice(6, 8)].forEach(tp => stroke(new P(tp), 1, INK, ww + 0.5, 0.8 * a));
+    });
   },
   // shadows the morning sun throws on the water (away from it, to the west-north-west): each convex solid's corners
   // carried down the sun's rays to the sea
@@ -598,11 +643,23 @@ scene({
       ctx.restore();
     }
     const wl = this.wlPts, dk = this.deckPts, nW = wl.length, iStem = this.ST.length - 1;
+    // her waterline, with the swell running along it (see the notes at the top): the water stands at the swell's height
+    // along her side, in 4 m steps; under it the wash line, wider and lighter on each crest (in eight widths, one stroke
+    // each), then the line itself
+    const band = Array.from({ length: 8 }, () => []), wline = [];
     for (let i = 0; i < nW; i++) if (vis[i]) {
-      const p0 = E3.proj(wl[i]), p1 = E3.proj(wl[(i + 1) % nW]);
-      JT.paperLine([[p0[0], p0[1] + 1.6], [p1[0], p1[1] + 1.6]], 1.6);
-      E3.line([wl[i], wl[(i + 1) % nW]], INK, 1.3, 0.85 * a);
+      const A = wl[i], B = wl[(i + 1) % nW], n = Math.max(1, Math.ceil(Math.hypot(B[0] - A[0], B[1] - A[1]) / 4)), pts = [];
+      for (let k = 0; k <= n; k++) { const x = lerp(A[0], B[0], k / n), y = lerp(A[1], B[1], k / n); pts.push([x, y, this.swell(x, y, lt)]); }
+      for (let k = 0; k < n; k++) {
+        const p0 = E3.proj(pts[k]), p1 = E3.proj(pts[k + 1]), c = clamp(((pts[k][2] + pts[k + 1][2]) / 2 / 0.3 + 1) / 2);
+        band[Math.min(7, Math.floor(c * c * 8))].push([[p0[0], p0[1] + 1.6], [p1[0], p1[1] + 1.6]]);
+      }
+      wline.push(pts);
     }
+    ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA; ctx.strokeStyle = PAPER_PAT; ctx.lineCap = 'round';
+    band.forEach((g, k) => { if (!g.length) return; ctx.lineWidth = 1.0 + 2.0 * (k + 0.5) / 8; ctx.beginPath(); g.forEach(([p, r]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(r[0], r[1]); }); ctx.stroke(); });
+    ctx.restore();
+    wline.forEach(pts => E3.line(pts, INK, 1.3, 0.85 * a));
     if (vis[iStem - 1] !== vis[iStem]) E3.line([wl[iStem], dk[iStem]], INK, 1.3, 0.9 * a);
     // the boot-top: the band from the water to her load line (5.5 m up), her bottom paint, a shade darker than her sides
     for (let i = 0; i < this.wlPts.length; i++) {

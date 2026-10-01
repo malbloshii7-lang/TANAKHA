@@ -59,21 +59,21 @@ scene({
     // side positive; each is turned near broadside to the eye, as camels are most often seen and read), sc its size (a
     // cow 1), its coat, what it does (graze: browses with one slow lift of the head at lift; settle: lowers its head to
     // graze between t0 and t1; walk: at v m/s), ph its own phase. The near group is in view to about t 3.9 (the pan then
-    // leaves it), the far cow and calf from about t 2.2 to 4.6, the far three from t 4.7 to the end, all over the train
+    // leaves it), the far cow and calf from about t 2.4 to 4.6, the far three from t 4.5 to the end, all over the train
     if (typeof REV11 !== 'undefined' && REV11) {
       this.herd11 = [
-        { s: 28.5, o: -27.2, hd: Math.PI + 0.75, sc: 1, coat: 'tan', act: 'graze', lift: 2.5, ph: 0.3, side: 'near' },
-        { s: 36.5, o: -31.5, hd: 0.7, sc: 1.03, coat: 'dark', act: 'settle', t0: 1.9, t1: 3.4, ph: 1.1, side: 'near' },
-        { s: 44, o: -27.4, hd: Math.PI + 0.55, sc: 0.98, coat: 'pale', act: 'walk', v: 0.55, ph: 0.15, side: 'near' },
-        { s: 46.6, o: -29.6, hd: Math.PI + 0.6, sc: 0.68, coat: 'pale', act: 'walk', v: 0.55, ph: 0.62, side: 'near' },
+        { s: 23.5, o: -28.6, hd: Math.PI + 0.75, sc: 1, coat: 'tan', act: 'graze', lift: 2.3, ph: 0.3, side: 'near' },
+        { s: 30, o: -25.8, hd: 0.7, sc: 1.03, coat: 'dark', act: 'settle', t0: 1.9, t1: 3.3, ph: 1.1, side: 'near' },
+        { s: 44.6, o: -29.6, hd: Math.PI + 0.55, sc: 0.98, coat: 'pale', act: 'walk', v: 0.55, ph: 0.15, side: 'near' },
+        { s: 41.6, o: -31.8, hd: Math.PI + 0.6, sc: 0.68, coat: 'pale', act: 'walk', v: 0.55, ph: 0.62, side: 'near' },
         { s: -112, o: 118, hd: 0.84, sc: 1, coat: 'tan', act: 'walk', v: 0.55, ph: 0.4, side: 'far' },
         { s: -109, o: 120.5, hd: 0.9, sc: 0.68, coat: 'tan', act: 'walk', v: 0.55, ph: 0.9, side: 'far' },
-        { s: 30, o: 138, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'graze', lift: 5.2, ph: 0.7, side: 'far' },
-        { s: 37, o: 142, hd: 0.2, sc: 1, coat: 'tan', act: 'graze', lift: 4.4, ph: 1.6, side: 'far' },
-        { s: 45, o: 136, hd: 0.3, sc: 0.97, coat: 'pale', act: 'settle', t0: 5.0, t1: 6.2, ph: 2.2, side: 'far' }
+        { s: -8, o: 128, hd: 0.25, sc: 1, coat: 'tan', act: 'walk', v: 0.5, ph: 1.6, side: 'far' },
+        { s: 12, o: 134, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'graze', lift: 5.4, ph: 0.7, side: 'far' },
+        { s: 30, o: 138, hd: 0.3, sc: 0.97, coat: 'pale', act: 'settle', t0: 4.9, t1: 6.0, ph: 2.2, side: 'far' }
       ];
       // low shrubs on the near plain besides the ones the grazers browse ([s, o, height m])
-      this.shrubs11 = [[33.4, -29.4, 0.35], [41.8, -25.4, 0.3], [24.5, -30.5, 0.3]];
+      this.shrubs11 = [[27.5, -31.2, 0.35], [48.5, -26.0, 0.32], [35.0, -33.5, 0.3]];
     }
   },
   // the head's position along the track (metres from Q) at scene time t, and the camera's pan that keeps it in view
@@ -229,35 +229,45 @@ scene({
     if (walk) g = 0.22 + 0.03 * Math.sin(2 * TAUq * ph);
     const tail = 0.07 * Math.sin(TAUq * lt / 3.1 + cm.ph * 2);
     // rings: a list of local points; tube rings (horizontal circles) for the legs and tail
-    const N = 12, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAUq));
+    const N = 16, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAUq));
     const hoop = (a, b, c, r) => ring(t => [a + r * Math.cos(t), b + r * Math.sin(t), c]);
+    // a Catmull-Rom spline through rows of numbers (sections, centres, radii), m steps a span, so the contours run smooth
+    const spl = (rows, m) => {
+      const out = [], at = k => rows[clamp(k, 0, rows.length - 1)];
+      for (let k = 0; k < rows.length - 1; k++) for (let j = 0; j < (k === rows.length - 2 ? m + 1 : m); j++) {
+        const u = j / m, p0 = at(k - 1), p1 = at(k), p2 = at(k + 1), p3 = at(k + 2);
+        out.push(p1.map((_, i) => 0.5 * (2 * p1[i] + (-p0[i] + p2[i]) * u + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * u * u + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * u * u * u)));
+      }
+      return out;
+    };
     // the trunk: [a, top, bottom, half-width, narrowing of its upper half] from the tail root to the breast
-    const trunk = [[-0.88, 1.60, 1.36, 0.15, 0.1], [-0.74, 1.73, 1.22, 0.21, 0.1], [-0.52, 1.84, 1.16, 0.25, 0.15], [-0.30, 1.99, 1.13, 0.27, 0.3],
-      [-0.05, 2.10, 1.10, 0.28, 0.38], [0.22, 2.01, 1.06, 0.28, 0.32], [0.45, 1.90, 1.00, 0.27, 0.18], [0.62, 1.84, 1.00, 0.25, 0.12], [0.78, 1.70, 1.12, 0.21, 0.1], [0.88, 1.55, 1.26, 0.15, 0.1]];
+    const trunk = spl([[-0.88, 1.60, 1.36, 0.15, 0.1], [-0.74, 1.73, 1.22, 0.21, 0.1], [-0.52, 1.84, 1.16, 0.25, 0.15], [-0.30, 1.99, 1.13, 0.27, 0.3],
+      [-0.05, 2.10, 1.10, 0.28, 0.38], [0.22, 2.01, 1.06, 0.28, 0.32], [0.45, 1.90, 1.00, 0.27, 0.18], [0.62, 1.84, 1.00, 0.25, 0.12], [0.78, 1.70, 1.12, 0.21, 0.1], [0.88, 1.55, 1.26, 0.15, 0.1]], 2);
     const body = trunk.map(([a, t, b, w, k]) => ring(th => [a, w * Math.cos(th) * (1 - k * Math.max(0, Math.sin(th))), (t + b) / 2 + (t - b) / 2 * Math.sin(th)]));
     const belly = trunk.map(([a, t, b, w]) => ring(th => [a, w * Math.cos(th / 2), (t + b) / 2 - (t - b) / 2 * Math.sin(th / 2) * 0.98]));
-    // the neck: five segments from its root at the breast, their angles (deg, up positive) blended from carried to grazing
+    // the neck: five segments from its root at the breast, their angles (deg, up positive) blended from carried to grazing,
+    // so it keeps its length; its rings across the curve through their joints
     const segL = [0.30, 0.27, 0.27, 0.26, 0.18], up = [-28, 0, 40, 68, 80], dn = [-38, -44, -48, -52, -55];
-    const nk = [[0.78, 1.50]], ang = [];
-    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; ang.push(A); nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
+    const nk = [[0.78, 1.50]];
+    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
     const nr = [[0.23, 0.15], [0.18, 0.12], [0.14, 0.1], [0.115, 0.085], [0.1, 0.08], [0.095, 0.075]];
-    const tube = (pts, angs, rr, bOff) => pts.map(([a, c], k) => {
-      const A = angs[Math.min(k, angs.length - 1)] * 0.5 + angs[Math.max(0, k - 1)] * 0.5, [hv, hw] = rr[k], b0 = bOff(k);
+    const tube = (pts, rr, bOff) => pts.map(([a, c], k) => {
+      const p = pts[Math.max(0, k - 1)], n = pts[Math.min(pts.length - 1, k + 1)], A = Math.atan2(n[1] - p[1], n[0] - p[0]), [hv, hw] = rr[k], b0 = bOff(k / (pts.length - 1));
       return ring(th => [a - Math.sin(A) * hv * Math.sin(th), b0 + hw * Math.cos(th), c + Math.cos(A) * hv * Math.sin(th)]);
     });
-    const swayAt = k => sway * Math.pow(k / 5, 2);
-    const neck = tube(nk, ang, nr, swayAt);
+    const nks = spl(nk.map((v, k) => v.concat(nr[k])), 3);
+    const neck = tube(nks.map(v => [v[0], v[1]]), nks.map(v => [v[2], v[3]]), u => sway * u * u);
     // the head: from the poll, 0.48 m to the muzzle, carried a little nose-down, near vertical when grazing
     const HA = lerp(-18, -65, g) * rad, [pa, pc] = nk[5], hu = [0, 0.14, 0.32, 0.48];
     const hpts = hu.map(u => [pa + u * Math.cos(HA), pc + u * Math.sin(HA)]);
-    const head = tube(hpts, [HA, HA, HA, HA], [[0.1, 0.085], [0.115, 0.085], [0.08, 0.065], [0.06, 0.05]], () => sway);
+    const head = tube(hpts, [[0.1, 0.085], [0.115, 0.085], [0.08, 0.065], [0.06, 0.05]], () => sway);
     // the tail: from its root under the croup, hanging, its tip swinging
     const tl = [[-0.89, 0, 1.56], [-0.93, tail * 0.4, 1.32], [-0.95, tail, 1.06]];
     const tailR = tl.map(([a, b, c], k) => hoop(a, b, c, [0.04, 0.03, 0.045][k]));
     // the legs: top (inside the trunk), joint, fetlock, pad. Front: the knee (carpus) bends forward; hind: the hock bends
     // back. A walker's feet move by the lateral gait (stance 0.68 of a stride, the hind of a side 0.1 ahead of the fore)
     const legs = [];
-    [[1, 0.5, 1.2, 0.5, 0.13, 0.61, 0.54, 0.2, -0.1, [0.085, 0.065, 0.058, 0.04, 0.05]], [-1, -0.52, 1.25, -0.68, 0.13, 0.72, 0.55, 0.16, 0, [0.13, 0.08, 0.06, 0.04, 0.05]]].forEach(([bend, ta, tc, fa, fc, L1, L2, lift, lag, rr]) => {
+    [[1, 0.5, 1.2, 0.5, 0.13, 0.61, 0.54, 0.2, -0.1, [0.09, 0.06, 0.065, 0.035, 0.045]], [-1, -0.52, 1.25, -0.68, 0.13, 0.72, 0.55, 0.16, 0, [0.13, 0.075, 0.06, 0.035, 0.045]]].forEach(([bend, ta, tc, fa, fc, L1, L2, lift, lag, rr]) => {
       [1, -1].forEach(sd => {
         let dx = 0, dz = 0;
         if (walk) {
@@ -281,7 +291,7 @@ scene({
     const P2 = rs => rs.map(r => r.map(v => pr(W(v[0], v[1], v[2]))));
     const hulls = rs => { const sp = P2(rs), out = []; for (let k = 0; k < sp.length - 1; k++) { const pts = sp[k].concat(sp[k + 1]); if (pts.some(v => !v)) return []; out.push(new P(this.hull11(pts), true)); } return out; };
     const farLegs = legs.filter(L => !L.near).flatMap(L => hulls(L.rings)), nearLegs = legs.filter(L => L.near).flatMap(L => hulls(L.rings));
-    const fig = hulls(body).concat(hulls(neck), hulls([neck[5]].concat(head)), hulls(tailR), nearLegs);
+    const fig = hulls(body).concat(hulls(neck), hulls([neck[neck.length - 1]].concat(head)), hulls(tailR), nearLegs);
     if (!fig.length) return;
     const lw = clamp(px * 0.025, 0.55, 1.1), al = clamp(px / 40, 0.7, 1) * q;
     const coat = { tan: ['#B08752', 0.5, 0.16], dark: ['#5E4532', 0.62, 0.42], pale: ['#D8C29C', 0.45, 0.06] }[cm.coat];
@@ -309,19 +319,24 @@ scene({
       if (e0 && e1) stroke(new P([e0, e1]), 1, INK, lw * 1.3, al);
     }
   },
-  // a low desert shrub (the gravel plain's rimth and markh) at ground point G, h tall: a rounded clump of twigs
+  // a low desert shrub of the gravel plain (rimth, Haloxylon salicornicum: a rounded cushion of thin jointed grey-green
+  // twigs on a little mound of trapped sand) at ground point G, h tall: a lumpy dome, its twigs drawn upright
   shrub11(G, h, psi, q, seed) {
     const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
     if (!b || !t) return;
-    const k = RAIL.f / b[2], w = 1.9 * h * k, hh = b[1] - t[1], r = rng(seed), ry = w / 2 * 12 / b[2], pts = [];
-    for (let j = 0; j <= 14; j++) { const u = j / 14, a = Math.PI * u; pts.push([b[0] - w / 2 * Math.cos(a), b[1] - ry * 0.3 - hh * Math.sin(a) * (0.8 + 0.3 * r())]); }
-    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; pts.push([b[0] + w / 2 * Math.cos(a), b[1] + ry * Math.sin(a) * 0.6]); }
+    const k = RAIL.f / b[2], w = 1.8 * h * k, hh = b[1] - t[1], r = rng(seed), ry = w / 2 * RAIL.eye / b[2], pts = [];
+    for (let j = 0; j <= 18; j++) { const a = Math.PI * j / 18, lump = 0.82 + 0.18 * Math.abs(Math.sin(a * 5 + seed)) + 0.06 * r(); pts.push([b[0] - w / 2 * Math.cos(a) * (0.95 + 0.08 * r()), b[1] - ry * 0.2 - hh * Math.pow(Math.sin(a), 0.7) * lump]); }
+    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; pts.push([b[0] + w / 2 * Math.cos(a), b[1] + ry * Math.sin(a) * 0.5]); }
     const clump = new P(pts, true);
-    fill(el(b[0], b[1] + ry * 0.3, w * 0.55, ry * 0.9, 0, TAU, seed, 0), SEPIA, 0.12 * q);
+    // the sand mound and the shade under it
+    fill(el(b[0], b[1] + ry * 0.2, w * 0.62, ry * 0.95, 0, TAU, seed, 0), SEPIA, 0.13 * q);
     mask(clump, q);
-    if (OPT.colour) wash(clump, '#8C8A5E', 0.5 * q); else fill(clump, SEPIA, 0.16 * q);
-    for (let j = 0; j < 9; j++) { const a = Math.PI * (0.15 + 0.7 * j / 8), L = hh * (0.6 + 0.4 * r()); stroke(new P([[b[0] + (j - 4) * w * 0.03, b[1]], [b[0] - Math.cos(a) * w * 0.45, b[1] - Math.sin(a) * L]]), 1, INK, 0.55, 0.45 * q); }
-    stroke(clump, 1, INK, 0.7, 0.55 * q);
+    if (OPT.colour) wash(clump, '#8C8A5E', 0.42 * q); else fill(clump, SEPIA, 0.14 * q);
+    const tw = [];
+    for (let j = 0; j < 16; j++) { const x = b[0] + (r() - 0.5) * w * 0.8, y0 = b[1] + (r() - 0.3) * ry * 0.4, L = hh * (0.35 + 0.5 * r()) * (1 - Math.pow(2 * (x - b[0]) / w, 2)), lean = (x - b[0]) * 0.35 + (r() - 0.5) * w * 0.08; tw.push([[x, y0], [x + lean * L / Math.max(1, hh), y0 - L]]); }
+    hatch(clump, [b[0] - w / 2 - 1, b[1] - hh - 2, b[0] + w / 2 + 1, b[1] + ry + 1], 1.25, Math.max(1.4, w * 0.09), q, INK, 0.45, 0.22, seed);
+    tw.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.5, 0.4 * q));
+    stroke(clump, 1, INK, 0.65, 0.5 * q);
   },
   // a convex hull of screen points (monotone chain)
   hull11(pts) {

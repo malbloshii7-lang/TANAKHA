@@ -6,7 +6,7 @@
 // kandura, and a woman in the black shayla and abaya who signs off the printed forecast with her own hand (every
 // forecast is approved by a forecaster: WAM, 29 June 2026). On the wall: a full-disk image from a geostationary
 // satellite over the Indian Ocean (sub-satellite point 45.5 E), the coasts faint and the seven emirates in gold; the
-// national picture as a chart draws the night (a frontal rain band crossing from the Gulf); forecast charts and tables;
+// national picture, the radar composite (a frontal rain band crossing from the Gulf); forecast charts and tables;
 // two clocks, UTC and the Emirates' time (19:05 and 23:05). What the wall shows follows the public descriptions of NCM's
 // Operations Centre («مركز العمليات», NCM headquarters, Al Shawamekh; staffed around the clock): satellite and radar
 // pictures and station reports (The National, 2017), live camera feeds from 26 sites across the UAE (2023), and the
@@ -14,6 +14,21 @@
 // camera feeds and one the station winds, drawn as wind barbs alone. The room's layout is not public, so the room stays
 // generic and unnamed. No red anywhere, and nothing that could read as a target:
 // no rings or arcs spreading from a point, no sweeps, no pins or point symbols over any map.
+// The room lives (Revision 11, the slower beat, 1 October 2026), every motion small, slow and a pure function of the
+// scene clock. The national picture is the radar composite, live: NCM composites its six C-band weather radars into one
+// reflectivity picture of the UAE every 6 minutes (a 1 km constant-altitude level on a 1 km grid; AMS 40th Conference
+// on Radar Meteorology, 2023), and a radar display shows it as nested bands of reflectivity. Here a frontal band over
+// the Gulf advects ESE toward the western coast through the beat (about 28 px), its cells growing and decaying, in the
+// plate's own blues, with the UAE's coast and borders from the film's map over it: no range rings, no radar sites and no
+// sweep. The satellite's clouds drift (the ITCZ's clusters west on the easterlies, the fronts east on the westerlies),
+// in the room and through the push; the satellite crop on the desk drifts; in the mosaic of 26 camera feeds a few
+// clouds drift and a few skies change their light slowly. The man on the left works his mouse in short strokes, the
+// man on the right looks up to the wall and partly back, the woman signs; a fourth forecaster stands at the wall and,
+// with an open hand, follows the radar's rain band. On the desk, Arabic coffee (with the dallah, on UNESCO's list for
+// the UAE, Saudi Arabia, Oman and Qatar since 2015): an Emirati brass dallah 24 cm to its finial (museum dallahs measure
+// 19-31.5 cm) with its bulbous body, waist, flared mouth, stepped spire lid and finial, handle, and the long spout that
+// ends in the crescent beak; and three finjan, handleless porcelain cups 6.4 cm across and 5 cm high (an 80 ml qahwa
+// cup), two nested and one by the man's hand. No steam: at this size a wisp would read as smoke.
 // Then the camera pushes into the full disc while the room fades to paper. The disc turns from the satellite's view to
 // the world beat's globe: centre, projection and place on screen are read from the world beat itself (its clock, its
 // camera, and the globe plate-world.js draws: centre 24 N, 46.5 E less 1.1 degrees a second, orthographic), and whatever
@@ -86,6 +101,9 @@ scene({
       return { X, Z, psi: -ph + extra, dress, side, sc, y7, k: F / Z * sc };
     };
     this.people = [who(-13.5, 'ghutra', 1, 1, 1.02), who(13.5, 'ghutra', -1, 1, 1.02), who(0, 'shayla', 1, 0.95, 1.0, 0.14)];
+    // a fourth forecaster stands at the wall, 1 m in front of it between the satellite's screen and the radar's, turned
+    // 15 degrees to his right toward the radar (C7 1.5 m up for a man of 1.75 m)
+    this.stand = { X: -1.17, Z: 8.3, psi: 15 * D2R, sc: 1, y7: 1.5, side: 1, dress: 'ghutra' };
     // a keyboard on the desk in front of each man, his working hand at its end
     this.keyboards = this.people.filter(o => o.dress === 'ghutra').map(o => { const T = this.frame(o, false), u0 = o.side * 0.06; return new P([T(u0 - 0.22, 0.755, 0.46), T(u0 + 0.22, 0.755, 0.46), T(u0 + 0.22, 0.755, 0.6), T(u0 - 0.22, 0.755, 0.6)], true); });
     // the printed forecast on the desk top, to the woman's right front, its near edge at the desk's edge: centre, turn,
@@ -199,6 +217,8 @@ scene({
     ['meteo', 'skewt', 'winds', 'waves'].forEach((k, i) => this.product(k, box(this.P3[i], 8), sq, 740 + i, false, this.P3[i][2] - this.P3[i][0]));
     ['table', 'cams', 'meteo', 'field', 'text', 'skewt', 'meteo', 'table'].forEach((k, i) => this.product(k, box(this.small[i], 5), sq, 750 + i, false, 90, sl));
     this.clocks(sl, sq);
+    // the forecaster standing at the wall, before the desk and the monitors that stand in front of him
+    this.stander(sl, easeInOut(prog(sl, T0 + 0.35, 1.0)));
     // the desk: its top, its edge, the dark under it
     const dq = easeInOut(prog(sl, T0 - 0.6, 0.9));
     mask([this.deskTop, this.deskEdge, this.deskUnder], dq);
@@ -210,6 +230,7 @@ scene({
     this.monitors.forEach(m => this.monitor(m, sl, dq));
     this.keyboards.forEach(kb => { mask(kb, dq); fill(kb, INK, 0.5 * dq); stroke(kb, dq, INK, 1, 0.8); });
     this.paper(sl, dq);
+    this.coffee(dq);
     // the forecasters, far ones first; each chair after its forecaster
     [...this.people].sort((a, c) => c.Z - a.Z).forEach((o, k) => {
       const q = easeInOut(prog(sl, T0 + 0.1 + (o.dress === 'shayla' ? 0.15 : k * 0.15), 1.0));
@@ -473,6 +494,200 @@ scene({
       this.lite(new P(this.crs([V(0.2, -0.12, 0.05), V(0.228, -0.2, 0.13), V(0.25, -0.26, 0.2)], false, 4)), '#EFE5CF', 0.9, 0.18 * q);
       this.rim(arm, 2.2, 0.5 * q); stroke(arm, q, INK, 1.3, 0.9);
       this.shayla(V, q);
+    }
+  },
+  // the standing forecaster's kandura (sections as KAND, about C7 1.5 m up; v down to the hem at the ankles): collarless,
+  // loose and straight. His right arm is raised (drawn apart), so on that side the cloth falls from the shoulder over the
+  // ribs alone; his left arm hangs in its sleeve at his side to the wrist (v -0.72)
+  STAND: [[0.03, 0.058, 0.058, 0.058, -0.02], [0.0, 0.12, 0.12, 0.085, -0.01], [-0.03, 0.17, 0.175, 0.1, 0], [-0.055, 0.196, 0.205, 0.106, 0],
+    [-0.085, 0.19, 0.218, 0.11, 0.005], [-0.15, 0.176, 0.222, 0.118, 0.012], [-0.25, 0.17, 0.22, 0.122, 0.02], [-0.4, 0.166, 0.215, 0.12, 0.025],
+    [-0.55, 0.166, 0.21, 0.118, 0.02], [-0.7, 0.172, 0.21, 0.12, 0.02], [-0.78, 0.176, 0.19, 0.12, 0.02], [-1.0, 0.178, 0.181, 0.12, 0.02],
+    [-1.25, 0.186, 0.188, 0.125, 0.02], [-1.44, 0.196, 0.197, 0.13, 0.02]],
+  // where his open hand reaches, as a direction from his shoulder (degrees to his right of straight ahead, and up): a
+  // presenter's gesture at head height toward the radar, up and to his right; the hand follows the rain band slowly,
+  // from its south-western end up toward its middle, rests, and comes back a little toward the coast (each sweep 1.4-1.6 s)
+  standAim(sl) {
+    const T0 = this.T0;
+    return this.keyed([[T0 + 1.0, 48, 30], [T0 + 2.6, 36, 41], [T0 + 3.7, 36, 41], [T0 + 5.1, 43, 34], [T0 + 6.2, 43, 34], [T0 + 7.6, 39, 37]], sl);
+  },
+  // the standing forecaster: drawn after the wall (he stands in front of it) and before the desk and the monitors (they
+  // stand in front of him and hide him below the hips). His raised arm first (it reaches away from the eye, beyond his
+  // back), then the kandura, then the ghutra and agal, his head turned toward the radar
+  stander(sl, q) {
+    if (q <= 0) return;
+    const o = this.stand, Tp = this.frame(o);
+    const [az, el] = this.standAim(sl), hd = 0.2 + 0.08 * clamp((48 - az) / 12);
+    const V = this.view(o, hd), k = V.k;
+    // the arm in his own frame (u right, v up from C7, w forward; metres): shoulder S, wrist H 0.535 m toward the aim,
+    // the elbow bent a little, down and outward (a two-bone reach, upper arm 0.29 m, forearm 0.26 m)
+    const add = (a, b, f = 1) => a.map((x, i) => x + f * b[i]), sub = (a, b) => a.map((x, i) => x - b[i]), dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const nrm = a => { const l = Math.hypot(...a) || 1; return a.map(x => x / l); }, cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const D2R = this.D2R, S = [0.185, -0.075, 0.0], d = [Math.cos(el * D2R) * Math.sin(az * D2R), Math.sin(el * D2R), Math.cos(el * D2R) * Math.cos(az * D2R)], D = 0.535, H = add(S, d, D);
+    const L1 = 0.29, L2 = 0.26, a0 = (L1 * L1 - L2 * L2 + D * D) / (2 * D), h0 = Math.sqrt(Math.max(0, L1 * L1 - a0 * a0));
+    const pole = [0.45, -1, 0], pp = nrm(sub(pole, d.map(x => x * dot(pole, d)))), E = add(add(S, d, a0), pp, h0);
+    const f = nrm(sub(H, E)), n = nrm(cross(f, [0, 1, 0])), up = cross(n, f);
+    const P3 = p => Tp(...p);
+    // his right hand, open, its back toward the eye and its palm toward the screens, fingers together along the forearm
+    // and a little raised, the thumb along its inner (left) side
+    const fh = nrm(add(f, up, 0.18)), at = (a, b, e = 0) => P3(add(add(add(H, fh, a), n, b), up, e));
+    const hand = new P(this.crs([at(0.0, -0.028), at(0.05, -0.036), at(0.095, -0.04), at(0.15, -0.036), at(0.178, -0.022), at(0.186, -0.004), at(0.18, 0.016), at(0.15, 0.03),
+      at(0.098, 0.036), at(0.07, 0.05), at(0.04, 0.064), at(0.022, 0.058), at(0.012, 0.034), at(0.0, 0.028)], true, 3), true);
+    mask(hand, q); if (OPT.colour) wash(hand, HUE.sand, 0.38 * q);
+    stroke(hand, q, INK, 0.9, 0.85);
+    [-0.016, 0.004, 0.022].forEach(b => stroke(new P([at(0.1, b), at(0.162, b * 0.9)]), q, INK, 0.5, 0.45));
+    // the sleeve: loose white cotton over the raised arm, hanging a little under it, the plain cuff at the wrist
+    const pts = [S, add(S, sub(E, S), 0.5), E, add(E, sub(H, E), 0.55), add(H, f, -0.012)].map(P3);
+    const rs = [0.066, 0.064, 0.058, 0.052, 0.046].map(r => r * k);
+    const arm = this.tube(pts, rs), bx = [Math.min(...pts.map(p => p[0])) - 20, Math.min(...pts.map(p => p[1])) - 20, Math.max(...pts.map(p => p[0])) + 20, Math.max(...pts.map(p => p[1])) + 20];
+    mask(arm, q); if (OPT.colour) wash(arm, HUE.sky, 0.07 * q);
+    this.within(arm, () => {
+      hatch(arm, bx, Math.atan2(pts[4][1] - pts[0][1], pts[4][0] - pts[0][0]), 2.6, q, INK, 0.5, 0.26, 2061);
+      // the cloth hanging under the raised forearm, and the fold at the elbow
+      const side = (p, i, g) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(4, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; return [p[0] + dy / l * rs[i] * g, p[1] - dx / l * rs[i] * g]; };
+      stroke(new P(this.crs([side(pts[1], 1, -0.55), side(pts[2], 2, -0.5), side(pts[3], 3, -0.45)], false, 3)), q, INK, 0.6, 0.4);
+      stroke(new P([side(pts[2], 2, 0.5), side(pts[2], 2, -0.3)]), q, INK, 0.6, 0.35);
+    });
+    this.rim(arm, 1.8, 0.8 * q); stroke(arm, q, INK, 1.1, 0.85);
+    const cf = add(H, f, -0.04), cuff = [P3(add(cf, n, 0.045)), P3(add(cf, n, -0.045))];
+    stroke(new P(cuff), q, INK, 0.7, 0.55);
+    // the kandura, then the ghutra and agal over it
+    const K = this.body(V, this.STAND), ko = K.outline(0.0, -1.44, 36), hem = [0.15, 0.35, 0.5, 0.65, 0.85].map(t => K.across(-1.44, t));
+    const kand = new P(this.crs(ko.R.concat(hem, ko.L.reverse()), true, 3), true);
+    this.kanduraStand(K, kand, q);
+    this.ghutra(V, k, 1, q, false, this.STAND, 18);
+  },
+  // the standing kandura from behind: long fine lines falling straight from the shoulders to the hem, closer in the
+  // hollows of its soft folds; the pull of the raised arm, from under the right arm across to the small of the back; the
+  // left arm's sleeve along its far side; the edges lit by the screens he faces
+  kanduraStand(K, path, q) {
+    const ss = this.ss, open = pts => new P(this.crs(pts, false, 3));
+    const sPull = v => lerp(-0.85, -0.05, clamp((-0.12 - v) / 0.33));
+    const tone = (s, v) => {
+      let tn = 0.12 + 0.1 * ss(-0.3, -0.9, v);
+      [-0.55, -0.15, 0.3, 0.62].forEach((c, i) => { tn += (0.12 + 0.04 * i) * Math.exp(-(((s - c) / 0.06) ** 2)) * ss(-0.2, -0.45, v); });
+      if (v < -0.1 && v > -0.48) tn += 0.24 * Math.exp(-(((s - sPull(v)) / 0.06) ** 2)) * Math.sin(Math.PI * clamp((-0.1 - v) / 0.38));
+      tn += 0.18 * Math.exp(-(((s - 0.8) / 0.05) ** 2)) * ss(-0.08, -0.14, v) * ss(-0.74, -0.66, v);
+      return tn * (1 - 0.65 * ss(0.72, 0.98, Math.abs(s)));
+    };
+    mask(path, q);
+    if (OPT.colour) wash(path, HUE.sky, 0.07 * q);
+    this.engrave(path, this.fallLines(K, 18, -0.02, -1.44, 0.012, null, tone), 0.6, 0.6 * q);
+    this.within(path, () => {
+      const pts = []; for (let v = -0.12; v >= -0.46; v -= 0.04) pts.push(K.across(v, this.tAt(K, v, sPull(v)))); stroke(open(pts), q, INK, 0.6, 0.35);
+      const sl = []; for (let v = -0.1; v >= -0.7; v -= 0.06) sl.push(K.across(v, this.tAt(K, v, 0.8))); stroke(open(sl), q, INK, 0.6, 0.35);
+    });
+    this.rim(path, 2.2, 0.85 * q); stroke(path, q, INK, 1.2, 0.85);
+  },
+  // Arabic coffee on the desk, between the left-hand forecaster's mouse and the woman: an Emirati dallah of brass and
+  // three finjan (handleless porcelain cups), two nested as they are kept and one by the man's hand. The dallah 24 cm to
+  // its finial (museum dallahs run 19-31.5 cm): a bulbous body tapering to a waist, flaring to a lipped mouth, a stepped,
+  // spire-like lid with a finial; the long spout rises from the lower body and ends in the crescent beak; the handle
+  // opposite. The finjan 6.4 cm across and 4.8 cm high (an 80 ml qahwa cup)
+  DALLAH: [[0, 0.056], [0.004, 0.059], [0.008, 0.06], [0.015, 0.065], [0.03, 0.069], [0.045, 0.068], [0.06, 0.062], [0.075, 0.051], [0.088, 0.04], [0.098, 0.034],
+    [0.106, 0.0325], [0.115, 0.035], [0.126, 0.041], [0.136, 0.048], [0.143, 0.053], [0.147, 0.0545], [0.15, 0.052], [0.153, 0.049], [0.158, 0.048], [0.161, 0.044],
+    [0.167, 0.041], [0.177, 0.034], [0.187, 0.025], [0.196, 0.015], [0.202, 0.009], [0.206, 0.0072], [0.209, 0.009], [0.213, 0.0094], [0.217, 0.006], [0.223, 0.0052],
+    [0.229, 0.0072], [0.234, 0.004], [0.24, 0]],
+  FINJAN: [[0, 0.016], [0.004, 0.0175], [0.006, 0.0168], [0.008, 0.018], [0.016, 0.0225], [0.026, 0.027], [0.037, 0.03], [0.046, 0.032], [0.048, 0.0322]],
+  // a body of revolution on the desk at (X, Z), its base Y0 up, turned phi (its x axis toward the spout): local points,
+  // rings, and the outline (the near arc of its base, then each ring's outermost points up one side and down the other)
+  solid(X, Z, Y0, phi, prof) {
+    const e1 = [Math.cos(phi), Math.sin(phi)], e3 = [-Math.sin(phi), Math.cos(phi)];
+    const at = (x, h, z = 0) => this.pj(X + x * e1[0] + z * e3[0], Y0 + h, Z + x * e1[1] + z * e3[1]);
+    const ring = (h, r, n = 36) => Array.from({ length: n }, (_, i) => { const g = i / n * TAU; return at(r * Math.cos(g), h, r * Math.sin(g)); });
+    // the near half of a ring (it lies lower on the page), from its leftmost point to its rightmost
+    const near = rg => {
+      const n = rg.length; let a = 0, b = 0;
+      rg.forEach((p, i) => { if (p[0] < rg[a][0]) a = i; if (p[0] > rg[b][0]) b = i; });
+      const walk = d => { const o = []; for (let i = a; ; i = (i + d + n) % n) { o.push(rg[i]); if (i === b) break; } return o; };
+      const f = walk(1), g = walk(-1), my = o => o.reduce((m, p) => m + p[1], 0) / o.length;
+      return my(f) > my(g) ? f : g;
+    };
+    const rings = prof.map(([h, r]) => (r > 0 ? ring(h, r) : [at(0, h)]));
+    const ext = rg => rg.reduce((m, p) => [p[0] < m[0][0] ? p : m[0], p[0] > m[1][0] ? p : m[1]], [rg[0], rg[0]]);
+    const ex = rings.map(ext), out = near(rings[0]).concat(ex.slice(1).map(e => e[1]), ex.slice(1).reverse().map(e => e[0]));
+    return { at, ring, near, rings, outline: new P(this.crs(out, true, 2), true), e1, e3, k: 1100 / Z };
+  },
+  coffee(q) {
+    if (q <= 0) return;
+    this.dallah(-0.44, 3.38, -20 * this.D2R, q);
+    this.finjan(-0.445, 3.19, q);
+    this.finjan(-0.355, 3.215, q, true);
+  },
+  dallah(X, Z, phi, q) {
+    const B = this.solid(X, Z, 0.752, phi, this.DALLAH), k = B.k, at = B.at, open = pts => new P(this.crs(pts, false, 3));
+    const brass = (path, a) => { if (OPT.colour) wash(path, GOLD, a * q); };
+    // the handle, behind the body on the far side: an ear from under the mouth down to the bulb, a thumb-rest on top
+    const hp = [[-0.05, 0.136], [-0.07, 0.141], [-0.086, 0.132], [-0.093, 0.11], [-0.088, 0.086], [-0.077, 0.07], [-0.063, 0.06]].map(([x, h]) => at(x, h));
+    stroke(open(hp), q, INK, Math.max(1.6, 0.0075 * k), 0.9);
+    this.lite(open(hp.slice(1, 5).map(([x, y]) => [x - 0.4, y])), '#F2DFA8', 0.7, 0.4 * q);
+    stroke(new P([at(-0.058, 0.142), at(-0.064, 0.149)]), q, INK, Math.max(1.4, 0.005 * k), 0.85);
+    // the body and lid, one turned outline: paper, the brass, engraved rings round the form (darker in the middle, the
+    // room's light along both edges, a bright streak where it mirrors the screens), the bands of its rings
+    mask(B.outline, q); brass(B.outline, 0.52);
+    const toEye = (() => { const dx = -X, dz = -Z, l = Math.hypot(dx, dz); return [dx / l, dz / l]; })();
+    const lines = [];
+    this.DALLAH.forEach(([h1, r1], i) => {
+      if (i === 0 || r1 <= 0) return;
+      const [h0, r0] = this.DALLAH[i - 1], steps = Math.max(1, Math.round((h1 - h0) / 0.0045));
+      for (let j = 0; j < steps; j++) {
+        const h = lerp(h0, h1, j / steps), r = lerp(r0, r1, j / steps), L = [];
+        for (let g = 0; g <= 36; g++) {
+          const a = g / 36 * TAU, nx = Math.cos(a) * B.e1[0] + Math.sin(a) * B.e3[0], nz = Math.cos(a) * B.e1[1] + Math.sin(a) * B.e3[1];
+          const fc = nx * toEye[0] + nz * toEye[1], lat = nx * toEye[1] - nz * toEye[0];
+          if (fc < -0.05) continue;
+          const p = at(r * Math.cos(a), h, r * Math.sin(a));
+          let tn = 0.55 - 0.35 * this.ss(0.45, 0.05, fc) - 0.55 * Math.exp(-(((lat - 0.42) / 0.11) ** 2)) - 0.3 * Math.exp(-(((lat + 0.62) / 0.1) ** 2));
+          tn += 0.15 * clamp((r0 - r1) / (h1 - h0) * 0.6, -1, 1);
+          L.push([p[0], p[1], clamp(tn)]);
+        }
+        L.sort((u, w) => u[0] - w[0]);
+        lines.push(L);
+      }
+    });
+    this.engrave(B.outline, lines, 0.6, 0.62 * q);
+    [0.006, 0.03, 0.106, 0.147, 0.153, 0.161, 0.206, 0.213].forEach(h => {
+      const i = this.DALLAH.findIndex(([hh]) => hh >= h), [ha, ra] = this.DALLAH[Math.max(0, i - 1)], [hb, rb] = this.DALLAH[i], r = lerp(ra, rb, clamp((h - ha) / ((hb - ha) || 1)));
+      stroke(open(B.near(B.ring(h, r))), q, INK, 0.7, 0.6);
+    });
+    // the mouth's lip seen from a little above, round the back of the lid
+    this.within(B.outline, () => this.lite(open(B.near(B.ring(0.1505, 0.051)).map(([x, y]) => [x, y + 0.6])), '#F6E7BE', 0.8, 0.45 * q));
+    this.rim(B.outline, 1.6, 0.7 * q); stroke(B.outline, q, INK, 1.1, 0.9);
+    // the spout, in front on the near side: a slender tube from a collar low on the bulb, rising clear of the waist,
+    // then the long beak curving up and out to its point, open along its top
+    const sp = [[0.066, 0.03], [0.077, 0.06], [0.084, 0.09], [0.089, 0.114], [0.094, 0.134]].map(([x, h]) => at(x, h));
+    const tubeP = this.tube(sp, [0.009, 0.0072, 0.0064, 0.0064, 0.007].map(r => r * k));
+    mask(tubeP, q); brass(tubeP, 0.52); this.within(tubeP, () => this.lite(open(sp.map(([x, y]) => [x - 0.45, y])), '#F6E7BE', 0.8, 0.5 * q));
+    stroke(tubeP, q, INK, 0.9, 0.9);
+    // the beak: a crescent, both edges sweeping up to its point at the height of the lid's dome
+    const lo2 = [[0.089, 0.127], [0.105, 0.134], [0.122, 0.145], [0.137, 0.159], [0.148, 0.176], [0.153, 0.193]], up2 = [[0.141, 0.176], [0.127, 0.163], [0.112, 0.153], [0.099, 0.146], [0.092, 0.142]];
+    const beak = new P(this.crs(lo2.concat(up2).map(([x, h]) => at(x, h)), true, 3), true);
+    mask(beak, q); brass(beak, 0.56);
+    this.within(beak, () => this.lite(open(lo2.slice(1, 5).map(([x, h]) => at(x - 0.001, h + 0.002))), '#F6E7BE', 0.8, 0.45 * q));
+    stroke(open([[0.098, 0.143], [0.112, 0.15], [0.127, 0.16], [0.14, 0.173], [0.149, 0.187]].map(([x, h]) => at(x, h))), q, INK, 0.8, 0.75);
+    this.rim(beak, 1.2, 0.6 * q); stroke(beak, q, INK, 0.9, 0.9);
+  },
+  // a finjan: white porcelain, a gold line round the lip; nested: a second cup sits inside it, 1.3 cm proud of its lip
+  finjan(X, Z, q, nested = false) {
+    const one = (Y0, clipTop) => {
+      const C = this.solid(X, Z, Y0, 0, this.FINJAN), rim = C.ring(0.048, 0.0322), rimP = new P(this.crs(rim, true, 2), true);
+      const draw = () => {
+        mask([C.outline, rimP], q); if (OPT.colour) wash(C.outline, HUE.sky, 0.05 * q);
+        // the shade on its side away from the screens, and under the lip
+        hatch(C.outline, [C.at(0, 0)[0] - 30, C.at(0, 0.05)[1] - 10, C.at(0, 0)[0] + 30, C.at(0, 0)[1] + 6], 1.35, 1.7, q, INK, 0.5, 0.2, 2071);
+        this.within(C.outline, () => stroke(new P(this.crs(C.near(C.ring(0.043, 0.031)), false, 2)), q, INK, 1.6, 0.14));
+        this.rim(C.outline, 1.3, 0.6 * q); stroke(C.outline, q, INK, 0.9, 0.85);
+        // its inside, the far wall in light, the near lip over it
+        fill(rimP, INK, 0.16 * q); this.within(rimP, () => this.lite(new P(this.crs(C.near(C.ring(0.036, 0.0298)), false, 2)), '#F3EADB', 1.6, 0.5 * q));
+        stroke(rimP, q, INK, 0.8, 0.85); stroke(new P(this.crs(C.near(rim), false, 2)), q, GOLD, 0.9, 0.85);
+      };
+      if (clipTop) { ctx.save(); ctx.beginPath(); new P(clipTop, true).trace(ctx, 1); ctx.clip(); draw(); ctx.restore(); } else draw();
+      return C;
+    };
+    const C0 = one(0.752);
+    if (nested) {
+      const fr = C0.near(C0.ring(0.048, 0.0322)), y0 = Math.min(...fr.map(p => p[1])) - 60;
+      one(0.765, fr.concat([[fr[fr.length - 1][0] + 30, fr[fr.length - 1][1]], [fr[fr.length - 1][0] + 30, y0], [fr[0][0] - 30, y0], [fr[0][0] - 30, fr[0][1]]]));
+      stroke(new P(this.crs(fr, false, 2)), q, GOLD, 0.9, 0.85);
     }
   },
   // the convex hull of screen points (monotone chain)
@@ -977,8 +1192,9 @@ scene({
     this.ctxLand.forEach(pg => stroke(pg, q, INK, 0.6, 0.35));
     this.uae.forEach(pg => stroke(pg, q, INK, 1, 0.85));
     ctx.restore();
-    // the legend strip: the five bands
-    const lx = P2[0] + 8, ly = P2[3] - 18;
+    // the legend strip: the five bands, in the corner south-east of the country (the standing forecaster's hand is
+    // raised by the south-western one)
+    const lx = P2[2] - 70, ly = P2[3] - 18;
     wordPatch([[lx - 3, ly - 3, 70, 14]], q);
     this.BANDS.forEach(([c, wa, gap, ha], i) => {
       const b = [lx + i * 13, ly, lx + i * 13 + 10, ly + 8], bp = boxP(...b);
@@ -1122,7 +1338,9 @@ scene({
       if (!this.hC || this.hC.width < DW) { this.hC = document.createElement('canvas'); this.hC.width = this.hC.height = DW; }
       const h = this.hC.getContext('2d'), gap = 2.4 * SCALE;
       h.setTransform(1, 0, 0, 1, 0, 0); h.globalCompositeOperation = 'source-over'; h.clearRect(0, 0, this.hC.width, this.hC.height);
-      h.strokeStyle = INK; h.lineWidth = 0.8 * SCALE; h.beginPath(); for (let y = gap / 2; y < DW; y += gap) { h.moveTo(0, y); h.lineTo(DW, y); } h.stroke();
+      // the lines are laid from the disc's centre, not from the scratch canvas's whole-pixel corner, so they move with the
+      // disc continuously as the camera eases (from the corner they snapped a pixel whenever the corner did)
+      h.strokeStyle = INK; h.lineWidth = 0.8 * SCALE; h.beginPath(); for (let y = ((sy - Y0) * SCALE + gap / 2) % gap; y < DW; y += gap) { h.moveTo(0, y); h.lineTo(DW, y); } h.stroke();
       h.globalCompositeOperation = 'destination-in'; h.imageSmoothingEnabled = true; h.imageSmoothingQuality = 'high';
       h.drawImage(this.rA, (sx - R - X0) * SCALE, (sy - R - Y0) * SCALE, 2 * R * SCALE, 2 * R * SCALE);
       ctx.save(); ctx.globalAlpha = SA * 0.62 * xa; ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(this.hC, 0, 0, DW, DW, X0, Y0, DW / SCALE, DW / SCALE); ctx.restore();

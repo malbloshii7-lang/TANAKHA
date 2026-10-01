@@ -15,13 +15,27 @@
 // Painted in three layers, as the eye (always above every boom) sees them: everything landward of the quay face, then the
 // ships and craft, then the lowered booms over the ships with their stays, trolleys, spreaders and loads.
 // 2026: no smoke, haze, glow or fire-like light anywhere; no red (boxes and craft in ochre, blue, sepia, steel, sea, sand).
+// The port at work (1 October 2026, "Jebel Ali at work"): every lowered crane discharges in the real cycle, each at its
+// own point in it (so no two move alike): the trolley runs out over its bay, the empty spreader comes down onto the box
+// standing on top of the deck stack, lands slowly, locks, hoists the box clear of the stacks, the trolley runs back over
+// the quay (the box starting down once it is clear of the ship's side) and the box is set down slowly onto a terminal
+// tractor's trailer waiting in the crane's lane under the portal, unlocked, and the tractor pulls away. Speeds are the
+// STS specification's (ZPMC: hoist 90 m/min laden, 180 m/min empty, trolley 240 m/min; Konecranes gives the same for
+// cranes 22-24 rows wide), each move easing in and out on a half-cosine, the port's time running 4 times the scene
+// clock: 2.9 times life at the design pace, 2.6 times at the film's 1.1 pace. Terminal 3 (Port Technology; CyberLogitec)
+// is semi-automated: remote-operated quay cranes, automated rail-mounted gantries over yard blocks parallel to the quay,
+// and manned terminal tractors with trailers between quay and yard (190 tractors, 178 trailers; Kalmar and Terberg
+// supplied them, 2014-2016), so the apron's traffic is tractor-trailers (a Terberg YT222: 5.6 m long, 2.5 m wide,
+// 3.2 m to the cab roof, the one-man cab on the left), never straddle carriers or AGVs. Behind the backreach, a one-way
+// pair of roadway lanes carries laden and empty tractors along the line, at about 22 km/h; in the yard the gantries run
+// along their blocks at 4 m/s. All of it is a pure function of the scene clock, from its own seeded stream.
 scene({
   id: 'jebelali',
   start: 0, dur: 8.333,
   init() {
     const r = rng(1107);
     const QZ = 4.5; // the quay deck above the water
-    Object.assign(this, { QZ, YW: 4, YL: 34.5, ZG: QZ + 71, ZT: QZ + 75, ZA: 104, REACH: 72, YLANE: 19, CYC: 7.2 });
+    Object.assign(this, { QZ, YW: 4, YL: 34.5, ZG: QZ + 71, ZT: QZ + 75, ZA: 104, REACH: 72 });
     // the hull's lines: stations [s at the deck, half-breadth at the deck, s at the waterline, half-breadth there], s from the
     // stern (0) to the stem (400); the counter overhangs the waterline aft, and the bow flares over a finer waterline
     this.ST = [[0, 23, 12, 12], [5, 26.5, 18, 21], [14, 29.2, 28, 27.5], [28, 30.5, 45, 30.5], [300, 30.5, 292, 30.5], [328, 30, 318, 28.2],
@@ -80,6 +94,146 @@ scene({
       y += gap * (0.8 + 0.4 * r());
     }
     this.R0 = [cam.R[0], cam.R[1]];
+    // the port at work, from a second stream so every draw above keeps its place
+    this.work(rng(1131));
+  },
+  // the port's working life: each lowered crane's three cycles around the beat, its tractors, the roadway's tractors and
+  // the yard gantries' runs. The port's clock (seconds of life) runs KT times the scene clock; the beat is seen over LW
+  work(r) {
+    this.KT = 4; this.LW = [0.85, 9.7];
+    const crs = this.cranes.filter(c => !c.raised).sort((p, q) => p.x - q.x);
+    // where the beat opens in each crane's work, as a share of the time from one pick to the next; the three cranes
+    // nearest the eye are set so that the beat holds a whole pick (#4), a whole set-down onto a tractor in the open lane
+    // at the bow (#5) and the trolley's run out (#3)
+    const HERO = { 5: ['land', 17], 4: ['down', 3], 3: ['out', 4] };
+    crs.forEach((c, k) => {
+      // the crane's lane under the portal (the three middle lanes in turn along the line), and the stretch of it its
+      // tractors are drawn on: the two at the bow come in from beyond the picture, the rest from behind the ships
+      c.lane = [25.5, 19.5, 13.5][k % 3];
+      c.ra = { 5: 250, 4: 250 }[c.i] || 62; c.rb = { 5: 80, 4: 74 }[c.i] || 62;
+      // three picks: A before the beat, B the next (its box stands on the stack until it is lifted), C after; A and C
+      // from the rows either side of B's, so a row never gives up the same box twice
+      const b = c.bay, wMin = Math.min(...b.cells.map(q => q.wa)) + 1.22, wMax = Math.max(...b.cells.map(q => q.wb)) - 1.22;
+      const w = clamp(-29.28 + 1.22 + 2.44 * c.row, wMin, wMax), wA = w + 2.44 <= wMax ? w + 2.44 : w - 2.44, wC = w - 2.44 >= wMin ? w - 2.44 : w + 2.44;
+      c.cyc = [wA, w, wC].map(q => this.cycle(c, q, r));
+      const [A, B] = c.cyc;
+      const lo = A.tLift - A.D, span = B.tLift - lo;
+      const h = HERO[c.i];
+      // (each hero's opening is set from one event of its work: the set-down of A's box, B's spreader starting down, or
+      // B's trolley starting out, that many seconds into the beat)
+      // (the others step round the cycle by the golden ratio along the line, so no two neighbours move alike)
+      const ev = h ? { land: A.tLand - A.D, down: B.tZ2, out: B.tY1 }[h[0]] - h[1] : lo + (0.03 + 0.94 * ((k * 0.618034 + 0.1 * r()) % 1)) * span;
+      c.u0 = clamp(ev, lo + 0.5, B.tLift - 0.5);
+      // each cycle's tractor: in to its stop W s before the box lands, away 2 s after the unlock
+      c.rigs = c.cyc.map((q, j) => {
+        const S = [-A.D, 0, B.D][j], W = 10 + r() * 12;
+        return { tA: S + q.tLand - W, tL: S + q.D, tD: S + q.D + 2, col: q.col };
+      });
+    });
+    // the roadway behind the backreach: a loop of two one-way lanes, seaward running down the line (+x), landward back,
+    // joined by a turn at each end (behind the eye, and some 5 km down the line), tractors spread round it at one pace
+    const rd = this.road = { y0: 66, y1: 76, xa: -760, xb: 5200, v: 6 };
+    rd.L = 2 * (rd.xb - rd.xa) + Math.PI * (rd.y1 - rd.y0);
+    this.fleet = [];
+    for (let s = r() * 60; s < rd.L - 60; s += 90 + r() * 170) this.fleet.push({ s, laden: r() < 0.55, col: r() });
+    // the yard gantries: about two in three make one run along their block while the beat is seen
+    this.yard.forEach(b => {
+      const lo = b.x0 + 8, hi = b.x1 - 8, x0 = clamp(b.gx, lo, hi), go = r() < 0.65, sg = r() < 0.5 ? -1 : 1, dx = 25 + r() * 110, t0 = r() * 30 - 8;
+      const to = go ? clamp(x0 + sg * dx, lo, hi) : x0;
+      b.gm = { x0, to, t0, p: this.prof(to - x0, 4, 6) };
+    });
+  },
+  // a move of length D at top speed v: the speed rises and falls on a half-cosine over ta s each way (no jolt in the
+  // speed or in its rate of change), or the same shape, shorter and slower, when D is too short to reach v
+  prof(D, v, ta) {
+    D = Math.abs(D);
+    if (D < 1e-6) return { T: 0, s: () => 0 };
+    if (D < v * ta) { ta = Math.sqrt(D * ta / v); v = D / ta; }
+    const tc = (D - v * ta) / v, T = 2 * ta + tc;
+    return { T, s: t => t <= 0 ? 0 : t >= T ? D : t < ta + tc ? this.ramp(t, v, ta) : D - this.ramp(T - t, v, ta) };
+  },
+  // the distance run t s after starting from rest on that half-cosine, then at v
+  ramp(t, v, ta) { return t <= 0 ? 0 : t < ta ? v / 2 * (t - ta / Math.PI * Math.sin(Math.PI * t / ta)) : v * ta / 2 + v * (t - ta); },
+  // when a move has run d
+  when(p, d) {
+    let a = 0, b = p.T;
+    for (let k = 0; k < 40; k++) { const m = (a + b) / 2; if (p.s(m) < d) a = m; else b = m; }
+    return b;
+  },
+  // one discharge cycle of a crane, picking from row w of its bay: the moves of the trolley (y) and of the spreader (z,
+  // its underside) in the cycle's own seconds, from the unlock on the last trailer to the unlock on the next
+  cycle(c, w, r) {
+    const { QZ } = this, s = c.ship, b = c.bay;
+    const cell = b.cells.find(q => w >= q.wa - 0.01 && w <= q.wb + 0.01) || b.cells[0];
+    // the box to pick stands one tier on its stack; the spreader lands on its top; it travels with the box hanging 2.5 m
+    // clear of the bay's highest stack; on the trailer the box's top is 4.09 m over the quay
+    const yL = c.lane, yP = s.YC + w, zP = cell.z1 + 2.59, zD = QZ + 4.09;
+    const zS = Math.max(zP, ...b.cells.map(q => q.z1)) + 2.59 + 2.5;
+    const TR = [4, 6], HE = [3, 2.5], HL = [1.5, 2], CR = [0.5, 1.5], LOCK = 2;
+    const Y = [], Z = [];
+    const add = (arr, t0, a, e, [v, ta]) => { const p = this.prof(e - a, v, ta); arr.push({ t0, a, b: e, p }); return t0 + p.T; };
+    // up off the trailer; the trolley sets out so that it crosses the ship's side (y -1.25) only once the spreader is up
+    const eZ1 = add(Z, 0, zD, zS, HE), pY1 = this.prof(yP - yL, ...TR);
+    const tY1 = Math.max(1.6, eZ1 - this.when(pY1, yL + 1.25));
+    const eY1 = add(Y, tY1, yL, yP, TR);
+    // down onto the box (the last 1.5 m at a creep), lock
+    const tZ2 = Math.max(eZ1, eY1 - 2), eZ2 = add(Z, tZ2, zS, zP + 1.5, HE), eZ3 = add(Z, eZ2, zP + 1.5, zP, CR), tLift = eZ3 + LOCK;
+    // hoist it clear; the trolley runs back; the box starts down once it is clear of the ship's side
+    const pZ4 = this.prof(zS - zP, ...HL), eZ4 = add(Z, tLift, zP, zS, HL);
+    const tY2 = tLift + this.when(pZ4, zS - zP - 0.3), pY2 = this.prof(yL - yP, ...TR);
+    add(Y, tY2, yP, yL, TR);
+    const tZ5 = Math.max(eZ4, tY2 + this.when(pY2, -0.78 - yP)), eZ5 = add(Z, tZ5, zS, zD + 1.5, HL);
+    const tLand = add(Z, eZ5, zD + 1.5, zD, CR);
+    return { Y, Z, yL, yP, zD, zP, zS, w, tY1, tZ2, tLift, tLand, D: tLand + LOCK, col: r() };
+  },
+  // an axis's place at cycle time t, from its moves
+  axis(segs, t, v) {
+    for (const g of segs) { if (t < g.t0) break; v = g.a + Math.sign(g.b - g.a) * g.p.s(t - g.t0); }
+    return v;
+  },
+  // the crane's time at scene time lt, and the spreader then: which cycle, where, whether it carries a box, whether the
+  // next box still stands on its stack, and whether it hangs low enough to be painted among the ship's stacks
+  hoist(c, lt) {
+    const u = c.u0 + (lt - this.LW[0]) * this.KT, [A, B] = c.cyc;
+    const k = u < 0 ? 0 : u < B.D ? 1 : 2, cy = c.cyc[k], t = u - [-A.D, 0, B.D][k];
+    const y = this.axis(cy.Y, t, cy.yL), z = this.axis(cy.Z, t, cy.zD), load = t >= cy.tLift && t < cy.D;
+    return { u, y, z, load, col: cy.col, stack: u < B.tLift ? B : null, low: (load ? z - 2.59 : z) < 60 };
+  },
+  // a tractor's place along the crane's lane at the crane's time u (its trailer's centre): running in, slowing to a stop
+  // with the trailer under the spreader, waiting, pulling away; null off the stretch of lane it is drawn on
+  rigX(c, g, u) {
+    const x = u < g.tA ? c.x - this.ramp(g.tA - u, 4.5, 5) : u < g.tD ? c.x : c.x + this.ramp(u - g.tD, 4.5, 6);
+    return x < c.x - c.ra || x > c.x + c.rb ? null : x;
+  },
+  // a roadway tractor's place on the loop at scene time lt: its kingpin, the tractor's heading and the trailer's (the
+  // trailer's axles following the kingpin's path 9.5 m behind)
+  fleetAt(f, lt) {
+    const rd = this.road, s = f.s + rd.v * (lt - this.LW[0]) * this.KT, K = this.loop(s), T = this.loop(s - 9.5), H = this.loop(s + 1.5);
+    return { kx: K[0], ky: K[1], h: Math.atan2(H[1] - K[1], H[0] - K[0]), th: Math.atan2(K[1] - T[1], K[0] - T[0]) };
+  },
+  // a point on the roadway loop at arc length s
+  loop(s) {
+    const { y0, y1, xa, xb, L } = this.road, L1 = xb - xa, R = (y1 - y0) / 2, Lc = Math.PI * R, ym = (y0 + y1) / 2;
+    s = ((s % L) + L) % L;
+    if (s < L1) return [xa + s, y0];
+    s -= L1;
+    if (s < Lc) { const a = -Math.PI / 2 + s / R; return [xb + R * Math.cos(a), ym + R * Math.sin(a)]; }
+    s -= Lc;
+    if (s < L1) return [xb - s, y1];
+    s -= L1;
+    const a = Math.PI / 2 + s / R;
+    return [xa + R * Math.cos(a), ym + R * Math.sin(a)];
+  },
+  // draw as the plate inks in at x along the quay, wherever in the layers it is drawn
+  inked(x, fn) {
+    const s0 = SA;
+    SA = this.SA0 * this.ink(x);
+    try { if (SA > 0.003) fn(); } finally { SA = s0; }
+  },
+  // a yard gantry's place along its block
+  gantryX(b, lt) {
+    const m = b.gm;
+    return m.x0 + Math.sign(m.to - m.x0) * m.p.s((lt - this.LW[0]) * this.KT - m.t0);
   },
   // one ship: the hull lofted from its stations, the boot-top face by face, the deck, the bays, the deckhouse and the casing
   ship(x0, L, bow, r, idx) {
@@ -175,31 +329,6 @@ scene({
     c.tip = P4(REACH, 0, 0); c.mid = P4(REACH / 2, 0, 0);
     return c;
   },
-  // the trolley, spreader and load of a working crane at scene time lt. One move (about 90 s in life; time runs about 12x
-  // here so a whole move reads in the beat): out over the ship, down to the stack under the trolley, up with the box, back
-  // over the quay, down to a truck in the lane under the portal, release, up again
-  move(c, lt) {
-    const { QZ, ZT, YLANE } = this, ph = (((lt - 0.9) / this.CYC + c.ph) % 1 + 1) % 1;
-    // (the row is kept inside the stacks this bay carries, so the spreader always lands on a box)
-    const wMin = Math.min(...c.bay.cells.map(q => q.wa)), wMax = Math.max(...c.bay.cells.map(q => q.wb));
-    const w = clamp(-29.28 + 1.22 + 2.44 * c.row, wMin + 1.22, wMax - 1.22), yPick = c.ship.YC + w;
-    const cell = c.bay.cells.find(q => w >= q.wa - 0.01 && w <= q.wb + 0.01) || c.bay.cells[0];
-    const zPick = cell.z1, zTr = QZ + 63, zTruck = QZ + 4.1;
-    const seg = (a, b) => easeInOut(prog(ph, a, b - a));
-    let y = YLANE, z = zTr;
-    if (ph < 0.16) y = lerp(YLANE, yPick, seg(0, 0.16));
-    else if (ph < 0.45) { y = yPick; z = ph < 0.3 ? lerp(zTr, zPick, seg(0.16, 0.28)) : lerp(zPick, zTr, seg(0.33, 0.45)); }
-    else if (ph < 0.61) y = lerp(yPick, YLANE, seg(0.45, 0.61));
-    else z = ph < 0.77 ? lerp(zTr, zTruck, seg(0.61, 0.74)) : lerp(zTruck, zTr, seg(0.79, 0.9));
-    const load = ph >= 0.29 && ph < 0.755;
-    // the truck: drives in under the portal, takes the box, drives off along the lane
-    let truck = null;
-    if (ph > 0.35 && ph < 0.98) {
-      const tx = ph < 0.6 ? lerp(c.x - 46, c.x, easeOut(prog(ph, 0.35, 0.25))) : c.x + 46 * Math.pow(prog(ph, 0.77, 0.21), 1.6);
-      truck = { x: tx, a: clamp((ph - 0.35) / 0.06) * clamp((0.98 - ph) / 0.06), box: ph >= 0.755 };
-    }
-    return { y, z, load, truck, col: cell.col };
-  },
   // this frame's camera, and where the horizon and the quay edge fall on screen (the washes and the water follow them)
   frame(lt) {
     const cam = this.view(lt), B = R11.BOX;
@@ -239,7 +368,9 @@ scene({
     R11.clipped(() => {
       this.frame(lt);
       const B = R11.BOX;
-      const ink = x => easeOut(prog(lt, 0.15 + clamp((x + 200) / 2600) * 1.3, 0.7)); // the plate inks in along the quay
+      // the plate inks in along the quay
+      const ink = x => easeOut(prog(lt, 0.15 + clamp((x + 200) / 2600) * 1.3, 0.7));
+      this.ink = ink; this.SA0 = SA;
       this.drawSky(lt);
       // the far ground to the horizon
       stroke(new P([[B[0], this.hz], [B[2], this.hz]]), 1, INK, 0.9, 0.45);
@@ -247,21 +378,45 @@ scene({
       this.drawSea(lt);
       const L1 = [], L2 = [], L3 = [];
       // (1) landward of the quay face, far to near: the sheds, the yard, the quay, the cranes' structure
+      // (landward of the roadway, all of it beyond anything nearer the quay, so painted first: +20000)
       this.sheds.forEach((b, k) => {
         const d = R11.dep([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, QZ]);
-        L1.push({ d, draw: () => R11.faded(ink(b.x0) * 0.85, () => {
+        L1.push({ d: d + 20000, draw: () => R11.faded(ink(b.x0) * 0.85, () => {
           const a = R11.air(d, 1800);
           E3.solid(E3.box(b.x0, b.x1, b.y0, b.y1, QZ, QZ + b.z1), { tone: 0.05, shade: 0.45, lw: 0.8, edgeA: 0.6 * a, noHatch: d > 1600, fillCol: OPT.colour ? HUE.steel : SEPIA, fillA: OPT.colour ? 0.16 : 0.08 }, 3000 + k);
         }) });
       });
       this.yard.forEach((b, k) => {
         const d = R11.dep([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, QZ]);
-        L1.push({ d, draw: () => R11.faded(ink(b.x0), () => this.drawBlock(b, d, k)) });
+        L1.push({ d: d + 20000, draw: () => R11.faded(ink(b.x0), () => this.drawBlock(b, d, k, lt)) });
       });
       L1.push({ d: 1e6, draw: () => R11.faded(easeInOut(prog(lt, 0.1, 0.8)), () => this.drawQuay(lt)) });
+      // the roadway's tractors, between the yard and the cranes (+10000)
+      this.fleet.forEach((f, k) => {
+        const g = this.fleetAt(f, lt);
+        if (g.kx < -400) return;
+        g.box = f.laden ? f.col : null;
+        const d = R11.dep([g.kx, g.ky, QZ + 2]);
+        L1.push({ d: d + 10000, draw: () => R11.faded(ink(g.kx), () => this.drawRig(g, d, 7000 + k * 7)) });
+      });
+      this.cranes.forEach(c => { c.here = []; c.mv = c.raised ? null : this.hoist(c, lt); });
+      // each crane's tractors in its lane: drawn with the crane whose portal they are under (between its legs in the
+      // painting order), else on their own
       this.cranes.forEach(c => {
-        const d = R11.dep([c.x, 19, QZ + 40]), mv = c.raised ? null : this.move(c, lt);
-        c.mv = mv;
+        if (c.raised) return;
+        c.rigs.forEach((g, j) => {
+          const x = this.rigX(c, g, c.mv.u);
+          if (x === null) return;
+          // (inked with its own crane wherever it is drawn, so its box passes from the spreader unchanged)
+          const rig = { kx: x + 5.25, ky: c.lane, h: 0, th: 0, box: c.mv.u >= g.tL ? g.col : null, ix: c.x }, xm = x + 1.5;
+          const host = this.cranes.find(q => Math.abs(q.x - xm) < 30);
+          if (host) { host.here.push(rig); return; }
+          const d = R11.dep([xm, c.lane, QZ + 2]);
+          L1.push({ d, draw: () => this.inked(c.x, () => this.drawRig(rig, d, 7600 + c.i * 7 + j)) });
+        });
+      });
+      this.cranes.forEach(c => {
+        const d = R11.dep([c.x, 19, QZ + 40]);
         L1.push({ d, draw: () => R11.faded(ink(c.x), () => this.craneFrame(c, d, lt)) });
         L3.push({ d: R11.dep(c.parts.mid), draw: () => R11.faded(ink(c.x), () => this.craneBoom(c, lt)) });
       });
@@ -382,9 +537,9 @@ scene({
     E3.segments(segs, INK, 0.8);
   },
   // a yard block: its runs of boxes far to near, the rows and the box ends on the faces toward the eye, its gantry
-  drawBlock(b, d, k) {
+  drawBlock(b, d, k, lt) {
     const QZ = this.QZ, a = R11.air(d, 2200), near = d < 1100;
-    const g0 = b.gx, zz = QZ + 24;
+    const g0 = this.gantryX(b, lt), zz = QZ + 24;
     // the gantry's legs on the far rail first
     [g0 - 5, g0 + 5].forEach(x => R11.member([x, b.y1 + 3, QZ], [x, b.y1 + 3, zz], 1, 0.6 * a));
     const segs = (d < 2000 ? b.segs : [{ x0: b.x0, x1: b.x1, z1: QZ + 2.59 * 5.5, col: b.segs[0].col }]).slice().sort((p, q) => R11.dep([q.x0, b.y0, QZ]) - R11.dep([p.x0, b.y0, QZ]));
@@ -404,17 +559,25 @@ scene({
     if (d < 2600) E3.solid(E3.box(g0 - 6, g0 + 6, b.y0 - 4, b.y1 + 4, zz, zz + 2.2), { tone: 0.1, shade: 0.45, lw: 0.9, edgeA: 0.8 * a, noHatch: true, fillCol: OPT.colour ? '#E6E1D4' : null, fillA: 0.5 }, 3600 + k);
     else R11.member([g0, b.y0 - 4, zz + 1], [g0, b.y1 + 4, zz + 1], 1.4, 0.7 * a);
   },
-  // the crane's structure landward of the quay face (and a load while it is over the quay), far to near
+  // the crane's structure landward of the quay face, with the tractors under its portal and the load while it is over
+  // the quay. The eye is always seaward of the quay and astern of every crane, so the parts go far to near by side: the
+  // landside legs and portal beam; the tractors in the lanes; the load (with the far legs' bracing before it when it
+  // hangs high, after it when it hangs low: a brace is nearer than whatever lower it crosses on screen); the near bracing;
+  // the waterside legs and portal beam; then the girder, trolley, machinery house, A-frames and back stays
   craneFrame(c, d, lt) {
     const p = c.parts, a = R11.air(d, 2600), st = { tone: 0.08, shade: 0.55, lw: 1.3, edgeA: 0.9 * a, noHatch: d > 1300, fillCol: OPT.colour ? '#E6E1D4' : null, fillA: 0.45 };
-    const items = [];
-    p.legs.forEach((l, i) => items.push({ p: l.p, draw: () => { E3.solid(l.bog, Object.assign({}, st, { tone: 0.3, noHatch: true }), 4000 + c.i * 20 + i); E3.solid(l.f, st, 4010 + c.i * 20 + i); } }));
-    p.sides.forEach(sd => items.push({ p: sd.p, draw: () => sd.m.forEach(([m, n], j) => R11.member(m, n, j ? 0.8 : 1.1, 0.75)) }));
-    p.cross.forEach((cb, i) => items.push({ p: cb.p, draw: () => E3.solid(cb.f, st, 4100 + c.i * 20 + i) }));
-    const mv = c.mv, over = mv && mv.y >= this.YW;
-    if (mv && mv.truck) items.push({ p: [mv.truck.x, this.YLANE, this.QZ + 2], draw: () => this.drawTruck(mv.truck, d, c) });
-    if (over) items.push({ p: [c.x, mv.y, (mv.z + this.ZG) / 2], draw: () => this.drawHoist(c, mv, d) });
-    items.sort((m, n) => R11.dep(n.p) - R11.dep(m.p)).forEach(it => it.draw());
+    const leg = i => { const l = p.legs[i]; E3.solid(l.bog, Object.assign({}, st, { tone: 0.3, noHatch: true }), 4000 + c.i * 20 + i); E3.solid(l.f, st, 4010 + c.i * 20 + i); };
+    const brace = j => p.sides[j].m.forEach(([m, n], k) => R11.member(m, n, k ? 0.8 : 1.1, 0.75));
+    [3, 2].forEach(leg);
+    E3.solid(p.cross[1].f, st, 4100 + c.i * 20 + 1);
+    c.here.map(g => ({ g, d: R11.dep([g.kx - 3.75, g.ky, this.QZ + 2]) })).sort((m, n) => n.d - m.d).forEach((o, k) => this.inked(o.g.ix, () => this.drawRig(o.g, o.d, 7300 + c.i * 7 + k)));
+    const mv = c.mv, over = mv && mv.y >= this.YW, high = over && mv.z > 40;
+    if (!high) brace(1);
+    if (over) this.drawHoist(c, mv, d);
+    if (high) brace(1);
+    brace(0);
+    [1, 0].forEach(leg);
+    E3.solid(p.cross[0].f, st, 4100 + c.i * 20);
     E3.solid(p.girder, st, 4200 + c.i);
     if (over) this.drawTrolley(c, mv, d);
     E3.solid(p.house, Object.assign({}, st, { tone: 0.12, fillCol: OPT.colour ? '#EDE8DC' : null, fillA: 0.55 }), 4300 + c.i);
@@ -422,11 +585,12 @@ scene({
     E3.solid(p.apexBeam, Object.assign({}, st, { noHatch: true }), 4350 + c.i);
     p.backstays.forEach(([m, n]) => R11.member(m, n, 0.7, 0.6));
   },
-  // the boom (lowered over the ship or raised), with what hangs under it while the trolley is out over the water, the
-  // trolley riding on it and the forestays over it
+  // the boom (lowered over the ship or raised), with what hangs under it while the trolley is out over the water and
+  // the load is up above the ships' houses (lower, it is painted among the ship's stacks), the trolley riding on it and
+  // the forestays over it
   craneBoom(c, lt) {
     const p = c.parts, d = R11.dep(p.mid), a = R11.air(d, 2600), mv = c.mv, out = mv && mv.y < this.YW;
-    if (out) this.drawHoist(c, mv, d);
+    if (out && !mv.low) this.drawHoist(c, mv, d);
     E3.solid(p.boom, { tone: 0.06, shade: 0.55, lw: 1.2, edgeA: 0.92 * a, noHatch: d > 1300, fillCol: OPT.colour ? '#ECE7DB' : null, fillA: 0.5, hdir: [0, 1, 0] }, 4400 + c.i);
     // the boom's girder panels, so its length reads as built steel
     const L = [];
@@ -439,12 +603,12 @@ scene({
     const zT = this.ZT, a = R11.air(d, 2600), x = c.x;
     E3.solid(E3.box(x - 3.6, x + 3.6, mv.y - 3, mv.y + 3, zT, zT + 2.4), { tone: 0.2, shade: 0.45, lw: 0.9, edgeA: 0.9 * a, noHatch: true, fillCol: OPT.colour ? HUE.deep : INK, fillA: OPT.colour ? 0.45 : 0.3 }, 4500 + c.i);
   },
-  // the hoist ropes from the trolley, the spreader, and the box on it
+  // the hoist ropes from the trolley, the box on the spreader, and the spreader on it (seen from above, so the box first)
   drawHoist(c, mv, d) {
     const a = R11.air(d, 2600), x = c.x, y = mv.y, z = mv.z, zT = this.ZT;
     [[-1.6, -1], [1.6, -1], [-1.6, 1], [1.6, 1]].forEach(([dx, dy]) => E3.line([[x + dx, y + dy * 0.8, zT], [x + dx * 3.4, y + dy * 0.9, z + 0.9]], INK, clamp(0.9 * 260 / d, 0.6, 1.1), 0.85 * a));
-    E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.25, y + 1.25, z, z + 0.9), { tone: 0.3, shade: 0.4, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: OCHRE, fillA: 0.5 }, 4550 + c.i);
     if (mv.load) this.drawBox(x, y, z, mv.col, a, 4600 + c.i);
+    E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.25, y + 1.25, z, z + 0.9), { tone: 0.3, shade: 0.4, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: OCHRE, fillA: 0.5 }, 4550 + c.i);
   },
   // a box's colour and how strongly it is laid: plain boxes, no liveries; steel, sea and cloud greys-blues, sepia, a few in
   // sand laid lighter (ochre, blue, sepia and ink in the default look). Never red
@@ -456,15 +620,35 @@ scene({
     const [cc, ck] = this.boxCol(col);
     E3.solid(E3.box(x - 6.1, x + 6.1, y - 1.22, y + 1.22, z - 2.59, z), { tone: 0.08, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: cc, fillA: (OPT.colour ? 0.6 : 0.35) * ck }, seed);
   },
-  // a terminal tractor and its chassis in the lane under the portal
-  drawTruck(t, d, c) {
-    const QZ = this.QZ, y = this.YLANE, x = t.x, a = R11.air(d, 2600);
-    R11.faded(t.a, () => {
-      const st = { tone: 0.2, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true };
-      E3.solid(E3.box(x - 6.3, x + 6.3, y - 1.25, y + 1.25, QZ + 0.9, QZ + 1.5), Object.assign({}, st, { tone: 0.35 }), 4700 + c.i);
-      E3.solid(E3.box(x + 6.6, x + 11.4, y - 1.3, y + 1.3, QZ, QZ + 3.4), Object.assign({}, st, { fillCol: OPT.colour ? HUE.steel : BLUE, fillA: 0.4 }), 4710 + c.i);
-      if (t.box) this.drawBox(x, y, QZ + 4.1, c.mv.col, a, 4720 + c.i);
-    });
+  // a block of the vehicles: centre (x, y), heading h, from l0 to l1 along it and w0 to w1 across (left +), z0 to z1
+  obox(x, y, h, l0, l1, w0, w1, z0, z1) {
+    const c = Math.cos(h), s = Math.sin(h), P = (u, v, z) => [x + u * c - v * s, y + u * s + v * c, z];
+    const q = [[l0, w0], [l1, w0], [l1, w1], [l0, w1]], b0 = q.map(([u, v]) => P(u, v, z0)), b1 = q.map(([u, v]) => P(u, v, z1));
+    return [b0, b1].concat([0, 1, 2, 3].map(i => [b0[i], b0[(i + 1) % 4], b1[(i + 1) % 4], b1[i]]));
+  },
+  // a terminal tractor and its trailer (g: the kingpin over the fifth wheel, the tractor's and the trailer's headings,
+  // the box's colour if laden). The tractor (a YT222: 5.6 x 2.5 m, 3.2 m to the cab roof): its chassis the full width,
+  // the one-man cab on the left and the engine cover on the right, both forward of the fifth wheel. The trailer: a
+  // 40-foot deck 12.5 m long, its kingpin 1 m from its front, the box's floor 1.5 m over the quay. Far to near as the
+  // eye sees them
+  drawRig(g, d, seed) {
+    const QZ = this.QZ, a = R11.air(d, 2600), st = { tone: 0.2, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true };
+    const tx = g.kx - 5.25 * Math.cos(g.th), ty = g.ky - 5.25 * Math.sin(g.th);
+    const tractor = () => {
+      E3.solid(this.obox(g.kx, g.ky, g.h, -1.6, 4, -1.25, 1.25, QZ + 0.4, QZ + 1.3), Object.assign({}, st, { tone: 0.5, fillCol: INK, fillA: 0.3 }), seed);
+      E3.solid(this.obox(g.kx, g.ky, g.h, 1, 4, -1.25, -0.05, QZ + 1.3, QZ + 2.1), Object.assign({}, st, { fillCol: OPT.colour ? HUE.steel : BLUE, fillA: 0.4 }), seed + 1);
+      E3.solid(this.obox(g.kx, g.ky, g.h, 1.7, 4, 0.05, 1.25, QZ + 1.3, QZ + 3.2), Object.assign({}, st, { tone: 0.12, fillCol: OPT.colour ? HUE.steel : BLUE, fillA: 0.5 }), seed + 2);
+    };
+    const trailer = () => {
+      E3.solid(this.obox(tx, ty, g.th, -6.25, 6.25, -1.25, 1.25, QZ + 1.0, QZ + 1.5), Object.assign({}, st, { tone: 0.35, fillCol: INK, fillA: 0.25 }), seed + 3);
+      // (along the lanes the box is drawn exactly as on the spreader, so it passes from one to the other unchanged)
+      if (g.box !== null && g.box !== undefined) {
+        if (g.th === 0) this.drawBox(tx, ty, QZ + 4.09, g.box, a, seed + 4);
+        else { const [cc, ck] = this.boxCol(g.box); E3.solid(this.obox(tx, ty, g.th, -6.1, 6.1, -1.22, 1.22, QZ + 1.5, QZ + 4.09), { tone: 0.08, shade: 0.45, lw: 0.8, edgeA: 0.85 * a, noHatch: true, fillCol: cc, fillA: (OPT.colour ? 0.6 : 0.35) * ck }, seed + 4); }
+      }
+    };
+    const dT = R11.dep([g.kx + 1.2 * Math.cos(g.h), g.ky + 1.2 * Math.sin(g.h), QZ + 1.5]), dR = R11.dep([tx, ty, QZ + 1.5]);
+    if (dT > dR) { tractor(); trailer(); } else { trailer(); tractor(); }
   },
   drawShip(s, lt, dS) {
     const D = s.D, a = R11.air(dS, 2600), C = this.ec.C;
@@ -507,6 +691,16 @@ scene({
       E3.face(s.funnel[1], { n: [0, 0, 1], fillCol: INK, fillA: 0.5, noHatch: true, edges: false }, 5805 + s.idx * 10);
     } });
     items.push({ d: ctr(s.bwater), draw: () => { E3.solid(s.bwater, Object.assign({}, white, { tone: 0.1 }), 5806 + s.idx * 10); R11.member(s.fmast[0], s.fmast[1], 1, 0.8); } });
+    // the cranes working her: the box each lifts next, standing one tier on its stack, and the spreader with its ropes
+    // and box while it is out over the water (it never rises above her houses' tops, so it is always among her stacks):
+    // each just after the stack under it, so the stacks nearer the eye paint over it as they should, inked with its crane
+    this.cranes.forEach(c => {
+      if (c.raised || c.ship !== s) return;
+      const mv = c.mv, b = c.bay, dC = R11.dep(c.parts.mid), aC = R11.air(dC, 2600);
+      const key = y => { const w = y - s.YC, q = b.cells.find(e => w >= e.wa - 0.01 && w <= e.wb + 0.01); return q ? Math.min(at(c.x, y), at(b.xc, s.YC + (q.wa + q.wb) / 2)) : at(c.x, y); };
+      if (mv.stack) { const B = mv.stack; items.push({ d: key(B.yP) - 0.01, draw: () => this.inked(c.x, () => this.drawBox(c.x, B.yP, B.zP, B.col, aC, 4620 + c.i)) }); }
+      if (mv.y < this.YW && mv.low) items.push({ d: key(mv.y) - 0.02, draw: () => this.inked(c.x, () => this.drawHoist(c, mv, dC)) });
+    });
     items.sort((p, q) => q.d - p.d).forEach(it => it.draw());
     this.boomShadows(s, a);
   },
