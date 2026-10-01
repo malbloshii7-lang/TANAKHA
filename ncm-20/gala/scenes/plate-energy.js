@@ -180,10 +180,39 @@ scene({
       const k = Math.max(2, Math.ceil((u1 - u0) / 3)), uu = Array.from({ length: k + 1 }, (_, i) => lerp(u0, u1, i / k));
       return new P(uu.map(u => this.scr11(zn, off, this.pt11(c, sn, u))).concat(uu.slice().reverse().map(u => this.scr11(zf, off, this.pt11(c, sn, u)))), true);
     };
-    spans(this.RG).forEach(s => fill(band(s), INK, 0.1));
+    spans(this.RG).forEach(s => fill(band(s), INK, 0.06));
     spans(this.RA).forEach(s => fill(band(s), INK, 0.3));
-    spans(0.25 * this.RA).forEach(s => fill(band(s), '#FFE6B8', 0.55 * S11.G));
-  }, toward the horizon, a warm halo about the sun, desert under the rows, the mirrors holding the sky
+    spans(0.25 * this.RA).forEach(s => { const b = band(s); this.grad11(b, b.pts[0], b.pts[b.pts.length - 1], '#FFE6B8', 0.6 * S11.G, 0.6 * S11.G, 'source-over'); });
+  },
+  // the receiver supports (struts from the torque box through the gap at the vertex to the tube), drawn while the eye
+  // sees the mirror's face at its vertex
+  supports11(off, zn, zf, c, sn, at) {
+    const a = 0.55 * clamp(0.5 + this.look11(c, sn, off, 0, zn).cv / 0.16);
+    if (a <= 0) return;
+    this.sup.forEach(z => {
+      if (z <= zn + 0.3 || z >= zf) return;
+      stroke(new P([at(z, off, [0, this.v11]), at(z, off, this.focus)]), 1, INK, 0.7 / (1 + this.K * z) + 0.2, a);
+    });
+  },
+  // a band along the receiver from its near end to its far end, its half-width hw px at s 1 tapering with distance
+  tube11(fN, fF, zn, zf, hw, col, a, mode) {
+    if (a <= 0) return;
+    const dx = fF[0] - fN[0], dy = fF[1] - fN[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+    const wn = hw / (1 + this.K * zn), wf = hw / (1 + this.K * zf);
+    const path = new P([[fN[0] + nx * wn, fN[1] + ny * wn], [fF[0] + nx * wf, fF[1] + ny * wf], [fF[0] - nx * wf, fF[1] - ny * wf], [fN[0] - nx * wn, fN[1] - ny * wn]], true);
+    this.grad11(path, fN, fF, col, a, a, mode);
+  },
+  // sunlight at the near end: rays from the model's sun, reflected by the parabola's normal at each point; they meet
+  // on the tube when the collectors are on sun and fall a little beside it while they are still 3 deg off
+  rays11(S11, off, zn, c, sn, sq, lt) {
+    const di = [-Math.sin(S11.rho), Math.cos(S11.rho)], f = this.turn11(c, sn, [0, this.v11 - this.f11]);
+    this.rays.forEach(([u]) => {
+      const h = this.pt11(c, sn, u), n = this.nrm11(c, sn, u), dn = di[0] * n[0] + di[1] * n[1], o = [di[0] - 2 * dn * n[0], di[1] - 2 * dn * n[1]];
+      const L = Math.hypot(f[0] - h[0], f[1] - h[1]), from = [h[0] - 0.4 * this.W0 * di[0], h[1] - 0.4 * this.W0 * di[1]], to = [h[0] + L * o[0], h[1] + L * o[1]];
+      stroke(new P([from, h, to].map(p => this.scr11(zn, off, p))), 1, OCHRE, 1.2, 0.8 * sq, [5, 4], -lt * 30);
+    });
+  },
+  // colour: a sky warming toward the horizon, a warm halo about the sun, desert under the rows, the mirrors holding the sky
   under(lt) {
     const q = easeInOut(prog(lt, 0.2, 1.2));
     washFade([985, -300, 1885, this.HY], [[0, HUE.sky, 0.4], [0.7, HUE.sky, 0.3], [1, HUE.dawn, 0.34]], 150, q);

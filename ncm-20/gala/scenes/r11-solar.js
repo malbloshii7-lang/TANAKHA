@@ -123,7 +123,7 @@ scene({
     const s = [Math.cos(alt) * Math.sin(az), Math.cos(alt) * Math.cos(az), Math.sin(alt)];
     // backtracking: the true-tracking angle in the plane across the rows, turned back until the rows just clear (only
     // past 64° at this ground-cover ratio, so never in this beat); then the tracker's ±60° stop
-    const tT = Math.atan2(-s[0], s[2]), c = Math.cos(tT) / this.GCR;
+    const tT = this.trueTrack(p.alt, p.az), c = Math.cos(tT) / this.GCR;
     let th = Math.abs(c) < 1 ? tT - Math.sign(tT) * Math.acos(Math.abs(c)) : tT;
     th = clamp(th, -this.LIM * D, this.LIM * D);
     const ct = Math.cos(th), st = Math.sin(th);

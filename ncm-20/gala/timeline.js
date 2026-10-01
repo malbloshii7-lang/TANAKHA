@@ -317,7 +317,8 @@ function REV11_BEATS() {
         } }],
     },
     after: {
-      // B14b · the clean-energy record (2 bars) after Shams 1: the gigawatt photovoltaic fields at sunset, and the
+      // B14b · the clean-energy record (2 bars) after Shams 1: the gigawatt photovoltaic fields in a time-lapse of the
+      // afternoon (13:50 to 15:28 on 16 November; the rows turn west with the sun until they reach their 60-degree stop), and the
       // requester's "pioneer" line: the region's first net-zero commitment (Masdar, 7 Oct 2021: "the first Middle East
       // and North Africa (MENA) nation"), with its region and year on screen. The plant's "largest at its opening"
       // (overtaken since) goes to the programme, so the headline can be read for 4 s

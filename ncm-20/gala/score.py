@@ -404,7 +404,7 @@ def main(cues_path, out_dir):
         'port': RAS + TAR + TUS + SAWT,  # the sawt's mirwas and claps: the coastal, urban colour
         'tanker': [(0, 'jahla', 0.8), (8, 'jahla', 0.6)],  # the drums rest: only the jahla, as in the pearling beat
         'energy': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # the tus shimmer
-        'solar': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # Revision 11: the same colour into the evening
+        'solar': AYYALA + [(i, 'tus', 0.3) for i in (2, 6, 10, 14)],  # Revision 11: the same colour into the afternoon
     }
     for sid, pat in colour.items():
         if sid in S:  # the tanker beat can be pulled (?pull=tanker)

@@ -552,7 +552,7 @@ identical to the pixel.
 bar longer each: see the notes of 1 October below; 4:00.2 with the tanker pulled; 4:29.5 with `?april2024`). The beats
 keep the bar grid. *Superseded lengths:* before the detail beats were slowed, 3:34.5 (58.5 bars; 3:27.2 and 3:52.8),
 still built with `?slow=0`; the table below gives each beat's length before that change.
-The working day now runs from dawn to sunset, and the Center's watch leads into the world.
+The working day now runs from dawn into the late afternoon, and the Center's watch leads into the world.
 
 | Beat | Revision 8 | Revision 11 |
 |---|---|---|
@@ -560,7 +560,7 @@ The working day now runs from dawn to sunset, and the Center's watch leads into 
 | B10 · Zayed International | the runway, 1.5 bars | dawn fog at the airfield (new, 1.5) and the arrival (1.5), both in true 3D |
 | B12 · Jebel Ali | one ship, 1.5 bars | the container quay in its length, true 3D, 2.5 bars |
 | B13 · the east coast | a tanker under way, 1.5 bars | the VLCC jetty with a tanker alongside, true 3D, 2 bars |
-| B14 · clean energy | Shams 1, 1.5 bars | Shams 1 (1.5), then Al Dhafra Solar PV at sunset and the net-zero pledge (new, 2) |
+| B14 · clean energy | Shams 1, 1.5 bars | Shams 1 (1.5), then Al Dhafra Solar PV in the afternoon, its trackers turning with the sun, and the net-zero pledge (new, 2) |
 | B18b · the watch | — | forecasters at work; the satellite disc becomes the globe (new, 2.5 bars) |
 
 **"Perfect forecast" is not claimed.** No NCM forecast-accuracy figure is published (the one found, 90–97%, is from

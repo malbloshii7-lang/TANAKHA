@@ -413,16 +413,42 @@ scene({
   ABAYA: [[0.0, 0.11, 0.11, 0.095, -0.005], [-0.03, 0.16, 0.16, 0.105, 0], [-0.055, 0.194, 0.194, 0.11, 0], [-0.085, 0.205, 0.212, 0.113, 0.005],
     [-0.14, 0.194, 0.218, 0.116, 0.01], [-0.22, 0.188, 0.222, 0.12, 0.02], [-0.3, 0.186, 0.222, 0.124, 0.03], [-0.38, 0.19, 0.218, 0.126, 0.03],
     [-0.46, 0.206, 0.218, 0.13, 0.025], [-0.52, 0.222, 0.228, 0.14, 0.035], [-0.56, 0.236, 0.238, 0.155, 0.05]],
+  // a smooth path through keyed values [[t, ...values], ...]: eased from each key to the next, held before the first and
+  // after the last (a move and a rest, as a hand moves)
+  keyed(keys, t) {
+    if (t <= keys[0][0]) return keys[0].slice(1);
+    for (let i = 1; i < keys.length; i++) if (t < keys[i][0]) { const a = keys[i - 1], b = keys[i], f = easeInOut((t - a[0]) / (b[0] - a[0])); return a.slice(1).map((x, j) => lerp(x, b[j + 1], f)); }
+    return keys[keys.length - 1].slice(1);
+  },
+  // the forecasters' small motions, on the scene clock (the beat's first frame is T0 = 1.3): the man on the left moves
+  // his mouse in short, slow strokes with rests between (a centimetre or two, each stroke over 0.7-0.8 s); the man on the
+  // right turns his head 22 degrees to his right, up to the wall's station winds, holds, and turns partly back
+  mouseAt(sl) {
+    const T0 = this.T0;
+    return this.keyed([[T0 + 0.9, 0, 0], [T0 + 1.6, 0.016, 0.01], [T0 + 2.5, 0.016, 0.01], [T0 + 3.3, 0.004, -0.006], [T0 + 4.4, 0.004, -0.006], [T0 + 5.1, 0.02, 0.004], [T0 + 6.1, 0.02, 0.004], [T0 + 6.9, 0.01, 0.012]], sl);
+  },
+  headTurn(o, sl) {
+    if (o.dress !== 'ghutra' || o.side > 0) return 0;
+    return 0.38 * (easeInOut(prog(sl, this.T0 + 1.4, 1.5)) - 0.6 * easeInOut(prog(sl, this.T0 + 4.3, 1.6)));
+  },
   person(o, sl, q) {
     if (q <= 0) return;
-    const V = this.view(o), k = V.k, sd = o.side, T = this.frame(o);
+    const V = this.view(o, this.headTurn(o, sl)), k = V.k, sd = o.side, T = this.frame(o);
     const box = [V(-0.4, 0.3)[0] - 40, V(0, 0.3)[1] - 10, V(0.4, 0.3)[0] + 40, V(0, -0.7)[1]];
     const closed = pts => new P(this.crs(pts, true, 3), true);
     if (o.dress === 'ghutra') {
-      // the working forearm and hand (on the keyboard, beside the body), drawn first: it lies beyond the upper arm
-      const E = V(sd * 0.236, -0.31, 0.12), Wr = T(sd * 0.2, -0.255, 0.42);
-      this.handFlat(T, sd, q);
-      this.limb(E, Wr, 0.05 * k, 0.038 * k, q, k);
+      // the working forearm and hand, drawn first: it lies beyond the upper arm. The man on the right types (his hand on
+      // the keyboard, beside the body); the man on the left has his hand on a mouse past his keyboard's end, and moves it
+      if (sd > 0) {
+        const [du, dw] = this.mouseAt(sl), at = [0.34 + du, -0.238, dw];
+        this.mouse(T, at, q);
+        this.handFlat(T, sd, q, at);
+        this.limb(V(0.255, -0.31, 0.12), T(at[0] + 0.01, at[1] + 0.007, 0.42 + at[2]), 0.05 * k, 0.038 * k, q, k);
+      } else {
+        const E = V(sd * 0.236, -0.31, 0.12), Wr = T(sd * 0.2, -0.255, 0.42);
+        this.handFlat(T, sd, q);
+        this.limb(E, Wr, 0.05 * k, 0.038 * k, q, k);
+      }
       // the kandura: shoulders and upper arms, the elbows forward toward the desk; then the ghutra and agal over it. The
       // man on the left has thrown the end on his working side back over that shoulder
       const K = this.body(V, this.KAND), ko = K.outline(0.0, -0.56), seat = [0.12, 0.3, 0.5, 0.7, 0.88].map(t => K.across(-0.56, t));
@@ -448,6 +474,23 @@ scene({
       this.rim(arm, 2.2, 0.5 * q); stroke(arm, q, INK, 1.3, 0.9);
       this.shayla(V, q);
     }
+  },
+  // the convex hull of screen points (monotone chain)
+  hull(pts) {
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    p.forEach(q => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); });
+    p.slice().reverse().forEach(q => { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); });
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  },
+  // a computer mouse on the desk under the hand (11 by 6.2 cm, 3.3 cm high, dark): its base and the domed top's
+  // outline, hulled; the hand covers most of it
+  mouse(T, at, q) {
+    const [u, , dw] = at, ring = (v, a, b) => Array.from({ length: 20 }, (_, i) => { const g = i / 20 * TAU, eg = 1 + 0.12 * Math.sin(g); return T(u + 0.012 + a * eg * Math.cos(g), v, 0.52 + dw + b * Math.sin(g)); });
+    const base = ring(-0.27, 0.031, 0.055), top = ring(-0.238, 0.022, 0.042), m = new P(this.crs(this.hull(base.concat(top)), true, 2), true);
+    mask(m, q); fill(m, INK, 0.62 * q);
+    this.lite(new P(this.crs(top.slice(11, 19), false, 2)), '#E8DDC5', 0.9, 0.35 * q);
+    stroke(m, q, INK, 1, 0.85);
   },
   // a rounded tube through screen points with radii (an arm)
   tube(pts, rs) {
@@ -504,9 +547,10 @@ scene({
     stroke(new P(zig), q, INK, 0.6, 0.7);
     stroke(new P([at(f0, rUp(f0)), at(f0, rLo(f0))]), q, INK, 0.7, 0.75);
   },
-  // a hand lying on the keyboard (true perspective, on the desk's plane): the back of the hand, the fingers, the thumb
-  handFlat(T, sd, q) {
-    const v = -0.262, u = sd * 0.19, H = (du, w) => T(u + sd * du, v, w);
+  // a hand lying on the keyboard (true perspective, on the desk's plane): the back of the hand, the fingers, the thumb.
+  // at: [u, v, w offset] where it lies (on a mouse, a little higher)
+  handFlat(T, sd, q, at = [sd * 0.19, -0.262, 0]) {
+    const [u, v, dw] = at, H = (du, w) => T(u + sd * du, v, w + dw);
     const h = new P(this.crs([H(-0.03, 0.42), H(-0.042, 0.49), H(-0.036, 0.565), H(-0.01, 0.58), H(0.018, 0.576), H(0.036, 0.556), H(0.042, 0.5), H(0.058, 0.47), H(0.05, 0.44), H(0.03, 0.42)], true, 3), true);
     mask(h, q); if (OPT.colour) wash(h, HUE.sand, 0.35 * q);
     hatch(h, [H(0, 0.4)[0] - 30, H(0, 0.6)[1] - 12, H(0, 0.4)[0] + 30, H(0, 0.4)[1] + 12], 0.9, 2.2, q, INK, 0.5, 0.2, 792);
@@ -612,9 +656,10 @@ scene({
   // square's two layers showing at the point. flip: the end on his working side is thrown back over that shoulder (an
   // Emirati way of wearing it) and hangs down his back beside the point. Over it the agal, its two cords hanging down the
   // back
-  ghutra(V, k, sd, q, flip) {
+  // secsB: the body it lies over (the seated kandura unless given); nl: lines across its fall (fewer for a far figure)
+  ghutra(V, k, sd, q, flip, secsB = this.KAND, nl = 44) {
     const ss = this.ss, PI = Math.PI, closed = pts => new P(this.crs(pts, true, 3), true), open = pts => new P(this.crs(pts, false, 3));
-    const secs = this.GHUTRA.concat(this.KAND.filter(sc => sc[0] < -0.06).map(([v, aR, aL, b, cw]) => [v, aR + 0.008, aL + 0.008, b + 0.008, cw]));
+    const secs = this.GHUTRA.concat(secsB.filter(sc => sc[0] < -0.06).map(([v, aR, aL, b, cw]) => [v, aR + 0.008, aL + 0.008, b + 0.008, cw]));
     const G = this.body(V, secs), vs = -0.062, D = sd > 0 ? 0.152 : 0.17;
     // the hem's height round the body (th 0 at his right side, -pi/2 over the spine, -pi at his left side): the cloth lies
     // over the shoulders at vs and its point hangs D lower (to the shoulder blades); past the sides, on the fronts of the
@@ -652,10 +697,10 @@ scene({
       return tn * ss(0.04, 0.4, dl) * (0.45 + 0.55 * ss(0.02, 0.25, df)) * (1 - 0.6 * ss(-0.02, -0.07, v) * ss(0.5, 0.95, Math.abs(s)));
     };
     const fan = (tj, v, sp) => sp + (tj - sp) * lerp(0.62, 1, Math.pow(clamp((0.16 - v) / 0.24), 0.7));
-    this.engrave(g, this.fallLines(G, 44, 0.164, -0.3, 0.01, fan, tone), 0.65, 0.6 * q);
+    this.engrave(g, this.fallLines(G, nl, 0.164, -0.3, 0.01, fan, tone), 0.65, 0.6 * q);
     // the dome over the ghafiya: lines round its lower half, its top in the light
     const dome = [];
-    for (let v = 0.236; v >= 0.174; v -= 0.0065) {
+    for (let v = 0.236, dv = nl === 44 ? 0.0065 : 0.0065 * 44 / nl; v >= 0.174; v -= dv) {
       const Ld = [];
       for (let i = 0; i <= 24; i++) { const t = i / 24, sp = G.spine(v), s = t < sp ? (t - sp) / sp : (t - sp) / (1 - sp), p = G.across(v, t); Ld.push([p[0], p[1], 0.36 * ss(0.236, 0.19, v) * ss(0, 0.4, 1 + s * sd) * (0.6 + 0.4 * ss(0, 0.3, 1 - s * sd))]); }
       dome.push(Ld);

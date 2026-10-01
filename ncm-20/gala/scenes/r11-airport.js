@@ -485,14 +485,19 @@ const AUH = (() => {
     }
     ctx.restore();
     // the shadows of what stands out of the fog, lying on its top (all hulls wound the same way, so one fill is their union)
-    // (a wash in colour, over horizontal rules on a fixed 2.6 px pitch, so the shadow reads as engraved tone)
+    // (a wash in colour, over horizontal rules on a fixed 2.6 px pitch, so the shadow reads as engraved tone), run by run:
+    // a shadow lies on the fog only as thickly as the fog is there, so where it has burnt off the shadow is the ground's
     if (o.shadow && o.shadow.polys.length) {
-      const sa = SA * o.shadow.a * clamp(a0 * 1.2);
       ctx.save(); ctx.beginPath(); ctx.rect(B[0], ya, B[2] - B[0], yb - ya); ctx.clip();
       ctx.beginPath(); o.shadow.polys.forEach(q => q.trace(ctx, 1)); ctx.clip('nonzero');
-      if (OPT.colour) { ctx.globalAlpha = sa * 0.8; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = o.shadow.col; ctx.fillRect(B[0], ya, B[2] - B[0], yb - ya); }
-      ctx.globalAlpha = sa * (OPT.colour ? 0.5 : 1.15); ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#4E5A6A' : INK; ctx.lineWidth = 0.85; ctx.lineCap = 'butt';
-      ctx.beginPath(); for (let y = Math.ceil(ya / 2.6) * 2.6; y < yb; y += 2.6) { ctx.moveTo(B[0], y); ctx.lineTo(B[2], y); } ctx.stroke();
+      const byK = new Map();
+      runs.forEach(r => { const k = Math.round(clamp(r.a * 1.2) * 20); if (k < 1) return; if (!byK.has(k)) byK.set(k, []); byK.get(k).push(r); });
+      byK.forEach((rs, k) => {
+        const sa = SA * o.shadow.a * k / 20;
+        if (OPT.colour) { ctx.globalAlpha = sa * 0.8; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = o.shadow.col; ctx.beginPath(); rs.forEach(r => ctx.rect(r.x0, ya, r.x1 - r.x0, yb - ya)); ctx.fill(); }
+        ctx.globalAlpha = sa * (OPT.colour ? 0.5 : 1.15); ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#4E5A6A' : INK; ctx.lineWidth = 0.85; ctx.lineCap = 'butt';
+        ctx.beginPath(); for (let y = Math.ceil(ya / 2.6) * 2.6; y < yb; y += 2.6) rs.forEach(r => { ctx.moveTo(r.x0, y); ctx.lineTo(r.x1, y); }); ctx.stroke();
+      });
       ctx.restore();
     }
     // light horizontal hatching on the rows in this band, in flat bands and lenses (o.rule gives each dash its weight)
@@ -575,8 +580,8 @@ const AUH = (() => {
   }
   // the shadow of a set of world points on the plane z = h, along the sun: its outline on the screen (the convex hull of
   // the projected points, counter-clockwise), or null
-  function shadowHull(pts, h) {
-    const sun = E3.sun(), out = [];
+  function shadowHull(pts, h, sun = E3.sun()) {
+    const out = [];
     // each point above the plane, cast along the sun onto it, and its foot where it stands in the plane
     // (a caster marked noFeet floats: a lamp head on its mast casts only its own patch)
     pts.forEach(p => { if (p[2] <= h) return; const k = (p[2] - h) / sun[2]; out.push([p[0] - sun[0] * k, p[1] - sun[1] * k]); if (!pts.noFeet) out.push([p[0], p[1]]); });
@@ -663,7 +668,61 @@ const AUH = (() => {
     ctx.globalAlpha = SA * a; ctx.beginPath(); byA.forEach(([s, r]) => { ctx.moveTo(s[0] + r, s[1]); ctx.arc(s[0], s[1], r, 0, TAU); }); ctx.fill();
     ctx.restore();
   }
-  return { groundRules, setClipZ, clipZ, walkway, shadowHull, hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES };
+  /* ---------- the morning: the sun's climb, the fog's burning off ---------- */
+  // the sun over AUH (24.43° N) at the December solstice (declination -23.44°), m minutes after its geometric rise (hour
+  // angle 78.6° at the rise, falling 0.25° a minute): [azimuth, altitude] in degrees. It rises at 115.9°; 15 minutes later
+  // it is 3.0° up at 117.6°, after 33 minutes 6.6° up at 119.5°, after 46 minutes 9.2° up at 121.1° (standard solar
+  // geometry, the equation of time aside)
+  function sunMin(m) {
+    const ph = 24.43 * D, de = -23.44 * D, H = Math.acos(-Math.tan(ph) * Math.tan(de)) - m * 0.25 * D;
+    const sa = Math.sin(ph) * Math.sin(de) + Math.cos(ph) * Math.cos(de) * Math.cos(H), alt = Math.asin(sa);
+    const az = Math.acos(clamp((Math.sin(de) - Math.sin(ph) * sa) / (Math.cos(ph) * Math.cos(alt)), -1, 1));
+    return [az / D, alt / D];
+  }
+  // the sun's direction (E3's world) at a compass azimuth and altitude, without setting E3's light
+  const sunVec = (az, alt) => { const a = (az - HEAD) * D, h = alt * D; return [Math.cos(h) * Math.sin(a), Math.cos(h) * Math.cos(a), Math.sin(h)]; };
+  // Radiation fog after sunrise (NWS fog guide; Waersted 2018): the sun works through the shallow layer and heats the
+  // ground, which warms the air in contact with it, and the fog evaporates from below and thins from its top, where it
+  // mixes with drier air; it goes first where it is thinnest, at its edges, so patches shrink from their rims and holes
+  // open and widen, until only lenses lie in the hollows. A fog's relative depth over a ground point: a fixed field of
+  // long flat lenses lying across the light air (toward 300°), cut at a level that rises as the morning heats the
+  // ground (theta 0: a whole sheet; 0.7: scattered lenses), with a soft rim
+  function fogDepth(u, v, theta, rim = 0.22) {
+    const dv = dirAz(300), a = u * dv[0] + v * dv[1], b = v * dv[0] - u * dv[1];
+    const phi = 0.5 * noise(a / 95, b / 36, 0.4) + 0.32 * noise(a / 41 + 1.3, b / 17, 2.4) + 0.18 * noise(a / 230, b / 110, 4.4);
+    return smooth(clamp((phi - theta) / rim));
+  }
+  // a fog band's density at a fraction f of the layer's depth, as a share of the whole layer's (a0 is the band's): the
+  // path through the fog shortens with its depth, so a thinning layer still whitens toward the horizon
+  const fogShare = (f, L, V) => f >= 1 ? 1 : (1 - Math.exp(-3 * L * f / V)) / Math.max(1e-4, 1 - Math.exp(-3 * L / V));
+  // the ground point under (l, t) of a fog band's row (l metres right of the view's axis at depth t)
+  function rowGround(l, t) {
+    const { C, F, R } = E3.cam(), h = Math.hypot(F[0], F[1]) || 1;
+    return [C[0] + F[0] / h * t + R[0] * l, C[1] + F[1] / h * t + R[1] * l];
+  }
+  // shadows on the ground (z 0) along the sun: each face cast, so a body held up on its gear casts its own shape apart
+  // from its feet; screen polygons for unionFill
+  function castFaces(faces, sun, out) {
+    faces.forEach(f => {
+      const g = f.map(p => { const k = Math.max(0, p[2]) / sun[2]; return [p[0] - sun[0] * k, p[1] - sun[1] * k, 0.02]; });
+      if (g.every(p => E3.depth(p) > 2)) out.push(new P(g.map(E3.proj), true));
+    });
+    return out;
+  }
+  // a prism: a convex cross-section [[y, z]...] (counter-clockwise) carried along x from xa to xb, in a body frame
+  function prism(sec, xa, xb, toW) {
+    const A = sec.map(([y, z]) => toW([xa, y, z])), Bq = sec.map(([y, z]) => toW([xb, y, z])), f = [A.slice().reverse(), Bq];
+    for (let i = 0; i < sec.length; i++) { const j = (i + 1) % sec.length; f.push([A[i], A[j], Bq[j], Bq[i]]); }
+    return f;
+  }
+  // gradient stops mixed between two sets of the same length (colour and alpha), at q
+  function mixStops(A, Bs, q) {
+    const hex = c => { const n = parseInt(c.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+    const to = c => '#' + c.map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
+    return A.map((a, i) => { const b = Bs[i], ca = hex(a[1]), cb = hex(b[1]); return [lerp(a[0], b[0], q), to(ca.map((x, k) => lerp(x, cb[k], q))), lerp(a[2], b[2], q)]; });
+  }
+  return { groundRules, setClipZ, clipZ, walkway, shadowHull, hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES,
+    sunMin, sunVec, fogDepth, fogShare, rowGround, castFaces, prism, mixStops, wheel };
 })();
 
 /* ==========================================================================================================

@@ -35,6 +35,15 @@
 // from the sun; the shore and the foot of the hills from the same tiles. Nothing ashore is drawn: no tank farm, terminal,
 // pipe rack or manifold (the coastal strip stays a bare, far band); no single-point mooring, no other ship, no craft, no
 // buoy. Clear air: no smoke, haze plume, flare, glow, fire or backlight anywhere.
+// Life on the water (1 October 2026): four large gulls glide over the berth in slow circles, the Steppe and Heuglin's
+// gulls (Larus fuscus barabensis, L. f. heuglini) that are common winter visitors and passage migrants on the UAE's
+// coasts to late March (UAE Checklist, Emirates Bird Records Committee, via uaebirding.com; Kalba and Fujairah beach
+// records, Jan-Feb 2015-16), drawn at their true wingspan of 1.4 m (1.24-1.5 m) and so small at 450-870 m: their wings
+// in the gull's glide (the arm raised, the hand angled down), at 9-10 m/s, banked to their turns; one gives three slow
+// wingbeats. Their mantles grey, their wingtips black. The swell (84 m, 7.4 s, from the east-south-east: deep water's
+// own length for its period) runs through the sea's strokes as before and now along the hull's waterline: the hull stands
+// still, a laden ship on her moorings, while the water rises and falls 0.3 m along her side and the wash line under it
+// opens on each crest, so the swell is seen running along her from bow to stern.
 // The inset: NCM's east-coast marine bulletin, drafting itself line by line (the AI assistant prepares the draft), then
 // signed (a forecaster approves it); no numbers. Its chart is the UAE's east coast from the film's map data
 // (data/uae-map.json arcs 43, 25, 23, 39, 45, north to south, as scenes/plate-tanker.js), with the sea to the east.
@@ -189,6 +198,14 @@ scene({
     this.sheet = new P([[X0, Y0], [X0 + 318, Y0], [X0 + 318, Y0 + 296], [X0, Y0 + 296]], true);
     this.sheetIn = new P([[X0 + 8, Y0 + 8], [X0 + 310, Y0 + 8], [X0 + 310, Y0 + 288], [X0 + 8, Y0 + 288]], true);
     this.sign = new P(wob([[X0 + 196, Y0 + 268], [X0 + 208, Y0 + 258], [X0 + 218, Y0 + 270], [X0 + 228, Y0 + 255], [X0 + 242, Y0 + 269], [X0 + 258, Y0 + 262], [X0 + 278, Y0 + 264]], 970, 0.6));
+    // the gulls: each glides round a circle (centre x, y in metres, radius, height) at v m/s, counter-clockwise when w is
+    // 1, from angle a0; flap: the centre and half-length (scene s) of a bout of slow wingbeats, if any
+    this.gulls = [
+      { c: [196, -522], R: 30, z: 50, v: 9.5, w: 1, a0: 0.6, ph: 0.2 },
+      { c: [222, -402], R: 44, z: 32, v: 10, w: -1, a0: 2.4, ph: 1.3, flap: [4.1, 0.75] },
+      { c: [70, -255], R: 36, z: 24, v: 9, w: 1, a0: 4.0, ph: 2.1 },
+      { c: [118, -118], R: 48, z: 30, v: 10, w: -1, a0: 5.2, ph: 0.7 }
+    ];
   },
   // is a point of the sea plane short of the shore (the computed coast along its bearing from the ranges' eye)
   onWater(p) {
@@ -298,6 +315,7 @@ scene({
       this.jetty(list, lt);
       R11.paint(list);
       this.drawShip(lt);
+      this.drawGulls(lt);
       this.drawInset(lt);
     });
     E3.sunAt();
