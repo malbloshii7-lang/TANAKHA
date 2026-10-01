@@ -293,10 +293,11 @@ def jet_pass(dur, gain, t_close, t_down=None, side=220.0, v=70.0, k=1.0):
         h = np.clip(-(x - vk * (td - t_close)) * np.tan(np.radians(3.0)), 0, None) + 2.5
         return x, np.full_like(x, side), h
 
-    s = jet_source(n, rev_from=td + 1.2)
-    y = propagate(s, path)
+    # the reversers open about a second after the mains touch (2 s of the picture's slowed clock)
+    s = jet_source(n, rev_from=td + 2.0)
+    y = propagate(s, path, ear_h=3.5)
     y = np.vstack([y, y])
-    return level(fades(y, 0.6, 1.5), ref)
+    return level(fades(y, 1.5, 1.5), ref)
 
 
 def turboprop_far(dur, gain=1.0):

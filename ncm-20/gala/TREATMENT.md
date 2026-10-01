@@ -835,6 +835,45 @@ airport, Jebel Ali at work, live radar on the watch wall, Shams 1's mirrors trac
   midpoint, and every motion was stepped frame by frame for smoothness. The approved cut's cue lists, score and stills
   are unchanged.
 
+**The requester's third notes (1 October 2026).** *"i think no need for narration, but the backgound sound must be
+enhanced, the airport scene and the aircraft must be enhanced, the sun over the solar must reach the right not fading
+and ending the scene in the middle, the camel eating desert grass in uae desert in the rail scene, Hili water way must
+have a sound effect of water not a mechanical generation sound."*
+- *No narration.* No voice is heard; the review copies drop the narration's subtitles, and the on-screen headlines and
+  labels carry the film's messages (among them H.E. Dr Abdulla Ahmed Al Mandous's WMO presidency). §11 row 51 is closed.
+- *The sound (`foley.py`, `score.py --foley`).* Every sound effect is now a field recording, or a physical model of an
+  event no free recording covers: the falaj's water is a real stream babbling over stones (gluckose, CC0) where it was
+  filtered noise under a regular pulse; the desert wind is Felix Blume's (CC0); the dhows' sea is water along a sailing
+  boat's hull with its timbers creaking; the jetty has lapping water and gulls; the seeding cloud's rain, the passing
+  freight and the night's crickets are recorded; Jebel Ali gains water at the quay, gulls and the twistlocks of the boxes
+  the cranes set down; the operations room its keyboards. The landing airliner is modelled as heard from beside the
+  runway: its roar comes up under the end of the dawn shot, and the Doppler fall, the ground reflection's sweeping comb
+  and the reverse thrust after touchdown follow the picture's own timing. The drums of Al Ayyala and the sea songs are
+  recorded hits (the Versilian Community Sample Library, CC0). Each recording is set to the loudness of the sound it
+  replaces, so the balance with the music holds; every leader's card still measures above the world beat. *Clearance:*
+  the recordings from the Moodist collection (the sailboat, the gentle waves, the gulls, the train, the keyboards, the
+  gusty wind) are under the Pixabay Content License or CC0, as Moodist states without naming each file's source; both
+  allow use in a film without credit, and a library replacement is listed for the masters if protocol prefers named
+  sources (§11 row 52).
+- *Zayed International and the airliner.* One real type throughout, a Boeing 787-9 with no marks, built from Boeing's
+  airport-planning document (D6-58333): its fuselage section, radome and flight deck, its windows and doors, the 35-degree
+  wing with raked tips, flap-track fairings, flaps, slats and spoilers, GEnx nacelles with chevrons, the swept tail, and
+  four-wheel bogies; stowed at the gate, flaps 30 and slats out on arrival, the spoilers rising and the reversers opening
+  at touchdown; steady landing lights, the beacons dark (no strobes). The dawn shot looks down on it at its Terminal A
+  pier, two jet bridges docked at L1 and L2, the tug at its nose gear, a baggage train passing, as the fog lifts. The
+  arrival is now a tracking pan from beside runway 31L (150 m from the centreline): the aircraft in its flare, its main
+  gear touching 298 m in, the nose lowering, the crescent tower sliding in behind it, all at real speed. *Not possible:*
+  the full approach at real speed in one beat (it opens in the flare), and the tower in the dawn shot (it stands toward
+  the rising sun, behind any viewpoint where the terminal is lit). *Corrected:* runway 31L's true bearing (308 degrees;
+  306 is magnetic), the touchdown-zone markings' coding, and the met enclosure's position (UAE AIP).
+- *Al Dhafra Solar PV.* The sun now travels the whole way across to the right of the picture and settles there, whole
+  and bright, before the scene dissolves; the camera turns slowly against the sun's swing west so its path spans the
+  frame, the rows still turning with it to their 60-degree stop; the glow around the disc no longer darkens.
+- *The rail.* The camels eat the plain's own plants, sown in true size: thumam grass (Panicum turgidum), thanda (Cyperus
+  conglomeratus), rimth (Haloxylon salicornicum) and arta (Calligonum comosum). The nearest camel works her lips into a
+  thumam tussock, tears a mouthful (the tussock is shorter after), lifts her head with the culms hanging and chews; the
+  others crop grass and browse shrubs (El-Keblawy et al., *Journal of Arid Environments*, 2009; ENHG, 1985; UAE Flora).
+
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
 was fixed. **Checked.** Every new plate was rendered in both looks; nothing is drawn right of the picture box and
@@ -1861,6 +1900,7 @@ Every number on screen, its qualifier and its source:
 | 49 | **The Geneva credit (Revision 11, 1 October).** A small plate of WMO's headquarters in Geneva in the world beat, captioned «مقرّ المنظمة العالمية للأرصاد الجوية · جنيف» / WMO HEADQUARTERS · GENEVA, and the line «وفيه ترأّس رئيس المنظمة الدورة الاستثنائية للمؤتمر العالمي للأرصاد الجوية · 2025» / WHERE THE WMO PRESIDENT CHAIRED THE EXTRAORDINARY SESSION OF THE WORLD METEOROLOGICAL CONGRESS · 2025, ahead of the presidency and his name. The building's width (about 27 m) is traced from OpenStreetMap, ±3 m; its length, storeys and height are published; WMO may wish to see its own house drawn | The requester asked for a little more credit to Geneva and to Dr Al Mandous; the line is the WMO's and WAM's own fact (Cg-Ext(2025), 20–23 Oct 2025, WMO Headquarters); the wording about the WMO President goes to protocol with the name | NCM communications, the protocol office, and WMO's communications if NCM wishes | As built; without approval, the world beat returns to its pins, the presidency and the name (all of it is drawn only under `?rev11`) |
 | 50 | **The locomotive and the wagons (Revision 11, 1 October).** The rail beat's head end is drawn as an EMD SD70ACS, the type Etihad Rail runs, to the dimensions found on 1 October (the maker's brochure and railfan data): 22.63 m, 4.84 m high, 3.12 m wide, truck centres 14.58 m, HTSC-II trucks of 3.81 m wheelbase, the deck at 1.854 m; the nose, cab and hood lengths are scaled. The wagons are CRRC's Stage Two aggregate hoppers (13.7 m, 3.212 m, rounded side sheets, three bottom doors, cool grey; CRRC, 17 Sep 2026), their height estimated. Etihad Rail describes the locomotives' livery as light grey "relieved with broad red bands" with its logo mid-body (2012); the bands are not drawn until their path is seen in a photograph or video (two AI video analyses are queued), and no logo is shown. Since 3 Oct 2024 the company's Arabic name is «قطارات الاتحاد» and its logo is new | A named operator's vehicle must be drawn as it is | NCM communications, with Etihad Rail | As built; the approved cut keeps its v3 drawing |
 | 51 | **The AI narrator (Revision 11, 1 October). Resolved, 1 October: the requester decided the film needs no narration**, so no voice is heard and the review copies no longer carry the narration's subtitles; the record below stands for reference. The narration is voiced by an AI voice (ElevenLabs through Higgsfield, "Jasper"), not a recorded narrator. It speaks the Founders' and the President's names, H.H. Sheikh Mansour's precedence lines and «معالي الدكتور عبدالله أحمد المندوس». Whether an AI voice may be heard at a state gala (and whether it is disclosed), or serves only as the guide track for a human narrator's session, is protocol's call; an Arabic editor checks every line's pronunciation and stress (the names, «جُلْفار», «سُهَيل», «المَنْدوس») | The requester asked for a real voice now; an AI voice at an official ceremony may need approval and disclosure | The protocol office, NCM communications and the Arabic editor | The scratch subtitles with the score alone; the AI lines as a guide track for a human narrator |
+| 52 | **The recorded sound effects (Revision 11, 1 October).** Most effects are CC0 recordings with named recordists (the stream: gluckose; the wind: Felix Blume; the rain and the night: Noisekun's library; the drums: VCSL). Six come from the Moodist collection, under the Pixabay Content License or CC0 without a source named for each file (the sailboat, the gentle waves, the gulls, the train, the keyboards, the gusty wind). Keep them, or replace them with named library recordings (or the studio's own) for the masters | Both licences allow use in a film without credit, but protocol may want every source named | Requester and the post-production studio | Keep; the studio may swap any of the six without changing the cut |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

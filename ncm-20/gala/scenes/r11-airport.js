@@ -1,8 +1,8 @@
 'use strict';
 // Revision 11 · Zayed International (AUH/OMAA), in true 3D (engrave3d.js): dawn radiation fog over Terminal A, and an
-// arrival on runway 31L. World metres in the RUNWAY FRAME: u along 31L's landing direction (true 306°, north-west) from its
-// threshold, v to the right of it (036°, toward the midfield), z up; E3's world is [v, u, z], a rotation of east-north-up,
-// so E3.sunAt takes the sun's true azimuth less 306°.
+// arrival on runway 31L. World metres in the RUNWAY FRAME: u along 31L's landing direction (true 308°, magnetic 306°: UAE
+// AIP OMAA AD 2.12; north-west) from its threshold, v to the right of it (038°, toward the midfield), z up; E3's world is
+// [v, u, z], a rotation of east-north-up, so E3.sunAt takes the sun's true azimuth less 308°.
 // The airfield (UAE AIP OMAA; KPF; CTBUH; as researched for this revision, 30 Sep 2026):
 //   runways 13R/31L 4,106 × 60 m and 13L/31R 4,100 × 60 m, centrelines 2,000 m apart; Terminal A and the tower midfield.
 //   The tower 1 km right of 31L and 2.3 km on from its threshold; Terminal A's high point 1.9 km beyond that (as the v3
@@ -14,9 +14,10 @@
 //   31L (CAT III): 900 m approach-light line of centreline barrettes (crossbars at 150 and 300 m), a green threshold bar with
 //   wing bars, touchdown-zone barrettes every 30 m for 900 m, centreline lights every 15 m, edge lights; all drawn steady.
 //   ILS glide path 3.0°, 17 m (57 ft) over the threshold. RVR sensors beside the runway at 385, 1,520, 2,620 and 3,760 m
-//   (twin-head masts, 2.5 m); a cup anemometer on a 10 m mast 300 m in.
+//   (twin-head masts, 2.5 m); a cup anemometer on a 10 m mast 300 m in; PAPI on both sides (AD 2.14: "PAPI BOTH 3.0°",
+//   MEHT 69 ft), so about 400 m in; the met enclosure 350 m south-west of the centreline, 1,200 m from 13R's threshold.
 //   Fog: radiation fog, commonest December–January around sunrise, a flat shallow layer: tall things stand above it.
-//   Aircraft: generic, no livery; A380 class 72.7 m long, 79.75 m span, 24.1 m high; 787-9 class 62.8 × 60.1 × 17 m.
+//   Aircraft: one type in both shots, the Boeing 787-9 (B789, below), a plain white airframe without livery or marks.
 // The sun at AUH (24.4° N) in late December rises at azimuth ~116°.
 // The fog lifting (1 Oct 2026, the requester's choice "fog lifting at the airport", across both beats): the dawn shot is a
 // time-lapse of the first half hour after sunrise in which the radiation fog burns off and the light comes up; the
@@ -33,66 +34,44 @@
 //   boarding bridge still connected); LD3/AKE containers (DSV, ANA Cargo: 156 × 153 cm base, 163 cm high, contour E);
 //   the landing: Airbus FCTM, flare and touchdown (flare at ~30 ft); Boeing FCTM (flare times 4-8 s; the flare distance
 //   about 1,000-2,000 ft beyond the threshold on a 3° path).
+// Round 2 (1 Oct 2026, afternoon; the requester, a second time: "the airport scene and the aircraft must be enhanced"):
+//   the airliner: the generic tube-and-slab airframes (an A380 class and a 787 class) replaced by one real type, a
+//   Boeing 787-9 built in true 3D from its airport-planning data (B789, after AUH: the fuselage's true section, nose,
+//   radome, flight-deck glass and tail cone; the window line and the doors; the wing-to-body fairing; the swept wing with
+//   its dihedral, its trailing-edge break, raked tips, flap-track fairings, flaps, slats and spoilers; the GEnx-class
+//   nacelles with their chevrons, pylons, inlets and plugs; the swept fin and stabiliser; the four-wheel bogies and the
+//   nose gear), engraved with lines that follow its surfaces, configured for each phase, at the gate and on the landing;
+//   the arrival recomposed as a tracking pan from beside the runway, the aircraft large through its flare, touchdown and
+//   de-rotation, the tower and Terminal A sliding in behind it; the dawn recomposed as a raised three-quarter view of the
+//   hero at its pier, its two jet bridges docked at L1 and L2. Corrections: the runway's true bearing (308°, not 306°:
+//   the AIP's 306° is magnetic); the touchdown-zone coding (one stripe at 750 m, not two); the met enclosure's side and
+//   place (AIP GEN 3.5: 350 m south-west of the centreline, 1,200 m from 13R). Sources: Boeing D6-58333 rev Q (Oct 2025),
+//   787 Airplane Characteristics for Airport Planning (787-9: 62.81 m long, 60.12 m span, door centres 6.30, 18.36,
+//   35.43 and 49.66 m from the nose, the entry doors on the left, the bulk cargo door left at 47.75 m, the forward and aft
+//   cargo doors right at 11.00 and 43.31 m; ground clearances: tail 16.81-17.09 m, engine 0.69-0.76 m (GE), stabiliser
+//   tip 6.88-7.14 m, wing tip 4.62-4.88 m); aircraftinvestigation.info's 787-9 sheet (fuselage 5.77 m wide, wing area
+//   377 m², root chord 11.93 m, tip chord 1.75 m, sweep 32.2°, raked tips, track 9.80 m, wheelbase 25.83 m, eight 54 × 21
+//   in main tyres on four-wheel bogies, single-slotted Fowler flaps, slats, spoilers); GE via planefyi.com (the GEnx-1B's
+//   2.82 m, 111 in, fan); ICAO
+//   Annex 14 §5.2.6 (touchdown-zone markings: pairs every 150 m, the distance-coded pattern's stripes 22.5 × 1.8 m, 1.5 m
+//   apart, a pair within 50 m of the aiming point dropped) and FAA AC 150/5340-1 (the coding: three, two, one stripes);
+//   UAE AIP OMAA AD 2.12 (31L: 308° true, 306° magnetic), AD 2.14 (PAPI BOTH, MEHT 69.13 ft) and AD 2.19 (GP 3.0°, RDH
+//   57 ft); the Airbus FCTM in the NTSB docket (begin the flare at about 30 ft; "fly the nosewheel smoothly, but without
+//   delay, on to the runway"); the Boeing FCTM (typical flare times 4-8 s; lower the nose as soon as the main gear
+//   touches down; the spoilers deploy at touchdown).
 const AUH = (() => {
-  const D = Math.PI / 180, HEAD = 306;
+  const D = Math.PI / 180, HEAD = 308;
   const W3 = (u, v, z = 0) => [v, u, z];
   const sunAt = (az, alt) => E3.sunAt(az - HEAD, alt);
   const dirAz = az => [Math.cos((az - HEAD) * D), Math.sin((az - HEAD) * D)]; // a compass bearing as a (u, v) unit vector
   const TWR = [2300, 1000], TA = [4200, 1000]; // the tower; Terminal A's high point
-  const TL = (a, b, z = 0) => W3(TA[0] + a, TA[1] + b, z); // Terminal A's plan frame (a toward 306°, b toward 036°)
+  const TL = (a, b, z = 0) => W3(TA[0] + a, TA[1] + b, z); // Terminal A's plan frame (a toward 308°, b toward 038°)
   const add = (p, q, k = 1) => [p[0] + q[0] * k, p[1] + q[1] * k, p[2] + q[2] * k];
   const lerp3 = (p, q, t) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
   const cen = pts => E3.centroid(pts);
   const smooth = t => t * t * (3 - 2 * t);
 
-  /* ---------- airframes: body frame x forward, y left, z up (metres), origin on the fuselage axis ---------- */
-  // fus: stations [x, half-width, half-height, centre z]; wing: y stations (root, kink, tip) with their leading and trailing
-  // edges and thickness; eng: nacelles by span station (lead: inlet ahead of the local leading edge); z0: the axis above
-  // the ground when parked
-  const TYPES = {
-    twin: { // a twin-aisle twin, 787-9 class: 62.8 m long, 60.1 m span, 17 m high, fuselage 5.8 m
-      z0: 5.2,
-      fus: [[29.5, .12, .12, -.5], [28.3, 1.25, 1.3, -.38], [26.2, 2.15, 2.25, -.16], [23.2, 2.72, 2.8, -.02], [19, 2.9, 2.95, 0], [3.5, 2.9, 2.95, 0], [-12, 2.9, 2.95, 0],
-        [-18, 2.72, 2.62, .25], [-24, 2.12, 1.92, .7], [-29, 1.3, 1.1, 1.1], [-32.4, .5, .45, 1.35], [-33.3, .12, .12, 1.4]],
-      segs: [[0, 4], [4, 5], [5, 6], [6, 8], [8, 11]],
-      wing: { y: [2.4, 10.5, 30.05], le: [4, -1.6, -15.2], te: [-7, -8.4, -17], t: [1.4, .9, .25], z0: -1.5, dih: 6 },
-      flaps: [[3.4, 10.2, 2.6], [10.9, 21.5, 1.9]],
-      eng: [{ y: 9.6, r: 1.75, lead: 5.8, len: 7.8, drop: 2.35 }],
-      stab: { y: [1.1, 10.6], le: [-24.2, -31.4], te: [-30.8, -33.4], t: [.55, .15], z0: 1.3, dih: 7 },
-      // the fin's leading edge swept ~43°, its trailing edge (the rudder's) ~20°, the tip a 4 m chord over the tail cone
-      fin: { z: [2.8, 11.8], le: [-20.5, -29.0], te: [-29.6, -33.0], t: [1.0, .3], zte: 2.2 },
-      gear: { y: 4.9, x: -3.2, top: -2.3, r: .64, w: .42, dx: .74, dy: .7, nx: 24.2, ntop: -2.6, nr: .5 },
-      win: [.6], cock: 26.6,
-    },
-    a380: { // A380 class: 72.7 m long, 79.75 m span, 24.1 m high, fuselage 7.1 × 8.4 m (two decks)
-      z0: 7.0,
-      fus: [[33.6, .15, .18, -1.6], [32.3, 1.6, 2.2, -1.05], [30, 2.75, 3.5, -.45], [26.5, 3.4, 4.1, -.1], [22.5, 3.57, 4.2, 0], [4, 3.57, 4.2, 0], [-14, 3.57, 4.2, 0],
-        [-22, 3.3, 3.55, .4], [-29, 2.45, 2.45, 1.05], [-35, 1.35, 1.25, 1.6], [-38.7, .45, .42, 1.9], [-39.1, .14, .14, 1.95]],
-      segs: [[0, 4], [4, 5], [5, 6], [6, 8], [8, 11]],
-      wing: { y: [3.2, 13.5, 39.9], le: [6.8, -.5, -19.8], te: [-11, -13.2, -23.8], t: [2.1, 1.3, .35], z0: -2.7, dih: 5.6 },
-      flaps: [[4, 13, 3.2], [13.8, 30, 2.4]],
-      eng: [{ y: 15.4, r: 1.65, lead: 5.5, len: 7.5, drop: 2.4 }, { y: 25.8, r: 1.6, lead: 5, len: 7.2, drop: 2.1 }],
-      stab: { y: [1.8, 15.2], le: [-29.5, -38.4], te: [-37.5, -41.2], t: [.8, .2], z0: 1.8, dih: 5 },
-      // the fin's leading edge swept ~40°, its trailing edge ~20°
-      fin: { z: [3.3, 17.1], le: [-24, -35.6], te: [-35.2, -40.0], t: [1.4, .4], zte: 2.6 },
-      gear: { y: 6.2, x: -4, top: -3.4, r: .7, w: .5, dx: .9, dy: .8, nx: 27.5, ntop: -3.9, nr: .6 },
-      win: [-1.3, 1.9], cock: 30.2,
-    },
-  };
-  // the leading or trailing edge at span station y (interpolated between the wing's stations)
-  const edgeAt = (w, key, y) => {
-    for (let i = 1; i < w.y.length; i++) if (y <= w.y[i] || i === w.y.length - 1) { const t = (y - w.y[i - 1]) / (w.y[i] - w.y[i - 1]); return w[key][i - 1] + (w[key][i] - w[key][i - 1]) * t; }
-    return w[key][0];
-  };
-  const wingZ = (w, y) => w.z0 + (y - w.y[0]) * Math.tan(w.dih * D);
-  const thickAt = (w, y) => edgeAt(w, 't', y);
-  // a hexahedron from two chord sections (each: LE and TE points, thickness, and the section's up direction)
-  function slab(a, b) { // a, b: { le, te, t } in body coordinates, the thickness along +z (or along a given normal)
-    const n = a.n || [0, 0, 1], m = b.n || n;
-    const P = (s, k, f) => add(s[k], s.n || n, f * s.t / 2);
-    const v = [P(a, 'le', 1), P(a, 'te', .25), P(b, 'te', .25), P(b, 'le', 1), P(a, 'le', -1), P(a, 'te', -.25), P(b, 'te', -.25), P(b, 'le', -1)];
-    return [[v[0], v[1], v[2], v[3]], [v[4], v[7], v[6], v[5]], [v[0], v[3], v[7], v[4]], [v[1], v[5], v[6], v[2]], [v[0], v[4], v[5], v[1]], [v[3], v[2], v[6], v[7]]];
-  }
+  /* ---------- small solids: rings, tubes, wheels (the airliner itself is B789, below) ---------- */
   function ringAt(x, hw, hh, zc, n, y0 = 0) { return Array.from({ length: n }, (_, m) => { const a = m / n * TAU; return [x, y0 + hw * Math.cos(a), zc + hh * Math.sin(a)]; }); }
   function tube(rings) { // side faces between consecutive rings
     const f = [];
@@ -104,43 +83,6 @@ const AUH = (() => {
     const A = [], B = [];
     for (let m = 0; m < n; m++) { const a = m / n * TAU; A.push([x + r * Math.cos(a), y - w / 2, z + r * Math.sin(a)]); B.push([x + r * Math.cos(a), y + w / 2, z + r * Math.sin(a)]); }
     return tube([A, B]).concat([A.slice(), B.slice().reverse()]);
-  }
-  function airframe(type, flight) {
-    const k = TYPES[type], NF = 14, parts = { fus: [], side: { L: [], R: [] }, fin: null, noseGear: null, k };
-    const rings = k.fus.map(([x, hw, hh, zc]) => ringAt(x, hw, hh, zc, NF));
-    k.segs.forEach(([i, j]) => parts.fus.push(tube(rings.slice(i, j + 1))));
-    const w = k.wing;
-    ['L', 'R'].forEach(side => {
-      const s = side === 'L' ? 1 : -1, out = [];
-      const sect = y => ({ le: [edgeAt(w, 'le', y), s * y, wingZ(w, y)], te: [edgeAt(w, 'te', y), s * y, wingZ(w, y)], t: thickAt(w, y) });
-      // the main gear (below the wing root), the engines with their pylons, the flaps, the wing panels, the stabiliser
-      const g = k.gear, gz = flight ? -k.z0 + g.r - 0.35 : -k.z0 + g.r;
-      const gear = { strut: [[g.x, s * g.y, g.top], [g.x, s * g.y, gz + 0.3]], wheels: [] };
-      [-1, 1].forEach(ix => [-1, 1].forEach(iy => gear.wheels.push(wheel(g.x + ix * g.dx, s * (g.y + iy * g.dy), gz, g.r, g.w))));
-      gear.beam = [[g.x - g.dx - .3, s * g.y, gz + .25], [g.x + g.dx + .3, s * g.y, gz + .25]];
-      out.push({ kind: 'gear', ...gear });
-      k.eng.forEach(e => {
-        const x0 = edgeAt(w, 'le', e.y) + e.lead, x1 = x0 - e.len, zw = wingZ(w, e.y), zc = zw - e.drop, yy = s * e.y;
-        const rg = [ringAt(x0, e.r * .88, e.r * .88, zc, 12, yy), ringAt(x0 - 1.1, e.r, e.r, zc, 12, yy), ringAt(x1 + 2.2, e.r * .9, e.r * .9, zc, 12, yy), ringAt(x1, e.r * .6, e.r * .6, zc, 12, yy)];
-        const plug = [ringAt(x1, e.r * .34, e.r * .34, zc, 10, yy), ringAt(x1 - 1.3, e.r * .07, e.r * .07, zc, 10, yy)];
-        const pyl = slab({ le: [x0 - 1.8, yy, zc + e.r * .8], te: [x1 + .4, yy, zc + e.r * .75], t: .55, n: [0, 1, 0] }, { le: [edgeAt(w, 'le', e.y) - .4, yy, zw - thickAt(w, e.y) * .3], te: [x1 - 1.5, yy, zw - thickAt(w, e.y) * .3], t: .55, n: [0, 1, 0] });
-        out.push({ kind: 'eng', nac: tube(rg), inlet: rg[0], plug: tube(plug), pyl, y: e.y });
-      });
-      // the flaps are out only in flight (an arrival); at the gate they are stowed inside the wing's trailing edge
-      if (flight) k.flaps.forEach(([ya, yb, c]) => {
-        const del = 30 * D, sec = y => { const te = [edgeAt(w, 'te', y) + .5, s * y, wingZ(w, y) - .5]; return { le: te, te: add(te, [-Math.cos(del), 0, -Math.sin(del)], c), t: .22, n: [-Math.sin(del), 0, Math.cos(del)] }; };
-        out.push({ kind: 'flap', f: slab(sec(ya), sec(yb)) });
-      });
-      for (let i = 0; i + 1 < w.y.length; i++) out.push({ kind: 'wing', f: slab(sect(w.y[i]), sect(w.y[i + 1])).filter((_, q) => q !== (i ? 4 : 5)) });
-      const st = k.stab, ss = y => { const t = (y - st.y[0]) / (st.y[1] - st.y[0]), z = st.z0 + (y - st.y[0]) * Math.tan(st.dih * D); return { le: [lerp(st.le[0], st.le[1], t), s * y, z], te: [lerp(st.te[0], st.te[1], t), s * y, z], t: lerp(st.t[0], st.t[1], t) }; };
-      out.push({ kind: 'stab', f: slab(ss(st.y[0]), ss(st.y[1])) });
-      parts.side[side] = out;
-    });
-    const fn = k.fin;
-    parts.fin = slab({ le: [fn.le[0], 0, fn.z[0]], te: [fn.te[0], 0, fn.zte], t: fn.t[0], n: [0, 1, 0] }, { le: [fn.le[1], 0, fn.z[1]], te: [fn.te[1], 0, fn.z[1]], t: fn.t[1], n: [0, 1, 0] });
-    const g = k.gear, nz = flight ? -k.z0 + g.nr - 0.3 : -k.z0 + g.nr;
-    parts.noseGear = { strut: [[g.nx, 0, g.ntop], [g.nx, 0, nz + .2]], wheels: [wheel(g.nx, .38, nz, g.nr, .35, 8), wheel(g.nx, -.38, nz, g.nr, .35, 8)] };
-    return parts;
   }
   // the pose of an aircraft: position (runway frame), heading psi (degrees from +u toward +v), pitch theta (nose up)
   function poser(p) {
@@ -212,79 +154,6 @@ const AUH = (() => {
       ctx.beginPath(); runs.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); }); ctx.stroke(); ctx.restore();
     });
   }
-  // draw one aircraft, its parts in an order that is exact for convex parts seen from outside: the far side's parts, the
-  // fuselage, the fin, the near side's; within a side, what hangs under the wing before the wing when the eye is above it
-  function drawPlane(ac, o = {}) {
-    const P = ac.parts, pose = ac.pose, C = E3.cam().C, cb = pose.toB(C), k = P.k;
-    const near = cb[1] > 0 ? 'L' : 'R', far = near === 'L' ? 'R' : 'L', above = cb[2] > k.wing.z0;
-    const a = o.air ?? 1, W = o.warm || null;
-    const tw = pts => pts.map(pose.toW);
-    const hx = pose.toW([1, 0, 0]), h0 = pose.toW([0, 0, 0]), along = [hx[0] - h0[0], hx[1] - h0[1], hx[2] - h0[2]];
-    const base = { lw: o.lw ?? 1.2, edgeA: 0.85 * a, hdir: along, fillCol: o.fill ?? null, fillA: o.fillA ?? 0.25, warmA: o.warmA };
-    const skin = Object.assign({}, base, { tone: o.tone ?? 0.02, shade: o.shade ?? 0.5, inkFill: o.inkFill || 0, warmAll: o.warmAll || 0 });
-    const seed = ac.seed || 1;
-    const gearDraw = g => {
-      if (!g) return;
-      const d = Math.max(1, E3.depth(tw([g.strut[0]])[0]));
-      E3.line(tw(g.strut), INK, clamp(260 * .9 / d, .5, 2.2), 0.9 * a);
-      if (g.beam) E3.line(tw(g.beam), INK, clamp(260 * .8 / d, .45, 2), 0.85 * a);
-      g.wheels.forEach((wf, i) => solid(wf.map(tw), Object.assign({}, base, { tone: .55, shade: .35, hdir: [0, 0, 1], fillCol: OPT.colour ? '#4A4038' : null, fillA: .35, lw: .8 }), seed + 300 + i, null, null, true));
-    };
-    const sideDraw = side => {
-      const S = P.side[side], order = above ? ['gear', 'eng', 'flap', 'wing', 'stab'] : ['stab', 'wing', 'flap', 'eng', 'gear'];
-      order.forEach(kind => S.filter(p => p.kind === kind).sort((p, q) => (kind === 'eng' ? p.y - q.y : 0)).forEach((p, i) => {
-        if (kind === 'gear') { if (o.gear !== false) gearDraw(p); return; }
-        if (kind === 'eng') {
-          solid(p.pyl.map(tw), skin, seed + 40 + i, W, null, true);
-          solid(p.nac.map(tw), Object.assign({}, skin, { tone: .08 }), seed + 50 + i, W, null, true);
-          solid(p.plug.map(tw), Object.assign({}, skin, { tone: .3 }), seed + 60 + i, null, null, true);
-          const inl = tw(p.inlet), ic = E3.centroid(inl);
-          if (E3.dot(E3.sub(C, ic), [-along[0], -along[1], -along[2]]) < 0) E3.face(inl, { n: along, tone: .7, shade: .1, noHatch: false, fillCol: OPT.colour ? '#3A342E' : null, fillA: .4, lw: .8, edgeA: .8 * a }, seed + 70 + i);
-          return;
-        }
-        const st = kind === 'flap' ? Object.assign({}, skin, { tone: .12 }) : kind === 'wing' ? Object.assign({}, skin, { tone: .04, hdir: along }) : skin;
-        solid(p.f.map(tw), st, seed + (kind === 'wing' ? 80 : kind === 'flap' ? 90 : 100) + i, W, null, true);
-      }));
-    };
-    // seen from below the wing (an aircraft overhead): the tail surfaces stand behind the fuselage, and the low wings,
-    // the engines under them and the gear all hang in front of its belly
-    const partsOf = (side, kind) => P.side[side].filter(p => p.kind === kind);
-    const drawKind = (side, kind) => partsOf(side, kind).sort((p, q) => (kind === 'eng' ? p.y - q.y : 0)).forEach((p, i) => {
-      if (kind === 'gear') { if (o.gear !== false) gearDraw(p); return; }
-      if (kind === 'eng') {
-        solid(p.pyl.map(tw), skin, seed + 40 + i, W, null, true);
-        solid(p.nac.map(tw), Object.assign({}, skin, { tone: .08 }), seed + 50 + i, W, null, true);
-        solid(p.plug.map(tw), Object.assign({}, skin, { tone: .3 }), seed + 60 + i, null, null, true);
-        return;
-      }
-      const st = kind === 'flap' ? Object.assign({}, skin, { tone: .12 }) : kind === 'wing' ? Object.assign({}, skin, { tone: .04, hdir: along }) : skin;
-      solid(p.f.map(tw), st, seed + (kind === 'wing' ? 80 : kind === 'flap' ? 90 : 100) + i, W, null, true);
-    });
-    if (!above) {
-      drawKind(far, 'stab'); drawKind(near, 'stab');
-      solid(P.fin.map(tw), skin, seed + 110, W, null, true);
-      solid([].concat(...P.fus).map(tw), skin, seed + 120, W, null, true);
-      ['wing', 'flap'].forEach(kd => { drawKind(far, kd); drawKind(near, kd); });
-      drawKind(far, 'eng'); drawKind(near, 'eng');
-      if (o.gear !== false) { gearDraw(P.noseGear); drawKind(far, 'gear'); drawKind(near, 'gear'); }
-      return;
-    }
-    sideDraw(far);
-    gearDraw(o.gear === false ? null : P.noseGear);
-    solid([].concat(...P.fus).map(tw), skin, seed + 120, W, null, true);
-    // the cabin windows and the flight-deck windows on the side toward the eye
-    const sgn = near === 'L' ? 1 : -1, hw = k.fus[5][1];
-    k.win.forEach(z => {
-      const run = [], x0 = k.fus[3][0] - 2.5, x1 = k.fus[7][0] + 1;
-      for (let x = x0; x > x1; x -= 1.6) { const yy = sgn * hw * Math.sqrt(Math.max(0, 1 - (z / k.fus[5][2]) ** 2)) * 1.01; run.push(tw([[x, yy, z], [x - .5, yy, z]])); }
-      const dd = E3.depth(h0); if (dd < 700) run.forEach(sg => E3.line(sg, INK, clamp(160 / dd, .5, 1.6), 0.55 * a));
-    });
-    const ck = k.cock, cz = k.fus[3][3] + k.fus[3][2] * .45;
-    E3.line(tw([[ck + 1.2, sgn * k.fus[2][1] * .95, cz], [ck - 1.4, sgn * k.fus[3][1] * .99, cz + .25]]), INK, clamp(300 / Math.max(1, E3.depth(h0)), .6, 2.4), 0.8 * a);
-    solid(P.fin.map(tw), skin, seed + 110, W, null, true);
-    sideDraw(near);
-  }
-
   /* ---------- Terminal A: the processor's roof and landside facade, the piers with their waving roofs ---------- */
   function terminal(res = 1) {
     const out = []; // { pts (world), st, seed }
@@ -309,7 +178,7 @@ const AUH = (() => {
       out.push({ pts: [TL(a0, b0, h0), TL(a1, b1, h1), TL(c1, d1, h1 - 0.6), TL(c0, d0, h0 - 0.6)], st: { tone: .08, shade: .42, hdir: E3.sub(TL(1, 0), TL(0, 0)), lw: 1, kind: 'roof' }, seed: 7300 + i, inside: TL(hub.ca, 0, 0) });
       out.push({ pts: [TL(c0, d0, h0 - 0.6), TL(c1, d1, h1 - 0.6), TL(c1, d1, h1 - 3.2), TL(c0, d0, h0 - 3.2)], st: { tone: .5, shade: .3, hdir: [0, 0, 1], lw: 1, kind: 'fascia' }, seed: 7400 + i, inside: TL(hub.ca, 0, h0 - 2) });
     }
-    // the hub's walls: the 50 m glazed landside facade (facing 306°) and the airside walls between the piers
+    // the hub's walls: the 50 m glazed landside facade (facing 308°) and the airside walls between the piers
     for (let i = 0; i < NA; i++) {
       const t0 = i / NA * TAU, t1 = (i + 1) / NA * TAU, tm = (t0 + t1) / 2;
       if (armAng.some(g => Math.abs(Math.atan2(Math.sin(tm - g), Math.cos(tm - g))) < 10 * D)) continue;
@@ -743,13 +612,32 @@ const AUH = (() => {
     const to = c => '#' + c.map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
     return A.map((a, i) => { const b = Bs[i], ca = hex(a[1]), cb = hex(b[1]); return [lerp(a[0], b[0], q), to(ca.map((x, k) => lerp(x, cb[k], q))), lerp(a[2], b[2], q)]; });
   }
-  return { above, groundRules, setClipZ, clipZ, walkway, shadowHull, hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, airframe, poser, drawPlane, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add, TYPES,
+  return { above, groundRules, setClipZ, clipZ, walkway, shadowHull, hazeItems, terminalItems, fogStrokes, unionFill, D, HEAD, W3, TL, TWR, TA, sunAt, dirAz, poser, solid, terminal, tower, drawTower, fogLayer, noise, skyRules, radialWash, lights, smooth, lerp3, add,
     sunMin, sunVec, fogDepth, fogShare, rowGround, castFaces, prism, mixStops, wheel };
 })();
 
 /* ==========================================================================================================
    The airliner: a Boeing 787-9 (Etihad flies the type), one model for both shots, in true 3D and in the plate's
    engraving language. A plain white airframe: no livery, logo, name or registration.
+   Built from the sources in the file's header: the overall length, span, height, door stations, track, wheelbase, wing
+   area, root and tip chords, sweep and ground clearances are the type's; the rest is drawn to agree with them and with
+   photographs of the type (estimates): the fuselage profile (5.77 × 5.97 m section, the radome's tip at the cabin floor's
+   level, the tail cone sweeping up to the APU's exhaust), the wing's planform (leading edge swept 35°, a trailing-edge
+   break at 11 m, raked tips from 26.5 m) and its 4.5° of dihedral (the tip 4.8 m over the apron at the gate; in flight
+   the wing bends up 1.6 m more), the nacelles (1.66 m in radius, the lip 4.9 m ahead of the fan nozzle), the tail's
+   planforms (fin swept 43° at its leading edge and 20° at its trailing edge, stabiliser 37°, 7° of dihedral), the gear's
+   legs and braces, the windows (27 × 47 cm at a 61 cm pitch) and the flight deck's four panes.
+   Configured for its phase: at the gate the flaps, slats and spoilers stowed (their seams only), the gear compressed; on
+   the landing the flaps at 30, the slats out, the spoilers stowed until the main gear touches and then raised, the
+   reversers' sleeves run aft, the bogies tilted until they touch, the oleos extended until loaded, the wings bent up
+   until the lift is dumped. Its landing lights (in the wing roots, and the taxi light on the nose gear) burn steadily
+   when asked; its beacons are drawn dark, and it has no strobes: nothing on it ever flashes.
+   Its engraving: each surface is a tube of rings, laid in paper as one shape, washed in colour by its light, hatched with
+   lines that run along it (an ordered choice of them, faded in and out with the tone, so none blinks as the view turns),
+   crossed in deep shade, and outlined at its silhouette and creases with a weight that falls with the distance; the
+   parts are painted in an order that is exact for this airframe from any eye (the far wing and its engine, the nose gear,
+   the fuselage and its seams and windows, the fin, the near wing; what hangs under a wing before it seen from above,
+   after it seen from below; the stabilisers before or after the wing as the eye is ahead of it or behind).
    ========================================================================================================== */
 const B789 = (() => {
   const D = Math.PI / 180, add = AUH.add, lerp3 = AUH.lerp3;
@@ -979,7 +867,7 @@ const B789 = (() => {
       DOORS.forEach(s => out.lines.push({ pts: onSide(rrect(s - 0.535, s + 0.535, -0.45, 1.45, 0.24), sg), n: skinN(s, angAt(s, 0.5, sg)), c: skin(s, angAt(s, 0.5, sg)), a: 0.62, closed: true }));
       (sg < 0 ? [[11.0, 1.35], [43.31, 0.9]] : [[47.75, 0.45]]).forEach(([s, hw]) => out.lines.push({ pts: onSide(rrect(s - hw, s + hw, -2.35, -0.95, 0.15), sg), n: skinN(s, angAt(s, -1.6, sg)), c: skin(s, angAt(s, -1.6, sg)), a: 0.45, closed: true }));
       // the flight deck's side window
-      out.glass.push({ pts: onSide([[3.17, 1.12], [3.7, 1.07], [4.25, 1.06], [4.45, 1.25], [4.25, 1.56], [3.3, 1.76], [3.14, 1.55]], sg), n: skinN(3.8, angAt(3.8, 1.35, sg)), c: skin(3.8, angAt(3.8, 1.35, sg)) });
+      out.glass.push({ pts: onSide([[3.15, 1.04], [3.75, 0.97], [4.4, 0.97], [4.62, 1.2], [4.42, 1.62], [3.3, 1.82], [3.1, 1.55]], sg), n: skinN(3.8, angAt(3.8, 1.35, sg)), c: skin(3.8, angAt(3.8, 1.35, sg)) });
       // the windshield's pane on this side: from the centre post to the side window, its lower edge sweeping down and back
       const ws = [[2.45, 86], [2.58, 68], [2.78, 50], [3.02, 36], [3.1, 51], [3.03, 70], [2.95, 86]].map(([s, a]) => { const q = sg > 0 ? a * D : Math.PI - a * D; return skin(s, q, 0.01); });
       out.glass.push({ pts: ws, n: skinN(2.7, sg > 0 ? 62 * D : Math.PI - 62 * D), c: skin(2.75, sg > 0 ? 62 * D : Math.PI - 62 * D), front: true });
@@ -1261,10 +1149,10 @@ const B789 = (() => {
     // the landing lights, steady (never flashing), as bright as they face the eye
     if (o.lights > 0) LIGHTS.forEach(l => {
       if (l.sg && (l.sg > 0 ? 'L' : 'R') !== near) return;
-      const p = W(l.p), d = dirW(pose, l.dir), v = sub(C, p), k = Math.pow(Math.max(0, dot(d, v) / Math.hypot(...v)), 1.4) * o.lights;
+      const p = W(l.p), d = dirW(pose, l.dir), v = sub(C, p), k = Math.pow(Math.max(0, dot(d, v) / Math.hypot(...v)), 0.8) * o.lights;
       if (k < 0.01) return;
-      const s = E3.proj(p), pxm = E3.cam().f / Math.max(1, E3.depth(p)), r = clamp(0.3 * pxm, 1.1, 7);
-      if (OPT.colour) disc(s[0], s[1], r * 3.2, '#F3C27A', 0.32 * k, 'multiply');
+      const s = E3.proj(p), pxm = E3.cam().f / Math.max(1, E3.depth(p)), r = clamp(0.32 * pxm, 1.4, 8);
+      if (OPT.colour) disc(s[0], s[1], r * 4.5, '#F3C27A', 0.3 * k, 'multiply');
       disc(s[0], s[1], r * 1.25, INK, 0.45 * k * (o.air ?? 1));
       mask(el(s[0], s[1], r, r * 0.8, 0, TAU, 17, 0), k);
       if (OPT.colour) disc(s[0], s[1], r * 0.8, '#FFF6DE', 0.85 * k, 'source-over');
@@ -1308,18 +1196,20 @@ const B789 = (() => {
 })();
 
 /* ==========================================================================================================
-   1 · Dawn (beat 'airport-dawn', 8.33 s on a 0.6 clock: lt 0.8-5.8, seen lt 0.5-5.95): from 28 m over the apron in the
-   courtyard between the south and east piers (150 m east of the south pier's axis), looking north-west across the fog
-   to Terminal A on a long lens (2150 px), with the sun just risen behind the eye's right shoulder. Shallow radiation fog
-   lies ~3 m deep round a 787-9 parked nose-in at the south pier's gate 155 m away (its jet bridge at the forward door; its
-   flaps stowed, as at any gate): its wheels and the lower halves of its engines are in the fog, its fuselage, wings, fin
-   and the tops of its nacelles stand out of it, whole in the frame from the first frame. An A380 and the tails at the
-   east pier beyond it, the pier roofs and the processor's great roof stand out of it too, all lit warm, and the long
-   shadows of the apron masts behind the eye lie across the fog's top as cool bands. The sky ahead is the western dawn
-   sky: blue above, the pink band low over the horizon. Over the beat the eye drifts left and rises 2 m. (The eye is 28 m
-   up, not lower, because the hero's near wing points almost at the eye from this side of the stand: from 18 m it
-   foreshortened to a sliver and the airliner read wingless.) (The crescent tower stands 1.9 km south-east of the
-   processor, toward the sun, so from any vantage where the terminal is lit it is behind the eye; it is in the arrival.)
+   1 · Dawn (beat 'airport-dawn', 8.33 s on a 0.6 clock: lt 0.8-5.8, seen lt 0.5-5.95): a raised three-quarter view of the
+   hero at its gate (round 2). The eye stands 34 m over the south pier's empty stand toward its tip (281 m out along the
+   pier, 60 m east of its axis) and looks back north-north-east, on a 1010 px lens, at a 787-9 parked nose-in at the next
+   stand 87 m away: from ahead of its left wing and above it, so that the swept wing lies open (never end-on), and the
+   nose, both nacelles, the far wing over the fuselage and the tail all read whole. Its flaps, slats and spoilers are
+   stowed (their seams drawn), its gear compressed; two apron-drive jet bridges are docked at its left doors, L1 and L2,
+   each a cab closed round the door, a glazed tunnel of two telescoping sections on a drive column with wheels, a rotunda
+   on its column and a fixed link into the pier; a towbarless tug is docked at its nose gear. Behind it the pier's canted
+   glazing and waving roof run back to the processor, whose great roof (52 m) rises at the top left; a sister ship stands
+   at the next stand toward the hub with its own two bridges, and across the courtyard the east pier's 787s. The sun just
+   risen behind the eye's right shoulder lights the hero's left side and the pier's glazing; the masts behind the eye lay
+   their long shadows across the fog. Over the beat the eye drifts 7 m toward the hub and rises 2 m. (The crescent tower
+   stands 1.9 km south-east of the processor, toward the sun, so from any vantage where the terminal is lit it is behind
+   the eye; it is in the arrival, at its true size.)
    The fog lifting (1 Oct 2026, the requester's "fog lifting at the airport"), a time-lapse of the morning: the clock runs
    steadily from 3 to 33 minutes after sunrise over the seen beat (minutes(lt), about 6 minutes a scene second) and the
    sun climbs from 0.6° to 6.6° and swings from 116° to 119.5° (AUH.sunMin), so the masts' shadows draw in from the
@@ -1335,7 +1225,8 @@ const B789 = (() => {
    Life on the apron, in true scale and real operation: a towbarless tug (Kalmar TBL 800 class: 9.7-10.1 m long, 4.5 m
    wide, 2.0-2.37 m high; Kalmar Motor) docked at the hero's nose gear while its bridge is still on, as such tugs dock,
    ready to push back; a baggage tractor with three dollies of LD3 containers (IATA: 1.56 m wide at the base, 2.01 m at
-   the top, 1.63 m high) driving slowly (3 m/s, on the right) along the service road toward the pier. They stand in the
+   the top, 1.63 m high) driving slowly (3 m/s, on the right) along the service road between the stands toward the pier,
+   in the foreground. They stand in the
    fog at first and come out of it as it burns off. (They move at their real speed; only the sky runs in time-lapse.)
    ========================================================================================================== */
 scene({
@@ -1444,7 +1335,7 @@ scene({
   // the eye: VIEW (pier coordinates s, w, z of the eye at the beat's start and end, the point it looks at, the lens)
   VIEW: { c0: [281, 60, 34], c1: [275, 57, 36], t0: [195, 73, 3], t1: [194, 72, 3.5], f: 1010, cx: 560, cy: 590 },
   view(lt) {
-    const u = easeInOut(clamp((lt - 0.7) / 5.2)), V = window.DAWNTEST ? Object.assign({}, this.VIEW, window.DAWNTEST) : this.VIEW;
+    const u = easeInOut(clamp((lt - 0.7) / 5.2)), V = this.VIEW;
     const c = V.c0.map((x, k) => lerp(x, V.c1[k], u)), t = V.t0.map((x, k) => lerp(x, V.t1[k], u));
     return E3.camera(this.PW(c[0], c[1], c[2]), this.PW(t[0], t[1], t[2]), V.f, V.cx, V.cy);
   },
@@ -1655,14 +1546,16 @@ scene({
 
 /* ==========================================================================================================
    2 · The arrival (beat 'airport', 8.33 s on a 0.6 clock: lt 0.6-5.6, seen lt 0.45-5.75): the aviation photographer's
-   tracking pan. The eye stands 3.5 m up on the sand 230 m left of runway 31L's centreline, abeam a point 205 m past the
-   threshold (outside the runway strip), and pans with a 787-9 (no livery) as it flares, puts its main gear down and
-   lowers its nose: seen first from the front quarter (its landing lights toward the eye), broadside at the touchdown, and
-   from the rear quarter at the end, when the crescent tower (2.3 km on, 1 km right of the runway) and Terminal A's
-   roofs (4.2 km) have slid in behind it. The pan is computed from the aircraft's position (the lens follows a point
-   just ahead of its main gear, held a little right of the frame's centre, so there is room ahead of its nose), and the
-   lens zooms gently as the aircraft draws away (its focal length grows as the distance to the power 0.7), so it stays
-   large and nothing jumps.
+   tracking pan (round 2). The eye stands 3.5 m up on the sand 150 m left of runway 31L's centreline (at the runway
+   strip's edge), abeam a point 240 m past the threshold, and pans with the 787-9 as it flares, puts its main gear down
+   and lowers its nose: seen first from the front quarter (37° ahead of its beam, its landing lights toward the eye),
+   broadside just before the touchdown, and from the rear quarter at the end (57° behind its beam), when the crescent
+   tower (2.3 km on, 1 km right of the runway, 109 m) has slid in behind it and Terminal A's piers (4.2 km) beyond. The
+   pan is computed from the aircraft's position: the lens turns on a point just ahead of its main gear (its position,
+   not its attitude), its focal length grows gently with the distance (as its 0.2 power) but never so far that the
+   airframe (nose, tail, fin, wing tips and wheels, softly bounded) fills more than 84% of the frame's width, and the frame
+   is shifted so that the airframe's middle sits a little right of the frame's (room ahead of its nose), moving right as
+   the tower comes in; all of it smooth in time, so nothing jumps.
    The motion is the aircraft's real one on the scene clock (the clock runs at 0.6, a gentle slow motion; never faster
    than real). The main gear crosses the threshold about 10 m up (the ILS's 17.4 m datum is the antenna's height, 57 ft)
    at 70 m/s on the 3.0° glide path; the flare begins with the main wheels at 30 ft (Airbus FCTM: about 30 ft; the
@@ -1670,7 +1563,8 @@ scene({
    from 3.7 to 0.6 m/s and the pitch rising from 2.4° to 5.2°, and the rear wheels of the tilted bogies touch 298 m past
    the threshold (lt 2.95): the bogies level, the oleos compress, the ground spoilers rise to 50° within a second (they
    deploy at main-gear touchdown), the reversers' sleeves run aft, and the nose is flown down without delay (FCTM:
-   "lower the nose as soon as the main gear touches down") to put the nose wheels on the runway 2.25 s later (lt 5.2);
+   "lower the nose as soon as the main gear touches down"): the nose wheels meet the runway 2 s later (lt 4.95) and the
+   nose leg settles by lt 5.2;
    the deceleration builds from 0.6 to 2.2 m/s². Real time cannot hold the approach as well: the flare, the touchdown
    and the de-rotation take 6.3 s of the beat's 5.3 seen seconds, so the beat opens in the flare, 1.5 s in, the main
    wheels 4.5 m up. Its shadow runs ahead of it on the runway (the sun 9.2° up at 121°, 46 minutes after sunrise, behind
@@ -1679,8 +1573,10 @@ scene({
    The runway (ICAO Annex 14, a precision approach runway of 4,106 × 60 m): sixteen 30 m threshold stripes 6 m in, the
    aiming point (two 60 × 10 m blocks 400 m in), the distance-coded touchdown-zone pairs every 150 m to 900 m (three
    stripes at 150 and 300 m, two at 600, one at 750 and 900; the pair at 450 m dropped beside the aiming point), the
-   centreline, the side stripes; its lights steady. The fog, 13 minutes after the dawn shot, is down to its last lenses:
-   a 1.5 m layer lying low over the sand, cleared from the runway's asphalt; in real time it barely moves.
+   centreline, the side stripes; its lights steady; the PAPI's housings on both sides 400 m in (their lamps face the
+   approach). The fog, 13 minutes after the dawn shot, is down to its last lenses: a 1 m layer lying low over the sand
+   between the eye and the runway and over the infield beyond, cleared within about 50 m of the centreline (the asphalt
+   and its shoulders); in real time it barely moves.
    ========================================================================================================== */
 scene({
   id: 'arrival',
@@ -1716,6 +1612,10 @@ scene({
     // the edge lights on short posts (60 m apart), drawn as the small fittings they are
     this.edge = [];
     for (let u = 0; u <= rw.L; u += 60) [-1, 1].forEach(s => this.edge.push(W3(u, s * 31, 0)));
+    // the PAPI on both sides (AIP: PAPI BOTH, 3.0°, MEHT 69 ft): four units a side 400 m in, the inner 15 m off the edge,
+    // 9 m apart; their lamps face the approach, so from the eye beside them they show only their housings
+    this.papi = [];
+    [-1, 1].forEach(s => { for (let k = 0; k < 4; k++) this.papi.push({ u: 400, v: s * (45 + 9 * k) }); });
     // the parallel taxiway (210 m to the right), its link at the threshold end, a rapid exit, and the far runway 31R
     this.twy = [q(-80, 3950, 198.5, 221.5), q(-34, -11, 30, 205)];
     this.exitL = [W3(1330, 22, 0.02), W3(1530, 200, 0.02)];
@@ -1726,7 +1626,7 @@ scene({
     this.anemo = { u: 300, v: 165 };
     this.enclosure = { u: 2906, v: -350 };
     // the eye: 3.5 m up on the sand left of the runway (its perimeter track beside it), abeam 250 m past the threshold
-    this.CAM = [285, -150, 3.5];
+    this.CAM = [240, -150, 3.5];
     this.track = [[W3(-400, -238, 0.01), W3(1400, -238, 0.01)], [W3(-400, -243.5, 0.01), W3(1400, -243.5, 0.01)]];
     // the ground's grain and the fog's, laid out over the whole of the pan's field (strokes lying square to the line of
     // sight, uniform on the screen), and kept off the pavement
@@ -1789,7 +1689,6 @@ scene({
   // the frame is shifted so that the airframe's middle sits a little right of the frame's, leaving room ahead of its nose
   view(lt) {
     const fl = this.flight(lt), aim = AUH.W3(fl.u + 2.5, 0, fl.z + 2.6), C = AUH.W3(this.CAM[0], this.CAM[1], this.CAM[2]), B = R11.BOX;
-    if (window.AIRTEST) { const A = window.AIRTEST, D = AUH.D; this.fl = fl; return E3.camera(AUH.W3(fl.u + A.d * Math.sin(A.az * D) * Math.cos(A.el * D), -A.d * Math.cos(A.az * D) * Math.cos(A.el * D), fl.z + A.d * Math.sin(A.el * D)), aim, A.f, 560, 560); }
     E3.camera(C, aim, 1, 0, 0);
     const pose = AUH.poser(fl), X = B789.X, zt = B789.zRef(30.06, fl.cfg.flex), Z = B789.Z0;
     const key = [[X(0), 0, -0.5], [X(62), 0, 1.0], [X(55.9), 0, 12.25], [X(59.3), 0, 12.25], [X(43.1), 30.06, zt], [X(43.95), 30.06, zt], [X(43.1), -30.06, zt], [X(43.95), -30.06, zt],
@@ -1797,10 +1696,10 @@ scene({
     const xs = key.map(p => p[0]), ys = key.map(p => p[1]), w0 = Math.max(...xs) - Math.min(...xs), kk = 60 / w0;
     const sm = (a, k) => { const m = k > 0 ? Math.max(...a) : Math.min(...a); return m + Math.log(a.reduce((s, v) => s + Math.exp(k * (v - m)), 0)) / k; };
     const x0 = sm(xs, -kk), x1 = sm(xs, kk), y0 = sm(ys, -kk), y1 = sm(ys, kk);
-    const d = Math.hypot(aim[0] - C[0], aim[1] - C[1], aim[2] - C[2]), fd = 2500 * Math.pow(d / 150, 0.5), fm = 0.84 * (B[2] - B[0]) / (x1 - x0);
+    const d = Math.hypot(aim[0] - C[0], aim[1] - C[1], aim[2] - C[2]), fd = 2350 * Math.pow(d / 150, 0.2), fm = 0.84 * (B[2] - B[0]) / (x1 - x0);
     const f = Math.pow(Math.pow(fd, -6) + Math.pow(fm, -6), -1 / 6), k = AUH.smooth(clamp((lt - 0.45) / 5.3));
     this.fl = fl;
-    return E3.camera(C, aim, f, lerp(600, 640, k) - f * (x0 + x1) / 2, 545 - f * (y0 + y1) / 2);
+    return E3.camera(C, aim, f, lerp(590, 680, k) - f * (x0 + x1) / 2, 600 - f * (y0 + y1) / 2);
   },
   frame(lt) {
     const cam = this.view(lt), h = E3.projDir([cam.F[0], cam.F[1], 0]);
@@ -1858,15 +1757,20 @@ scene({
       this.rvr.forEach(s => list.push({ d: R11.dep(W3(s.u, s.v, 1)), draw: () => this.rvrSensor(s, ink) }));
       list.push({ d: R11.dep(W3(this.anemo.u, this.anemo.v, 5)), draw: () => this.anemometer(this.anemo, ink, lt) });
       list.push({ d: R11.dep(W3(this.enclosure.u, this.enclosure.v, 1)), draw: () => this.metPlot(this.enclosure, ink) });
+      this.papi.forEach((q, i) => { const c = W3(q.u, q.v, 0.6), d = R11.dep(c); if (d > 3) list.push({ d, draw: () => {
+        const al = R11.air(d, 2600) * ink, st = { tone: 0.35, shade: 0.4, lw: 0.9, edgeA: 0.85 * al, fillCol: OPT.colour ? '#9AA0A6' : null, fillA: 0.4 };
+        [-0.45, 0.45].forEach(o => R11.member(W3(q.u + 0.3, q.v + o, 0), W3(q.u + 0.3, q.v + o, 0.45), 1, 0.8 * al));
+        E3.solid(E3.box(q.v - 0.75, q.v + 0.75, q.u - 0.5, q.u + 0.6, 0.45, 1.05), st, 4100 + i);
+      } }); });
       this.bars.forEach(b => { const p = W3(b.u, 0, b.z), d = R11.dep(p); if (d > 1) { const s = E3.proj(p); if (s[0] > B[0] - 80 && s[0] < B[2] + 80) list.push({ d, draw: () => this.drawBar(b, ink) }); } });
       const dP = R11.dep(pose.toW([0, 0, 0]));
-      list.push({ d: dP, draw: () => B789.draw(m, pose, { air: R11.air(dP, 3000) * ink, warm: OPT.colour ? HUE.dawn : null, warmA: 0.3, warmAll: 0.04, lights: ink, lw: 1.1 }) });
+      list.push({ d: dP, draw: () => B789.draw(m, pose, { air: R11.air(dP, 3000) * ink, warm: OPT.colour ? HUE.dawn : null, warmA: 0.34, warmAll: 0.03, coolK: 1.6, hatchA: 1.25, inkFill: 0.16, lights: ink, lw: 0.85 }) });
       // the fog's last lenses, 1.5 m deep, over the infield's sand, cleared from the runway's asphalt and its shoulders;
       // in real time it only settles 0.1 m and drifts at 1.5 m/s toward the north-west
       const w = clamp((lt - 0.45) / 5.3), slide = 1.5 * (lt - 0.6), dv = AUH.dirAz(300), C2 = cam.C[2], hF = lerp(1.0, 0.92, w), Vf = 55;
       const fogF = (fu, fv) => {
-        const onRw = clamp(1 - (Math.abs(fv) - 110) / 30) * clamp((fu + 260) / 60) * clamp((4300 - fu) / 60);
-        return AUH.fogDepth(fu - dv[0] * slide, fv - dv[1] * slide, 0.57 + 0.01 * w, 0.12, 1.5) * (1 - onRw);
+        const onRw = clamp(1 - (Math.abs(fv) - 48) / 26) * clamp((fu + 260) / 60) * clamp((4300 - fu) / 60);
+        return AUH.fogDepth(fu - dv[0] * slide, fv - dv[1] * slide, 0.52 + 0.01 * w, 0.12, 1.1) * (1 - onRw);
       };
       AUH.fogLayer(list, {
         h: hF, V: Vf, amt: 0.92 * ink, strokes: this.fogSk,

@@ -46,9 +46,9 @@ import numpy as np
 import audio as A
 
 FOLEY = None  # foley.py, when --foley installs it: recorded sound effects and drums, and the layers only they have
-# the arrival's moments on its plate's clock (scenes/r11-airport.js), for its pass with --foley: nearest the listener
-# beside the runway, and the main gear's touchdown
-JET_CLOSE, JET_DOWN = 2.0, 5.4
+# the arrival's moments on its plate's clock (scenes/r11-airport.js), for its pass with --foley: abeam the camera (150 m
+# left of the centreline, 240 m past the threshold) and the main gear's touchdown (298 m in)
+JET_CLOSE, JET_DOWN, JET_SIDE = 2.03, 2.95, 150.0
 
 BPM = 72
 BEAT = 60 / BPM
@@ -421,9 +421,10 @@ def main(cues_path, out_dir):
         stroke(perc, 'tus', st(sid), 0.7)
     if FOLEY and SLOW:
         # the arrival heard from beside the runway: its pass, touchdown and reverse thrust on the plate's own clock
-        a0, k_ = st('airport'), S['airport']['speed']
-        sfx.add(FOLEY.jet_pass(en('airport') - a0 + 1.0, 0.9, sc('airport', JET_CLOSE) - a0 + 0.2,
-                               sc('airport', JET_DOWN) - a0 + 0.2, k=k_), a0 - 0.2, 0.8)
+        # the roar comes up 1.5 s before the cut, under the end of the dawn shot
+        a0, k_ = st('airport') - 1.5, S['airport']['speed']
+        sfx.add(FOLEY.jet_pass(en('airport') - a0 + 1.0, 0.9, sc('airport', JET_CLOSE) - a0, sc('airport', JET_DOWN) - a0,
+                               side=JET_SIDE, k=k_), a0, 0.8)
     else:
         sfx.add(A.jet_far(4.5 / S['airport']['speed'] if SLOW else 4.5, gain=0.9), st('airport') + 0.3, 0.8, pan=0.2)
     if R11:
