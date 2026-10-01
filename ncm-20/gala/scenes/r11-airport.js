@@ -44,7 +44,8 @@ const AUH = (() => {
       flaps: [[3.4, 10.2, 2.6], [10.9, 21.5, 1.9]],
       eng: [{ y: 9.6, r: 1.75, lead: 5.8, len: 7.8, drop: 2.35 }],
       stab: { y: [1.1, 10.6], le: [-24.2, -31.4], te: [-30.8, -33.4], t: [.55, .15], z0: 1.3, dih: 7 },
-      fin: { z: [2.8, 11.8], le: [-20.5, -28.2], te: [-31.6, -32.4], t: [1.0, .3], zte: 2.0 },
+      // the fin's leading edge swept ~43°, its trailing edge (the rudder's) ~20°, the tip a 4 m chord over the tail cone
+      fin: { z: [2.8, 11.8], le: [-20.5, -29.0], te: [-29.6, -33.0], t: [1.0, .3], zte: 2.2 },
       gear: { y: 4.9, x: -3.2, top: -2.3, r: .64, w: .42, dx: .74, dy: .7, nx: 24.2, ntop: -2.6, nr: .5 },
       win: [.6], cock: 26.6,
     },
@@ -57,7 +58,8 @@ const AUH = (() => {
       flaps: [[4, 13, 3.2], [13.8, 30, 2.4]],
       eng: [{ y: 15.4, r: 1.65, lead: 5.5, len: 7.5, drop: 2.4 }, { y: 25.8, r: 1.6, lead: 5, len: 7.2, drop: 2.1 }],
       stab: { y: [1.8, 15.2], le: [-29.5, -38.4], te: [-37.5, -41.2], t: [.8, .2], z0: 1.8, dih: 5 },
-      fin: { z: [3.3, 17.1], le: [-24, -35.6], te: [-37.6, -40.2], t: [1.4, .4], zte: 2.4 },
+      // the fin's leading edge swept ~40°, its trailing edge ~20°
+      fin: { z: [3.3, 17.1], le: [-24, -35.6], te: [-35.2, -40.0], t: [1.4, .4], zte: 2.6 },
       gear: { y: 6.2, x: -4, top: -3.4, r: .7, w: .5, dx: .9, dy: .8, nx: 27.5, ntop: -3.9, nr: .6 },
       win: [-1.3, 1.9], cock: 30.2,
     },
@@ -109,7 +111,8 @@ const AUH = (() => {
         const pyl = slab({ le: [x0 - 1.8, yy, zc + e.r * .8], te: [x1 + .4, yy, zc + e.r * .75], t: .55, n: [0, 1, 0] }, { le: [edgeAt(w, 'le', e.y) - .4, yy, zw - thickAt(w, e.y) * .3], te: [x1 - 1.5, yy, zw - thickAt(w, e.y) * .3], t: .55, n: [0, 1, 0] });
         out.push({ kind: 'eng', nac: tube(rg), inlet: rg[0], plug: tube(plug), pyl, y: e.y });
       });
-      k.flaps.forEach(([ya, yb, c]) => {
+      // the flaps are out only in flight (an arrival); at the gate they are stowed inside the wing's trailing edge
+      if (flight) k.flaps.forEach(([ya, yb, c]) => {
         const del = 30 * D, sec = y => { const te = [edgeAt(w, 'te', y) + .5, s * y, wingZ(w, y) - .5]; return { le: te, te: add(te, [-Math.cos(del), 0, -Math.sin(del)], c), t: .22, n: [-Math.sin(del), 0, Math.cos(del)] }; };
         out.push({ kind: 'flap', f: slab(sec(ya), sec(yb)) });
       });
@@ -664,16 +667,19 @@ const AUH = (() => {
 })();
 
 /* ==========================================================================================================
-   1 · Dawn (beat 'airport-dawn', 5 s, entered at lt 0.8): from 18 m over the apron in the courtyard between the south
+   1 · Dawn (beat 'airport-dawn', 5 s, entered at lt 0.8): from 28 m over the apron in the courtyard between the south
    and east piers (150 m east of the south pier's axis), looking north-west across the fog to Terminal A on a long lens
-   (2150 px), with the sun just risen behind the eye's right shoulder (116°, 3° up). Radiation fog lies ~5 m deep: the
-   upper fuselage and fin of a 787-9 at the south pier's gate 155 m away (its jet bridge at the forward door), an A380 and
-   the tails at the east pier beyond it, the pier roofs and the processor's great roof (its 52.5 m crown 400 m off, ~255 px
-   above the fog) stand out of it, all lit warm, and the long shadows of the apron masts behind the eye lie across the
-   fog's top as cool bands. The sky ahead is the western dawn sky: blue above, the pink band over the earth's shadow at
-   the horizon. Over the beat the eye drifts left and rises 2 m, the fog settles (5.2 m to 3.9 m) and thins and slides
-   with the dawn air, and the wing roots come out of it. (The crescent tower stands 1.9 km south-east of the processor,
-   toward the sun, so from any vantage where the terminal is lit it is behind the eye; it is in the arrival shot.)
+   (2150 px), with the sun just risen behind the eye's right shoulder (116°, 3° up). Shallow radiation fog lies ~3 m deep
+   round a 787-9 parked nose-in at the south pier's gate 155 m away (its jet bridge at the forward door; its flaps stowed,
+   as at any gate): its wheels and the lower halves of its engines are in the fog, its fuselage, wings, fin and the tops of
+   its nacelles stand out of it, whole in the frame from the first frame. An A380 and the tails at the east pier beyond it,
+   the pier roofs and the processor's great roof stand out of it too, all lit warm, and the long shadows of the apron masts
+   behind the eye lie across the fog's top as cool bands. The sky ahead is the western dawn sky: blue above, the pink band
+   over the earth's shadow at the horizon. Over the beat the eye drifts left and rises 2 m, and the fog settles (3.3 m to
+   2.4 m) and thins and slides with the dawn air. (The eye is 28 m up, not lower, because the hero's near wing points
+   almost at the eye from this side of the stand: from 18 m it foreshortened to a sliver and the airliner read wingless.)
+   (The crescent tower stands 1.9 km south-east of the processor, toward the sun, so from any vantage where the terminal
+   is lit it is behind the eye; it is in the arrival shot.)
    ========================================================================================================== */
 scene({
   id: 'airportdawn',
@@ -729,15 +735,15 @@ scene({
     });
     return out;
   },
-  // over the courtyard between the south and east piers, 18 m up (rising 2 m), 330 m out along the south pier and 150 m
-  // east of its axis (155 m from the hero's stand); a long lens (2150 px) on the processor; the eye drifts 10 m left and
-  // the view tilts a little up the roof over the beat
+  // over the courtyard between the south and east piers, 28 m up (rising 2 m), 330 m out along the south pier and 150 m
+  // east of its axis (155 m from the hero's stand); a long lens (2150 px) turned left far enough to hold the hero whole,
+  // nose to tail, from the first frame; the eye drifts 10 m left and the view tilts a little up the roof over the beat
   view(lt) {
     const u = easeInOut(clamp((lt - 0.7) / 5.2)), A = AUH.TA;
     const dS = [-0.7071, -0.7071], nE = [-0.7071, 0.7071], lf = AUH.dirAz(238);
     const P0 = [dS[0] * 330 + nE[0] * 150, dS[1] * 330 + nE[1] * 150];
-    const ca = P0[0] + lf[0] * 10 * u, cb = P0[1] + lf[1] * 10 * u, z = lerp(18, 20, u);
-    const f = 2150, hyT = 540, pitch = -Math.atan((562 - hyT) / f), a = lerp(326.1, 324.8, u), ax = AUH.dirAz(a), far = 5000;
+    const ca = P0[0] + lf[0] * 10 * u, cb = P0[1] + lf[1] * 10 * u, z = lerp(28, 30, u);
+    const f = 2150, hyT = 500, pitch = -Math.atan((562 - hyT) / f), a = lerp(323.4, 322.4, u), ax = AUH.dirAz(a), far = 5000;
     const C = AUH.W3(A[0] + ca, A[1] + cb, z), L = AUH.W3(A[0] + ca + far * ax[0] * Math.cos(pitch), A[1] + cb + far * ax[1] * Math.cos(pitch), z + far * Math.sin(pitch));
     this.ax = a;
     return E3.camera(C, L, f, 560, 562);
@@ -781,9 +787,10 @@ scene({
       });
       this.masts.forEach((m, i) => list.push({ d: R11.dep(m), draw: () => this.drawMast(m, ink, i) }));
       this.behind.forEach((m, i) => { if (R11.dep(m) > 3) list.push({ d: R11.dep(m), draw: () => this.drawMast(m, ink, 10 + i) }); });
-      // the fog: dense to 5.4 m at first, settling to 4.2 m; visibility in it 60 m, clearing to 170 m; it slides with the
-      // dawn air (about 3 m/s toward the north-west, across the eye's view)
-      const hF = lerp(5.2, 3.9, w), V = lerp(50, 110, w * w), drift = 3 * (lt - 0.8), dv = AUH.dirAz(300);
+      // the fog: 3.3 m deep at first, settling to 2.4 m (below the wing roots and the nacelle tops); visibility in it 40 m,
+      // clearing to 90 m, so it stays white seen from above; it slides with the dawn air (about 3 m/s toward the
+      // north-west, across the eye's view)
+      const hF = lerp(3.3, 2.4, w), V = lerp(40, 90, w * w), drift = 3 * (lt - 0.8), dv = AUH.dirAz(300);
       const slide = [dv[1] * drift, dv[0] * drift, 0];
       // the long shadows the low sun lays on the fog's top (19 times the height they stand above it), away from the eye
       const casters = this.term.casters.concat(this.tower.casters, this.planes.map(p => p.parts.fin.flat().map(p.pose.toW)),

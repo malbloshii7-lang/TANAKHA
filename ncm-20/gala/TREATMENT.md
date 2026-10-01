@@ -713,6 +713,41 @@ pace (§11 row 43).
   the airport's watch. Every subtitle now reads at 15.4 characters a second or less in English (it was up to 22.1, the
   list of professions in VO-15a) and 13.8 or less in Arabic (it was up to 20.0).
 
+**The requester's second notes on the review copy (1 October 2026).**
+- *"The locomotive of the train must be fixed."* The rail beat's head end is now drawn as the locomotive Etihad Rail runs,
+  an EMD SD70ACS: the desert version of the SD70ACe (seven delivered in 2013 for Stage One; the 38 "EMD SD70" of the
+  Stage Two fleet from Progress Rail, 4,500–4,600 hp; Railway Gazette 2011, 2013 and 2020; Etihad Rail 2020 and 2022),
+  22.6 m over the couplers and nearly 5 m high (The National, 2011). It has the isolated wide-nose cab under a tropical
+  roof, a short nose with two headlights, the long hood with a walkway and handrail along each side, louvred intakes
+  behind the cab, the exhaust stack and the dynamic brake's roof grille, the radiator section at the rear wider than
+  the hood with its two fans, two three-axle trucks whose side frames stand outside the 1,067 mm wheels, the fuel tank
+  slung between them, and at the pilot the coupler, the ditch lights, steps at the corners and a V sand plough (the
+  SD70ACS carries two fixed ploughs and a movable one; IRJ, 2015). The old drawing (a narrow box for a nose, a plough
+  floating ahead of the pilot, toy bogies with the wheels outside their frames) is gone. Lengths the sources do not give
+  (truck centres, the deck's height, the nose, cab and hood) are estimated from the SD70ACe's proportions; no livery or
+  logo is shown (§11 row 50).
+- *"The plane in the terminal needs a fix: review it."* Reviewed, and four faults fixed in the dawn shot at Terminal A:
+  the parked 787-9 had its landing flaps out at the gate (they are now stowed, as at any stand; only the arrival keeps
+  them out); its fin had an unswept trailing edge, a shark fin (both types' rudders now sweep back about 20°); the fog
+  lay 5 m deep, so the wings, engines and gear vanished and the airliner read as a tube; and from the 18 m eye its near
+  wing pointed straight at the lens and foreshortened to a sliver, with its nose cut by the frame's edge. The fog is now
+  a shallow layer 3.3 m settling to 2.4 m (the wheels and the lower halves of the engines stand in it, the fuselage,
+  wings, fin and nacelle tops above it), the eye is 28 m up, and the view is turned a little left, so the aircraft stands
+  whole in the frame, nose to tail, at its jet bridge from the first frame.
+- *"The cloud, Geneva and Dr Mandous need an additional little credit in a scene."* Read as one credit for Geneva, its
+  clouds and the WMO President, set in the world beat while the camera pushes toward the Geneva pin: a small engraved
+  plate of WMO's headquarters at 7bis avenue de la Paix (Brodbeck & Roulet, 1999: an elongated oval 120 m long, nine
+  storeys, 35.81 m, glazed all round in bluish glass that "reflects the sky"; its width is assumed) under fair-weather
+  cumulus, the same clouds lying in its glass. Its caption, «مقرّ المنظمة العالمية للأرصاد الجوية · جنيف» / WMO
+  HEADQUARTERS · GENEVA, is followed by «وفيه ترأّس رئيس المنظمة الدورة الاستثنائية للمؤتمر العالمي للأرصاد الجوية ·
+  2025» / WHERE THE WMO PRESIDENT CHAIRED THE EXTRAORDINARY SESSION OF THE WORLD METEOROLOGICAL CONGRESS · 2025
+  (Cg-Ext(2025), 20–23 October 2025, at WMO Headquarters, Geneva, chaired by Dr Al Mandous: WMO, the session's page and
+  the Secretary-General's opening address; WAM, 23 October 2025). The beat's own lines then name the presidency and «معالي
+  الدكتور عبدالله أحمد المندوس», as before. The plate and its lines keep clear of the pins' labels at the push's peak
+  (§11 row 49). If "the cloud" meant cloud seeding, his WMO profile's "Lead of UAE Rain Enhancement Programme" is the
+  verified line for a credit in the seeding beat. It is offered, not built: the programme runs under H.H. Sheikh Mansour
+  bin Zayed's patronage, and his card follows the science beat, so a credit there is protocol's call.
+
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
 was fixed. **Checked.** Every new plate was rendered in both looks; nothing is drawn right of the picture box and
@@ -1538,6 +1573,7 @@ Every number on screen, its qualifier and its source:
 | Shams 1 · 2013 | the region's first *operational utility-scale* CSP plant | Shams Power | [V] |
 | Al Dhafra Solar PV · 2 GW · 2023 | — ("largest at its opening" to the programme) | Masdar, 16 Nov 2023 | [V] |
 | Net zero by 2050 · 2021 | first in the Middle East and North Africa | Masdar, 7 Oct 2021 | [V] |
+| Cg-Ext(2025) · Geneva · 2025 | the Extraordinary Session of the World Meteorological Congress, held at WMO Headquarters on 20–23 Oct 2025 and chaired by the WMO President (named in the next lines) | WMO, the session's page and the Secretary-General's opening address; WAM, 23 Oct 2025 | [V] |
 | Sector sizes | *Superseded under `?rev11`* for the Jebel Ali capacity only, set under the port's name, apart from NCM's headline | — | — |
 
 ### 9.4 NCM's role and the April 2024 passage
@@ -1735,6 +1771,8 @@ Every number on screen, its qualifier and its source:
 | 46 | **VO-10t in the approved cut.** It says NCM's AI drafts the east-coast bulletin; WAM (29 June 2026) says the Forecaster Assistant helps prepare weather and marine bulletins in general, without naming the east-coast one. Revision 11 uses WAM's own verb | The narration is not yet recorded, so it can be corrected before the session | NCM and the Arabic editor | Revision 11's wording, «…نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،» |
 | 47 | **The Operations Centre and the forecasters (Revision 11, B18b).** Reference photographs of NCM's Operations Centre, and of consenting staff at work, so the room can be drawn as it is and named; the cultural adviser (row 37) to confirm the ghutra, agal and shayla as drawn from behind. Until then the room is generic and unnamed, and the supercomputer appears only in the register | H.H. Sheikh Mansour toured the real room on 4 Aug 2025, and NCM's staff work in it; an invented interior must not be labelled as theirs | NCM communications and the cultural adviser | A generic room, not named; three anonymous forecasters seen from behind |
 | 48 | **The finale's two new landmarks (Revision 11, 1 October).** ADNOC HQ in the closing skyline, in the 2026 context (ADNOC's Ruwais complex and its Fujairah terminal were struck in March 2026, and ADNOC vessels attacked in Hormuz); and Qasr Al Watan, the Presidential Palace, whose depiction the Presidential Court approves | The requester asked for both. Each is drawn as the other landmarks are, a quiet lit silhouette at its true size with no name, logo, beam or glow beyond its own floodlights; the closing frame is the film's calm last image | The protocol office and the Presidential Court | As built; without approval, the finale returns to the approved skyline (both are drawn only under `?rev11`) |
+| 49 | **The Geneva credit (Revision 11, 1 October).** A small plate of WMO's headquarters in Geneva in the world beat, captioned «مقرّ المنظمة العالمية للأرصاد الجوية · جنيف» / WMO HEADQUARTERS · GENEVA, and the line «وفيه ترأّس رئيس المنظمة الدورة الاستثنائية للمؤتمر العالمي للأرصاد الجوية · 2025» / WHERE THE WMO PRESIDENT CHAIRED THE EXTRAORDINARY SESSION OF THE WORLD METEOROLOGICAL CONGRESS · 2025, ahead of the presidency and his name. The building's width is assumed (its length, storeys and height are published); WMO may wish to see its own house drawn | The requester asked for a little more credit to Geneva and to Dr Al Mandous; the line is the WMO's and WAM's own fact (Cg-Ext(2025), 20–23 Oct 2025, WMO Headquarters); the wording about the WMO President goes to protocol with the name | NCM communications, the protocol office, and WMO's communications if NCM wishes | As built; without approval, the world beat returns to its pins, the presidency and the name (all of it is drawn only under `?rev11`) |
+| 50 | **The locomotive (Revision 11, 1 October).** The rail beat's head end is drawn as an EMD SD70ACS, the type Etihad Rail runs; the sources give its length (22.6 m), its height (nearly 5 m), its isolated cab, tropical roof, pulse filtration and sand ploughs, but not its truck centres or the lengths of its nose, cab and hood, which are estimated. Etihad Rail's photographs (or a general-arrangement drawing) settle them, and say whether the 2026 fleet's livery may be shown | A named operator's vehicle must be drawn as it is | NCM communications, with Etihad Rail | As built, with no livery and no logo; the approved cut keeps its v3 drawing |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

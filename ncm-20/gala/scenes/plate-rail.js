@@ -155,12 +155,143 @@ scene({
     if (f.front) { if (front) fill(f.front, front[0], front[1] * tq); stroke(f.front, tq, INK, lw, 0.9); }
     if (f.side) { if (side) fill(f.side, side[0], side[1] * tq); stroke(f.side, tq, INK, lw, 0.9); }
   },
+  // Revision 11 (?rev11): the head end drawn as the locomotive Etihad Rail runs, an EMD SD70ACS, the SD70ACe built for
+  // the desert (its first seven delivered in 2013; the 38 'EMD SD70' of the Stage Two fleet from Progress Rail; Railway
+  // Gazette 2011, 2013, 2020; Etihad Rail 2020, 2022): 22.6 m over the couplers and nearly 5 m high (The National, 2011),
+  // an isolated wide-nose cab under a tropical roof (IRJ 2015), the long hood with a walkway and handrail along each side,
+  // the radiator section at the rear wider than the hood with its two big fans on the roof, two three-axle trucks with
+  // their side frames outside the 1,067 mm wheels, the fuel tank slung between them, and sand ploughs at the pilot (two
+  // fixed and a movable one; IRJ 2015). Lengths and heights the sources do not give (truck centres 15.2 m, the deck at
+  // 1.7 m, the nose, cab and hood lengths) are estimated from the SD70ACe's proportions and rounded: match them to Etihad
+  // Rail's photographs before the master. No livery and no logo, as before. Distances x are metres back from the front
+  // coupler's face; o across the track (negative toward the camera); z above the rail head.
+  loco11(b, psi, zr, tq) {
+    const s1 = b.s1, X = x => s1 - x;
+    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + z, psi); return p ? [p[0], p[1]] : null; };
+    const line = (a, e, lw = 0.7, al = 0.7) => { if (a && e) stroke(new P([a, e]), tq, INK, lw, al); };
+    const face = pts => { const p = pts.map(([x, o, z]) => L(x, z, o)); return p.some(q => !q) ? null : new P(p, true); };
+    const B = (x0, x1, o0, o1, z0, z1) => this.box(X(x1), X(x0), o0, o1, zr + z0, zr + z1, psi);
+    const bb = f => [Math.min(...f.pts.map(p => p[0])) - 1, Math.min(...f.pts.map(p => p[1])) - 1, Math.max(...f.pts.map(p => p[0])) + 1, Math.max(...f.pts.map(p => p[1])) + 1];
+    // a face laid on paper, toned, finely hatched (the light grey body) and outlined
+    const plate = (f, { tone = null, skin = 0, ang = 0.1, gap = 4.5, lw = 0.9, al = 0.85, seed = 0 } = {}) => {
+      if (!f) return;
+      mask(f);
+      if (tone) fill(f, tone[0], tone[1] * tq);
+      if (skin) hatch(f, bb(f), ang, gap, tq, INK, 0.6, skin, 2100 + seed);
+      stroke(f, tq, INK, lw, al);
+    };
+    const circle = (x, z, o, r, plane = 'side', n = 18) => {
+      const pts = [];
+      for (let k = 0; k < n; k++) {
+        const a = k / n * TAU, p = plane === 'side' ? L(x + r * Math.cos(a), z + r * Math.sin(a), o) : plane === 'roof' ? L(x + r * Math.cos(a), z, o + r * Math.sin(a)) : L(x, z + r * Math.sin(a), o + r * Math.cos(a));
+        if (!p) return null; pts.push(p);
+      }
+      return new P(pts, true);
+    };
+    // the trucks: three axles 2.05 m apart, the wheels (1,067 mm) inside the side frames, which dip to the journal boxes
+    // at each axle and rise between them; a coil-spring nest over each box
+    [3.7, 18.9].forEach((xc, ti) => {
+      [-2.05, 0, 2.05].forEach((dx, k) => { const w = circle(xc + dx, 0.533, -0.8, 0.533); if (w) { mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.9, 0.85); } });
+      const prof = [[-2.75, 0.75], [-2.3, 1.02], [2.3, 1.02], [2.75, 0.75], [2.55, 0.5], [2.4, 0.3], [1.7, 0.3], [1.35, 0.62], [0.7, 0.62], [0.35, 0.3], [-0.35, 0.3], [-0.7, 0.62], [-1.35, 0.62], [-1.7, 0.3], [-2.4, 0.3], [-2.55, 0.5]];
+      const sf = face(prof.map(([dx, z]) => [xc + dx, -1.08, z]));
+      plate(sf, { tone: [INK, 0.5], lw: 0.9 });
+      [-2.05, 0, 2.05].forEach(dx => {
+        plate(face([[xc + dx - 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.72], [xc + dx - 0.24, -1.14, 0.72]]), { tone: [INK, 0.62], lw: 0.7 });
+        for (let z = 0.76; z < 1.0; z += 0.06) line(L(xc + dx - 0.16, z, -1.14), L(xc + dx + 0.16, z + 0.03, -1.14), 0.6, 0.7);
+      });
+      // the traction motors' and brake gear's shadow between the frames, seen through the gaps
+      line(L(xc - 2.3, 1.12, -1.1), L(xc + 2.3, 1.12, -1.1), 1.2, 0.6);
+    });
+    // the fuel tank, 16,655 litres (The National, 2011), between the trucks: deep, its lower edges chamfered
+    const tank = B(6.9, 15.7, -1.35, 1.35, 0.62, 1.22);
+    this.paintBox(tank, tq, { side: [INK, 0.28], front: [INK, 0.36], lw: 0.9 });
+    plate(face([[6.9, -1.35, 0.62], [15.7, -1.35, 0.62], [15.7, -1.0, 0.45], [6.9, -1.0, 0.45]]), { tone: [INK, 0.45], lw: 0.8 });
+    line(L(7.0, 0.92, -1.36), L(15.6, 0.92, -1.36), 0.55, 0.5);
+    // the rear steps (the far end is the hood's end) and the frame with its walkway, full width
+    [21.3, 21.7].forEach(x => line(L(x, 0.45, -1.58), L(x, 1.7, -1.58), 0.8, 0.8));
+    [0.55, 0.95, 1.35].forEach(z => line(L(21.3, z, -1.58), L(21.7, z, -1.58), 0.8, 0.8));
+    const frame = B(0.75, 21.85, -1.55, 1.55, 1.22, 1.70);
+    this.paintBox(frame, tq, { side: [INK, 0.42], top: [SEPIA, 0.2], front: [INK, 0.46], lw: 1 });
+    // the radiator section at the rear: wider than the hood, its radiator cores behind long screens on each side, two
+    // fans on the roof
+    const rad = B(17.25, 21.6, -1.47, 1.47, 1.70, 4.62);
+    if (rad.all.length) {
+      mask(rad.all);
+      if (rad.top) { fill(rad.top, SEPIA, 0.12 * tq); stroke(rad.top, tq, INK, 0.9, 0.8); }
+      if (rad.front) { fill(rad.front, SEPIA, 0.24 * tq); stroke(rad.front, tq, INK, 1, 0.85); }
+      if (rad.side) { hatch(rad.side, bb(rad.side), 0.1, 4.5, tq, INK, 0.6, 0.16, 2111); stroke(rad.side, tq, INK, 1, 0.9); }
+      const scr = face([[17.7, -1.48, 2.65], [21.15, -1.48, 2.65], [21.15, -1.48, 4.35], [17.7, -1.48, 4.35]]);
+      if (scr) { mask(scr); fill(scr, INK, 0.16 * tq); for (let x = 17.82; x < 21.1; x += 0.12) line(L(x, 2.68, -1.48), L(x, 4.32, -1.48), 0.5, 0.55); line(L(17.7, 3.5, -1.48), L(21.15, 3.5, -1.48), 0.7, 0.7); stroke(scr, tq, INK, 0.9, 0.85); }
+      [18.35, 20.45].forEach(x => { const fan = circle(x, 4.63, 0, 0.78, 'roof', 24); if (fan) { fill(fan, INK, 0.22 * tq); stroke(fan, tq, INK, 0.8, 0.8); for (let k = -2; k <= 2; k++) line(L(x - 0.7, 4.64, k * 0.28), L(x + 0.7, 4.64, k * 0.28), 0.45, 0.5); } });
+    }
+    // the long hood, narrower than the frame (a walkway each side): behind the cab its louvred intakes (the filtered air
+    // for the engine and electrics), then the engine room's doors; the exhaust stack and the dynamic brake's roof grille
+    const hood = B(6.45, 17.25, -1.17, 1.17, 1.70, 4.52);
+    if (hood.all.length) {
+      mask(hood.all);
+      if (hood.top) { fill(hood.top, SEPIA, 0.12 * tq); stroke(hood.top, tq, INK, 0.9, 0.8); }
+      if (hood.side) {
+        hatch(hood.side, bb(hood.side), 0.1, 4.5, tq, INK, 0.6, 0.16, 2112); stroke(hood.side, tq, INK, 1, 0.9);
+        const lv = face([[6.75, -1.18, 3.2], [8.75, -1.18, 3.2], [8.75, -1.18, 4.32], [6.75, -1.18, 4.32]]);
+        if (lv) { mask(lv); for (let z = 3.26; z < 4.3; z += 0.09) line(L(6.8, z, -1.18), L(8.7, z, -1.18), 0.5, 0.55); stroke(lv, tq, INK, 0.8, 0.8); }
+        for (let x = 9.2; x < 17.1; x += 2.2) line(L(x, 1.82, -1.18), L(x, 4.32, -1.18), 0.55, 0.5);
+        line(L(6.55, 4.36, -1.18), L(17.15, 4.36, -1.18), 0.55, 0.55);
+      }
+      const stack = B(11.6, 12.4, -0.32, 0.32, 4.52, 4.8);
+      this.paintBox(stack, tq, { side: [INK, 0.5], top: [INK, 0.7], front: [INK, 0.55], lw: 0.8 });
+      const grid = face([[6.9, -0.9, 4.53], [9.6, -0.9, 4.53], [9.6, 0.9, 4.53], [6.9, 0.9, 4.53]]);
+      if (grid) { for (let x = 7.05; x < 9.5; x += 0.18) line(L(x, 4.53, -0.88), L(x, 4.53, 0.88), 0.45, 0.5); stroke(grid, tq, INK, 0.7, 0.7); }
+    }
+    // the walkway's handrail along the camera side: posts every 1.6 m at the deck's edge, one rail at 1.05 m
+    for (let x = 6.7; x <= 21.4; x += 1.6) line(L(x, 1.72, -1.52), L(x, 2.75, -1.52), 0.6, 0.65);
+    line(L(6.7, 2.75, -1.52), L(21.4, 2.75, -1.52), 0.8, 0.8);
+    // the cab, full width, its front raked back above the nose; the tropical roof standing a hand's breadth above its
+    // roof; the windscreens and the side windows
+    const xr = z => 3.25 + 0.35 * (z - 3.45) / 1.3;
+    plate(face([[6.45, -1.55, 1.70], [3.25, -1.55, 1.70], [3.25, -1.55, 3.45], [3.6, -1.55, 4.75], [6.45, -1.55, 4.75]]), { skin: 0.16, seed: 3, lw: 1 });
+    plate(face([[3.25, -1.55, 1.70], [3.25, 1.55, 1.70], [3.25, 1.55, 3.45], [3.25, -1.55, 3.45]]), { tone: [SEPIA, 0.26], lw: 1 });
+    plate(face([[3.25, -1.55, 3.45], [3.25, 1.55, 3.45], [3.6, 1.55, 4.75], [3.6, -1.55, 4.75]]), { tone: [SEPIA, 0.26], lw: 1 });
+    plate(face([[3.6, -1.55, 4.75], [3.6, 1.55, 4.75], [6.45, 1.55, 4.75], [6.45, -1.55, 4.75]]), { tone: [SEPIA, 0.14], lw: 0.9 });
+    const troof = B(3.5, 6.6, -1.62, 1.62, 4.82, 4.94);
+    this.paintBox(troof, tq, { side: [INK, 0.3], top: [SEPIA, 0.16], front: [INK, 0.32], lw: 0.8 });
+    line(L(3.6, 4.79, -1.56), L(6.45, 4.79, -1.56), 1.1, 0.6);
+    [[-1.38, -0.12], [0.12, 1.38]].forEach(([a, e]) => {
+      const ws = face([[xr(3.62), a, 3.62], [xr(3.62), e, 3.62], [xr(4.55), e, 4.55], [xr(4.55), a, 4.55]]);
+      if (ws) { fill(ws, BLUE, 0.4 * tq); stroke(ws, tq, INK, 0.9, 0.9); }
+    });
+    [[3.85, 5.25], [5.45, 6.15]].forEach(([a, e]) => {
+      const sw = face([[a, -1.56, 3.35], [e, -1.56, 3.35], [e, -1.56, 4.35], [a, -1.56, 4.35]]);
+      if (sw) { fill(sw, BLUE, 0.34 * tq); stroke(sw, tq, INK, 0.9, 0.9); }
+    });
+    // the short nose ahead of the cab, a little narrower than it, its top falling toward the front; two headlights
+    // high on its face (lit, as trains run by day)
+    plate(face([[3.25, -1.32, 1.70], [1.95, -1.32, 1.70], [1.95, -1.32, 3.15], [3.25, -1.32, 3.45]]), { skin: 0.16, seed: 4, lw: 1 });
+    plate(face([[1.95, -1.32, 1.70], [1.95, 1.32, 1.70], [1.95, 1.32, 3.15], [1.95, -1.32, 3.15]]), { tone: [SEPIA, 0.28], lw: 1 });
+    plate(face([[1.95, -1.32, 3.15], [1.95, 1.32, 3.15], [3.25, 1.32, 3.45], [3.25, -1.32, 3.45]]), { tone: [SEPIA, 0.14], lw: 0.9 });
+    [-0.3, 0.3].forEach(o => { const h = L(1.94, 2.85, o), e = L(1.94, 2.94, o); if (h && e) disc(h[0], h[1], Math.max(1, Math.hypot(e[0] - h[0], e[1] - h[1])), OCHRE, 0.9 * tq); });
+    // the pilot under the front of the frame, the coupler, the anticlimber along the deck's front edge, the ditch lights
+    // at its corners, and the sand ploughs: a V-blade just clear of the rail heads ahead of the leading wheels
+    plate(face([[0.75, -1.5, 1.22], [0.75, 1.5, 1.22], [0.55, 1.4, 0.5], [0.55, -1.4, 0.5]]), { tone: [INK, 0.42], lw: 0.9 });
+    plate(face([[0.35, 0, 0.08], [1.25, 1.45, 0.08], [1.25, 1.45, 0.5], [0.35, 0, 0.5]]), { tone: [INK, 0.22], lw: 0.7 });
+    plate(face([[0.35, 0, 0.08], [1.25, -1.45, 0.08], [1.25, -1.45, 0.5], [0.35, 0, 0.5]]), { tone: [INK, 0.34], lw: 0.8 });
+    const cpl = B(0.05, 0.75, -0.24, 0.24, 0.72, 1.04);
+    this.paintBox(cpl, tq, { side: [INK, 0.6], top: [INK, 0.5], front: [INK, 0.65], lw: 0.8 });
+    const ac = B(0.66, 0.8, -1.55, 1.55, 1.6, 1.78);
+    this.paintBox(ac, tq, { side: [INK, 0.55], top: [INK, 0.4], front: [INK, 0.55], lw: 0.7 });
+    [-1.2, 1.2].forEach(o => { const h = L(0.62, 1.42, o), e = L(0.62, 1.52, o); if (h && e) disc(h[0], h[1], Math.max(1, Math.hypot(e[0] - h[0], e[1] - h[1])), OCHRE, 0.85 * tq); });
+    // the front steps at the corners and the front deck's handrails
+    [0.88, 1.32].forEach(x => line(L(x, 0.45, -1.58), L(x, 1.7, -1.58), 0.8, 0.8));
+    [0.55, 0.95, 1.35].forEach(z => line(L(0.88, z, -1.58), L(1.32, z, -1.58), 0.8, 0.8));
+    [[-1.5, -0.55], [0.55, 1.5]].forEach(([a, e]) => { line(L(0.9, 2.75, a), L(0.9, 2.75, e), 0.8, 0.85); line(L(0.9, 2.25, a), L(0.9, 2.25, e), 0.6, 0.7); [a, e].forEach(o => line(L(0.9, 1.78, o), L(0.9, 2.75, o), 0.7, 0.8)); });
+    line(L(0.9, 2.75, -1.5), L(1.95, 2.75, -1.5), 0.8, 0.85);
+  },
   vehicle(b, psi, zr, tq) {
     const { c, s0, s1 } = b;
     const probe = this.box(s0, s1, -1.6, 1.6, zr, zr + c.top, psi);
     if (!probe.all.length) return;
     const xs = probe.all.flatMap(p => p.pts.map(q => q[0]));
     if (Math.max(...xs) < RAIL.x0 - 10 || Math.min(...xs) > RAIL.x1 + 10) return;
+    if (c.kind === 'loco' && typeof REV11 !== 'undefined' && REV11) { this.loco11(b, psi, zr, tq); return; }
     const L = (s, z, o) => { const [X, Y] = this.at(s, o), p = this.proj(X, Y, z, psi); return p ? [p[0], p[1]] : null; };
     const seg = (a, e) => a && e ? new P([a, e]) : null;
     // bogies and wheels (the near side), under the frame

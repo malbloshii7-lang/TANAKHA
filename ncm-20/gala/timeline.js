@@ -348,6 +348,14 @@ function worldWords(f, out = START('world') + 12.1) {
   levelA(f, s + 2.2, s + 7.9, ['من سماء الإمارات', 'إلى العالم'], 'FROM THE SKIES OF THE EMIRATES TO THE WORLD', { y: 640, arSize: 92, enSize: 32, patch: true });
   levelB(f, s + 8.0, out, 'رئاسة المنظمة العالمية للأرصاد الجوية · ' + ltr('2023–2027'), ['PRESIDENCY OF THE WORLD METEOROLOGICAL', 'ORGANIZATION · 2023–2027'], { y: 640, arSize: 28, enSize: 17 });
   levelB(f, s + 9.6, out, 'معالي الدكتور عبدالله أحمد المندوس', 'HIS EXCELLENCY DR ABDULLA AHMED AL MANDOUS', { y: 790, arSize: 28, enSize: 16 });
+  // Revision 11 (?rev11): Geneva's own plate as the camera pushes to its pin (scenes/r11-geneva.js), its caption, and the
+  // President's work there, before his name: the Extraordinary Session of Congress, WMO Headquarters, 20-23 Oct 2025
+  if (REV11) {
+    R11_GENEVA.draw(textIn(f, s + 3.0, out, 1.0));
+    levelB(f, s + 3.4, out, 'مقرّ المنظمة العالمية للأرصاد الجوية · جنيف', 'WMO HEADQUARTERS · GENEVA', { y: 332, arSize: 26, enSize: 14 });
+    levelB(f, s + 4.6, out, ['وفيه ترأّس رئيس المنظمة', 'الدورة الاستثنائية للمؤتمر العالمي', 'للأرصاد الجوية · ' + ltr('2025')],
+      ['WHERE THE WMO PRESIDENT CHAIRED', 'THE EXTRAORDINARY SESSION OF THE', 'WORLD METEOROLOGICAL CONGRESS · 2025'], { y: 400, arSize: 22, enSize: 13, maxW: 420 });
+  }
 }
 
 // the title and the lockup over the night (also the stage hold's frame)
