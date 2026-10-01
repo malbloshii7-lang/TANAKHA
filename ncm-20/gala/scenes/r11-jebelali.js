@@ -135,9 +135,12 @@ scene({
     const rd = this.road = { y0: 66, y1: 76, xa: -760, xb: 5200, v: 6 };
     rd.L = 2 * (rd.xb - rd.xa) + Math.PI * (rd.y1 - rd.y0);
     this.fleet = [];
-    for (let s = r() * 60; s < rd.L - 60; s += 90 + r() * 170) this.fleet.push({ s, laden: r() < 0.55, col: r() });
-    // the yard gantries: about two in three make one run along their block while the beat is seen
+    for (let s = r() * 60; s < rd.L - 60; s += 70 + r() * 150) this.fleet.push({ s, laden: r() < 0.55, col: r() });
+    // the yard gantries: about two in three make one run along their block while the beat is seen. (Each girder is drawn
+    // as a box or, far off, as a line by its distance from the eye at mid-beat, so none changes as the eye rises)
+    this.view(5.2);
     this.yard.forEach(b => {
+      b.dRef = E3.depth([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, this.QZ]);
       const lo = b.x0 + 8, hi = b.x1 - 8, x0 = clamp(b.gx, lo, hi), go = r() < 0.65, sg = r() < 0.5 ? -1 : 1, dx = 25 + r() * 110, t0 = r() * 30 - 8;
       const to = go ? clamp(x0 + sg * dx, lo, hi) : x0;
       b.gm = { x0, to, t0, p: this.prof(to - x0, 4, 6) };
@@ -556,7 +559,7 @@ scene({
     });
     // the near legs, then the girder across the block
     [g0 - 5, g0 + 5].forEach(x => R11.member([x, b.y0 - 3, QZ], [x, b.y0 - 3, zz], 1, 0.7 * a));
-    if (d < 2600) E3.solid(E3.box(g0 - 6, g0 + 6, b.y0 - 4, b.y1 + 4, zz, zz + 2.2), { tone: 0.1, shade: 0.45, lw: 0.9, edgeA: 0.8 * a, noHatch: true, fillCol: OPT.colour ? '#E6E1D4' : null, fillA: 0.5 }, 3600 + k);
+    if (b.dRef < 2600) E3.solid(E3.box(g0 - 6, g0 + 6, b.y0 - 4, b.y1 + 4, zz, zz + 2.2), { tone: 0.1, shade: 0.45, lw: 0.9, edgeA: 0.8 * a, noHatch: true, fillCol: OPT.colour ? '#E6E1D4' : null, fillA: 0.5 }, 3600 + k);
     else R11.member([g0, b.y0 - 4, zz + 1], [g0, b.y1 + 4, zz + 1], 1.4, 0.7 * a);
   },
   // the crane's structure landward of the quay face, with the tractors under its portal and the load while it is over

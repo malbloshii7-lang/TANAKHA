@@ -18,17 +18,18 @@
 // scene clock. The national picture is the radar composite, live: NCM composites its six C-band weather radars into one
 // reflectivity picture of the UAE every 6 minutes (a 1 km constant-altitude level on a 1 km grid; AMS 40th Conference
 // on Radar Meteorology, 2023), and a radar display shows it as nested bands of reflectivity. Here a frontal band over
-// the Gulf advects ESE toward the western coast through the beat (about 28 px), its cells growing and decaying, in the
-// plate's own blues, with the UAE's coast and borders from the film's map over it: no range rings, no radar sites and no
-// sweep. The satellite's clouds drift (the ITCZ's clusters west on the easterlies, the fronts east on the westerlies),
-// in the room and through the push; the satellite crop on the desk drifts; in the mosaic of 26 camera feeds a few
-// clouds drift and a few skies change their light slowly. The man on the left works his mouse in short strokes, the
-// man on the right looks up to the wall and partly back, the woman signs; a fourth forecaster stands at the wall and,
-// with an open hand, follows the radar's rain band. On the desk, Arabic coffee (with the dallah, on UNESCO's list for
-// the UAE, Saudi Arabia, Oman and Qatar since 2015): an Emirati brass dallah 24 cm to its finial (museum dallahs measure
-// 19-31.5 cm) with its bulbous body, waist, flared mouth, stepped spire lid and finial, handle, and the long spout that
-// ends in the crescent beak; and three finjan, handleless porcelain cups 6.4 cm across and 5 cm high (an 80 ml qahwa
-// cup), two nested and one by the man's hand. No steam: at this size a wisp would read as smoke.
+// the Gulf advects ESE toward the western coast through the beat (some 20-25 px), its cells growing and decaying, in
+// the plate's own blues, with the UAE's coast and borders from the film's map over it: no range rings, no radar sites
+// and no sweep. The satellite's clouds drift (the ITCZ's clusters west on the easterlies, the fronts east on the
+// westerlies), in the room and through the push; the satellite crop on the desk drifts; in the mosaic of 26 camera
+// feeds a few clouds drift and a few skies change their light slowly. The man on the left works his mouse in short
+// strokes, the man on the right turns his head toward the wall on his right and partly back, the woman signs; a fourth
+// forecaster stands at the wall and, with an open hand, follows the radar's rain band. On the desk, Arabic coffee (with
+// the dallah, on UNESCO's list for the UAE, Saudi Arabia, Oman and Qatar since 2015): an Emirati brass dallah 24 cm to
+// its finial (museum dallahs measure 19-31.5 cm) with its bulbous body, waist, flared mouth, stepped spire lid and
+// finial, handle, and the long spout that ends in the crescent beak; and three finjan, handleless porcelain cups 6.4 cm
+// across and 5 cm high (an 80 ml qahwa cup), two nested and one by the man's hand. No steam: at this size a wisp would
+// read as smoke.
 // Then the camera pushes into the full disc while the room fades to paper. The disc turns from the satellite's view to
 // the world beat's globe: centre, projection and place on screen are read from the world beat itself (its clock, its
 // camera, and the globe plate-world.js draws: centre 24 N, 46.5 E less 1.1 degrees a second, orthographic), and whatever
@@ -443,7 +444,7 @@ scene({
   },
   // the forecasters' small motions, on the scene clock (the beat's first frame is T0 = 1.3): the man on the left moves
   // his mouse in short, slow strokes with rests between (a centimetre or two, each stroke over 0.7-0.8 s); the man on the
-  // right turns his head 22 degrees to his right, up to the wall's station winds, holds, and turns partly back
+  // right turns his head 22 degrees to his right, toward the wall's station winds, holds, and turns partly back
   mouseAt(sl) {
     const T0 = this.T0;
     return this.keyed([[T0 + 0.9, 0, 0], [T0 + 1.6, 0.016, 0.01], [T0 + 2.5, 0.016, 0.01], [T0 + 3.3, 0.004, -0.006], [T0 + 4.4, 0.004, -0.006], [T0 + 5.1, 0.02, 0.004], [T0 + 6.1, 0.02, 0.004], [T0 + 6.9, 0.01, 0.012]], sl);
@@ -1096,7 +1097,7 @@ scene({
   // the radar composite's reflectivity at scene time t, as a function of the panel's grid: a frontal band lying SW-NE
   // over the Gulf north-west of Abu Dhabi's coast, broken into cells of every shape (lon, lat, half-length and half-width
   // in degrees, turn in degrees, peak), a light shield joining them. The whole band advects ESE toward the western coast
-  // (0.06 degree of longitude and -0.03 of latitude a second of scene clock, about 28 px over the beat), its cells
+  // (0.06 degree of longitude and -0.03 of latitude a second of scene clock, some 20-25 px over the beat), its cells
   // growing and decaying slowly about their peaks (periods of 9-15 s), one new cell building at the band's south-western
   // end and one decaying at its north-eastern end; the cells' texture evolves slowly as they move. Nothing reaches the
   // Hajar or the east coast
@@ -1192,12 +1193,12 @@ scene({
     this.ctxLand.forEach(pg => stroke(pg, q, INK, 0.6, 0.35));
     this.uae.forEach(pg => stroke(pg, q, INK, 1, 0.85));
     ctx.restore();
-    // the legend strip: the five bands, in the corner south-east of the country (the standing forecaster's hand is
-    // raised by the south-western one)
-    const lx = P2[2] - 70, ly = P2[3] - 18;
-    wordPatch([[lx - 3, ly - 3, 70, 14]], q);
+    // the legend strip: the five bands, low in the empty desert south of the country's border (the standing forecaster's
+    // hand is raised by the panel's south-western corner; the neighbours' faint border runs down its south-eastern one)
+    const lx = P2[0] + 104, ly = P2[3] - 13;
+    wordPatch([[lx - 3, ly - 3, 57, 13]], q);
     this.BANDS.forEach(([c, wa, gap, ha], i) => {
-      const b = [lx + i * 13, ly, lx + i * 13 + 10, ly + 8], bp = boxP(...b);
+      const b = [lx + i * 11, ly, lx + i * 11 + 8, ly + 7], bp = boxP(...b);
       for (let j = 0; j <= i; j++) { const [cj, waj, gj, haj] = this.BANDS[j]; if (OPT.colour) { wash(bp, col(cj), waj * q); if (j >= 3) this.hatchEO([bp], b, 0.75, gj * 1.3, q, BLUE, 0.6, haj * 0.6, 775 + j); } else if (j === i) this.hatchEO([bp], b, 0.75, gj, q, BLUE, 0.7, haj, 775 + j); }
       stroke(bp, q, BLUE, 0.6, 0.6);
     });

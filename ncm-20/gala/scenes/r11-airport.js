@@ -437,7 +437,7 @@ const AUH = (() => {
     const oo = Object.assign({}, o, { amt: o.amt * sl.amt });
     let y = Math.max(B[1], yh + 0.5);
     while (y < B[3]) {
-      const hgt = clamp(1.5 + (y - yh) * 0.032, 1.5, 11), y1 = Math.min(B[3], y + hgt), ym = (y + y1) / 2, dz = dirZ(ym);
+      const hgt = clamp(1.5 + (y - yh) * 0.032, 1.5, 7), y1 = Math.min(B[3], y + hgt), ym = (y + y1) / 2, dz = dirZ(ym);
       if (dz < -1e-6 && C[2] > sl.z1) {
         const t = (sl.z1 - C[2]) / dz, L = (sl.z1 - sl.z0) / -dz, a0 = 1 - Math.exp(-3 * L / sl.V);
         const tf = dirZ(y) < -1e-6 ? (sl.z1 - C[2]) / dirZ(y) : 1e9, tn = (sl.z1 - C[2]) / dirZ(y1);
@@ -461,9 +461,9 @@ const AUH = (() => {
   }
   function fogBand(o, ya, yb, t, a0, strokes, rows = []) {
     const B = R11.BOX, cam = E3.cam(), f = cam.f, cx = cam.cx;
-    // runs of equal density across the row (22 px cells, the density in steps of 1/40), each laid as paper at that
-    // density, and in colour tinted by the fog's colour there
-    const CW = 22, runs = [];
+    // runs of equal density across the row (11 px cells, so a burning rim steps finely; the density in steps of 1/40),
+    // each laid as paper at that density, and in colour tinted by the fog's colour there
+    const CW = 11, runs = [];
     for (let x = B[0]; x < B[2]; x += CW) {
       const l = (x + CW / 2 - cx) / f * t, al = Math.round(clamp(a0 * (o.dens ? o.dens(l, t) : 1) * o.amt) * 40) / 40, x1 = Math.min(B[2], x + CW);
       const last = runs[runs.length - 1];
@@ -748,9 +748,10 @@ const AUH = (() => {
    The fog lifting (1 Oct 2026, the requester's "fog lifting at the airport"), a time-lapse of the morning: the clock runs
    steadily from 3 to 33 minutes after sunrise over the seen beat (minutes(lt), about 6 minutes a scene second) and the
    sun climbs from 0.6° to 6.6° and swings from 116° to 119.5° (AUH.sunMin), so the masts' shadows draw in from the
-   horizon toward the eye. The fog burns off as radiation fog does: its top settles from 3.3 to 1.7 m, it thins (its own
-   visibility 40 to 150 m), and it goes first where it is thinnest, so holes open in the sheet and widen and its patches
-   shrink from their rims, until lenses lie scattered over the apron (AUH.fogDepth). Under it the apron comes out: its
+   horizon toward the eye. The fog burns off as radiation fog does (fogAt: from minute 6 to 32): its top settles from 3.3
+   to 1.8 m, it thins (its own visibility 22 to 35 m), and it goes first where it is thinnest, so holes open in the sheet
+   and widen and its lenses (15-40 m across) shrink from their rims, until about a third of the apron lies under them
+   (AUH.fogDepth); it slides with the light air at 3 m/s, the eye looking down through it. Under it the apron comes out: its
    concrete slabs, the stands' yellow lead-in lines, the service road beyond the hero's wingtip, the shadows on the
    ground, which part from the shadows on the fog's top by the fog's depth along the sun. The light comes up with it: a
    cool veil over the first seconds lifts, the pink band sinks and fades into a warm horizon, the sky pales, and the warm
@@ -889,8 +890,8 @@ scene({
   },
   // the morning's clock: minutes after sunrise, 3 to 33 over the seen beat (lt 0.5-5.95), steadily
   minutes(lt) { return 3 + 30 * clamp((lt - 0.5) / 5.45); },
-  // at minute m: how far the fog has burnt off (e), the level its lenses are cut at, its top, its own visibility; and how
-  // far the light has come up (q)
+  // at minute m: how far the fog has burnt off (e, steadily from minute 6 to 32), the level its lenses are cut at (whole
+  // at 0.2, a third left at 0.54), its top, its own visibility; and how far the light has come up (q)
   fogAt(m) {
     const e = clamp((m - 6) / 26);
     return { e, theta: 0.2 + 0.34 * Math.pow(e, 0.8), h: lerp(3.3, 1.8, e), V: lerp(22, 35, e), q: AUH.smooth(clamp((m - 3) / 28)) };
@@ -1070,7 +1071,7 @@ scene({
 /* ==========================================================================================================
    2 · The arrival (beat 'airport', 8.33 s on a 0.6 clock: lt 0.6-5.6, seen lt 0.45-5.75): the classic picture from the
    approach lights, a landing. The eye stands 12 m up beside 31L's approach-light line, 200 m before the threshold and
-   10 m left of the line (the 150 m crossbar large in the foreground), looking up the approach at the runway (a 1500 px
+   10 m left of the line (the 150 m crossbar large in the foreground), looking up the approach at the runway (an 1800 px
    lens). A widebody (787-9 class, no livery) on the 3.0° glide path, gear down and flaps out, is over the last
    barrettes as the beat opens (19 m up, ~520 px span), crosses the threshold 17.4 m up (the ILS datum height, 57 ft) at
    lt 0.95, flares and puts its main gear down 305 m past the threshold at lt 5.35, then rolls on, nose still up. Its
@@ -1085,10 +1086,10 @@ scene({
    5.2° (Boeing's flare: touchdown 1,000-1,500 ft in). Threshold to touchdown takes 4.4 s, so the beat holds exactly the
    last of the approach, the threshold, the flare and the touchdown; the approach over the eye (the earlier plan) cannot
    share a 5 s beat with them at real speed.
-   The fog, 13 minutes after the dawn shot: thinner and breaking. A 1.5 m layer in lenses over the sand of the infield,
-   cleared from the runway's dark asphalt (which the sun heats first), opaque only along the horizon where the eye looks
-   through it edgewise; the lamps that stand in it glow through it, steadily. Over the 5 s it barely changes (real time):
-   it settles 0.1 m and drifts at 1.5 m/s.
+   The fog, 13 minutes after the dawn shot: thinner and breaking. A 1.5 m layer (visibility 30 m inside it) in lenses
+   over the sand of the infield, hatched, cleared from the runway's dark asphalt (which the sun heats first), opaque only
+   along the horizon where the eye looks through it edgewise; the lamps that stand in it glow through it, steadily. Over
+   the 5 s it barely changes (real time): it settles 0.1 m and drifts at 1.5 m/s.
    ========================================================================================================== */
 scene({
   id: 'arrival',
@@ -1165,9 +1166,9 @@ scene({
   },
   TTHR: 0.95,
   view(lt) {
-    // 200 m before the threshold, 10 m left of the light line, 12 m up, on a 1500 px lens; the eye follows the aircraft
+    // 200 m before the threshold, 10 m left of the light line, 12 m up, on an 1800 px lens; the eye follows the aircraft
     // down as it recedes: the axis from 310.2° to 308.4°, the horizon from y 420 to y 390
-    const u = easeInOut(clamp((lt - 0.9) / 4.6)), a = lerp(310.2, 308.4, u), ax = AUH.dirAz(a), f = 1500, hyT = lerp(420, 390, u), pitch = -Math.atan((562 - hyT) / f), far = 5000;
+    const u = easeInOut(clamp((lt - 0.9) / 4.6)), a = lerp(310.2, 308.4, u), ax = AUH.dirAz(a), f = 1800, hyT = lerp(420, 390, u), pitch = -Math.atan((562 - hyT) / f), far = 5000;
     const C = AUH.W3(-200, -10, 12), L = AUH.W3(-200 + far * ax[0] * Math.cos(pitch), -10 + far * ax[1] * Math.cos(pitch), 12 + far * Math.sin(pitch));
     this.ax = a;
     return E3.camera(C, L, f, 560, 562);
@@ -1238,17 +1239,21 @@ scene({
       const dP = R11.dep(pose.toW([0, 0, 0]));
       if (dP > 3) list.push({ d: dP, draw: () => AUH.drawPlane(ac, { air: R11.air(dP, 3000) * ink, lw: 1.5, fill: OPT.colour ? '#F2ECE0' : null, fillA: 0.4, warm: OPT.colour ? HUE.dawn : null, warmA: 0.22, tone: 0.06, shade: 0.6, inkFill: 0.3 }) });
       // the fog 13 minutes after the dawn shot, thinner and breaking: a 1.5 m layer in lenses over the infield's sand (the
-      // dawn's field, larger: k 1.6), cleared from the runway's asphalt and 25 m beyond its edges; in real time it only
+      // dawn's field, larger: k 1.2), cleared from the runway's asphalt and its shoulders; in real time it only
       // settles 0.1 m and drifts at 1.5 m/s toward the north-west
-      const w = clamp((lt - 0.45) / 5.3), slide = 1.5 * (lt - 0.6), dv = AUH.dirAz(300), C2 = E3.cam().C[2], hF = lerp(1.5, 1.4, w), Vf = 60;
+      const w = clamp((lt - 0.45) / 5.3), slide = 1.5 * (lt - 0.6), dv = AUH.dirAz(300), C2 = E3.cam().C[2], hF = lerp(1.5, 1.4, w), Vf = 30;
       const fogF = (fu, fv) => {
-        const onRw = clamp(1 - (Math.abs(fv) - 40) / 25) * clamp((fu + 90) / 30) * clamp((4140 - fu) / 30);
-        return AUH.fogDepth(fu - dv[0] * slide, fv - dv[1] * slide, 0.48 + 0.02 * w, 0.14, 1.6) * (1 - onRw);
+        const onRw = clamp(1 - (Math.abs(fv) - 38) / 12) * clamp((fu + 62) / 10) * clamp((4116 - fu) / 10);
+        return AUH.fogDepth(fu - dv[0] * slide, fv - dv[1] * slide, 0.44 + 0.02 * w, 0.14, 1.2) * (1 - onRw);
       };
       AUH.fogLayer(list, {
         h: hF, V: Vf, amt: 0.92 * ink, strokes: this.fogSk,
         dens: (l, t) => { const g = AUH.rowGround(l, t); return AUH.fogShare(fogF(g[1], g[0]), hF * t / Math.max(1, C2 - hF), Vf); },
         tint: OPT.colour ? () => [[0, HUE.cloud, 0.24], [1, HUE.cloud, 0.18]] : null,
+        // hatched as the dawn's fog is: cool rules along the rows, heavier toward the eye
+        rule: (x, y) => clamp((y - hy) / 8) * (0.3 + 0.7 * Math.pow(clamp((y - hy) / (B[3] - hy)), 0.6)),
+        rulePitch: y => lerp(2.3, 3.6, clamp((y - hy) / (B[3] - hy))), ruleW: y => lerp(0.5, 1.2, clamp((y - hy) / (B[3] - hy))),
+        ruleA: OPT.colour ? 0.5 : 0.8,
         grain: (x, y, l, t, k) => clamp((y - hy) / 24) * (0.2 + 0.5 * k),
         lineCol: OPT.colour ? HUE.steel : SEPIA, lw: 0.8,
       });
@@ -1262,7 +1267,7 @@ scene({
   },
   // one barrette: its bar across the centreline on two legs, its lamps (steady), a crossbar's long bar on more legs
   drawBar(b, ink) {
-    const W3 = AUH.W3, d = R11.dep(W3(b.u, 0, b.z)), a = R11.air(d, 2600) * ink, lw = clamp(0.1 * 1500 / d, 0.5, 4.5);
+    const W3 = AUH.W3, d = R11.dep(W3(b.u, 0, b.z)), a = R11.air(d, 2600) * ink, fl = E3.cam().f, lw = clamp(0.1 * fl / d, 0.5, 4.5);
     const z = b.z;
     E3.line([W3(b.u, -b.h, z), W3(b.u, b.h, z)], INK, lw * 1.2, 0.85 * a);
     const legs = b.h > 3 ? [-b.h, -b.h / 2, -1.5, 1.5, b.h / 2, b.h] : [-1.5, 1.5];
@@ -1275,7 +1280,7 @@ scene({
     if (d < 260) {
       // near lamps: a dark housing, its lit lens (paper, the brightest thing on the plate) and a warm halo round it
       lamps.forEach(p => {
-        const s = E3.proj(p), rr = clamp(0.2 * 1500 / d, 0.9, 12);
+        const s = E3.proj(p), rr = clamp(0.2 * fl / d, 0.9, 12);
         fill(el(s[0], s[1] + rr * 0.25, rr * 1.35, rr * 1.05, 0, TAU, 60, 0), INK, 0.6 * a);
         if (OPT.colour) disc(s[0], s[1], rr * 2.4, '#F2B14A', 0.3 * ink, 'multiply');
         mask(el(s[0], s[1], rr * 0.85, rr * 0.7, 0, TAU, 61, 0), ink);

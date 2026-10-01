@@ -35,15 +35,17 @@
 // from the sun; the shore and the foot of the hills from the same tiles. Nothing ashore is drawn: no tank farm, terminal,
 // pipe rack or manifold (the coastal strip stays a bare, far band); no single-point mooring, no other ship, no craft, no
 // buoy. Clear air: no smoke, haze plume, flare, glow, fire or backlight anywhere.
-// Life on the water (1 October 2026): four large gulls glide over the berth in slow circles, the Steppe and Heuglin's
-// gulls (Larus fuscus barabensis, L. f. heuglini) that are common winter visitors and passage migrants on the UAE's
-// coasts to late March (UAE Checklist, Emirates Bird Records Committee, via uaebirding.com; Kalba and Fujairah beach
-// records, Jan-Feb 2015-16), drawn at their true wingspan of 1.4 m (1.24-1.5 m) and so small at 450-870 m: their wings
-// in the gull's glide (the arm raised, the hand angled down), at 9-10 m/s, banked to their turns; one gives three slow
-// wingbeats. Their mantles grey, their wingtips black. The swell (84 m, 7.4 s, from the east-south-east: deep water's
-// own length for its period) runs through the sea's strokes as before and now along the hull's waterline: the hull stands
-// still, a laden ship on her moorings, while the water rises and falls 0.3 m along her side and the wash line under it
-// opens on each crest, so the swell is seen running along her from bow to stern.
+// Life on the water (1 October 2026): four large gulls glide over the berth, the Steppe and Heuglin's gulls (Larus
+// fuscus barabensis, L. f. heuglini), common winter visitors and passage migrants on the UAE's coasts until late March
+// (UAE Checklist, Emirates Bird Records Committee, via uaebirding.com; Kalba and Fujairah beach records, Jan-Feb
+// 2015-16). Each is drawn at its true wingspan, 1.4 m (1.24-1.5 m), so small at its distance: the nearest glides high
+// (92 m) toward the eye, from 250 to 170 m away, the second away from it at 310-345 m, two more circle at 600-800 m. Their
+// wings are set as a gull's in a glide (the arm raised 15 deg, the hand angled 20 deg down: the 'M' that reads at this
+// size), at 9-10 m/s, banked to their turns; one gives three slow wingbeats. Mantles grey, wingtips black. The swell
+// (84 m, 7.4 s, from the east-south-east: deep water's own length for its period) runs through the sea's strokes as
+// before and now along the hull's waterline: the hull stands still, a laden ship on her moorings, while the water rises
+// and falls 0.3 m along her side and the wash line under it opens on each crest, so the swell is seen running along her
+// from bow to stern.
 // The inset: NCM's east-coast marine bulletin, drafting itself line by line (the AI assistant prepares the draft), then
 // signed (a forecaster approves it); no numbers. Its chart is the UAE's east coast from the film's map data
 // (data/uae-map.json arcs 43, 25, 23, 39, 45, north to south, as scenes/plate-tanker.js), with the sea to the east.
@@ -199,13 +201,13 @@ scene({
     this.sheetIn = new P([[X0 + 8, Y0 + 8], [X0 + 310, Y0 + 8], [X0 + 310, Y0 + 288], [X0 + 8, Y0 + 288]], true);
     this.sign = new P(wob([[X0 + 196, Y0 + 268], [X0 + 208, Y0 + 258], [X0 + 218, Y0 + 270], [X0 + 228, Y0 + 255], [X0 + 242, Y0 + 269], [X0 + 258, Y0 + 262], [X0 + 278, Y0 + 264]], 970, 0.6));
     // the gulls: each glides round a circle (centre x, y in metres, radius, height) at v m/s, counter-clockwise when w is
-    // 1, from angle a0 at t 0; flap: the centre and half-length (scene s) of a bout of slow wingbeats. The two nearer ones
-    // glide on wide curves, one toward the eye and one away (so their spread wings, the gull's 'M', face it), both bearing
-    // a little east-north-east: the camera's swing round the berth carries near things left across the frame (6-7 m/s at
-    // their distance), and this holds them in it. The two farther ones circle, showing their span and then their side
+    // 1, from angle a0 at t 0; flap: the centre and half-length (scene s) of a bout of slow wingbeats. The nearest glides
+    // high toward the eye and passes across the frame, its spread wings (the gull's 'M') facing it; the second glides
+    // away, bearing a little east-north-east against the drift the camera's swing round the berth gives near things
+    // (about 6 m/s at its distance), so it holds its place; the two farther ones circle, showing their span, then their side
     this.gulls = [
-      { c: [406, -436], R: 220, z: 62, v: 9.5, w: 1, a0: -2.367, ph: 0.2 },
-      { c: [473, -578], R: 220, z: 39, v: 9.5, w: -1, a0: 3.065, ph: 1.3, flap: [4.1, 0.75] },
+      { c: [569, -542], R: 300, z: 92, v: 9.5, w: 1, a0: -2.58, ph: 0.2 },
+      { c: [510, -682], R: 220, z: 60, v: 9.5, w: -1, a0: 3.065, ph: 1.3, flap: [4.1, 0.75] },
       { c: [125, -368], R: 28, z: 60, v: 9, w: 1, a0: -2.953, ph: 2.1 },
       { c: [137, -159], R: 32, z: 24, v: 9.5, w: -1, a0: 5.989, ph: 0.7 }
     ];
@@ -411,16 +413,17 @@ scene({
       const h = th + G.w * Math.PI / 2, bank = G.w * Math.atan(G.v * G.v / (9.81 * G.R));
       const fw = [Math.cos(h), Math.sin(h), 0], l0 = [-Math.sin(h), Math.cos(h)];
       const up = [l0[0] * Math.sin(bank), l0[1] * Math.sin(bank), Math.cos(bank)], lf = [l0[0] * Math.cos(bank), l0[1] * Math.cos(bank), -Math.sin(bank)];
-      // the wings' set: the arm raised about 9 deg, the hand angled down; a slow flex, and the bout of slow wingbeats
-      let din = 9 + 2 * Math.sin(TAU * lt / 4 + G.ph);
+      // the wings' set: the arm raised about 15 deg, the hand angled 20 deg down; a slow flex, and the bout of wingbeats
+      let din = 15 + 2 * Math.sin(TAU * lt / 4 + G.ph);
       if (G.flap) { const u = (lt - G.flap[0]) / G.flap[1]; if (Math.abs(u) < 1) din += 24 * 0.5 * (1 + Math.cos(Math.PI * u)) * Math.sin(TAU * 2.4 * (lt - G.flap[0])); }
-      const ti = Math.tan(din * Math.PI / 180), to = Math.tan((din - 22) * Math.PI / 180);
+      const ti = Math.tan(din * Math.PI / 180), to = Math.tan((din - 35) * Math.PI / 180);
       const wz = y => (Math.abs(y) <= 0.33 ? (Math.abs(y) - 0.05) * ti : 0.28 * ti + (Math.abs(y) - 0.33) * to);
       const B = (x, y, z) => [pos[0] + x * fw[0] + y * lf[0] + z * up[0], pos[1] + x * fw[1] + y * lf[1] + z * up[1], pos[2] + x * fw[2] + y * lf[2] + z * up[2]];
       const sp = pts => pts.map(([x, y, z]) => E3.proj(B(x, y, z === undefined ? wz(y) : z)));
       if (E3.depth(pos) < 50) return;
       // the wings' mid-chord line from tip to tip, and its seen width: the chord as projected, never under 1.5 px, since the
-      // eye, 50-90 m above them, sees them nearly edge-on and a real gull there is a white 'M' a few pixels deep
+      // eye, from level with them to 10 deg above, sees them nearly edge-on and a real gull there is a white 'M' a few
+      // pixels deep
       const half = [[-0.14, 0.70], [-0.06, 0.55], [0.0, 0.33], [0.0, 0.05]];
       const wing = sp(half.concat(half.slice().reverse().map(([x, y]) => [x, -y])).map(([x, y]) => [x, y]));
       const c0 = E3.proj(B(0.1, 0.2, wz(0.2))), c1 = E3.proj(B(-0.1, 0.2, wz(0.2))), ww = Math.max(1.5, Math.hypot(c1[0] - c0[0], c1[1] - c0[1]));
@@ -657,7 +660,7 @@ scene({
       wline.push(pts);
     }
     ctx.save(); PAPER_PAT.setTransform(ctx.getTransform().inverse()); ctx.globalAlpha = SA; ctx.strokeStyle = PAPER_PAT; ctx.lineCap = 'round';
-    band.forEach((g, k) => { if (!g.length) return; ctx.lineWidth = 1.0 + 2.0 * (k + 0.5) / 8; ctx.beginPath(); g.forEach(([p, r]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(r[0], r[1]); }); ctx.stroke(); });
+    band.forEach((g, k) => { if (!g.length) return; ctx.lineWidth = 0.8 + 3.0 * (k + 0.5) / 8; ctx.beginPath(); g.forEach(([p, r]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(r[0], r[1]); }); ctx.stroke(); });
     ctx.restore();
     wline.forEach(pts => E3.line(pts, INK, 1.3, 0.85 * a));
     if (vis[iStem - 1] !== vis[iStem]) E3.line([wl[iStem], dk[iStem]], INK, 1.3, 0.9 * a);

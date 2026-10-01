@@ -213,23 +213,24 @@ scene({
   // inked with a doubled line and then masked with paper, which leaves only the figure's outer contour, then toned in its
   // coat and hatched under the belly (light from above; no sun direction is implied, as for the ghaf)
   camel11(cm, idx, fr, psi, lt, q) {
-    const W = fr.W, G0 = fr.P, TAUq = TAU, rad = Math.PI / 180;
+    const W = fr.W, G0 = fr.P, rad = Math.PI / 180;
     const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
     const p0 = this.proj(G0[0], G0[1], 0, psi);
     if (!p0 || p0[0] < RAIL.x0 - 60 || p0[0] > RAIL.x1 + 60) return;
-    const px = RAIL.f * cm.sc / p0[2];
+    // its pixels a metre, from its distance (not the panning view's depth), so nothing set by its size switches mid-beat
+    const px = RAIL.f * cm.sc / Math.hypot(G0[0], G0[1]);
     // which side faces the eye (the eye is at the world's origin)
     const near = fr.l[0] * -G0[0] + fr.l[1] * -G0[1] > 0 ? 1 : -1;
     // the pose: g lowers the neck from carried (0) to grazing (1); the head's slow sway; the tail's swing; the gait
     const bump = (c, w) => (Math.abs(lt - c) < w ? 0.5 * (1 + Math.cos(Math.PI * (lt - c) / w)) : 0);
     const walk = cm.act === 'walk', T = 2.0 * Math.pow(cm.sc, 0.8), ph = lt / T + cm.ph;
     let g = 0.22, sway = 0;
-    if (cm.act === 'graze') { g = 1 - 0.62 * bump(cm.lift, 1.4); sway = 0.1 * Math.sin(TAUq * lt / 4.6 + cm.ph * 3) * g; }
+    if (cm.act === 'graze') { g = 1 - 0.62 * bump(cm.lift, 1.4); sway = 0.1 * Math.sin(TAU * lt / 4.6 + cm.ph * 3) * g; }
     if (cm.act === 'settle') g = 0.12 + 0.86 * easeInOut(clamp((lt - cm.t0) / (cm.t1 - cm.t0)));
-    if (walk) g = 0.22 + 0.03 * Math.sin(2 * TAUq * ph);
-    const tail = 0.07 * Math.sin(TAUq * lt / 3.1 + cm.ph * 2);
+    if (walk) g = 0.22 + 0.03 * Math.sin(2 * TAU * ph);
+    const tail = 0.07 * Math.sin(TAU * lt / 3.1 + cm.ph * 2);
     // rings: a list of local points; tube rings (horizontal circles) for the legs and tail
-    const N = 16, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAUq));
+    const N = 16, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAU));
     const hoop = (a, b, c, r) => ring(t => [a + r * Math.cos(t), b + r * Math.sin(t), c]);
     // a Catmull-Rom spline through rows of numbers (sections, centres, radii), m steps a span, so the contours run smooth
     const spl = (rows, m) => {
@@ -273,7 +274,7 @@ scene({
         if (walk) {
           const vl = cm.v / cm.sc, Sh = vl * 0.68 * T / 2, u0 = ph + (sd > 0 ? 0 : 0.5) + lag, u = u0 - Math.floor(u0);
           if (u < 0.68) dx = Sh * (1 - 2 * u / 0.68);
-          else { const w = (u - 0.68) / 0.32; dx = -Sh + 2 * Sh * (w - Math.sin(TAUq * w) / TAUq); dz = lift * (1 - Math.cos(TAUq * w)) / 2; }
+          else { const w = (u - 0.68) / 0.32; dx = -Sh + 2 * Sh * (w - Math.sin(TAU * w) / TAU); dz = lift * (1 - Math.cos(TAU * w)) / 2; }
         }
         const Tp = [ta, tc], F = [fa + dx, fc + dz], da = F[0] - Tp[0], dc = F[1] - Tp[1], dd = Math.hypot(da, dc);
         let J;
@@ -299,7 +300,7 @@ scene({
     const tone = (polys, k) => { if (OPT.colour) wash(polys, coat[0], coat[1] * k * q); else wash(polys, SEPIA, (0.1 + coat[2]) * k * q); };
     const bbOf = polys => { const xs = polys.flatMap(p => p.pts.map(v => v[0])), ys = polys.flatMap(p => p.pts.map(v => v[1])); return [Math.min(...xs) - 1, Math.min(...ys) - 1, Math.max(...xs) + 1, Math.max(...ys) + 1]; };
     // its shadow on the ground, under the trunk
-    const sh = Array.from({ length: 20 }, (_, j) => pr(W(-0.05 + 1.05 * Math.cos(j / 20 * TAUq), 0.45 * Math.sin(j / 20 * TAUq), 0)));
+    const sh = Array.from({ length: 20 }, (_, j) => pr(W(-0.05 + 1.05 * Math.cos(j / 20 * TAU), 0.45 * Math.sin(j / 20 * TAU), 0)));
     if (sh.every(Boolean)) fill(new P(sh, true), SEPIA, 0.16 * q);
     // the far legs, in shade
     if (farLegs.length) { inkAll(farLegs, 2 * lw, al); mask(farLegs, q); tone(farLegs, 1); wash(farLegs, INK, 0.22 * q); }
