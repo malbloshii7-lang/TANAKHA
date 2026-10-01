@@ -5,16 +5,20 @@
 // the WMO President's work there: the Extraordinary Session of the World Meteorological Congress, held at WMO
 // Headquarters in Geneva on 20-23 October 2025 and chaired by Dr Abdulla Ahmed Al Mandous (WMO, the session's page and
 // the Secretary-General's opening address; WAM, 23 October 2025). The President is named in the beat's next lines.
-// The building (WMO; Geneva's architecture register; Forbes India, 2023): Brodbeck & Roulet, 1996-1999; an elongated oval
-// set east-west, 120 m long, nine storeys (35.81 m), glazed on every side in a double skin of bluish glass that "reflects
-// the sky" ("The building is in itself meteorological", its architects). Its width is not given by those sources: it is
-// drawn a quarter of its length (an assumption), seen from the south-west a little above its foot, as from the slope
-// below the Palais des Nations. Screen coordinates (the words layer): it sits clear of the pins' labels (x < 1200) and of
+// The building (WMO's building page; the architects' and engineers' project pages; Geneva's architecture register; UN
+// press release of 30 April 1999; researched 1 October 2026): Brodbeck & Roulet, inaugurated 4 May 1999. Its plan is a
+// true ellipse, 125 m long (the engineers; WMO says 120 m) and about 27 m wide (traced from OpenStreetMap, whose area
+// matches an ellipse), its long axis east-west. Ground and nine floors, 35.81 m: eight office floors under the top floor's
+// restaurant, which is set back and ringed by terraces. It is glazed all round in a double skin of blue and green glass
+// "reflecting the sky", with narrow vertical steel lines, and 38 external steel pillars (one about every 7 m). Two low
+// wings, the conference hall and the library, stand along its south side ("The building is in itself meteorological",
+// its architects). It is seen from the south-south-east, a little above its foot, as in WMO's own photograph taken just
+// south of it. Screen coordinates (the words layer): it sits clear of the pins' labels (x < 1200) and of
 // the beat's big lines below it (y > 560). Its caption runs above the pins' labels (y < 380), and the line about the
 // Congress keeps right of x 1420, where the labels reach at the push's peak (x 1375, y 390-470), until the big lines.
 const R11_GENEVA = (() => {
   const F = [1300, 84, 1840, 292]; // the plate's frame
-  const A = 60, Bm = 15, H = 35.81, TH = 24 * Math.PI / 180, EL = 11 * Math.PI / 180, K = 2.85, CX = 1572, CY = 262;
+  const A = 62.5, Bm = 13.5, H = 35.81, H8 = 32.2, TH = 24 * Math.PI / 180, EL = 11 * Math.PI / 180, K = 2.8, CX = 1572, CY = 262;
   // a point of the building (x east, y north, z up, metres from its centre) on screen
   const pr = (x, y, z) => { const u = x * Math.cos(TH) + y * Math.sin(TH), v = -x * Math.sin(TH) + y * Math.cos(TH); return [CX + K * u, CY - K * (z * Math.cos(EL) + v * Math.sin(EL))]; };
   const N = 144, ring = Array.from({ length: N }, (_, j) => j / N * TAU);
@@ -26,10 +30,24 @@ const R11_GENEVA = (() => {
   const k0 = vis.findIndex((p, i) => i === 0 ? lit(ring[(ring.indexOf(p) - 1 + N) % N]) <= 0 : lit(ring[ring.indexOf(p) - 1]) <= 0);
   const arc = vis.slice(k0).concat(vis.slice(0, k0));
   const at = (p, z) => pr(A * Math.cos(p), Bm * Math.sin(p), z);
-  const facade = new P(arc.map(p => at(p, 0)).concat(arc.slice().reverse().map(p => at(p, H))), true);
-  const roof = new P(ring.map(p => at(p, H)), true), parapet = new P(ring.map(p => pr(0.94 * A * Math.cos(p), 0.86 * Bm * Math.sin(p), H + 1.1)), true);
-  const floors = Array.from({ length: 9 }, (_, i) => new P(arc.map(p => at(p, H * (i + 1) / 10))));
-  const mull = arc.filter((_, j) => j % 2 === 0).map(p => [at(p, 0.4), at(p, H), lit(p)]);
+  // the office block to the eighth floor; the top floor's restaurant set back 2.5 m behind its terrace's rail
+  const facade = new P(arc.map(p => at(p, 0)).concat(arc.slice().reverse().map(p => at(p, H8))), true);
+  const top = (p, z) => pr((A - 2.5) * Math.cos(p), (Bm - 2.5) * Math.sin(p), z);
+  const topFace = new P(arc.map(p => top(p, H8)).concat(arc.slice().reverse().map(p => top(p, H))), true);
+  const terrace = new P(ring.map(p => at(p, H8)), true), roof = new P(ring.map(p => top(p, H)), true);
+  const rail = new P(arc.map(p => at(p, H8 + 1.1)));
+  const floors = Array.from({ length: 8 }, (_, i) => new P(arc.map(p => at(p, H8 * (i + 1) / 9))));
+  const mull = arc.filter((_, j) => j % 2 === 0).map(p => [at(p, 0.4), at(p, H8), lit(p)]);
+  // the 38 external pillars, spaced evenly along the ellipse's perimeter; the ones on the face toward the eye
+  const per = [];
+  { let L = 0; const M = 2000; for (let j = 0; j < M; j++) { const a0 = j / M * TAU, a1 = (j + 1) / M * TAU; per.push([a0, L]); L += Math.hypot(A * (Math.cos(a1) - Math.cos(a0)), Bm * (Math.sin(a1) - Math.sin(a0))); } per.total = L; }
+  const pillars = Array.from({ length: 38 }, (_, i) => { const want = i / 38 * per.total + 3.5; return per.find(([, L]) => L >= want)[0]; })
+    .filter(p => lit(p) > 0.04).map(p => [at(p, 0), at(p, H8), lit(p)]);
+  // the two low wings on the south side, the conference hall and the library: one block 110 m long and 8 m high
+  const wb = (x, y, z) => pr(x, y, z), W0 = -48, W1 = 62, WS = -Bm - 11, WN = -Bm + 1, WH = 8;
+  const wing = { south: new P([wb(W0, WS, 0), wb(W1, WS, 0), wb(W1, WS, WH), wb(W0, WS, WH)], true),
+    west: new P([wb(W0, WN, 0), wb(W0, WS, 0), wb(W0, WS, WH), wb(W0, WN, WH)], true),
+    top: new P([wb(W0, WS, WH), wb(W1, WS, WH), wb(W1, WN, WH), wb(W0, WN, WH)], true) };
   // fair-weather cumulus: a cauliflower outline of a few turrets on a flat base (the seeding plate's turret drawn small)
   const puff = (x, y, r, n, ph, sq = 0.92) => new P(Array.from({ length: 64 }, (_, j) => { const a = j / 64 * TAU, q = r * (1 + 0.06 * Math.pow(Math.abs(Math.sin(n * a / 2 + ph)), 0.6) - 0.03); return [x + q * Math.cos(a), y + q * sq * Math.sin(a)]; }), true);
   // a cloud wider than it is tall: turrets in a low dome over a flat base (sq < 1 squashes it, as the glass does)
@@ -45,7 +63,7 @@ const R11_GENEVA = (() => {
   const inGlass = [cloud(1494, 228, 40, 2044, 0.55), cloud(1650, 223, 35, 2045, 0.55)];
   const frame = boxP(F[0], F[1], F[2], F[3]), inner = boxP(F[0] + 7, F[1] + 7, F[2] - 7, F[3] - 7);
   const ground = new P([[F[0] + 7, 268], [F[2] - 7, 266], [F[2] - 7, F[3] - 7], [F[0] + 7, F[3] - 7]], true);
-  // plane trees along the avenue in front of its foot (Geneva's avenue de la Paix is lined with them), drawn as soft crowns
+  // trees on the lawns about its foot, drawn as soft crowns
   const trees = [[1350, 274, 20], [1396, 278, 16], [1716, 278, 17], [1770, 273, 21]].map(([x, y, r], i) => ({ x, y, r, crown: puff(x, y - r * 0.8, r, 10, i * 1.7, 0.8) }));
   function cumulus(c, q, a = 1) {
     ctx.save(); ctx.beginPath(); ctx.rect(c.x0 - 40, F[1], c.x1 - c.x0 + 80, c.base - F[1]); ctx.clip();
@@ -81,14 +99,18 @@ const R11_GENEVA = (() => {
       hatch(ground, [F[0], 264, F[2], F[3]], 0, 3.2, 1, SEPIA, 0.6, 0.3, 2046);
       // the building: its roof, then the glazed face toward the eye, shaded as the oval turns from it, with the clouds
       // lying in the glass; floor lines and mullions over them
-      mask(roof); fill(roof, SEPIA, 0.12); stroke(roof, 1, INK, 0.9, 0.8); stroke(parapet, 1, INK, 0.6, 0.55);
+      mask(terrace); fill(terrace, SEPIA, 0.1); stroke(terrace, 1, INK, 0.8, 0.7);
+      mask(topFace); if (OPT.colour) { wash(topFace, HUE.sea, 0.2); wash(topFace, HUE.water, 0.16); }
+      hatch(topFace, [F[0], F[1], F[2], F[3]], 1.5708, 2.2, 1, INK, 0.5, 0.35, 2047); stroke(topFace, 1, INK, 0.8, 0.8);
+      mask(roof); fill(roof, SEPIA, 0.12); stroke(roof, 1, INK, 0.9, 0.8);
       mask(facade);
-      if (OPT.colour) { wash(facade, HUE.water, 0.26); wash(facade, HUE.steel, 0.2); }
+      // blue and green glass, layered
+      if (OPT.colour) { wash(facade, HUE.sea, 0.2); wash(facade, HUE.water, 0.18); wash(facade, HUE.steel, 0.12); }
       ctx.save(); ctx.beginPath(); facade.trace(ctx, 1); ctx.clip();
       ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK;
       for (let j = 0; j + 1 < arc.length; j++) {
         const p = arc[j], e = Math.max(0, lit(p)), dk = 0.12 + 0.5 * Math.pow(1 - e, 1.6);
-        const a0 = at(p, -1), a1 = at(arc[j + 1], -1), b0 = at(p, H + 1), b1 = at(arc[j + 1], H + 1);
+        const a0 = at(p, -1), a1 = at(arc[j + 1], -1), b0 = at(p, H8 + 1), b1 = at(arc[j + 1], H8 + 1);
         ctx.globalAlpha = SA * dk; ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(...a0); ctx.lineTo(...a1); ctx.lineTo(...b1); ctx.lineTo(...b0); ctx.closePath(); ctx.fill();
       }
       ctx.restore();
@@ -97,7 +119,13 @@ const R11_GENEVA = (() => {
       ctx.restore();
       floors.forEach(f => stroke(f, 1, INK, 0.6, 0.55));
       mull.forEach(([a, b, e]) => stroke(new P([a, b]), 1, INK, 0.45, 0.25 + 0.2 * (1 - e)));
+      pillars.forEach(([a, b, e]) => stroke(new P([a, b]), 1, INK, 0.9, 0.45 + 0.25 * (1 - e)));
+      stroke(rail, 1, INK, 0.7, 0.7);
       stroke(facade, 1, INK, 1, 0.85);
+      // the low south wings in front of its foot
+      ['top', 'west', 'south'].forEach((k, i) => { const f = wing[k]; mask(f); if (OPT.colour) wash(f, k === 'top' ? HUE.steel : HUE.sea, 0.18); fill(f, INK, [0.06, 0.24, 0.14][i]); stroke(f, 1, INK, 0.8, 0.8); });
+      for (let x = W0 + 4; x < W1; x += 4) stroke(new P([wb(x, WS, 0.3), wb(x, WS, WH - 0.3)]), 1, INK, 0.4, 0.35);
+      stroke(new P([wb(W0, WS, 4), wb(W1, WS, 4)]), 1, INK, 0.5, 0.45);
       trees.forEach(t => { stroke(new P([[t.x, t.y], [t.x, t.y - 0.4 * t.r]]), 1, INK, 1.2, 0.75); mask(t.crown); if (OPT.colour) wash(t.crown, '#6E7F5A', 0.45); hatch(t.crown, [t.x - t.r, t.y - 2 * t.r, t.x + t.r, t.y + t.r], -0.6, 2.2, 1, INK, 0.6, 0.38, 2050 + Math.round(t.x)); stroke(t.crown, 1, INK, 0.8, 0.7); });
       ctx.restore();
       stroke(frame, 1, INK, 1.2, 0.8); stroke(inner, 1, INK, 0.7, 0.6);
