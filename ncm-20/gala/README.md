@@ -98,6 +98,8 @@ mkdir -p out/r11s && python3 score.py out/r11/cues-design.json out/r11s/ --sampl
 mkdir -p out/r11f && python3 score.py out/r11/cues-design.json out/r11f/ --samples ../VSCO-2-CE --foley ../foley && python3 pace.py out/r11f/mix.wav out/r11f/mix-paced.wav 1.1
 FILM_QUERY=rev11 node render.js cues out/r11/cues.json
 FILM_QUERY='vo&colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11/mix-paced.wav --jobs 3
+# since 1 October (no narration; recorded sound effects and drums): the review copy without the narration's subtitles
+FILM_QUERY='colour&heritage&rev11&fadeout=2.5' node render.js film out/review-rev11.mp4 out/r11f/mix-paced.wav --jobs 3
 
 # every master in one go (about 2.7 hours at --jobs 3), then the show deliverables, the QC report and its page
 sh masters.sh out/audio out/masters                   # gathers the WAVs from out/ and out/pull/ if out/audio has none

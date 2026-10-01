@@ -873,6 +873,9 @@ have a sound effect of water not a mechanical generation sound."*
   conglomeratus), rimth (Haloxylon salicornicum) and arta (Calligonum comosum). The nearest camel works her lips into a
   thumam tussock, tears a mouthful (the tussock is shorter after), lifts her head with the culms hanging and chews; the
   others crop grass and browse shrubs (El-Keblawy et al., *Journal of Arid Environments*, 2009; ENHG, 1985; UAE Flora).
+- *Checked.* The review copy (4:11.2, no narration, recorded sound) passes the photosensitivity pre-check (no flash
+  transitions), its sound sits on the mix at zero lag, every leader's card measures above the world beat
+  (-13.4/-13.5/-13.5 against -14.2 LUFS), and the approved cut's cue lists, score (12 of 12 WAVs) and stills are unchanged.
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
