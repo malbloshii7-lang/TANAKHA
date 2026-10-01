@@ -830,6 +830,10 @@ airport, Jebel Ali at work, live radar on the watch wall, Shams 1's mirrors trac
   (the arrival's jet, the seeding aircraft and the rain from its cloud, the winds) follow the plates' slower clocks, and
   the watch's walk gains a bar (D minor, B flat, G minor, C). Every leader's card still measures above the world beat
   (-13.6/-13.7/-13.6 against -14.1 LUFS); the approved cut's score is byte-identical.
+- *Checked.* The review copy (4:11.2) passes the photosensitivity pre-check (`qc/pse.py --fps 30`: no flash transitions,
+  no red flashes), its sound sits on the mix at zero lag, the dissolve into and out of every new beat was reviewed at its
+  midpoint, and every motion was stepped frame by frame for smoothness. The approved cut's cue lists, score and stills
+  are unchanged.
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
