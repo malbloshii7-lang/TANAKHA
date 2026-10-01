@@ -28,7 +28,8 @@
 // supplied them, 2014-2016), so the apron's traffic is tractor-trailers (a Terberg YT222: 5.6 m long, 2.5 m wide,
 // 3.2 m to the cab roof, the one-man cab on the left), never straddle carriers or AGVs. Behind the backreach, a one-way
 // pair of roadway lanes carries laden and empty tractors along the line, at about 22 km/h; in the yard the gantries run
-// along their blocks at 4 m/s. All of it is a pure function of the scene clock, from its own seeded stream.
+// along their blocks at up to 150 m/min (the top of Konecranes' RMG range). All of it is a pure function of the scene
+// clock, from its own seeded stream.
 scene({
   id: 'jebelali',
   start: 0, dur: 8.333,
@@ -143,7 +144,7 @@ scene({
       b.dRef = E3.depth([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, this.QZ]);
       const lo = b.x0 + 8, hi = b.x1 - 8, x0 = clamp(b.gx, lo, hi), go = r() < 0.65, sg = r() < 0.5 ? -1 : 1, dx = 25 + r() * 110, t0 = r() * 30 - 8;
       const to = go ? clamp(x0 + sg * dx, lo, hi) : x0;
-      b.gm = { x0, to, t0, p: this.prof(to - x0, 4, 6) };
+      b.gm = { x0, to, t0, p: this.prof(to - x0, 2.5, 5) };
     });
   },
   // a move of length D at top speed v: the speed rises and falls on a half-cosine over ta s each way (no jolt in the

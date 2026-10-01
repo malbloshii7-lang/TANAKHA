@@ -777,6 +777,53 @@ would now undo them; if the room needs a shorter film, `?slow=0` (3:34.5) is the
   beat (-13.5/-13.4/-13.4 against -15.2 LUFS). Built into `out/r11s/`; the approved cut's audio is byte-identical. The
   live recording at the gala, if any, still replaces both.
 
+**Slower detail beats, and the plates come alive (1 October 2026, at the requester's ask).** *"i need to slow the video,
+the audience cant catch the details, like the solar panels following the sun, also i want more tweak like this."* The
+requester chose to slow the detail scenes (not the whole film again), and these living details: the fog lifting at the
+airport, Jebel Ali at work, live radar on the watch wall, Shams 1's mirrors tracking, and "anything that add soul".
+- *The slower beats.* Each of the ten detail beats (the two airport shots, the rail, Jebel Ali, the jetty, Shams 1, Al
+  Dhafra, the seeding, the science and the watch) gains one bar, and its plate's clock slows in the same proportion
+  (to 0.60-0.80 of its speed), so every motion, camera move and draw-in spans the longer beat and every label stays up to
+  its end; cards, the opening, the founding, the map, the world and the finale keep their lengths. The cut runs 4:11.2
+  on screen; `?slow=0` rebuilds the 3:34.5 cut exactly. The narration keeps its cues, so each line now has more room.
+- *Al Dhafra Solar PV (the trackers follow the sun).* A time-lapse of the afternoon of 16 November at the plant (24.141
+  N, 54.517 E; OpenStreetMap), 13:50 to 15:28: every row turns west with the sun, in unison, from 32.6 to 60 degrees,
+  the stop of its Arctech SkySmart II trackers (Arctech, 7 Sep 2021; pv magazine, 15 Jan 2025), and the shadows swing
+  and lengthen as the light warms. The sun comes from NOAA's solar-position equations and the angle from the standard
+  single-axis formula. The beat ends as the rows reach their stop, before backtracking would begin (15:43): a sunset
+  would have shown them turning away from the sun, so the beat is no longer "at sunset". *Simplified:* the plate draws
+  112 modules a tracker (about 127 on the real plant) and one drive at the middle pile.
+- *Shams 1 (the troughs track the sun).* A time-lapse of the late morning of 17 March 2013, the day of its inauguration
+  (09:34 to 12:14 solar time): every ET-150 trough turns on its north-south axis from facing east toward the sun, about
+  47 degrees, its section a true parabola with the receiver at its focus on its supports (DLR/CIEMAT EuroTrough: 5.76 m
+  aperture, 1.71 m focal length); the collectors come on sun from a slight defocus, as Shams 1 runs them, and the
+  receivers' glow grows steadily; each mirror facet is toned by what it reflects. One sun model moves the sun on the
+  plate's dial and the troughs (NREL SolarPACES and Shams Power: 768 collectors in 192 loops, 27,648 receivers).
+- *Zayed International (the fog lifts; the arrival lands).* The dawn shot is a time-lapse of the first half-hour after
+  sunrise: the radiation fog settles and burns off from its rims into lenses as the sun climbs to 6.6 degrees, as fog
+  does over a heating ground (NWS; CIMSS; Stull, *Practical Meteorology*), the light warms, and the apron works: a
+  towbarless tug docked at the parked widebody's nose gear and a baggage tractor with three LD3 dollies. The arrival runs
+  at real speed: 70 m/s on the 3-degree path, the threshold crossed 17 m up, the flare, and main-gear touchdown 310 m in,
+  inside the beat (Airbus and Boeing flight-crew training manuals); to keep the touchdown in frame its eye now stands
+  200 m out behind the approach lights. The approach lights glow steadily through the last fog; the sequenced flashers
+  are never drawn (photosensitivity), and no visibility figure is put on screen.
+- *Jebel Ali (at work).* The quay cranes, the apron traffic and the yard at work (being built; described when the plate is final).
+- *The watch (live radar).* The wall's rain chart is now a radar composite as NCM's network makes it (six C-band
+  radars; AMS 40th Conference on Radar Meteorology, 2023): five nested reflectivity bands drift east-south-east across
+  the UAE's coast, the cells growing and decaying, with the coast and borders over them and nothing else: no range
+  rings, radar sites, sweep, pins or arcs. The satellite image's fronts and cloud bands drift, and keep drifting on the
+  disc through the push into the world; the camera mosaic's skies change slowly. The forecasters move: a hand on a mouse,
+  a head turning toward the wall, and a fourth forecaster standing at the wall following the rain band with an open hand
+  (a weather briefing; protocol may prefer him seated, §11 row 43).
+- *Soul.* Arabic coffee on the forecasters' desk: a brass dallah with its crescent beak and three finjan, true to size
+  (Arabic coffee, UNESCO's list, 2015); dromedaries grazing and walking calmly outside Etihad Rail's camel fence while
+  the freight passes (the line's camel fence and underpasses: Etihad Rail's civil-works specification; Gulf News, 11 Sep
+  2023); gulls gliding over the jetty at their true size, and a slow swell running along the moored tanker's waterline.
+- *The music.* The score is rebuilt on the new bar lengths (not stretched further): sounds that belong to something drawn
+  (the arrival's jet, the seeding aircraft and the rain from its cloud, the winds) follow the plates' slower clocks, and
+  the watch's walk gains a bar (D minor, B flat, G minor, C). Every leader's card still measures above the world beat
+  (-13.6/-13.7/-13.6 against -14.1 LUFS); the approved cut's score is byte-identical.
+
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
 was fixed. **Checked.** Every new plate was rendered in both looks; nothing is drawn right of the picture box and
@@ -1794,7 +1841,7 @@ Every number on screen, its qualifier and its source:
 | 40 | H.H. Sheikh Mohammed bin Rashid's words at the national rail network's inauguration (23 February 2023, verified): «ربط إمارات الدولة بشبكة قطارات وطنية يرفع إمكاناتنا ويعزز تنافسيتنا ويرسخ وحدتنا». A card only, never voiced, with WAM's English; it bears on row 5 | Prominence of the Vice President and Prime Minister | Presidential Court | Not used |
 | 41 | **The colour pass (Revision 9, `?colour`):** adopt it for the ceremony masters, and if so as drafted or more restrained. Management asked for the film to be "More colorful" | The look of the whole film in the hall; the LED grade is calibrated on the wall with it | Requester and NCM | The approved Revision 8 look; the colour pass is delivered as a subtitled review copy |
 | 42 | **The Emirati crafts and skills (Revision 10, `?heritage`):** adopt them for the ceremony masters, all or some (the «الدِّيرة» card, the nahham, Al Sadu on the cards, the ghaf, al-Shi'ra above Suhail) | Heritage shown before the Vice President must be true and dignified; the cards carry the leaders' words | Requester, NCM, the cultural adviser (row 37) and the protocol office | The approved Revision 8 look; the touches are delivered in a subtitled review copy |
-| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 4:11.2 on screen at the pace the requester asked for, with the detail beats a bar longer each (3:48.3 at the design tempo), 71.2 s over the earlier ~3:00 instruction; the cut before the detail beats were slowed (3:34.5) stays buildable with `?slow=0`. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2 | The requester asked for them; they lengthen the film by 87.9 s on screen (31.7 s of new beats at the design tempo, then the pace and the slower detail beats); the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
+| 43 | **The founding, the working day in full and the watch (Revision 11, `?rev11`):** adopt them for the ceremony masters, all or some (the decree's charter and the Center's instruments; the two airport shots; Jebel Ali's quay; the Fujairah jetty; Al Dhafra Solar PV and the net-zero pledge; the forecasters' watch). The film grows to 4:11.2 on screen at the pace the requester asked for, with the detail beats a bar longer each (3:48.3 at the design tempo), 71.2 s over the earlier ~3:00 instruction; the cut before the detail beats were slowed (3:34.5) stays buildable with `?slow=0`. The charter's founding credit is the decree-law's issuer; whether the charter also carries the proposing office in the decree's own words («بناءً على ما عرضه وزير شؤون الرئاسة، وموافقة مجلس الوزراء» / "upon the proposal of the Minister of Presidential Affairs and the approval of the Cabinet"; that minister in 2007 was H.H. Sheikh Mansour bin Zayed) is the Court's decision, tied to row 2; and whether the watch keeps a forecaster standing at the wall, his open hand following the radar's rain band over the UAE, or seats him (a weather briefing, with no symbol on the map; the 2026 reading is protocol's to judge) | The requester asked for them; they lengthen the film by 87.9 s on screen (31.7 s of new beats at the design tempo, then the pace and the slower detail beats); the charter is now the main message, so its credits are protocol's | Requester, NCM and the Presidential Court's protocol office | The approved Revision 8 cut; Revision 11 is delivered in a subtitled review copy; the charter without the proposing-office line |
 | 44 | **The Fujairah jetty in the 2026 context.** The oil zone and the port's manifolds were struck in March and May 2026. The plate shows only the jetty, the breakwater, the sea and the Hajar, calm and in morning light, bow south | A terminal picture can read as a target or damage | NCM, the protocol office and MoFA; the go/no-go checks as for the tanker beat | Built as requested; removable with `?pull=tanker` |
 | 45 | **The operators' figures on screen (Revision 11).** 32.5 million passengers at Zayed International in 2025 (Abu Dhabi Airports); Jebel Ali's annual capacity of 19.4 million TEU (DP World; not its 2025 throughput, the last before the 2026 fall); Al Dhafra Solar PV, 2 GW, 2023 (Masdar; "the world's largest single-site solar plant at its inauguration" goes to the programme); Shams 1, the region's first operational utility-scale CSP plant (Shams Power); the first nation in the Middle East and North Africa to commit to net zero (Masdar, 2021). Each is its owner's fact, with its year and every qualifier, set under the place's name, never under an NCM "we" headline | Every number on screen carries its source and year; the owners may wish to see them | NCM communications, with each owner | As built, with the sources in Revision 11 and §9.3 |
 | 46 | **VO-10t in the approved cut.** It says NCM's AI drafts the east-coast bulletin; WAM (29 June 2026) says the Forecaster Assistant helps prepare weather and marine bulletins in general, without naming the east-coast one. Revision 11 uses WAM's own verb | The narration is not yet recorded, so it can be corrected before the session | NCM and the Arabic editor | Revision 11's wording, «…نشراتٌ بحريّة، يُسهِمُ الذكاءُ الاصطناعيُّ في إعدادِها، ويعتمدُها المتنبِّئون،» |
