@@ -27,11 +27,40 @@
 //   The dromedary, from body measurements of adult camels (Elbashir et al. 2011, Butana, 256 camels: 1.81 m at the
 //   withers, body 1.57 m from the point of the shoulder to the pin bone, neck 1.19 m, face 0.48 m; Dich et al. 2023,
 //   Algeria: tail 0.58 m) and the brief's 1.8-2.0 m at the shoulder and 2.1 m at the hump: drawn 1.90 m at the withers
-//   and 2.10 m at the hump, the trunk deep and narrow, the hump mid-back, the rump falling to a thin tail, the long neck
-//   dipping forward from the chest and rising to a small head, long legs with knobbed knees and a backward hock, broad
-//   flat pads. A calf is drawn at 0.68 of a cow. Their walk is the camel's lateral gait (both legs of a side together, the
-//   hind a little ahead), slow (0.55 m/s); a grazing camel browses a low shrub and lifts its head once to chew; the tail
-//   swings slowly. Coats: tan, a dark (majaheem) and a pale (maghateer) camel. Nothing about them reacts to the train.
+//   and 2.10 m at the hump, the trunk deep and narrow, the hump mid-back, the rump falling to a thin tail, the long
+//   neck dipping forward from the chest and rising to a small head, long legs with knobbed knees and a backward hock,
+//   broad flat pads. A calf is drawn at 0.68 of a cow. Their walk is the camel's lateral gait (both legs of a side
+//   together, the hind a little ahead), slow (0.3-0.5 m/s); the tail swings slowly. Coats: tan, a dark (majaheem) and a
+//   pale (maghateer) camel. Nothing about them reacts to the train.
+// Revision 11, the camels eating the desert's own plants (the requester: "the camel eating desert grass in uae desert
+//   in the rail scene"). The plain is sown with its plants at true size (sow11, one new seeded stream), and most of the
+//   herd eats:
+//   The plants. On camel-grazed gravel plains in the UAE rimth (Haloxylon salicornicum) is the dominant perennial and
+//   thanda (Cyperus conglomeratus) a co-dominant (El-Keblawy, Ksiksi and El Alqamy 2009, J. Arid Environments 73:
+//   347-354); on the Madam plain toward Dhaid, a mixed gravel and sand surface, arta (Calligonum comosum) stands on
+//   small sand mounds of its own, rimth on smaller ones, and thanda takes the open sandy spots (ENHG Bulletin 27, 1985,
+//   "A Botanical Reconnaissance of the Northern Emirates"); thumam (Panicum turgidum), the desert grass camels graze
+//   even when it is dry, grows in Sharjah (UAE Flora, uaeflora.ae) and is the native tuman grass trialled at the Dhaid
+//   Research Station. Thumam: a pale glaucous tussock of stiff, woody, jointed culms with brown sheaths at the swollen
+//   nodes, 0.4-1 m high and about as wide, catching sand into a low hummock (UAE Flora; PROTA, Brink 2006; World Flora
+//   Online); Pennisetum divisum, also called thumam, looks the same out of flower (UAE Flora) and is not drawn apart.
+//   Thanda: a tuft of stiff arching leaves and culms 0.26-0.44 m high (UAE Flora: 30-70 cm; WFO: 4-30 cm),
+//   brown-sheathed at the base, with small brown heads of spikelets. Arta: a leafless broom of thin jointed branches,
+//   1-1.6 m. Rimth as before (shrub11). Outside the fence they are grazed, the thumam cropped even; inside it, out of
+//   the camels' reach, a few stand taller and in seed. More grow where the near herd feeds; the far plain has a sparse
+//   scatter. The ghaf stay as they were (heritage).
+//   How a camel eats (Iqbal and Khan 2001, a review of camel feeding behaviour; Slimani et al. 2013, LRRD 25(12): 1-4
+//   bites a plant, feeding on the move; Dittmann et al. 2017, J. Exp. Zool. 327: 98-109): the split, prehensile upper
+//   lip gathers the culms, the lower incisors close on them against the dental pad, and a pull of the head tears them;
+//   it chews with the lower jaw swinging to the side, a camel changing side with every stroke (Bürger 1966 and
+//   Hendrichs 1965, in Dittmann et al.), more slowly than cattle chew: one stroke in 0.85 s of the scene clock. So the
+//   dark cow nearest the eye grips a thumam tussock (its culms bend to her lips), pulls up and to the side, tears a
+//   mouthful at t 2.05 (the cut stubs spring back; the tussock is shorter where she pulled), lifts her muzzle to about
+//   1.4 m, below her withers, with the torn culms hanging from her lips and chews them in by t 3.8, and lowers it
+//   again; the tan cow crops another tussock a bite at a time (her lips tug the culms, which spring back cropped); the
+//   pale cow browses a rimth bush; her calf crops a thanda tuft; far out, three graze, a calf and a cow walk. The near
+//   herd was brought to 44-53 m from the eye (from 43-62 m) so their eating reads, still outside the fence. Every
+//   motion is a pure function of the scene clock.
 const RAIL = { cx: 1435, hz: 430, f: 1805, eye: 12.0, azC: 90, x0: 985, x1: 1885, y0: 100, y1: 1000 };
 scene({
   id: 'rail',
@@ -67,8 +96,8 @@ scene({
     if (typeof REV11 !== 'undefined' && REV11) {
       this.herd11 = [
         { s: 42.5, o: -27.6, hd: 0.42, sc: 1.03, coat: 'dark', act: 'feed', food: 'thumam', fh: 0.78, ph: 1.1, side: 'near',
-          ev: [{ tA: 0.75, tG: 1.4, tC: 2.05, tR: 2.75, pm: 0.2, pl: 0.06, kind: 'tear', up: [2.0, 2.75], dn: [3.55, 4.3], gL: 0.44, chew: [2.15, 3.8] },
-            { tA: 4.3, tG: 4.8, tC: 5.35, tR: 6.0, pm: 0.18, pl: -0.05, kind: 'tear', up: [5.3, 6.0], dn: [7.2, 7.8], gL: 0.44, chew: [5.45, 7.6] }] },
+          ev: [{ tA: 0.75, tG: 1.4, tC: 2.05, tR: 2.75, pm: 0.2, pl: 0.06, kind: 'tear', up: [2.0, 2.75], dn: [3.55, 4.3], gL: 0.3, chew: [2.15, 3.8] },
+            { tA: 4.3, tG: 4.8, tC: 5.35, tR: 6.0, pm: 0.18, pl: -0.05, kind: 'tear', up: [5.3, 6.0], dn: [7.2, 7.8], gL: 0.3, chew: [5.45, 7.6] }] },
         { s: 34.5, o: -26.4, hd: -2.18, sc: 1, coat: 'tan', act: 'feed', food: 'thumam', fh: 0.66, bite: 'nibble', P: 1.35, ph: 0.3, side: 'near' },
         { s: 37.0, o: -32.4, hd: -1.75, sc: 0.98, coat: 'pale', act: 'feed', food: 'rimth', fh: 0.5, bite: 'browse', P: 1.6, ph: 0.15, side: 'near' },
         { s: 40.6, o: -34.6, hd: 1.2, sc: 0.68, coat: 'pale', act: 'feed', food: 'thanda', fh: 0.36, bite: 'nibble', P: 1.15, ph: 0.62, side: 'near' },
@@ -298,8 +327,11 @@ scene({
   // from them, so nothing switches mid-beat), the camel that eats it (food) and, for the grasses, its culms
   sow11() {
     const r = rng(9101), out = [];
-    const axes = this.herd11.map(cm => { const fr = this.camelFrame11(cm, 3.0); return [-1.1, -0.4, 0.3, 1.0, 1.7, 2.3].map(a => fr.W(a, 0, 0)); });
-    const free = (X, Y, rad) => axes.every(ax => ax.every(([x, y]) => Math.hypot(X - x, Y - y) > rad + 0.9)) && out.every(p => Math.hypot(X - p.X, Y - p.Y) > (rad + p.w / 2) * 1.2);
+    const axes = this.herd11.map(cm => { const fr = this.camelFrame11(cm, 3.0); return [-1.1, -0.4, 0.3, 1.0, 1.7, 2.3, 2.9].map(a => fr.W(a, 0, 0).concat(a > 1.5 ? 1.7 : 1.1)); });
+    // and none just beyond a feeder's head as the eye sees it, where it would read as the plant being eaten
+    const heads = this.herd11.filter(cm => cm.act === 'feed').map(cm => { const fr = this.camelFrame11(cm, 3.0), [x, y] = fr.W(2.3, 0, 0), d = Math.hypot(x, y); return [x, y, x / d, y / d]; });
+    const clearOfHeads = (X, Y, rad) => heads.every(([x, y, vx, vy]) => { const dx = X - x, dy = Y - y, al = dx * vx + dy * vy; return al < -1 || al > 6 || Math.abs(dx * vy - dy * vx) > rad + 1.4; });
+    const free = (X, Y, rad) => clearOfHeads(X, Y, rad) && axes.every(ax => ax.every(([x, y, , m]) => Math.hypot(X - x, Y - y) > rad + m)) && out.every(p => Math.hypot(X - p.X, Y - p.Y) > (rad + p.w / 2) * 1.2);
     const size = (kind, grazed) => {
       if (kind === 'thumam') { const h = grazed ? 0.4 + 0.3 * r() : 0.7 + 0.3 * r(); return [h, h * (0.95 + 0.3 * r())]; }
       if (kind === 'thanda') { const h = 0.26 + 0.18 * r(); return [h, h * (1.1 + 0.3 * r())]; }
@@ -309,13 +341,13 @@ scene({
     const pick = mix => { let u = r(), k = 0; while (k < mix.length - 1 && u > mix[k][1]) { u -= mix[k][1]; k++; } return mix[k][0]; };
     const add = (kind, X, Y, h, w, side, food = -1) => {
       const D = Math.hypot(X, Y), hp = RAIL.f * h / D, seed = 9200 + out.length, p = { kind, X, Y, h, w, D, hp, side, food, seed };
-      const n = kind === 'thumam' ? (hp > 22 ? 24 : hp > 9 ? 12 : 5) : kind === 'thanda' ? (hp > 12 ? 18 : hp > 6 ? 10 : 5) : 0;
+      const n = kind === 'thumam' ? (hp > 22 ? 30 : hp > 9 ? 12 : 5) : kind === 'thanda' ? (hp > 12 ? 18 : hp > 6 ? 10 : 5) : 0;
       if (n) p.culms = this.culms11(kind, h, w, n, rng(seed), side !== 'row');
       out.push(p);
     };
     this.herd11.forEach((cm, i) => {
       if (cm.act !== 'feed') return;
-      const fr = this.camelFrame11(cm, 3.0), [X, Y] = fr.W(this.neck11(cm.gF, 0).lip[0] + 0.1 / cm.sc, 0, 0), h = cm.fh;
+      const fr = this.camelFrame11(cm, 3.0), [X, Y] = fr.W(this.neck11(cm.gF, 0).lip[0] + (cm.bite ? 0.1 : 0.2) / cm.sc, 0, 0), h = cm.fh;
       add(cm.food, X, Y, h, h * { thumam: 1.05, thanda: 1.2, rimth: 1.8 }[cm.food], cm.side, i);
     });
     // a region's scatter: n tries over s0..s1 and o0..o1, each kind drawn from its mix
@@ -350,7 +382,7 @@ scene({
       for (let j = 0; j < 8; j++) cz += Math.cos(a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5)) / 8;
       const L = top / Math.max(0.35, cz), pts = [[bx, by, 0]];
       for (let j = 0; j < 8; j++) { const a = a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5), p = pts[j]; pts.push([p[0] + L / 8 * Math.sin(a) * Math.cos(az), p[1] + L / 8 * Math.sin(a) * Math.sin(az), p[2] + L / 8 * Math.cos(a)]); }
-      out.push({ pts, L, bk: 0.42 + 0.2 * r(), head: flower, pan: !th && !grazed && r() < 0.5, sw: r() });
+      out.push({ pts, L, bk: 0.36 + 0.2 * r(), head: flower, pan: !th && !grazed && r() < 0.5, sw: r() });
     }
     return out;
   },
@@ -365,13 +397,14 @@ scene({
   // bite the gripped ones (w over 0.7) are cut where the lips hold them (a nibble) or torn at a node lower down (a tear),
   // and the rest are let go; every culm let go or cut springs back from where it was (a damped swing of about 0.4 s:
   // nothing jumps). What is torn off stays in the mouth: a nibble's tops are drawn in at once; a tear's culms hang from
-  // the lips, swing with the jaw and are chewed in until its chewing ends. Returns { stubs, held }: world polylines
+  // the lips, swing with the jaw and are chewed in until its chewing ends. Returns { stubs, held }: world polylines (each
+  // held one tagged ci, the culm it came from)
   bites11(pl, cm, fr, lt) {
-    const ss = u => this.ss11(u), tuft = pl.kind === 'thanda' ? [0.05, 0.15] : [0.09, 0.24], R1 = tuft[0], R2 = tuft[1];
+    const ss = u => this.ss11(u), thin = pl.kind === 'thanda' ? 0.6 : 1;
     const spring = t => Math.exp(-t / 0.12) * Math.cos(TAU * t / 0.42);
     cm.ev.forEach(e => { if (!e.M) { e.M = this.mouth11(cm, fr, e.tG); e.Mc = this.mouth11(cm, fr, e.tC); } });
     const Mt = this.mouth11(cm, fr, lt), ps = this.pose11(cm, lt), down = [0, 0, -1], stubs = [], held = [];
-    pl.culms.forEach(c => {
+    pl.culms.forEach((c, ci) => {
       // the culm's rest point at fraction u of its first length
       const P = u => { const x = clamp(u) * 8, j = Math.min(7, Math.floor(x)), f = x - j, a = c.pts[j], b = c.pts[j + 1]; return [pl.X + lerp(a[0], b[0], f), pl.Y + lerp(a[1], b[1], f), lerp(a[2], b[2], f)]; };
       const sB = (u, ug) => (u >= ug ? 1 : (u / ug) * (u / ug));
@@ -384,6 +417,8 @@ scene({
         if (P(lam)[2] < zm - 0.05) continue;
         let ug = lam;
         if (P(lam)[2] > zm) { let a = 0, b = lam; for (let k = 0; k < 14; k++) { const m = (a + b) / 2; if (P(m)[2] < zm) a = m; else b = m; } ug = (a + b) / 2; }
+        // a tear takes a mouthful (full grip within 0.2 m of the lips), a nibble a few culms (0.09 m)
+        const R1 = (e.kind === 'tear' ? 0.2 : 0.09) * thin, R2 = (e.kind === 'tear' ? 0.42 : 0.24) * thin;
         const pg = P(ug), w = 1 - ss((Math.hypot(pg[0] - e.M[0], pg[1] - e.M[1], pg[2] - e.M[2]) - R1) / (R2 - R1));
         if (w < 0.002) continue;
         if (lt < e.tC) {
@@ -396,7 +431,7 @@ scene({
           const tear = e.kind === 'tear', cut = tear ? Math.max(0.15, Math.min(ug - 0.12, c.bk * lam)) : ug;
           // the piece in the mouth: its shape at the bite, carried by the lips; a tear's lower part swings down to hang
           // and is chewed in with its tops; a nibble's tops are drawn straight in
-          const life = tear ? ss((tau - 0.35) / (e.chew[1] - e.tC - 0.35)) : ss(tau / 0.35), lifeTop = tear ? ss(tau / 1.3) : life;
+          const life = tear ? ss((tau - 0.6) / (e.chew[1] - e.tC - 0.6)) : ss(tau / 0.35), lifeTop = tear ? ss(tau / 1.3) : life;
           if (life < 1 || lifeTop < 1) {
             const Pc = u => { const p = P(u), s = sB(u, ug); return [p[0] + Dc[0] * s, p[1] + Dc[1] * s, p[2] + Dc[2] * s]; };
             const anc = Pc(ug), off = [anc[0] - e.Mc[0], anc[1] - e.Mc[1], anc[2] - e.Mc[2]], hold = 1 - ss(tau / 0.3);
@@ -410,8 +445,8 @@ scene({
               } else o = v.map(x => x * (1 - lifeTop));
               return [Mt[0] + off[0] * hold + o[0], Mt[1] + off[1] * hold + o[1], Mt[2] + off[2] * hold + o[2]];
             };
-            if (tear && life < 1) held.push([0, 0.25, 0.5, 0.75, 1].map(j => at(lerp(cut, ug, j))));
-            if (lifeTop < 1 && lam - ug > 0.01) held.push([0, 0.5, 1].map(j => at(lerp(ug, lam, j))));
+            if (tear && life < 1) held.push(Object.assign([0, 0.25, 0.5, 0.75, 1].map(j => at(lerp(cut, ug, j))), { ci }));
+            if (lifeTop < 1 && lam - ug > 0.01) held.push(Object.assign([0, 0.5, 1].map(j => at(lerp(ug, lam, j))), { ci }));
           }
           lam = cut;
         }
@@ -476,7 +511,7 @@ scene({
         }
       });
     }
-    if (st && part !== 'back') this.ink11(st.held.map(l => l.map(pr)), lw * 1.05, 0.72 * q, ink);
+    if (st && part !== 'back') this.ink11(st.held.map(l => l.map(pr)), lw * 1.5, 0.85 * q, ink);
   },
   // a dromedary in true 3D (see the notes at the top), built as rings round its trunk, neck, head, lower jaw, legs and
   // tail: each pair of neighbouring rings, projected, gives a convex hull, and the hulls of a part together give its
@@ -595,8 +630,8 @@ scene({
   },
   // a low desert shrub of the gravel plain (rimth, Haloxylon salicornicum: a rounded cushion of thin jointed grey-green
   // twigs on a little mound of trapped sand) at ground point G, h tall: a lumpy dome, its twigs drawn upright. Revision
-  // 11: browsed (st: the lips' screen point m and their grip G), the twigs by the lips bend toward them, and part
-  // 'front' draws those twigs again over the muzzle; a small one far off is drawn without its hatching and twigs
+  // 11: browsed (st: the lips' screen point m and their grip G), the twigs by the lips bend toward them above their
+  // lower 0.6, and part 'front' draws their tips again over the muzzle; a small one far off is drawn without its hatching and twigs
   shrub11(G, h, psi, q, seed, part = 'all', st = null) {
     const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
     if (!b || !t || b[0] < RAIL.x0 - 50 || b[0] > RAIL.x1 + 50 || b[1] > RAIL.y1 + 60) return;
@@ -608,15 +643,18 @@ scene({
     for (let j = 0; j < 16; j++) { const x = b[0] + (r() - 0.5) * w * 0.8, y0 = b[1] + (r() - 0.3) * ry * 0.4, L = hh * (0.35 + 0.5 * r()) * (1 - Math.pow(2 * (x - b[0]) / w, 2)), lean = (x - b[0]) * 0.35 + (r() - 0.5) * w * 0.08; tw.push([[x, y0], [x + lean * L / Math.max(1, hh), y0 - L]]); }
     // the twigs by the lips: drawn toward them as they grip
     const rr = 0.3 * w, bit = [];
-    if (st) tw.forEach(tg => { const p = tg[1], d = Math.hypot(p[0] - st.m[0], p[1] - st.m[1]); if (d < rr) { const kk = 0.55 * st.G * (1 - d / rr); tg[1] = [p[0] + (st.m[0] - p[0]) * kk, p[1] + (st.m[1] - p[1]) * kk]; bit.push(tg); } });
-    if (part === 'front') { bit.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.55, 0.5 * q)); return; }
+    if (st) tw.forEach(tg => {
+      const [p0, p] = tg, d = Math.hypot(p[0] - st.m[0], p[1] - st.m[1]);
+      if (d < rr) { const kk = 0.55 * st.G * (1 - d / rr); tg.splice(1, 1, [lerp(p0[0], p[0], 0.6), lerp(p0[1], p[1], 0.6)], [p[0] + (st.m[0] - p[0]) * kk, p[1] + (st.m[1] - p[1]) * kk]); bit.push(tg); }
+    });
+    if (part === 'front') { bit.forEach(tg => stroke(new P(tg.slice(1)), 1, INK, 0.5, 0.45 * q)); return; }
     // the sand mound and the shade under it
     fill(el(b[0], b[1] + ry * 0.2, w * 0.62, ry * 0.95, 0, TAU, seed, 0), SEPIA, 0.13 * q);
     mask(clump, q);
     if (OPT.colour) wash(clump, '#8C8A5E', 0.42 * q); else fill(clump, SEPIA, 0.14 * q);
     if (w > 7) {
       hatch(clump, [b[0] - w / 2 - 1, b[1] - hh - 2, b[0] + w / 2 + 1, b[1] + ry + 1], 1.25, Math.max(1.4, w * 0.09), q, INK, 0.45, 0.22, seed);
-      tw.forEach(([p0, p1]) => stroke(new P([p0, p1]), 1, INK, 0.5, 0.4 * q));
+      tw.forEach(tg => stroke(new P(tg), 1, INK, 0.5, 0.4 * q));
     }
     stroke(clump, 1, INK, 0.65, 0.5 * q);
   },
