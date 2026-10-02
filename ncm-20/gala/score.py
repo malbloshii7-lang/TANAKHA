@@ -38,6 +38,7 @@ opens rather than ends; and D major, with the motif as D-E-F#-G on the rababa, f
 only full cadence. 72 BPM, one bar = 3.333 s. Nothing imitates a siren, an alert tone, a horn, thunder, a boom or an
 impact, and the rail has no jointed-track clack (Etihad Rail's main line is continuously welded).
 """
+import contextlib
 import json
 import sys
 
@@ -235,6 +236,45 @@ def turboprop_far(dur, gain=1.0):
     air = A.bp(A.noise(n), 200, 1400, 2) * 0.35
     env = np.sin(np.pi * np.clip(t / dur, 0, 1)) ** 1.5
     return A.lp(hum_ * 0.5 + air, 900, 2) * env * 0.05 * gain
+
+
+# Revision 11's finale (scenes/night-finale.js FIN11), on the finale's own clock: NCM's King Air crosses the frieze right
+# to left at one height (its nose enters, its tail leaves, and it crosses the screen's centre), then the rain begins over
+# the Hajar beyond the city, veil by veil, right to left (the first veil at FIN_RAIN, the last 1.1 s later, each full 3 s on)
+FIN_AIR = (1.6, 5.0, 3.31)
+FIN_RAIN = 3.77
+
+
+@contextlib.contextmanager
+def seeds_aside():
+    """make new sounds without advancing the score's seeded generators (audio.rng, and foley's own once installed), so
+    every sound made after them renders as it did before they were added"""
+    gens = [A.rng] + ([FOLEY.frng] if FOLEY else [])
+    states = [g.bit_generator.state for g in gens]
+    try:
+        yield
+    finally:
+        for g, state in zip(gens, states):
+            g.bit_generator.state = state
+
+
+def finale_r11(sfx, sc, f1):
+    """Revision 11's finale: the King Air's pass, far and faint, carried across the stereo field right to left as it
+    crosses the screen; then distant rain on the left, under the cloud, growing in as the veils do and held to the end
+    (the film's fade takes it out). Never over the music: the aircraft sits under the wind, the rain under the pad."""
+    with seeds_aside():
+        a0, a1, ac = (sc('finale', x) for x in FIN_AIR)
+        half = max(ac - a0, a1 - ac) + 0.8  # heard a little before the nose enters and after the tail leaves
+        y = turboprop_far(2 * half, gain=0.7)
+        y = y.mean(axis=0) if y.ndim == 2 else y
+        a = (np.linspace(0.75, -0.75, len(y)) + 1) * np.pi / 4  # constant-power pan, right to left with the aircraft
+        sfx.add2(y * np.cos(a), y * np.sin(a), ac - half)
+        r0 = sc('finale', FIN_RAIN)
+        dur = f1 + 3.0 - r0
+        rain = A.rain(dur, gain=0.3, density=0.6)
+        rain = np.vstack([A.lp(ch, 2600, 2) for ch in rain])  # far off: its high air lost over the distance
+        grow = np.minimum(1.0, np.arange(rain.shape[1]) / (4.2 * A.SR))  # the seven veils fill in over 4.2 s
+        sfx.add2(rain[0] * grow, rain[1] * grow * 0.55, r0)  # the cloud is on the left of the frame
 
 
 def diesel_far(dur, gain=1.0):
@@ -578,8 +618,11 @@ def main(cues_path, out_dir):
         if t < title - 0.13:
             rab(music, t, m, min(d, title - t), gain=0.75, grace={0: EHF, 4: 71}.get(j))
             music.add(A.strings(m - 12, d, bright=1800, attack=0.4, release=0.8, voices=5), t, 0.25)
-    music.add(harmonic(D4 + 24, 0.8), f0 + 2.467)
+    # the ring tone as Suhail's gold ring closes; Revision 11 has no Suhail, and the same tone marks the first rain
+    music.add(harmonic(D4 + 24, 0.8), sc('finale', FIN_RAIN) if R11 else f0 + 2.467)
     answer(music, f0 + 2.467, D3, [A2, D3], gain=0.45, dur=(1.1, 1.3))
+    if R11:
+        finale_r11(sfx, sc, f1)
     chord(music, [D2, D3, A3, 62, 66, 69, 74], title, f1 - title + 3.0, gain=0.46, bright=2200, attack=0.4, release=4.0)
     music.add(A.timpani(D2 + 12, 0.45), title)
 

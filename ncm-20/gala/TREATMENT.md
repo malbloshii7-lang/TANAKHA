@@ -66,6 +66,8 @@ and the build win.** The words as built, with their film times, are in **`SCRIPT
   - Suhail, at 12.2°, clears the towers just to their right.
   - Revision 11 adds ADNOC HQ (1.67 km, bearing 174.2°, 11.6° high) and Qasr Al Watan (2.37 km, bearing 226.6°).
     See its notes of 1 October.
+  - Revision 11's finale (2 October) leaves this view for a symbolic skyline of the seven emirates, with no Suhail.
+    See its fifth notes.
 
 **Sound and build.**
 - The seeding aircraft is a distant turboprop.
@@ -898,6 +900,56 @@ looks like attacking drone !"*
   colours with no letters or figures. The landing's sound is retimed to this vantage.
 - *The east coast.* The gulls are taken out of the jetty, drawn and heard: small dark shapes in the sky over an oil
   terminal read, in 2026, as attacking drones. Jebel Ali's harbour tug and pilot boat stay (they read as harbour craft).
+
+**The requester's fifth notes (2 October 2026).**
+> *"in the ending scene i want add aditional building icon, like Burj khaliffa Burj AL Arab, al Dar HQ building (the
+> circle) and insteda of suhail rising replace it with small king air beach craft from right to left on same stable
+> altitude over the landmarks and clouds rains after it cross it"*
+
+When asked, the requester chose three things:
+- a symbolic skyline of all seven emirates;
+- gentle rain beyond the city, not on the towers;
+- Suhail taken out entirely.
+
+- **The skyline.** Under `?rev11`, the finale is no longer the view from the Marina.
+  - **The order.** One landmark for each emirate, set right to left in the constitutional order, the way Arabic reads:
+
+    | Emirate | Landmarks |
+    |---|---|
+    | Abu Dhabi | Qasr Al Watan, Emirates Palace, the Etihad Towers, ADNOC HQ, the Nation Towers, Aldar HQ |
+    | Dubai | Burj Khalifa, Burj Al Arab |
+    | Sharjah | Al Hisn |
+    | Ajman | Ajman Fort |
+    | Umm Al Quwain | Al Ali Fort |
+    | Fujairah | Fujairah Fort, on its rock |
+    | Ras Al Khaimah | Dhayah Fort on its hill, unlit as it is at night |
+
+    The Hajar's crest stands behind them, from SRTM, counting only UAE ground.
+  - **The sizes.** The order is symbolic; the sizes are not.
+    - There is one eye, 14 m above the water, and each bank has one scale. So the towers' heights are true to each
+      other: Burj Khalifa's 828 m is 257 px.
+    - The two palaces stand on a nearer bank so their domes read. The forts stand on a nearer bank still.
+  - **The sources.** Burj Khalifa is traced from the OpenStreetMap 3D model of its 37 building parts. The sources for
+    every landmark are in `scenes/night-finale.js`.
+- **The King Air.** NCM's King Air C90 is the seeding plate's model, without its flare racks.
+  - **Its path.** It crosses right to left at one steady height, from 4:01.9 to 4:05.7. That is 63 px above Burj
+    Khalifa's spire and clear of the lockup. Its tail leaves the frame as the Arabic title begins.
+  - **Its lights** are steady: red on the left wingtip, green on the right, white at the tail. There is no strobe, flare
+    or trail, and no livery or registration.
+  - **Its sound.** It is heard far and faint (`foley.turboprop_far`), and its sound moves across the stereo field from
+    right to left with it.
+- **The rain.** After the aircraft passes, a band of cloud over the Hajar lets down seven veils of gentle rain.
+  - The veils start right to left, each 0.55 s after the aircraft clears it, and are full by 4:09.0. None falls within
+    12 px of a landmark.
+  - The rain is heard far off on the left, low-passed, under the music.
+  - The ring tone (a harp harmonic on D) that marked Suhail's ring now marks the first rain.
+- **Suhail is not drawn:** no star, halo, rings, label or heritage Sirius halo. The rest of the computed sky stays.
+- **Checked.**
+  - The default cut is byte-identical: 46 stills, and wipcheck.
+  - The finale passes the flash check (PSE) at 30 fps.
+  - The holds loop seamlessly.
+  - The rev11 cue list is unchanged, so are its subtitles.
+  - The new sounds are made without advancing the score's seeded generators, so every other sound renders as before.
 
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
@@ -1926,6 +1978,7 @@ Every number on screen, its qualifier and its source:
 | 50 | **The locomotive and the wagons (Revision 11, 1 October).** The rail beat's head end is drawn as an EMD SD70ACS, the type Etihad Rail runs, to the dimensions found on 1 October (the maker's brochure and railfan data): 22.63 m, 4.84 m high, 3.12 m wide, truck centres 14.58 m, HTSC-II trucks of 3.81 m wheelbase, the deck at 1.854 m; the nose, cab and hood lengths are scaled. The wagons are CRRC's Stage Two aggregate hoppers (13.7 m, 3.212 m, rounded side sheets, three bottom doors, cool grey; CRRC, 17 Sep 2026), their height estimated. Etihad Rail describes the locomotives' livery as light grey "relieved with broad red bands" with its logo mid-body (2012); the bands are not drawn until their path is seen in a photograph or video (two AI video analyses are queued), and no logo is shown. Since 3 Oct 2024 the company's Arabic name is «قطارات الاتحاد» and its logo is new | A named operator's vehicle must be drawn as it is | NCM communications, with Etihad Rail | As built; the approved cut keeps its v3 drawing |
 | 51 | **The AI narrator (Revision 11, 1 October). Resolved, 1 October: the requester decided the film needs no narration**, so no voice is heard and the review copies no longer carry the narration's subtitles; the record below stands for reference. The narration is voiced by an AI voice (ElevenLabs through Higgsfield, "Jasper"), not a recorded narrator. It speaks the Founders' and the President's names, H.H. Sheikh Mansour's precedence lines and «معالي الدكتور عبدالله أحمد المندوس». Whether an AI voice may be heard at a state gala (and whether it is disclosed), or serves only as the guide track for a human narrator's session, is protocol's call; an Arabic editor checks every line's pronunciation and stress (the names, «جُلْفار», «سُهَيل», «المَنْدوس») | The requester asked for a real voice now; an AI voice at an official ceremony may need approval and disclosure | The protocol office, NCM communications and the Arabic editor | The scratch subtitles with the score alone; the AI lines as a guide track for a human narrator |
 | 52 | **The recorded sound effects (Revision 11, 1 October).** Most effects are CC0 recordings with named recordists (the stream: gluckose; the wind: Felix Blume; the rain and the night: Noisekun's library; the drums: VCSL). Six come from the Moodist collection, under the Pixabay Content License or CC0 without a source named for each file (the sailboat, the gentle waves, the gulls, the train, the keyboards, the gusty wind). Keep them, or replace them with named library recordings (or the studio's own) for the masters | Both licences allow use in a film without credit, but protocol may want every source named | Requester and the post-production studio | Keep; the studio may swap any of the six without changing the cut |
+| 53 | **The seven emirates' skyline (Revision 11, 2 October).** Burj Khalifa, Burj Al Arab and Aldar HQ join ADNOC HQ and Qasr Al Watan (row 48) as recognisable copyrighted architecture. The frieze also picks one landmark per emirate: Al Hisn (Sharjah), Ajman Fort, Al Ali Fort (Umm Al Quwain), Fujairah Fort and Dhayah Fort (Ras Al Khaimah; Jebel Jais appears as the crest behind it). Only some heights are sourced: Al Kabs 12 m, Fujairah's 20 m rock and Dhayah's 70 m hill. The other towers (11–15 m) are estimated from storey counts. Al Hisn, Ajman Fort and Al Ali Fort are assumed floodlit at night. Burj Al Arab's helipad side has not been checked against a photograph | Each emirate should recognise its own landmark, and choosing one per emirate is itself a statement. The King Air carries no livery or registration | The protocol office, each emirate's heritage authority for its fort, and the owners for the towers | As built, drawn only under `?rev11`. Without approval, the finale returns to the approved skyline |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`
