@@ -206,14 +206,14 @@ const RegionV = (() => {
     return cv;
   }
   // ---- the pressure field at analysis time tk (fractional), on the half-degree grid ----
-  function field(tk) {
+  function field(tk, V = G.V) {
     const P = D.p, N = G.N, F = G.F, k = Math.floor(tk), f = tk - k, K = i => clamp(i, 0, P.nt - 1) * N;
     const a0 = K(k - 1), a1 = K(k), a2 = K(k + 1), a3 = K(k + 2), f2 = f * f, f3 = f2 * f;
     const w0 = -0.5 * f3 + f2 - 0.5 * f, w1 = 1.5 * f3 - 2.5 * f2 + 1, w2 = -1.5 * f3 + 2 * f2 + 0.5 * f, w3 = 0.5 * f3 - 0.5 * f2;
     const C = G.cur;
     for (let n = 0; n < N; n++) C[n] = w0 * F[a0 + n] + w1 * F[a1 + n] + w2 * F[a2 + n] + w3 * F[a3 + n];
     // bicubic (Catmull-Rom) to the half degree: rows first, then columns
-    const nx = P.nx, ny = P.ny, nx2 = G.nx2, ny2 = G.ny2, Rw = G.row, V = G.V;
+    const nx = P.nx, ny = P.ny, nx2 = G.nx2, ny2 = G.ny2, Rw = G.row;
     const mid = (p0, p1, p2, p3) => (-p0 + 9 * p1 + 9 * p2 - p3) / 16;
     for (let j = 0; j < ny; j++) {
       const r = j * nx, o = j * nx2;
@@ -233,6 +233,40 @@ const RegionV = (() => {
     const P = D.p, fi = (lonAt(x) - P.lon0) * 2, fj = (P.lat0 - latAt(y)) * 2;
     const i = clamp(Math.floor(fi), 0, G.nx2 - 2), j = clamp(Math.floor(fj), 0, G.ny2 - 2), u = fi - i, v = fj - j, n = G.nx2;
     return lerp(lerp(V[j * n + i], V[j * n + i + 1], u), lerp(V[(j + 1) * n + i], V[(j + 1) * n + i + 1], u), v);
+  }
+  // the field at a plate point, bicubic (Catmull-Rom; smooth in its slope, for the values at the chart's edge)
+  function atC(V, x, y) {
+    const P = D.p, fi = (lonAt(x) - P.lon0) * 2, fj = (P.lat0 - latAt(y)) * 2, n = G.nx2;
+    const i = clamp(Math.floor(fi), 0, G.nx2 - 2), j = clamp(Math.floor(fj), 0, G.ny2 - 2), u = fi - i, v = fj - j;
+    const w = t => { const t2 = t * t, t3 = t2 * t; return [-0.5 * t3 + t2 - 0.5 * t, 1.5 * t3 - 2.5 * t2 + 1, -1.5 * t3 + 2 * t2 + 0.5 * t, 0.5 * t3 - 0.5 * t2]; };
+    const wu = w(u), wv = w(v);
+    let s = 0;
+    for (let b = 0; b < 4; b++) {
+      const jj = clamp(j - 1 + b, 0, G.ny2 - 1) * n;
+      let r = 0;
+      for (let a = 0; a < 4; a++) r += wu[a] * V[jj + clamp(i - 1 + a, 0, G.nx2 - 1)];
+      s += wv[b] * r;
+    }
+    return s;
+  }
+  // the field at a plate point and a time, straight from the 1-degree analyses (Catmull-Rom in time and in space)
+  const crw = t => { const t2 = t * t, t3 = t2 * t; return [-0.5 * t3 + t2 - 0.5 * t, 1.5 * t3 - 2.5 * t2 + 1, -1.5 * t3 + 2 * t2 + 0.5 * t, 0.5 * t3 - 0.5 * t2]; };
+  function pAt(tk, x, y) {
+    const P = D.p, N = G.N, F = G.F, fi = lonAt(x) - P.lon0, fj = P.lat0 - latAt(y), k = Math.floor(tk);
+    const i = clamp(Math.floor(fi), 0, P.nx - 2), j = clamp(Math.floor(fj), 0, P.ny - 2), wt = crw(tk - k), wu = crw(fi - i), wv = crw(fj - j);
+    let s = 0;
+    for (let c = 0; c < 4; c++) {
+      const o = clamp(k - 1 + c, 0, P.nt - 1) * N;
+      let sv = 0;
+      for (let b = 0; b < 4; b++) {
+        const r = o + clamp(j - 1 + b, 0, P.ny - 1) * P.nx;
+        let su = 0;
+        for (let a = 0; a < 4; a++) su += wu[a] * F[r + clamp(i - 1 + a, 0, P.nx - 1)];
+        sv += wv[b] * su;
+      }
+      s += wt[c] * sv;
+    }
+    return s;
   }
   // marching squares: the isobar of level L as polylines on the plate ({ pts, closed })
   function contour(V, L) {
@@ -298,42 +332,65 @@ const RegionV = (() => {
     init();
     if (!G) return;
     const tk = tau(lt), V = field(tk);
+    // the field a moment later, for how fast each isobar slides along the chart's edge (px a frame at 30 fps)
+    const dtk = 0.02, tps = (tau(lt + 0.01) - tau(lt)) / 0.01 / 30;
     // the chart as printed and coloured
     ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(G.base, 0, 0, PW, PH); ctx.restore();
     // ---- what moves: the isobars' values at the chart's edge, and the centres ----
-    const marks = [];
+    const marks = [], cents = [];
     const qa = easeOut(prog(lt, 1.0, 0.8));
-    // the values where the isobars leave the chart, left, right and bottom: each fades in as its line crosses the edge
-    // squarely, and out as it runs along the edge or crowds a neighbour
+    // the values where the isobars leave the chart at its left and right edges, south of 21 S (where they run west to
+    // east): each fades in as its line crosses the edge squarely and slowly, and out as it runs along the edge, slides
+    // fast or crowds a neighbour
     if (qa > 0) {
       const found = [];
+      const WIN = Array.from({ length: 17 }, (_, n) => [(n - 8) * 0.1, 9 - Math.abs(n - 8)]);
       const side = (x0, y0, x1, y1, kind) => {
         const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 2), s = [];
-        for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), y = lerp(y0, y1, i / n); s.push([x, y, at(V, x, y)]); }
+        for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), y = lerp(y0, y1, i / n); s.push([x, y, atC(V, x, y)]); }
         for (let i = 1; i < s.length; i++) {
           const [xa, ya, pa] = s[i - 1], [xb, yb, pb] = s[i];
           for (let L = Math.ceil(Math.min(pa, pb) / 4) * 4; L <= Math.max(pa, pb); L += 4) {
             if (L === pa) continue;
-            const f = (L - pa) / (pb - pa), g = Math.abs(pb - pa) / Math.hypot(xb - xa, yb - ya);
-            found.push({ x: lerp(xa, xb, f), y: lerp(ya, yb, f), L, a: clamp((g - 0.012) / 0.02), kind });
+            const f = (L - pa) / (pb - pa), x = lerp(xa, xb, f), y = lerp(ya, yb, f), ends = Math.min(Math.hypot(x - x0, y - y0), Math.hypot(x - x1, y - y1));
+            // the gradient along and across the edge (bicubic, so it changes smoothly): a value shows where the field
+            // slopes along the edge and the isobar meets it squarely (one running along the edge slides fast, so its
+            // value is left out; two meeting where an isobar touches the edge fade together)
+            const ux = (xb - xa) / Math.hypot(xb - xa, yb - ya), uy = (yb - ya) / Math.hypot(xb - xa, yb - ya);
+            // judged over a short window of the analyses' clock (a weighted mean over 1.6 analyses), so a value never pops
+            let a = 0, ws = 0;
+            WIN.forEach(([o, w]) => {
+              const t = clamp(tk + o, 0, NT - 1 - dtk), g = Math.abs(pAt(t, x + 2 * ux, y + 2 * uy) - pAt(t, x - 2 * ux, y - 2 * uy)) / 4;
+              const gn = Math.abs(pAt(t, x - uy * 2, y + ux * 2) - pAt(t, x + uy * 2, y - ux * 2)) / 4, sq = g / Math.hypot(g, gn);
+              const spd = Math.abs((pAt(t + dtk, x, y) - pAt(t, x, y)) / dtk * tps) / Math.max(g, 1e-4);
+              a += w * smooth01((g - 0.01) / 0.035) * smooth01((sq - 0.4) / 0.35) * smooth01((2.8 - spd) / 2.3); ws += w;
+            });
+            // and where an isobar has only just touched the edge (a pair of crossings born together) it is held back
+            const g0 = Math.abs(pAt(tk, x + 2 * ux, y + 2 * uy) - pAt(tk, x - 2 * ux, y - 2 * uy)) / 4;
+            const g16 = (pAt(tk, x + 16 * ux, y + 16 * uy) - pAt(tk, x - 16 * ux, y - 16 * uy)) / 32 * Math.sign(pb - pa); // the same way across 32 px
+            a = a / ws * smooth01(ends / 24) * smooth01((g0 - 0.006) / 0.03) * smooth01((g16 - 0.012) / 0.03);
+            found.push({ x, y, L, a, kind, dbg: [a] });
           }
         }
       };
-      side(CH[0], CH[1] + 60, CH[0], G.stampBox[1] - 10, 'left'); side(CH[2], CART[3] + 10, CH[2], CH[3] - 4, 'right'); side(G.stampBox[0] + G.stampBox[2] + 24, CH[3], CH[2] - 40, CH[3], 'bottom');
+      side(CH[0], py(-21), CH[0], G.stampBox[1] - 10, 'left'); side(CH[2], py(-21), CH[2], CH[3] - 4, 'right');
       const fixed = [10, 0, -10, -20, -30, -40].map(lat => ({ x: CH[0], y: py(lat), kind: 'left' }));
+      // a value gives way to a neighbour in proportion to how strongly that neighbour shows (the latitudes always show)
+      fixed.forEach(o => { o.a0 = 1; }); found.forEach(o => { o.a0 = o.a; });
       found.forEach(l => found.concat(fixed).forEach(o => {
         if (o === l || o.kind !== l.kind) return;
-        const d = l.kind === 'bottom' ? Math.abs(o.x - l.x) : Math.abs(o.y - l.y), lim = l.kind === 'bottom' ? 30 : 14;
-        l.a *= clamp((d - lim) / 6);
+        const d = Math.abs(o.y - l.y);
+        l.a *= 1 - Math.min(1, 4 * o.a0) * (1 - smooth01((d - 14) / 20));
       }));
       const f = `500 9.5px ${F_MONO}`;
+      if (window.__RV_FOUND) window.__RV_FOUND.push(found.map(l => [l.L, l.kind, Math.round(l.x), Math.round(l.y), +l.a.toFixed(3), l.dbg.map(v => +v.toFixed(3)), +l.a.toFixed(3)]));
       const gap = (a, b) => Math.max(a[0] - (b[0] + b[2]), b[0] - (a[0] + a[2]), a[1] - (b[1] + b[3]), b[1] - (a[1] + a[3]));
       found.forEach(l => {
-        const a = l.a * qa;
+        const a = l.a * l.a * qa; // squared: a value only half-defined shows faintly
         if (a <= 0.01) return;
         const [x, y, al] = l.kind === 'left' ? [CH[0] + 4, l.y + 3.5, 'left'] : l.kind === 'right' ? [CH[2] - 4, l.y + 3.5, 'right'] : [l.x, CH[3] - 4, 'center'];
         const box = inkBox(String(l.L), x, y, f, 1, 'ltr', al, 0, 2);
-        const aa = G.letters.reduce((m, t) => m * clamp((gap(box, t.box) - 1) / 6), a);
+        const aa = G.letters.reduce((m, t) => m * clamp((gap(box, t.box) - 12) / 8), a);
         if (aa > 0.01) marks.push({ t: String(l.L), x, y, f, ls: 1, al, a: aa, ta: 0.8, box });
       });
     }
@@ -349,14 +406,15 @@ const RegionV = (() => {
         return 0.5 * (2 * p1 + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f2 + (-p0 + 3 * p1 - 3 * p2 + p3) * f3); };
       const x = px(cr(tr.lon)), y = py(cr(tr.lat));
       // kept off the neatline, the cartouche and the stamp
-      const edge = clamp(Math.min(x - CH[0] - 14, CH[2] - 14 - x, y - CH[1] - 18, CH[3] - 26 - y) / 14);
-      const clear = b => clamp(Math.max(b[0] - 14 - x, x - (b[0] + b[2]) - 14, b[1] - 6 - (y + 24), y - 18 - (b[1] + b[3])) / 10);
+      const edge = smooth01(Math.min(x - CH[0] - 14, CH[2] - 14 - x, y - CH[1] - 18, CH[3] - 26 - y) / 30);
+      const clear = b => smooth01(Math.max(b[0] - 14 - x, x - (b[0] + b[2]) - 14, b[1] - 6 - (y + 24), y - 18 - (b[1] + b[3])) / 24);
       const under = G.letters.slice(0, 4).reduce((m, t) => Math.min(m, clear(t.box)), 1);
       const aa = a * edge * clear([CART[0], CART[1], CART[2] - CART[0], CART[3] - CART[1]]) * clear(G.stampBox) * lerp(0.18, 1, under);
       if (aa <= 0.01) return;
-      const v = String(tr.v[clamp(Math.round(tk) - k0, 0, n - 1)]), fL = `700 25px ${F_HEAD}`, fV = `600 10px ${F_MONO}`;
-      marks.push({ t: tr.kind, x, y: y + 8, f: fL, ls: 0, al: 'center', a: aa, ta: 0.95, col: BLUE, box: inkBox(tr.kind, x, y + 8, fL, 0, 'ltr', 'center', 0, 2.5) });
-      marks.push({ t: v, x, y: y + 21, f: fV, ls: 1, al: 'center', a: aa, ta: 0.85, box: inkBox(v, x, y + 21, fV, 1, 'ltr', 'center', 0, 1.5) });
+      cents.push([x, y]);
+      const v = String(tr.v[clamp(Math.round(tk) - k0, 0, n - 1)]), fL = `700 29px ${F_HEAD}`, fV = `600 10.5px ${F_MONO}`;
+      marks.push({ t: tr.kind, x, y: y + 10, f: fL, ls: 0, al: 'center', a: aa, ta: 0.95, col: BLUE, box: inkBox(tr.kind, x, y + 10, fL, 0, 'ltr', 'center', 0, 1.5) });
+      marks.push({ t: v, x, y: y + 24, f: fV, ls: 1, al: 'center', a: aa, ta: 0.85, box: inkBox(v, x, y + 24, fV, 1, 'ltr', 'center', 0, 1.5) });
     });
     // ---- the isobars, on a sheet of their own: inked in over the first 1.6 s, then gliding with the analyses; the
     // lettering breaks them ----
@@ -368,14 +426,36 @@ const RegionV = (() => {
     for (let L = 960; L <= 1048; L += 4) {
       const lines = contour(V, L), heavy = L === 1012 || L === 1016;
       ig.lineWidth = heavy ? 2.0 : 1.2; ig.globalAlpha = heavy ? 0.92 : 0.82;
+      const a0 = ig.globalAlpha, trace = (pts, closed) => {
+        if (ip < 1) new P(pts, closed).trace(ig, ip);
+        else { pts.forEach(([x, y], i) => (i ? ig.lineTo(x, y) : ig.moveTo(x, y))); if (closed) ig.closePath(); }
+      };
+      const faint = [];
       ig.beginPath();
       lines.forEach(l => {
         const pts = chaikin(chaikin(l.pts, l.closed), l.closed);
-        if (l.closed) { let per = 0; for (let i = 1; i < pts.length; i++) per += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (per < 20) return; }
-        if (ip < 1) new P(pts, l.closed).trace(ig, ip);
-        else { pts.forEach(([x, y], i) => (i ? ig.lineTo(x, y) : ig.moveTo(x, y))); if (l.closed) ig.closePath(); }
+        if (l.closed) {
+          // a small closed isobar fades with its size (no speck of a loop pops in or out), and one about a lettered centre
+          // gives way to the letter, which marks the centre
+          let per = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+          for (let i = 0; i < pts.length; i++) {
+            const q = pts[(i + 1) % pts.length], [x, y] = pts[i]; per += Math.hypot(q[0] - x, q[1] - y);
+            x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+          }
+          if (per < 260) {
+            const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+            const d = cents.reduce((m, [x, y]) => Math.min(m, Math.hypot(x - cx, y + 6 - cy)), 1e9);
+            const fit = smooth01(Math.min(x1 - x0 - 58, y1 - y0 - 46) / 16); // does the letter and its value fit inside?
+            const k = smooth01((per - 34) / 40) * lerp(fit, 1, smooth01((d - 26) / 16));
+            if (k <= 0.01) return;
+            if (k < 0.99) { faint.push([pts, k]); return; }
+          }
+        }
+        trace(pts, l.closed);
       });
       ig.stroke();
+      faint.forEach(([pts, k]) => { ig.globalAlpha = a0 * k; ig.beginPath(); trace(pts, true); ig.stroke(); });
+      ig.globalAlpha = a0;
     }
     ig.restore();
     ig.save(); ig.globalCompositeOperation = 'destination-out';
@@ -386,9 +466,10 @@ const RegionV = (() => {
     ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(icv, 0, 0, PW, PH); ctx.restore();
     // ---- the lettering that moves, and the running stamp (the nearest of the 6-hourly analyses) ----
     marks.forEach(m => text(m.t, m.x, m.y, m.a * m.ta, m.f, m.ls, m.al, m.col || INK));
+    if (window.__RV_DEBUG) window.__RV_DEBUG.push(marks.map(m => [m.t, Math.round(m.x), Math.round(m.y), +m.a.toFixed(3), m.f.includes('29px') ? 'C' : m.f.includes('10.5px') ? 'cv' : 'v']));
     text(stamp(clamp(Math.round(tk), 0, NT - 1)), STAMP[0], STAMP[1], 0.82, F_STAMP, 1.5, 'left');
   }
-  return { init, draw, tau, stamp };
+  return { init, draw, tau, stamp, _field: field, _at: at };
 })();
 
 scene({
