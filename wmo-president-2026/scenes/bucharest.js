@@ -31,15 +31,20 @@
 //   the sun (NOAA's equations after Meeus, for 44.5106° N 26.0781° E): at 09:00 EEST it stands 17.6° up at azimuth
 //   113.2° (rose 07:14), behind the eye's left shoulder: the screens' east faces and the trees in sun, the north faces
 //   (the doors) in shade, every shadow long (3.2 times the height) toward 293°.
-// The eye: just inside the garden's north-east corner, 1.6 m up, looking 241° (west-south-west) across the garden, f 950
-// px (54° across the plate); it eases 0.8 m forward over the beat. Everything is to one scale from that eye: the near
-// screen 10 m off (its 0.8 m box 75 px wide), the observer 9.5 m (1.75 m, 175 px), the mast 20 m, the trees 45-95 m.
-// The living detail (slow): the observer, a man of 1.75 m in a coat with the register in his left hand, walks in from
-// the gate side down the path, climbs the ladder, opens the screen's double door (west leaf, then east), reads the
-// thermometers and enters them; the cups turn at the rate a 2-4 m/s wind gives them and the vane swings slowly between
-// north-west and north-east; a few leaves blown in on the north breeze drift low across the garden and settle (none
-// above the trees' line, none smaller than 7 px).
-// The print (lt 9.4 to the end) covers plate x 581-925, y 367-609: the screen and the observer stand left of it.
+// The eye: just inside the garden's north-east corner (9.2 m east and 10.6 m north of its centre), 1.6 m up, looking 242°
+// (west-south-west) across the garden, pitched 7° up so the mast's head is in the frame, f 1000 px (52° across the
+// plate); it eases 0.7 m forward over the beat. Everything is to one scale from that eye: the near screen 8.7 m off (its
+// 0.8 m box about 90 px wide, 2.6 m to its roof about 300 px), the observer on its ladder 8.3 m (1.75 m, 210 px), the
+// mast 20.3 m (its 10 m at 25° up; the cups, true to size, 3 px each), the trees 45-95 m, the low roofs 110-350 m.
+// The living detail (slow): the observer, a man of 1.75 m in a dark coat with the register in his left hand, comes in
+// from the gate (on the north side) and walks straight down the path to the screen (his back to the eye), stops at the
+// ladder's foot and looks at his watch (the synoptic hour), climbs to the second tread, opens the double door (the west
+// leaf, then the east, which swings back along the box's side so the doorway stands clear), reads the thermometers and
+// enters them in the register, twice; the cups turn at the rate a 2-4 m/s wind gives them and the vane swings slowly
+// between north-west and north-east; eight leaves blown in from behind the eye's right drift low across the garden on
+// the breeze, 5-7 s each, and settle on the grass (none above the trees' line).
+// The print (lt 9.4 to the end) covers plate x 581-925, y 367-609: the screens and the observer stand left of it (a leaf
+// that comes in after it may pass behind it).
 {
   const D2R = Math.PI / 180;
   const v3 = {
@@ -109,7 +114,7 @@
       // lands: [time it comes in, distance, height]. They cross the frame in 5-7 s; one that comes in after lt 9.4 passes
       // behind the print and comes out at its left edge
       this.drift = [[-1.9, 6.5, 2.5], [0.9, 5.0, 2.2], [3.1, 8.0, 2.6], [5.2, 6.0, 2.3], [7.4, 7.5, 2.6], [9.6, 5.5, 2.4], [11.8, 7.0, 2.5], [13.9, 6.0, 2.2]]
-        .map(([t0, de, ze], i) => { const az = (this.HEAD + 27.5) * D2R; return { t0, p: [this.C0[0] + de * Math.sin(az), this.C0[1] + de * Math.cos(az), ze], s: 0.13 + 0.03 * r(), c: r(), ph: 1.0 + i * 0.7, sp: 0.8 + 0.25 * r(), seed: i }; });
+        .map(([t0, de, ze], i) => { const az = (this.HEAD + 27.5) * D2R; return { t0, p: [this.C0[0] + de * Math.sin(az), this.C0[1] + de * Math.cos(az), ze], s: 0.15 + 0.03 * r(), c: r(), ph: 1.0 + i * 0.7, sp: 0.8 + 0.25 * r(), seed: i }; });
       this.initObserver();
     },
     initTrees(r) {
@@ -264,7 +269,7 @@
       if (OPT.colour) wash(band, '#9AAE9A', 0.42);
       hatch(band, this.PB, 0, 2.4, 1, INK, 0.55, 0.13, 15001);
       stroke(new P(pts), 1, INK, 0.6, 0.2);
-      // the houses (110-350 m): two storeys under hipped or gabled roofs of clay tile, rendered walls, seen between the
+      // the houses (110-350 m): two storeys under hipped or gabled roofs (a brown-grey, no red), rendered walls, seen between the
       // trees' trunks
       this.houses.slice().sort((a, b) => Math.hypot(b.cx - C[0], b.cy - C[1]) - Math.hypot(a.cx - C[0], a.cy - C[1])).forEach((o, i) => {
         const c = Math.cos(o.rot), s = Math.sin(o.rot), P2 = (u, v, z) => [o.cx + u * c + v * s, o.cy - u * s + v * c, z];
@@ -276,7 +281,7 @@
         if (o.hip) roofs.push([P2(hw, -hd, o.h), P2(hw, hd, o.h), ridge[1]], [P2(-hw, hd, o.h), P2(-hw, -hd, o.h), ridge[0]]);
         else { walls[1] = [P2(hw, -hd, 0), P2(hw, hd, 0), P2(hw, hd, o.h), ridge[1], P2(hw, -hd, o.h)]; walls[3] = [P2(-hw, hd, 0), P2(-hw, -hd, 0), P2(-hw, -hd, o.h), ridge[0], P2(-hw, hd, o.h)]; }
         const wst = { tone: 0.02, shade: 0.35, lw: 0.6, edgeA: 0.45 * a, fillCol: OPT.colour ? this.mix(this.mix('#EBDDBF', '#D9C9A6', o.tone), '#C8D2D6', hz * 3) : null, fillA: 0.4, hdir: [0, 0, 1] };
-        const rst = { tone: 0.18, shade: 0.35, lw: 0.6, edgeA: 0.5 * a, fillCol: OPT.colour ? this.mix(this.mix('#A8714E', '#8F7A66', o.tone), '#B8C2C8', 0.2 + hz * 3) : null, fillA: 0.45, hdir: [c, -s, 0] };
+        const rst = { tone: 0.18, shade: 0.35, lw: 0.6, edgeA: 0.5 * a, fillCol: OPT.colour ? this.mix(this.mix('#9A7E66', '#857A6E', o.tone), '#B8C2C8', 0.2 + hz * 3) : null, fillA: 0.45, hdir: [c, -s, 0] };
         E3.solid(walls, wst, 15100 + i * 17);
         roofs.forEach((q, k) => E3.face(q, rst, 15200 + i * 17 + k));
       });
@@ -974,9 +979,9 @@
     // his shadow on the ground: the legs, the coat, the arms and the head, cast toward 293°
     observerShadow(out, hullOf) {
       const P = this.pose; if (!P) return;
-      const lift = p => p; // the shadow falls on the grass (on the ladder's treads it is lost among their own shadows)
+      // the shadow falls on the grass (on the ladder's treads it is lost among their own shadows)
       const segs = [[P.ankleL, P.kneeL, 0.06], [P.kneeL, P.hipL, 0.08], [P.ankleR, P.kneeR, 0.06], [P.kneeR, P.hipR, 0.08], [v3.am(P.pelvis, [0, 0, 1], -0.24), P.shC, 0.21], [P.shL, P.elL, 0.05], [P.elL, P.wrL, 0.045], [P.shR, P.elR, 0.05], [P.elR, P.wrR, 0.045], [P.c7, P.head, 0.09]];
-      segs.forEach(([a, b, r]) => out.push(hullOf([v3.am(lift(a), P.right, -r), v3.am(lift(a), P.right, r), v3.am(lift(b), P.right, r), v3.am(lift(b), P.right, -r)])));
+      segs.forEach(([a, b, r]) => out.push(hullOf([v3.am(a, P.right, -r), v3.am(a, P.right, r), v3.am(b, P.right, r), v3.am(b, P.right, -r)])));
       out.push(hullOf([v3.am(P.head, [0, 0, 1], 0.11, P.right, -0.07), v3.am(P.head, [0, 0, 1], 0.11, P.right, 0.07), v3.am(P.head, [0, 0, 1], -0.1, P.right, 0.07), v3.am(P.head, [0, 0, 1], -0.1, P.right, -0.07)]));
     },
 
@@ -1072,18 +1077,19 @@
     },
 
     /* ---------- leaves: lying on the grass, and a few drifting in low on the breeze ---------- */
-    leafShape(c, a, s, tilt, flip) {
-      // a maple or linden leaf (0.1-0.15 m), seen as it lies or turns: its outline round a midrib, a short stalk
-      const ca = Math.cos(a), sa = Math.sin(a), ct = Math.cos(tilt), st = Math.sin(tilt);
+    // a maple leaf (0.1-0.18 m) in the plane of two world axes u, v (on the grass: east and north; in the air: turned
+    // mostly toward the eye, tumbling), spun by a in that plane: its outline round a midrib, and the stalk
+    leafShape(c, a, s, u, v, flip) {
+      const ca = Math.cos(a), sa = Math.sin(a);
       const L = [[0, 0.62], [0.2, 0.42], [0.42, 0.36], [0.3, 0.16], [0.48, 0.02], [0.28, -0.12], [0.3, -0.34], [0.08, -0.26], [0, -0.42], [-0.08, -0.26], [-0.3, -0.34], [-0.28, -0.12], [-0.48, 0.02], [-0.3, 0.16], [-0.42, 0.36], [-0.2, 0.42]];
-      const W = ([u, v]) => { const x = u * s * flip, y = v * s, X = x * ca - y * sa, Y = x * sa + y * ca; return [c[0] + X, c[1] + Y * ct, c[2] + Y * st]; };
+      const W = ([x0, y0]) => { const x = x0 * s * flip, y = y0 * s, X = x * ca - y * sa, Y = x * sa + y * ca; return v3.am(c, u, X, v, Y); };
       return { outline: L.map(W), rib: [W([0, 0.5]), W([0, -0.42]), W([0, -0.6])] };
     },
     leaves(t) {
       const col = OPT.colour, hy = this.hy;
       this.fallen.forEach(o => {
         const d = E3.depth([o.x, o.y, 0]); if (d < 1) return;
-        const lf = this.leafShape([o.x, o.y, 0.006], o.a, o.s, 0, 1), p = new P(lf.outline.map(E3.proj), true);
+        const lf = this.leafShape([o.x, o.y, 0.006], o.a, o.s, [1, 0, 0], [0, 1, 0], 1), p = new P(lf.outline.map(E3.proj), true);
         if (col) fill(p, this.mix('#E6AE40', '#B47634', o.c), 0.78); else fill(p, INK, 0.25);
         stroke(p, 1, INK, 0.5, 0.4);
       });
@@ -1095,13 +1101,14 @@
         const sway = 0.28 * Math.sin(uu * 2.6 * o.sp + o.ph) * clamp(uu / 0.8);
         const pos = [o.p[0] + vx * uu + sway * 0.6, o.p[1] + vy * uu + sway * 0.3, Math.max(zLand, o.p[2] - fall * uu + 0.06 * Math.sin(uu * 5.2 * o.sp))];
         const landed = u >= tl;
-        const spin = landed ? o.ph + tl * 2.3 * o.sp : o.ph + uu * 2.3 * o.sp, tilt = landed ? 0 : 0.9 + 0.6 * Math.sin(uu * 3.1 * o.sp + o.seed);
+        const spin = landed ? o.ph + tl * 1.4 * o.sp : o.ph + uu * 1.4 * o.sp;
         const d = E3.depth(pos); if (d < 1) return;
-        const lf = this.leafShape(pos, spin, o.s, tilt, Math.sin(uu * 1.7 + o.seed) > 0 ? 1 : -1);
+        const cam = E3.cam(), tb = landed ? 0 : 0.8 * Math.sin(uu * 2.2 * o.sp + o.seed);
+        const lf = landed ? this.leafShape(pos, spin, o.s, [1, 0, 0], [0, 1, 0], 1) : this.leafShape(pos, spin, o.s, cam.R, v3.am([0, 0, 0], cam.U, Math.cos(tb), cam.F, Math.sin(tb)), 1);
         const sp = lf.outline.map(E3.proj), p = new P(sp, true);
         if (sp.every(q => q[0] < -20 || q[0] > PW + 20)) return;
         mask(p);
-        if (col) fill(p, this.mix('#EBB040', '#C07A32', o.c), 0.8); else fill(p, INK, 0.3);
+        if (col) fill(p, this.mix('#F3B53A', '#D08A34', o.c), 0.85); else fill(p, INK, 0.3);
         stroke(p, 1, INK, 0.6, 0.75);
         E3.line(lf.rib, INK, 0.5, 0.6);
         if (!landed) { const s2 = E3.proj(this.sh(pos)), sz = Math.max(1.5, o.s * 0.4 * this.ppm(E3.depth(this.sh(pos)))); disc(s2[0], s2[1], sz, '#2A3A50', 0.18); }
