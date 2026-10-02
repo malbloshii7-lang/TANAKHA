@@ -258,23 +258,47 @@ def seeds_aside():
             g.bit_generator.state = state
 
 
-def finale_r11(sfx, sc, f1):
+def finale_pass(dur):
+    """the King Air's pass as heard, dur seconds centred on its closest approach. The recorded-sound model (foley.py)
+    delays a pass by its length over the speed of sound (5.1 s at its 1.75 km), so it is made long enough for the sound
+    to arrive and cut around the arrival; the synthesized one has no delay"""
+    if not FOLEY:
+        return turboprop_far(dur)
+    delay = np.hypot(1500.0, 900.0 - 1.6) / FOLEY.C  # foley.turboprop_far's path: 1.5 km off, 900 m up; the ear 1.6 m
+    D = dur + 2 * delay + 3.5  # the cut must start after the first sound arrives and end before the clip's fade
+    y = turboprop_far(D).mean(axis=0)
+    c, h = int((D / 2 + delay) * A.SR), int(dur / 2 * A.SR)
+    return y[c - h:c + h]
+
+
+def finale_r11(sfx, music, sc, f0, f1):
     """Revision 11's finale: the King Air's pass, far and faint, carried across the stereo field right to left as it
     crosses the screen; then distant rain on the left, under the cloud, growing in as the veils do and held to the end
-    (the film's fade takes it out). Never over the music: the aircraft sits under the wind, the rain under the pad."""
+    (the film's fade takes it out). Each is set against the finale's own music: the aircraft 15 dB under it, the rain
+    18 dB under it once full, both well above the night wind and never over the music"""
+    ref = A.lufs(music.stereo()[:, int(f0 * A.SR):int(f1 * A.SR)])
     with seeds_aside():
         a0, a1, ac = (sc('finale', x) for x in FIN_AIR)
         half = max(ac - a0, a1 - ac) + 0.8  # heard a little before the nose enters and after the tail leaves
-        y = turboprop_far(2 * half, gain=0.7)
-        y = y.mean(axis=0) if y.ndim == 2 else y
-        a = (np.linspace(0.75, -0.75, len(y)) + 1) * np.pi / 4  # constant-power pan, right to left with the aircraft
-        sfx.add2(y * np.cos(a), y * np.sin(a), ac - half)
+        y = finale_pass(2 * half)
+        t = ac - half + np.arange(len(y)) / A.SR
+        y = y * np.sin(np.pi * np.clip((t - (ac - half)) / (2 * half), 0, 1))  # swells to the centre, fades as it leaves
+        pan = np.clip(0.75 - 1.5 * (t - a0) / (a1 - a0), -0.75, 0.75)  # right to left with the aircraft
+        a = (pan + 1) * np.pi / 4
+        air = np.vstack([y * np.cos(a), y * np.sin(a)])
+        air *= 10 ** ((ref - 15.0 - A.lufs(air)) / 20)
+        sfx.add2(air[0], air[1], ac - half)
         r0 = sc('finale', FIN_RAIN)
         dur = f1 + 3.0 - r0
         rain = A.rain(dur, gain=0.3, density=0.6)
         rain = np.vstack([A.lp(ch, 2600, 2) for ch in rain])  # far off: its high air lost over the distance
-        grow = np.minimum(1.0, np.arange(rain.shape[1]) / (4.2 * A.SR))  # the seven veils fill in over 4.2 s
+        k = int(4.2 * A.SR)  # the seven veils fill in over 4.2 s
+        full = rain[:, k:k + int(4.0 * A.SR)] * np.array([[1.0], [0.55]])
+        rain *= 10 ** ((ref - 18.0 - A.lufs(full)) / 20)
+        grow = np.minimum(1.0, np.arange(rain.shape[1]) / k)
         sfx.add2(rain[0] * grow, rain[1] * grow * 0.55, r0)  # the cloud is on the left of the frame
+    print(f'finale (rev11): the King Air at {A.lufs(air):.1f} LUFS and the rain at {ref - 18.0:.1f}, under the music\'s '
+          f'{ref:.1f} (before the mix)')
 
 
 def diesel_far(dur, gain=1.0):
@@ -621,10 +645,10 @@ def main(cues_path, out_dir):
     # the ring tone as Suhail's gold ring closes; Revision 11 has no Suhail, and the same tone marks the first rain
     music.add(harmonic(D4 + 24, 0.8), sc('finale', FIN_RAIN) if R11 else f0 + 2.467)
     answer(music, f0 + 2.467, D3, [A2, D3], gain=0.45, dur=(1.1, 1.3))
-    if R11:
-        finale_r11(sfx, sc, f1)
     chord(music, [D2, D3, A3, 62, 66, 69, 74], title, f1 - title + 3.0, gain=0.46, bright=2200, attack=0.4, release=4.0)
     music.add(A.timpani(D2 + 12, 0.45), title)
+    if R11:  # after the finale's music is complete: its sounds are set against it
+        finale_r11(sfx, music, sc, f0, f1)
 
     # detent clicks where one circle locks onto the next (the plates' own rings and the irises)
     for sid in ['monsoon', 'pearling', 'centre', 'nation', 'science', 'world', 'gauge']:
