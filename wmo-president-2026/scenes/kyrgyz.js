@@ -683,9 +683,8 @@ scene({
         this.drawClouds(lt);
         this.drawRange(lt);
         this.drawLake(lt);
-        this.drawBoatReflection(lt);
-        this.drawWake(lt);
-        this.drawBoat(lt);
+        // the launch inks in with the rest of the plate
+        R11.faded(easeInOut(prog(lt, -0.45, 0.9)), () => { this.drawBoatReflection(lt); this.drawWake(lt); this.drawBoat(lt); });
         this.drawShore(lt);
       } finally { E3.sunAt(); }
     });

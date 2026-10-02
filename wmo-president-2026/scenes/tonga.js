@@ -291,7 +291,7 @@ const TGP = (() => {
         const ux = sunP ? sunP[0] - p[0] : 0, uy = sunP ? sunP[1] - p[1] : -1, ul = Math.hypot(ux, uy) || 1, sx = ux / ul, sy = uy / ul;
         const low = clamp((p[1] - y0) / Math.max(1, yb - y0)); // 0 at the cloud's top, 1 at its base
         ctx.save(); ctx.beginPath(); path.trace(ctx, 1); ctx.clip();
-        ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.arc(p[0] + sx * rr * 0.5, p[1] + sy * rr * 0.5, rr * 1.0, 0, TAU, true); ctx.clip('evenodd');
+        ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.moveTo(p[0] + sx * rr * 0.5 + rr, p[1] + sy * rr * 0.5); ctx.arc(p[0] + sx * rr * 0.5, p[1] + sy * rr * 0.5, rr * 1.0, 0, TAU, true); ctx.clip('evenodd');
         if (OPT.colour) { ctx.globalAlpha = SA * (0.1 + 0.14 * low) * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#9DB0CA'; ctx.fillRect(p[0] - 1.3 * rr, p[1] - 1.3 * rr, 2.6 * rr, 2.6 * rr); }
         if (!small && low > 0.5) {
           ctx.globalAlpha = SA * 0.11 * low * air; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.5; ctx.beginPath();
@@ -324,7 +324,7 @@ const TGP = (() => {
       if (xs.length) {
         const a0 = Math.min(...xs.map(v => v[0])), a1 = Math.max(...xs.map(v => v[1])), bh = Math.max(2.5, (yb - y0) * 0.2);
         if (OPT.colour) washFade([a0, yb - bh, a1, yb + 0.5], [[0, '#8FA3BE', 0], [1, '#6A7F9D', (small ? 0.3 : 0.48) * air]], 0, 1, clipU);
-        if (!small) hatch(clipU, [a0, yb - bh, a1, yb], 0, 1.7, 1, INK, 0.5, 0.18 * air, 4300 + c.id);
+        if (!small) { const hb2 = bh * 0.55; ctx.save(); ctx.beginPath(); ctx.rect(a0, yb - hb2, a1 - a0, hb2); ctx.clip(); hatch(clipU, [a0, yb - hb2, a1, yb], 0, 1.8, 1, INK, 0.5, 0.15 * air, 4300 + c.id); ctx.restore(); }
         stroke(new P([[a0 + 1.5, yb], [a1 - 1.5, yb]]), 1, INK, small ? 0.45 : 0.7, (small ? 0.2 : 0.4) * air);
       }
     });
