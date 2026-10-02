@@ -340,11 +340,17 @@
           if (OPT.colour) wash(path, shc, 0.22);
           hatch(path, bx, -0.75, 1.7 + 1.4 * lum, 1, INK, 0.55, (0.26 + 0.16 * (1 - lum)) * a, T.seed + li);
           ctx.restore();
-          stroke(path, 1, INK, 0.6, (0.22 + 0.35 * (1 - lum)) * a);
-          const rg = rng(L.s + 7), nm = Math.round(3 + 6 * (1 - lum));
+          // the cluster's edge cut firmly only on its shaded side (the light side left open), a hairline elsewhere
+          stroke(path, 1, INK, 0.5, 0.1 * a);
+          const a0 = Math.atan2(-L2[1], -L2[0]), arc = [];
+          for (let k2 = 0; k2 <= 14; k2++) { const th = a0 - 1.35 + 2.7 * k2 / 14, rad = rr * (0.9 + 0.1 * Math.abs(Math.sin(th * m * 0.5 + L.s))); arc.push([c[0] + rad * Math.cos(th), c[1] + rad * Math.sin(th) * 0.92]); }
+          stroke(new P(arc), 1, INK, 0.7, (0.3 + 0.35 * (1 - lum)) * a);
+          // leaf-marks: small cups in loose rows, closer toward the shade
+          const rg = rng(L.s + 7), nm = Math.round(5 + 8 * (1 - lum));
           for (let k2 = 0; k2 < nm; k2++) {
-            const u = rg() * 2 - 1, v = rg() * 2 - 1; if (u * u + v * v > 0.8) continue;
-            ticks.push([c[0] + u * rr * 0.9, c[1] + v * rr * 0.85, Math.max(1.2, rr * 0.15), (0.25 + 0.4 * (1 - lum)) * a]);
+            const u = rg() * 2 - 1, v = rg() * 2 - 1; if (u * u + v * v > 0.85) continue;
+            const sd = u * L2[0] + v * L2[1];
+            ticks.push([c[0] + u * rr * 0.9, c[1] + v * rr * 0.85, Math.max(1, rr * 0.11), clamp((0.2 + 0.35 * (1 - lum)) * (1 - 0.5 * sd)) * a]);
           }
         });
       });
@@ -993,6 +999,8 @@
       const ax = x, ay = y - 0.7;
       E3.line([[ax, ay, z], [ax, ay, z + 0.22]], INK, this.lw(0.025, d, 0.7, 1.4), 0.9);
       const th = this.cupAngle(t), hub = [ax, ay, z + 0.25], cups = [];
+      // the circle the cups run round, faint (at this distance the turning rotor reads by it)
+      stroke(new P(R11.ring([ax, ay], 0.115, z + 0.25, 28).slice(0, 28).map(E3.proj), true), 1, INK, 0.6, 0.3);
       for (let k = 0; k < 3; k++) { const a = th + k * TAU / 3, e = [ax + 0.09 * Math.cos(a), ay + 0.09 * Math.sin(a), z + 0.25]; cups.push({ e, a, d: E3.depth(e) }); }
       cups.sort((p, q) => q.d - p.d).forEach(({ e, a }) => {
         E3.line([hub, e], INK, this.lw(0.008, d, 0.6, 1), 0.85);

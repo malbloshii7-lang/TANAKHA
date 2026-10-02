@@ -344,36 +344,41 @@ const RegionV = (() => {
     // fast or crowds a neighbour
     if (qa > 0) {
       const found = [];
+      // how well the isobar of level L shows where it crosses the edge (at x) nearest to y0 at analysis time t: it must
+      // slope along the edge, meet it squarely and slide slowly (one running along the edge slides fast); 0 if it does
+      // not cross within 40 px
+      const quality = (t, x, y0, L, yA, yB) => {
+        let best = null, yp = Math.max(yA, y0 - 40), pp = pAt(t, x, yp);
+        for (let y = yp + 2; y <= Math.min(yB, y0 + 40); y += 2) {
+          const p = pAt(t, x, y);
+          if ((pp - L) * (p - L) < 0) { const yc = y - 2 + 2 * (L - pp) / (p - pp); if (best === null || Math.abs(yc - y0) < Math.abs(best - y0)) best = yc; }
+          yp = y; pp = p;
+        }
+        if (best === null) return 0;
+        const yc = best, g = (pAt(t, x, yc + 2) - pAt(t, x, yc - 2)) / 4, ag = Math.abs(g);
+        const gn = Math.abs(pAt(t, x + 2, yc) - pAt(t, x - 2, yc)) / 4, sq = ag / Math.hypot(ag, gn);
+        const g16 = Math.sign(g) * (pAt(t, x, yc + 16) - pAt(t, x, yc - 16)) / 32; // the same way across 32 px
+        const spd = Math.abs((pAt(t + dtk, x, yc) - pAt(t, x, yc)) / dtk * tps) / Math.max(ag, 1e-4);
+        return smooth01((ag - 0.01) / 0.035) * smooth01((sq - 0.4) / 0.35) * smooth01((2.8 - spd) / 2.3) * smooth01((g16 - 0.012) / 0.03);
+      };
+      // ... judged over a window of the analyses' clock (1.6 analyses, a weighted mean), following the crossing, so a
+      // value fades in and out over a third of a second or more and never pops
       const WIN = Array.from({ length: 17 }, (_, n) => [(n - 8) * 0.1, 9 - Math.abs(n - 8)]);
-      const side = (x0, y0, x1, y1, kind) => {
-        const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 2), s = [];
-        for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), y = lerp(y0, y1, i / n); s.push([x, y, atC(V, x, y)]); }
-        for (let i = 1; i < s.length; i++) {
-          const [xa, ya, pa] = s[i - 1], [xb, yb, pb] = s[i];
-          for (let L = Math.ceil(Math.min(pa, pb) / 4) * 4; L <= Math.max(pa, pb); L += 4) {
-            if (L === pa) continue;
-            const f = (L - pa) / (pb - pa), x = lerp(xa, xb, f), y = lerp(ya, yb, f), ends = Math.min(Math.hypot(x - x0, y - y0), Math.hypot(x - x1, y - y1));
-            // the gradient along and across the edge (bicubic, so it changes smoothly): a value shows where the field
-            // slopes along the edge and the isobar meets it squarely (one running along the edge slides fast, so its
-            // value is left out; two meeting where an isobar touches the edge fade together)
-            const ux = (xb - xa) / Math.hypot(xb - xa, yb - ya), uy = (yb - ya) / Math.hypot(xb - xa, yb - ya);
-            // judged over a short window of the analyses' clock (a weighted mean over 1.6 analyses), so a value never pops
+      const side = (x, yA, yB, kind) => {
+        let pp = atC(V, x, yA);
+        for (let y = yA + 2; y <= yB; y += 2) {
+          const p = atC(V, x, y);
+          for (let L = Math.ceil(Math.min(pp, p) / 4) * 4; L <= Math.max(pp, p); L += 4) {
+            if (L === pp) continue;
+            const yc = y - 2 + 2 * (L - pp) / (p - pp);
             let a = 0, ws = 0;
-            WIN.forEach(([o, w]) => {
-              const t = clamp(tk + o, 0, NT - 1 - dtk), g = Math.abs(pAt(t, x + 2 * ux, y + 2 * uy) - pAt(t, x - 2 * ux, y - 2 * uy)) / 4;
-              const gn = Math.abs(pAt(t, x - uy * 2, y + ux * 2) - pAt(t, x + uy * 2, y - ux * 2)) / 4, sq = g / Math.hypot(g, gn);
-              const spd = Math.abs((pAt(t + dtk, x, y) - pAt(t, x, y)) / dtk * tps) / Math.max(g, 1e-4);
-              a += w * smooth01((g - 0.01) / 0.035) * smooth01((sq - 0.4) / 0.35) * smooth01((2.8 - spd) / 2.3); ws += w;
-            });
-            // and where an isobar has only just touched the edge (a pair of crossings born together) it is held back
-            const g0 = Math.abs(pAt(tk, x + 2 * ux, y + 2 * uy) - pAt(tk, x - 2 * ux, y - 2 * uy)) / 4;
-            const g16 = (pAt(tk, x + 16 * ux, y + 16 * uy) - pAt(tk, x - 16 * ux, y - 16 * uy)) / 32 * Math.sign(pb - pa); // the same way across 32 px
-            a = a / ws * smooth01(ends / 24) * smooth01((g0 - 0.006) / 0.03) * smooth01((g16 - 0.012) / 0.03);
-            found.push({ x, y, L, a, kind, dbg: [a] });
+            WIN.forEach(([o, w]) => { a += w * quality(clamp(tk + o, 0, NT - 1 - dtk), x, yc, L, yA, yB); ws += w; });
+            found.push({ x, y: yc, L, a: a / ws * smooth01(Math.min(yc - yA, yB - yc) / 24), kind, dbg: [a / ws] });
           }
+          pp = p;
         }
       };
-      side(CH[0], py(-21), CH[0], G.stampBox[1] - 10, 'left'); side(CH[2], py(-21), CH[2], CH[3] - 4, 'right');
+      side(CH[0], py(-21), G.stampBox[1] - 10, 'left'); side(CH[2], py(-21), CH[3] - 4, 'right');
       const fixed = [10, 0, -10, -20, -30, -40].map(lat => ({ x: CH[0], y: py(lat), kind: 'left' }));
       // a value gives way to a neighbour in proportion to how strongly that neighbour shows (the latitudes always show)
       fixed.forEach(o => { o.a0 = 1; }); found.forEach(o => { o.a0 = o.a; });
@@ -386,7 +391,7 @@ const RegionV = (() => {
       if (window.__RV_FOUND) window.__RV_FOUND.push(found.map(l => [l.L, l.kind, Math.round(l.x), Math.round(l.y), +l.a.toFixed(3), l.dbg.map(v => +v.toFixed(3)), +l.a.toFixed(3)]));
       const gap = (a, b) => Math.max(a[0] - (b[0] + b[2]), b[0] - (a[0] + a[2]), a[1] - (b[1] + b[3]), b[1] - (a[1] + a[3]));
       found.forEach(l => {
-        const a = l.a * l.a * qa; // squared: a value only half-defined shows faintly
+        const a = l.a * qa;
         if (a <= 0.01) return;
         const [x, y, al] = l.kind === 'left' ? [CH[0] + 4, l.y + 3.5, 'left'] : l.kind === 'right' ? [CH[2] - 4, l.y + 3.5, 'right'] : [l.x, CH[3] - 4, 'center'];
         const box = inkBox(String(l.L), x, y, f, 1, 'ltr', al, 0, 2);

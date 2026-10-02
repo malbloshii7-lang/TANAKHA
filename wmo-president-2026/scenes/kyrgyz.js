@@ -338,7 +338,8 @@ scene({
     ctx.fillStyle = colr ? `rgb(${Math.round(lerp(206, 251, u))},${Math.round(lerp(212, 249, u))},${Math.round(lerp(226, 243, u))})` : `rgb(${Math.round(lerp(214, 246, u))},${Math.round(lerp(208, 240, u))},${Math.round(lerp(198, 228, u))})`;
     ctx.beginPath(); r.path.trace(ctx, 1); ctx.fill(); ctx.restore();
     if (u < 0.6 && (bb[2] - bb[0]) * (bb[3] - bb[1]) > 4) {
-      const c0 = E3.centroid(f), a = E3.proj(c0), b = E3.proj([c0[0] + hd[0] * 0.5, c0[1] + hd[1] * 0.5, c0[2] + hd[2] * 0.5]);
+      const t = Math.abs(n[2]) < 0.9 ? [n[1], -n[0], 0] : hd; // a horizontal line in the face (along her, on a side)
+      const c0 = E3.centroid(f), a = E3.proj(c0), b = E3.proj([c0[0] + t[0] * 0.5, c0[1] + t[1] * 0.5, c0[2] + t[2] * 0.5]);
       hatch(r.path, bb, Math.atan2(b[1] - a[1], b[0] - a[0]), 1.9 + 1.5 * u, 1, colr ? '#3A4A66' : INK, 0.5, 0.22 * (1 - u) + 0.06, seed);
     }
     if (edge) stroke(r.path, 1, INK, 0.7, 0.75 * edge);
