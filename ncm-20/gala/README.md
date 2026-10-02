@@ -16,6 +16,17 @@ and keeps that film's engraved-plate language, rebuilt for the room:
   - Suhail stands 12.2° up in the south, just clear of the Etihad Towers.
   - Emirates Palace lies low to the right.
   - Every building is at its true bearing and angular size.
+  - Revision 11 (`?rev11`, 2 October, at the requester's direction) ends instead on a symbolic skyline of the seven
+    emirates, a landmark of each set right to left in the constitutional order: Qasr Al Watan, Emirates Palace, the
+    Etihad and Nation Towers, ADNOC HQ and Aldar HQ; Burj Khalifa (from its OpenStreetMap 3D parts) and Burj Al Arab;
+    Al Hisn Sharjah, Ajman Fort, Umm Al Quwain Fort, Fujairah Fort on its rock, and Dhayah Fort on its hill, unlit, with
+    the Hajar's crest (SRTM, UAE ground only) behind. Each bank has one scale (towers 0.31 px/m, palaces 0.55, Dhayah 1.3,
+    forts 3.4) and stands where one eye 14 m up puts it. Suhail is not drawn. NCM's King Air C90 (the seeding plate's
+    model, without its flare racks) crosses right to left at one altitude with steady navigation lights only, from just
+    after the dissolve until the title begins; behind it, rain falls from a band of engraved cloud onto the Hajar, never on
+    a landmark. The stage holds have no aircraft and the rain loops in the hold's length (`FIN11` in
+    `scenes/night-finale.js`). Burj Khalifa, Burj Al Arab and Aldar HQ, like row 48's buildings, may need their owners'
+    clearance.
 - **One device.** A turning circle carries the film: the star wheel, the compass and wind roses, the radar scope, the
   globe, the gauge's rim, and the gold ring around Suhail at the end.
 - **Protocol.**
