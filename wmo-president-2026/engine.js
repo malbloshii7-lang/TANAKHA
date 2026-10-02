@@ -680,7 +680,8 @@ function light(t, night) {
 /* ---------- the timeline: scenes, their dissolves, and one frame ---------- */
 // Per scene: start, dur, speed (local time rate), night (dark theme), xf (length of the dissolve INTO it),
 // enter: { type: 'fade' | 'dawn' | 'iris', x, y }, cam(t) → camera, draw(t, realT) → art, words(t, realT) → text.
-let XF = 0.5, DURATION = 0, FADE_IN = 2.0, FADE_OUT = OPT.fadeout; // the film ends on the hold loop's first frame unless ?fadeout=s
+// the feed film starts bright on its first frame (the autoplay preview and the thumbnail), so there is no fade in
+let XF = 0.5, DURATION = 0, FADE_IN = 0, FADE_OUT = OPT.fadeout; // the film ends on the hold loop's first frame unless ?fadeout=s
 function visible(t) {
   const out = [];
   SCENES.forEach((s, i) => {

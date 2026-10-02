@@ -7,7 +7,7 @@ const LAY = {
   // (the last right-aligned)
   REG: { top: 50, head: 82, row: 128, rule: 152, x: [64, 276, 762, 1016] },
   PLATE: [54, 176, 1026, 900], // the plate's box on the page (972×724); plates draw in their own coordinates, 0..972 × 0..724
-  WORDS: { x: 64, kicker: 952, head: 1012, body: 1060, lh: 38, maxW: 952 },
+  WORDS: { x: 64, kicker: 948, head: 1016, body: 1068, lh: 42, maxW: 952 }, // sized for a phone: kicker 25, head 64, body 36 px
   SAFE: 1147,
 };
 const PW = LAY.PLATE[2] - LAY.PLATE[0], PH = LAY.PLATE[3] - LAY.PLATE[1];
@@ -55,7 +55,7 @@ function registerRow(row, lt, s, { t0 = 0.5, cps = 30 } = {}) {
   let t = t0;
   row.forEach((cell, i) => {
     if (!cell) return;
-    const size = cell.length > 26 ? 18 : i === 0 && cell.length > 9 ? 19 : 22, s0 = SA;
+    const size = cell.length > 26 ? 19 : i === 0 && cell.length > 9 ? 21 : cell.length > 9 ? 22 : 26, s0 = SA;
     SA = s0 * out; // typeLine sets its own alpha from SA
     try { typeLine(cell, R.x[i], R.row, t, lt, { size, ls: size > 20 ? 3 : size > 18 ? 2 : 1.5, a: 0.9, weight: 600, align: i === 3 ? 'right' : 'left', cps }); } finally { SA = s0; }
     t += cell.length / cps + 0.12;
@@ -73,13 +73,13 @@ function wrapText(text, font, maxW, ls = 0) {
 }
 // one set of words: a kicker (place and date), a headline, and up to two lines. tin/tout in the scene's seconds; ar: the
 // Arabic of each part for the SRT (the screen is English, the Arabic travels as subtitles)
-function wordSet(s, lt, { tin, tout, kicker, head, body, ar = {}, maxLines = 3, headSize = 54, bodySize = 32 }) {
+function wordSet(s, lt, { tin, tout, kicker, head, body, ar = {}, maxLines = 2, headSize = 64, bodySize = 36 }) {
   const Wd = LAY.WORDS, f0 = s.start;
   recText('K', f0 + tin, f0 + tout, ar.kicker, kicker);
   recText('A', f0 + tin, f0 + tout, ar.head, head);
   if (body) recText('B', f0 + tin, f0 + tout, ar.body, body);
   const q = t => easeOut(prog(lt, t, 0.6)) * clamp((tout - lt) / 0.35) * wordsOut(s);
-  small(kicker, Wd.x, Wd.kicker, q(tin), { size: 21, ls: 4, a: 0.72, weight: 600 });
+  small(kicker, Wd.x, Wd.kicker, q(tin), { size: 25, ls: 3, a: 0.78, weight: 600 });
   let hs = headSize;
   const hw = textWidth(head, `700 ${hs}px ${F_HEAD}`, 1);
   if (hw > Wd.maxW) hs = Math.floor(hs * Wd.maxW / hw);
@@ -98,7 +98,15 @@ function wordSet(s, lt, { tin, tout, kicker, head, body, ar = {}, maxLines = 3, 
   });
 }
 
-// ---- photographs, laid on the plate as prints ----
+// a host's name set large on the Region V chart beside its city, on a paper patch so the isobars never cut it
+function hostLabel(text, x, y, p) {
+  if (p <= 0) return;
+  const f = `700 30px ${F_HEAD}`;
+  wordPatch([inkBox(text, x, y, f, 1, 'ltr', 'center', 0, 9)], p);
+  blurIn(off => { setText(f, 1, 'ltr', 'center'); ctx.fillStyle = INK; ctx.fillText(text, x, y + off * 0.2); }, p, 5, 6);
+}
+
+// ---- photographs, laid on the plate as prints (unused: the requester chose a film without photographs) ----
 // the office's own photographs (photos/<name>.jpg): shown as they are, toned a little toward the paper, cropped to the
 // print, never altered beyond tone and crop. A print whose photograph has not arrived is left out (with ?slots, its
 // place is marked).

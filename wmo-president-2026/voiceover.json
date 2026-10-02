@@ -1,61 +1,61 @@
 {
- "about": "The voice-over: H.E. Dr Abdulla Al Mandous reads it himself, in English, in the first person. Each line starts at `in` (film seconds) and must end by `in + max`; score.py places his recorded takes there (vo/line-N.wav), lowers the music under them and writes the voice SRTs (English as spoken, Arabic translated). Every fact is in SOURCES.md.",
+ "about": "The narration of the feed cut (59.5 s): a narrator, in the third person, read by an AI voice (Higgsfield Seed Audio, preset voice Holden), at the requester's choice; the President does not appear in the film and an AI voice does not speak as him. Each line starts at `in` (film seconds) and must end by `in + max`; score.py places the takes there (vo/line-N.wav, cut from the one generated read), lowers the music under them and writes the voice captions (English as spoken, Arabic translated). Every fact is in SOURCES.md.",
  "lines": [
   {
    "n": 1,
    "beat": "title",
-   "in": 0.8,
-   "max": 5.6,
+   "in": 0.3,
+   "max": 4.3,
    "en": "Four weeks. Three of WMO's regions. Six countries.",
    "ar": "أربعة أسابيع. ثلاثة من أقاليم المنظمة. ستّ دول."
   },
   {
    "n": 2,
    "beat": "kyrgyz",
-   "in": 8.2,
-   "max": 14.5,
-   "en": "On the shore of Lake Issyk-Kul, Kyrgyzhydromet marked a century of service. In Bishkek, we spoke about the glaciers, the dust storms, and the rivers people depend on.",
-   "ar": "على ضفاف بحيرة إيسيك-كول، احتفلت هيئة الأرصاد الجوية القيرغيزية بقرنٍ من العطاء. وفي بيشكيك، تحدّثنا عن الأنهار الجليدية، والعواصف الترابية، والأنهار التي يعتمد عليها الناس."
+   "in": 4.6,
+   "max": 8.6,
+   "en": "At Lake Issyk-Kul, Kyrgyzstan's weather service turned one hundred. In Bishkek: glaciers, dust storms and rivers.",
+   "ar": "على ضفاف بحيرة إيسيك-كول، أتمّت هيئة الأرصاد الجوية القيرغيزية مئة عام. وفي بيشكيك: الأنهار الجليدية، والعواصف الترابية، والأنهار."
   },
   {
    "n": 3,
    "beat": "tonga",
-   "in": 25.2,
-   "max": 14.5,
-   "en": "In Nukuʻalofa, Pacific ministers adopted a new declaration for stronger national services and early warnings. I was honoured to be received by His Royal Highness the Crown Prince of Tonga.",
-   "ar": "في نوكوألوفا، اعتمد وزراء المحيط الهادئ إعلاناً جديداً لتعزيز المرافق الوطنية والإنذار المبكر. وتشرّفتُ باستقبال صاحب السمو الملكي ولي عهد تونغا."
+   "in": 14.5,
+   "max": 10.0,
+   "en": "In Tonga, ministers adopted a new declaration for early warnings, and His Royal Highness the Crown Prince received the WMO President.",
+   "ar": "في تونغا، اعتمد الوزراء إعلاناً جديداً للإنذار المبكر، واستقبل صاحب السمو الملكي ولي العهد رئيسَ المنظمة العالمية للأرصاد الجوية."
   },
   {
    "n": 4,
    "beat": "regionv",
-   "in": 42.2,
-   "max": 14.5,
-   "en": "In Wellington, Melbourne and Jakarta, I visited the rooms where forecasts and warnings are made, around the clock: for weather, for climate, and for tsunamis.",
-   "ar": "في ولينغتون وملبورن وجاكرتا، زرتُ الغرف التي تُصنع فيها التنبؤات والإنذارات على مدار الساعة: للطقس، وللمناخ، وللتسونامي."
+   "in": 25.6,
+   "max": 9.4,
+   "en": "In Wellington, Melbourne and Jakarta: the forecast and warning rooms that never close.",
+   "ar": "في ولينغتون وملبورن وجاكرتا: غرف التنبؤ والإنذار التي لا تُغلق أبداً."
   },
   {
    "n": 5,
    "beat": "bucharest",
-   "in": 59.2,
-   "max": 14.5,
-   "en": "And in Bucharest, with Europe's services, we turned to the work ahead: early warnings for all, and the plan that will guide WMO from 2028.",
-   "ar": "وفي بوخارست، ومع المرافق الأوروبية، اتّجهنا إلى العمل المقبل: الإنذار المبكر للجميع، والخطة التي ستوجّه المنظمة بدءاً من عام ⁦2028⁩."
+   "in": 36.6,
+   "max": 9.4,
+   "en": "In Bucharest, Europe's services turned to the work ahead: early warnings for all.",
+   "ar": "في بوخارست، اتّجهت المرافق الأوروبية إلى العمل المقبل: الإنذار المبكر للجميع."
   },
   {
    "n": 6,
    "beat": "close",
-   "in": 75.6,
-   "max": 12.8,
-   "en": "Every warning begins with a national service, and with people who never stop watching the sky. Our aim: early warnings for everyone on Earth by the end of 2027.",
-   "ar": "كلّ إنذارٍ يبدأ من مرفقٍ وطني، ومن أناسٍ لا يكفّون عن مراقبة السماء. هدفنا: إنذارٌ مبكر لكلّ إنسانٍ على وجه الأرض بحلول نهاية عام ⁦2027⁩."
+   "in": 50.7,
+   "max": 5.4,
+   "en": "Early warnings for everyone on Earth, by the end of 2027.",
+   "ar": "إنذارٌ مبكر لكلّ إنسانٍ على وجه الأرض، بحلول نهاية عام ⁦2027⁩."
   },
   {
    "n": 7,
    "beat": "close",
-   "in": 89.2,
-   "max": 3.2,
-   "en": "To all our hosts: thank you.",
-   "ar": "إلى جميع مضيفينا: شكراً لكم."
+   "in": 56.4,
+   "max": 2.6,
+   "en": "With thanks to every host.",
+   "ar": "مع الشكر لجميع المضيفين."
   }
  ]
 }
