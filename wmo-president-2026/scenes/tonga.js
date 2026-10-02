@@ -292,10 +292,10 @@ const TGP = (() => {
         const low = clamp((p[1] - y0) / Math.max(1, yb - y0)); // 0 at the cloud's top, 1 at its base
         ctx.save(); ctx.beginPath(); path.trace(ctx, 1); ctx.clip();
         ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.arc(p[0] + sx * rr * 0.5, p[1] + sy * rr * 0.5, rr * 1.0, 0, TAU, true); ctx.clip('evenodd');
-        if (OPT.colour) { ctx.globalAlpha = SA * (0.14 + 0.16 * low) * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#9DB0CA'; ctx.fillRect(p[0] - rr, p[1] - rr, 2 * rr, 2 * rr); }
-        if (!small && low > 0.35) {
-          ctx.globalAlpha = SA * 0.14 * low * air; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.5; ctx.beginPath();
-          for (let yy = p[1] - rr; yy < p[1] + rr; yy += 1.9) { ctx.moveTo(p[0] - rr, yy); ctx.lineTo(p[0] + rr, yy); }
+        if (OPT.colour) { ctx.globalAlpha = SA * (0.1 + 0.14 * low) * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#9DB0CA'; ctx.fillRect(p[0] - 1.3 * rr, p[1] - 1.3 * rr, 2.6 * rr, 2.6 * rr); }
+        if (!small && low > 0.5) {
+          ctx.globalAlpha = SA * 0.11 * low * air; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.5; ctx.beginPath();
+          for (let yy = p[1] - 1.2 * rr; yy < p[1] + 1.2 * rr; yy += 1.9) { ctx.moveTo(p[0] - 1.3 * rr, yy); ctx.lineTo(p[0] + 1.3 * rr, yy); }
           ctx.stroke();
         }
         ctx.restore();
@@ -305,7 +305,7 @@ const TGP = (() => {
         o.pts.concat([o.pts[0]]).forEach(q => {
           const front = items.slice(i + 1).some(m => inside(q, m)), back = items.slice(0, i).some(m => inside(q, m));
           if (!front && !back) { if (!cur) { cur = []; runs.push(cur); } cur.push(q); } else cur = null;
-          if (!front && back) { if (!curF) { curF = []; folds.push(curF); } curF.push(q); } else curF = null;
+          if (!front && back && q[1] < p[1] - rr * 0.15) { if (!curF) { curF = []; folds.push(curF); } curF.push(q); } else curF = null;
         });
         o.runs = runs; o.folds = folds;
       });

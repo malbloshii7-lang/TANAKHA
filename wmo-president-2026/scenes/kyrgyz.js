@@ -507,8 +507,8 @@ scene({
         const p = [stern[0] + a[0] * s2, stern[1] + a[1] * s2], cl = (0.55 * lam + 0.02 * s2) * (0.75 + 0.5 * this.hash(k * 2.7 + sg));
         // inward along the crest (toward her track) and a little outward of the cusp line, broken in two
         const pa = [p[0] - e[0] * cl * 0.75, p[1] - e[1] * cl * 0.75], pm = [p[0] - e[0] * cl * 0.18, p[1] - e[1] * cl * 0.18], pm2 = [p[0] - e[0] * cl * 0.05, p[1] - e[1] * cl * 0.05], pb = [p[0] + e[0] * cl * 0.25, p[1] + e[1] * cl * 0.25];
-        seg(pa, pm, al * 0.8, light, 1.0);
-        if (this.hash(k * 1.3 + sg) > 0.3) seg(pm2, pb, al * 0.6, light, 0.9);
+        seg(pa, pm, Math.min(1, al * 1.05), light, 1.1);
+        if (this.hash(k * 1.3 + sg) > 0.3) seg(pm2, pb, al * 0.8, light, 1.0);
         const tr = 0.22 * lam + 0.3;
         seg([pa[0] + nrm[0] * tr, pa[1] + nrm[1] * tr], [pb[0] + nrm[0] * tr, pb[1] + nrm[1] * tr], al * 0.75, dark, 0.9);
       }
