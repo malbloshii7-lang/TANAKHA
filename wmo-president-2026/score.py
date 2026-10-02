@@ -3,7 +3,10 @@
 no narration. 93.0 s, placed on the cut's own grid: a bar of 3.4 s (70.6 BPM) from 0.2 s, so every beat of the film
 (7.0, 24.0, 41.0, 58.0, 75.0 s) starts on a downbeat, and the name at 88.8 s falls on the last cadence (bar 26, 88.6 s).
 
-    python3 score.py out/score.wav --samples VSCO --foley DIR
+    python3 score.py out/score.wav --samples VSCO --foley DIR [--vo vo/]
+
+--vo: the President's own voice-over (VOICEOVER.md), placed on its cues with the music lowered under it, and the voice
+captions (out/four-weeks-three-regions.voice.{en,ar}.srt) written from the times his lines actually run.
 
 VSCO: a checkout of https://github.com/sgossner/VSCO-2-CE (the folders ../ncm-20/gala/sampler.py lists).
 DIR: the checkouts ../ncm-20/gala/foley.py lists (blanket, noisekun, moodist, vcsl), with Moodist's nature/wind-in-trees.mp3
@@ -164,12 +167,62 @@ def places(F):
     return out
 
 
+def voice(F, vo_dir, n_total):
+    """the President's recorded lines (vo/line-N.*, any format ffmpeg reads), each trimmed of its silence, cleaned (a
+    high-pass under his voice's fundamental) and set to one level, placed on its cue in voiceover.json; and the duck: how
+    far the music and the places fall under him (9 dB, easing down 0.3 s before a line and back up over 0.8 s after it).
+    Returns the voice track, the duck gain and the cues actually used (start, end, line)"""
+    import glob
+    import json
+    cues = json.load(open(os.path.join(HERE, 'voiceover.json')))['lines']
+    track = np.zeros((2, n_total))
+    duck = np.ones(n_total)
+    used = []
+    for c in cues:
+        files = sorted(glob.glob(os.path.join(vo_dir, f"line-{c['n']}.*")))
+        if not files:
+            raise SystemExit(f"--vo: no recording for line {c['n']} in {vo_dir}")
+        x = F.decode(files[0])
+        m = np.mean(np.abs(x), axis=0)
+        env = np.convolve(m, np.ones(480) / 480, 'same')
+        thr = env.max() * 10 ** (-38 / 20)
+        on = np.nonzero(env > thr)[0]
+        x = x[:, max(0, on[0] - int(0.05 * A.SR)):min(x.shape[1], on[-1] + int(0.15 * A.SR))]
+        x = F.filt(x, hp=80)
+        x = F.fades(x, 0.01, 0.08)
+        x = to_lufs(x, -18.0)
+        dur = x.shape[1] / A.SR
+        if dur > c['max'] + 0.3:
+            print(f"  line {c['n']}: {dur:.1f} s, longer than its {c['max']:.1f} s slot")
+        i = int(c['in'] * A.SR)
+        k = min(x.shape[1], n_total - i)
+        track[:, i:i + k] += x[:, :k]
+        a0, a1 = int((c['in'] - 0.3) * A.SR), int((c['in'] + dur + 0.8) * A.SR)
+        duck[max(0, a0):min(n_total, a1)] = 0.0
+        used.append((c['in'], c['in'] + dur, c))
+    # the duck's shape: 0 under a line, 1 between; smoothed, then mapped to gain (-9 dB under a line)
+    w = int(0.35 * A.SR)
+    sm = np.convolve(duck, np.ones(w) / w, 'same')
+    return track, 10 ** (-9 * (1 - sm) / 20), used
+
+
+def voice_srt(used, out_dir):
+    """the captions of what he says, in English and in Arabic, on the times his lines actually run"""
+    tc = lambda t: f'{int(t // 3600):02d}:{int(t // 60) % 60:02d}:{int(t) % 60:02d},{int(round(t * 1000)) % 1000:03d}'
+    for lang in ('en', 'ar'):
+        body = '\n'.join(f"{k + 1}\n{tc(t0)} --> {tc(t1 + 0.3)}\n{c[lang]}\n" for k, (t0, t1, c) in enumerate(used))
+        f = os.path.join(out_dir, f'four-weeks-three-regions.voice.{lang}.srt')
+        open(f, 'w').write(body)
+        print('wrote', f)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('out')
     ap.add_argument('--samples', required=True)
     ap.add_argument('--foley', required=True)
     ap.add_argument('--lufs', type=float, default=-14.0)
+    ap.add_argument('--vo', help='a folder of the voice-over takes, line-1 ... line-7 (VOICEOVER.md)')
     a = ap.parse_args()
     import sampler
     import foley
@@ -182,6 +235,10 @@ def main():
     # the music sits at the front; the places at their own levels under it (set above), then the whole is mastered
     mix = to_lufs(mus, -16.5) + amb
     n = mix.shape[1]
+    if a.vo:
+        vo, g, used = voice(foley, a.vo, n)
+        mix = mix * g + vo
+        voice_srt(used, os.path.dirname(os.path.abspath(a.out)))
     fade = int(2.5 * A.SR)
     mix[:, n - fade:] *= np.cos(np.linspace(0, np.pi / 2, fade)) ** 2
     mix = A.master(mix, target_lufs=a.lufs, ceiling_db=-1.0)
