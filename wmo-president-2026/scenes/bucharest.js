@@ -103,10 +103,13 @@
       }
       // fallen leaves lying on the grass (more of them against the fence)
       this.fallen = Array.from({ length: 80 }, () => { const e = r() < 0.35; return { x: e ? -12.7 + r() * 0.6 : -12 + r() * 24, y: e ? -12 + r() * 24 : -12 + r() * 24, a: r() * TAU, s: 0.1 + r() * 0.06, c: r() }; });
-      // leaves blown in on the north breeze, low over the garden: [start time, start point]; each drifts south on the
-      // breeze, falls at about 0.4 m/s, flutters and turns, and lies where it lands
-      this.drift = [[-2.2, [3.4, 13.4, 2.25]], [0.4, [6.4, 12.6, 1.95]], [3.0, [1.2, 13.9, 2.3]], [5.6, [5.6, 10.2, 2.05]], [8.6, [4.6, 9.2, 2.1]], [11.4, [5.8, 9.6, 1.9]], [13.6, [3.9, 8.8, 2.2]]]
-        .map(([t0, p], i) => ({ t0, p, s: 0.11 + 0.035 * r(), c: r(), ph: r() * TAU, sp: 0.7 + 0.5 * r(), lat: (r() - 0.5) * 0.6, seed: i }));
+      // leaves blown in on the breeze from the trees behind the eye's right: each comes in past the frame's right edge,
+      // 5-8 m off and 2.2-2.6 m up, drifts on the breeze at 0.9 m/s toward 200° (the light air near the ground under a 10
+      // m wind of 2 m/s; from 020°, inside LRBS's 320°-040°), falls at 0.36 m/s, flutters and turns, and lies where it
+      // lands: [time it comes in, distance, height]. They cross the frame in 5-7 s; one that comes in after lt 9.4 passes
+      // behind the print and comes out at its left edge
+      this.drift = [[-1.9, 6.5, 2.5], [0.9, 5.0, 2.2], [3.1, 8.0, 2.6], [5.2, 6.0, 2.3], [7.4, 7.5, 2.6], [9.6, 5.5, 2.4], [11.8, 7.0, 2.5], [13.9, 6.0, 2.2]]
+        .map(([t0, de, ze], i) => { const az = (this.HEAD + 27.5) * D2R; return { t0, p: [this.C0[0] + de * Math.sin(az), this.C0[1] + de * Math.cos(az), ze], s: 0.13 + 0.03 * r(), c: r(), ph: 1.0 + i * 0.7, sp: 0.8 + 0.25 * r(), seed: i }; });
       this.initObserver();
     },
     initTrees(r) {
@@ -141,7 +144,7 @@
           // clusters spread evenly over the crown (a jittered Fibonacci sphere), each a rounded mass of leaves
           const zz = 1 - 2 * (j + 0.5) / N + (q() - 0.5) * 0.04, rr0 = Math.sqrt(Math.max(0, 1 - zz * zz)), ph = j * 2.39996 + (q() - 0.5) * 0.5;
           const ux = rr0 * Math.cos(ph), uy = rr0 * Math.sin(ph), uz = zz, k = 0.7 + 0.22 * q();
-          lobes.push({ p: [x + R * k * ux, y + R * k * uy, zc + Rv * k * uz], n: v3.norm([ux, uy, uz + 0.25]), rr: (0.2 + 0.1 * q()) * R, s: q() * 1000 | 0, deep: k, low: uz, tw: q() });
+          lobes.push({ p: [x + R * k * ux, y + R * k * uy, zc + Rv * k * uz], n: v3.norm([ux, uy, uz + 0.25]), rr: (0.15 + 0.16 * q() * q()) * R + 0.04 * R, s: q() * 1000 | 0, deep: k, low: uz, tw: q() });
         }
         const turn = g(K.turn);
         this.trees.push({ x, y, h, R, Rv, zc, base, kind, lobes, lit: this.mix(K.g[0], K.lit, turn), sh: this.mix(K.g[1], K.sh, turn), trunk: 0.2 + 0.16 * q(), lean: (q() - 0.5) * 0.05, seed: q() * 1e6 | 0 });
@@ -279,7 +282,7 @@
     /* ---------- the grounds' lawn beyond the garden, and a low hedge at their edge ---------- */
     lawn() {
       const hy = this.hy;
-      if (OPT.colour) washFade([0, hy - 1, PW, PH], [[0, '#97AE6A', 0.45], [0.2, '#8CB058', 0.52], [1, '#82A84C', 0.58]], 0, 1);
+      if (OPT.colour) washFade([0, hy - 1, PW, PH], [[0, '#93B066', 0.48], [0.2, '#86B652', 0.56], [1, '#79B044', 0.62]], 0, 1);
       // the hedge, about 1.6 m, along the grounds' west and south edges (their line from OSM's outline of the grounds)
       [[[-36, -62], [-36, 74]], [[-36, -62], [12, -62]]].forEach((hl, k) => {
         const top = [], bot = [];
@@ -322,37 +325,46 @@
         const lit = this.mix(T.lit, '#C4CCC8', hz * 3), shc = this.mix(T.sh, '#A9B4BC', hz * 3);
         // the light's direction on the plate (the sun is behind the eye: it comes from the upper left)
         const cam = E3.cam(), Ls = [E3.dot(S, cam.R), -E3.dot(S, cam.U)], ll = Math.hypot(Ls[0], Ls[1]), L2 = [Ls[0] / ll, Ls[1] / ll];
-        T.lobes.map(L => ({ L, d: E3.depth(L.p) })).sort((x, y) => y.d - x.d).forEach(({ L, d: dl }, li) => {
-          const c = E3.proj(L.p), rr = L.rr * this.ppm(dl);
-          if (rr < 1) return;
-          // a cluster's light: turned to the sun, out at the crown's surface rather than deep in it, above the crown's
-          // middle rather than under it
-          const lum = clamp((0.2 + 0.85 * Math.max(0, E3.dot(L.n, S)) + 0.1 * L.n[2]) * (0.55 + 0.45 * clamp(L.deep)) * (0.82 + 0.18 * clamp(L.low + 1)));
-          const pts = [], m = 7 + (L.s % 3);
-          for (let k = 0; k < 40; k++) { const th = k / 40 * TAU, rad = rr * (0.9 + 0.1 * Math.abs(Math.sin(th * m * 0.5 + L.s))); pts.push([c[0] + rad * Math.cos(th), c[1] + rad * Math.sin(th) * 0.92]); }
-          const path = new P(pts, true), bx = [c[0] - rr - 2, c[1] - rr - 2, c[0] + rr + 2, c[1] + rr + 2];
+        // each cluster: where it lies on the plate, its outline, and its light (turned to the sun, out at the crown's
+        // surface rather than deep in it, above the crown's middle rather than under it)
+        const lobes = T.lobes.map(L => {
+          const dl = E3.depth(L.p), c = E3.proj(L.p), rr = L.rr * this.ppm(dl), m = 7 + (L.s % 3), pts = [];
+          for (let k = 0; k < 36; k++) { const th = k / 36 * TAU, rad = rr * (0.9 + 0.1 * Math.abs(Math.sin(th * m * 0.5 + L.s))); pts.push([c[0] + rad * Math.cos(th), c[1] + rad * Math.sin(th) * 0.92]); }
+          const lum = clamp((0.2 + 0.85 * Math.max(0, E3.dot(L.n, S)) + 0.1 * L.n[2]) * (0.6 + 0.4 * clamp((L.deep - 0.7) / 0.22)) * (0.8 + 0.2 * clamp(L.low + 1)));
+          return { L, dl, c, rr, m, path: new P(pts, true), lum };
+        }).filter(o => o.rr >= 1);
+        // the crown's body in shade first: every cluster's outline together, washed in the shade colour and ruled close
+        const body = lobes.map(o => o.path), cb = [pc[0] - rpx, pc[1] - rpx * 1.3, pc[0] + rpx, pc[1] + rpx * 1.3];
+        mask(body);
+        if (OPT.colour) wash(body, shc, 0.8);
+        hatch(body, cb, -0.75, 1.7, 1, INK, 0.55, 0.36 * a, T.seed + 1);
+        hatch(body, cb, 0.55, 2.4, 1, INK, 0.5, 0.16 * a, T.seed + 2);
+        stroke(new P(this.hull(lobes.flatMap(o => o.path.pts))), 0, INK, 0.5, 0);
+        // then the clusters the sun reaches, far to near; between them the shade stays open (the crown's depth)
+        lobes.filter(o => o.lum > 0.12 + 0.12 * o.L.tw).sort((x, y) => y.dl - x.dl).forEach(({ L, c, rr, m, path, lum }, li) => {
+          const bx = [c[0] - rr - 2, c[1] - rr - 2, c[0] + rr + 2, c[1] + rr + 2];
           mask(path);
           const tint = this.mix(lit, shc, 0.12 * L.tw);
-          if (OPT.colour) wash(path, this.mix(shc, tint, 0.45 + 0.55 * lum), 0.74);
-          // the shaded side of the cluster: the part of it a disc moved toward the light does not cover
-          const k = 0.22 + 0.6 * (1 - lum), off = new P(Array.from({ length: 28 }, (_, j) => { const th = j / 28 * TAU; return [c[0] + L2[0] * k * rr + rr * 0.98 * Math.cos(th), c[1] + L2[1] * k * rr + rr * 0.98 * Math.sin(th)]; }), true);
+          if (OPT.colour) wash(path, this.mix(shc, tint, 0.3 + 0.7 * lum), 0.74);
+          // its own shaded side: the part a disc moved toward the light does not cover, ruled
+          const k = 0.12 + 0.55 * (1 - lum), off = new P(Array.from({ length: 28 }, (_, j) => { const th = j / 28 * TAU; return [c[0] + L2[0] * k * rr + rr * 0.98 * Math.cos(th), c[1] + L2[1] * k * rr + rr * 0.98 * Math.sin(th)]; }), true);
           ctx.save(); ctx.beginPath(); path.trace(ctx, 1); off.trace(ctx, 1); ctx.clip('evenodd');
-          if (OPT.colour) wash(path, shc, 0.22);
-          hatch(path, bx, -0.75, 1.7 + 1.4 * lum, 1, INK, 0.55, (0.26 + 0.16 * (1 - lum)) * a, T.seed + li);
+          if (OPT.colour) wash(path, shc, 0.2);
+          hatch(path, bx, -0.75, 1.8 + 1.2 * lum, 1, INK, 0.5, (0.24 + 0.14 * (1 - lum)) * a, T.seed + li);
           ctx.restore();
-          // the cluster's edge cut firmly only on its shaded side (the light side left open), a hairline elsewhere
-          stroke(path, 1, INK, 0.5, 0.1 * a);
+          // the edge cut firmly only on the shaded side, the light side left open
           const a0 = Math.atan2(-L2[1], -L2[0]), arc = [];
           for (let k2 = 0; k2 <= 14; k2++) { const th = a0 - 1.35 + 2.7 * k2 / 14, rad = rr * (0.9 + 0.1 * Math.abs(Math.sin(th * m * 0.5 + L.s))); arc.push([c[0] + rad * Math.cos(th), c[1] + rad * Math.sin(th) * 0.92]); }
-          stroke(new P(arc), 1, INK, 0.7, (0.3 + 0.35 * (1 - lum)) * a);
-          // leaf-marks: small cups in loose rows, closer toward the shade
-          const rg = rng(L.s + 7), nm = Math.round(5 + 8 * (1 - lum));
+          stroke(new P(arc), 1, INK, 0.7, (0.3 + 0.3 * (1 - lum)) * a);
+          const rg = rng(L.s + 7), nm = Math.round(4 + 7 * (1 - lum));
           for (let k2 = 0; k2 < nm; k2++) {
             const u = rg() * 2 - 1, v = rg() * 2 - 1; if (u * u + v * v > 0.85) continue;
             const sd = u * L2[0] + v * L2[1];
             ticks.push([c[0] + u * rr * 0.9, c[1] + v * rr * 0.85, Math.max(1, rr * 0.11), clamp((0.2 + 0.35 * (1 - lum)) * (1 - 0.5 * sd)) * a]);
           }
         });
+        // the crown's silhouette, light
+        lobes.forEach(o => { if (o.lum <= 0.12 + 0.12 * o.L.tw) stroke(o.path, 1, INK, 0.45, 0.12 * a); });
       });
       const bands = [[], [], [], []];
       ticks.forEach(k => bands[Math.min(3, Math.floor(k[3] * 4))].push(k));
@@ -390,7 +402,7 @@
     garden(t) {
       const Fz = this.FENCE;
       const g = this.poly([[-Fz, -Fz, 0], [Fz, -Fz, 0], [Fz, Fz, 0], [-Fz, Fz, 0]]);
-      if (g && OPT.colour) wash(g, '#86B04A', 0.3);
+      if (g && OPT.colour) wash(g, '#7DB646', 0.3);
       this.PATHS.forEach(([a, b], k) => {
         const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), ex = dx / L * 0.2, ey = dy / L * 0.2, nx = -ey, ny = ex;
         const q = this.poly([[a[0] - nx - ex, a[1] - ny - ey, 0], [b[0] - nx + ex, b[1] - ny + ey, 0], [b[0] + nx + ex, b[1] + ny + ey, 0], [a[0] + nx - ex, a[1] + ny - ey, 0]]);
@@ -586,8 +598,10 @@
         this.TREADS.forEach(([v, z], i) => E3.solid(E3.box(x - w, x + w, yn + v - 0.1, yn + v + 0.1, z - 0.03, z), { tone: 0.12, shade: 0.5, lw: 0.9, edgeA: 0.85, fillCol: col ? '#B98A55' : null, fillA: 0.5 }, 15780 + i));
       } else rail(1);
     },
-    // the door over the beat (radians, west leaf then east): shut until the observer's hand is on it
-    doorOpen(t) { return [1.85 * easeInOut(prog(t, 8.0, 0.8)), 1.85 * easeInOut(prog(t, 9.15, 0.8))]; },
+    // the door over the beat (radians, west leaf then east): shut until the observer's hand is on it; the west leaf drawn
+    // open to 115°, the east pushed through its first 60° and swinging on to 165°, back along the box's side, so the
+    // doorway stands clear to the eye (and the thermometers show beside him)
+    doorOpen(t) { return [2.0 * easeInOut(prog(t, 8.0, 0.85)), 1.05 * easeInOut(prog(t, 9.15, 0.55)) + 1.83 * easeOut(prog(t, 9.62, 1.1))]; },
 
     /* ---------- the observer ---------- */
     // the walk, from footsteps: he comes in from the gate down the east path at 1.3 m/s (steps of 0.65 m, two a
@@ -716,7 +730,7 @@
       const side = (s, k) => v3.am(s === 1 ? shR : shL, [0, 0, -1], 0.53, fwd, k, right, 0.06 * s);
       const walkR = side(1, 0.42 * swing / 2 + 0.03), walkL = side(-1, -0.12 * swing / 2 + 0.06);
       const restR = side(1, 0.04), restL = side(-1, 0.07);
-      const latchW = v3.am(this.latch(sc, -1, open[0]), fwd, -0.03), latchE = v3.am(this.latch(sc, 1, Math.min(open[1], 1.05)), fwd, -0.03);
+      const latchW = v3.am(this.latch(sc, -1, open[0]), fwd, -0.03), latchE = v3.am(this.latch(sc, 1, Math.min(open[1], 1.0)), fwd, -0.03);
       const sill = [sc.x - 0.16, sc.y + BOX.hy + 0.07, BOX.z0 + 0.05];
       // the register raised before his chest, tilted toward his face; the pencil's point moving over it in short lines
       const chest = v3.am(P.shC, spine, -0.2, fwd, 0.3, right, -0.04);
@@ -830,6 +844,7 @@
       const halfPlane = (s0) => { const big = 4 * half + 400, o = [mc[0] + Np[0] * s0, mc[1] + Np[1] * s0], d = [Np[0] * dark, Np[1] * dark], t = [-Np[1], Np[0]];
         return new P([[o[0] + t[0] * big, o[1] + t[1] * big], [o[0] - t[0] * big, o[1] - t[1] * big], [o[0] - t[0] * big + d[0] * big, o[1] - t[1] * big + d[1] * big], [o[0] + t[0] * big + d[0] * big, o[1] + t[1] * big + d[1] * big]], true); };
       Object.values(groups).forEach(({ m, paths }, gi) => {
+        if (!OPT.colour) wash(paths, INK, m.mono || 0);
         if (OPT.colour) {
           wash(paths, m.col, m.a);
           if (prof.length > 1) {
@@ -861,12 +876,12 @@
       if (contour) { ctx.save(); ctx.globalAlpha = SA * 0.85; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = contour; ctx.lineCap = 'round'; ctx.beginPath(); segs.forEach(([a, b]) => { const p = E3.proj(a), r = E3.proj(b); ctx.moveTo(p[0], p[1]); ctx.lineTo(r[0], r[1]); }); ctx.stroke(); ctx.restore(); }
     },
     MAT: {
-      coat: { id: 'coat', col: '#22324A', a: 0.66, sa: 0.5, h: [[3.4, 0.08], [1.9, 0.3]], x: [2.4, 0.18] },
-      trousers: { id: 'tr', col: '#2C2C33', a: 0.6, sa: 0.45, h: [[3.2, 0.08], [1.9, 0.3]], x: [2.4, 0.16] },
-      shoe: { id: 'sh', col: '#231D19', a: 0.78, sa: 0.3, h: [null, [1.6, 0.34]] },
-      sole: { id: 'so', col: '#1C1714', a: 0.85, sa: 0.1, h: [null, null] },
-      skin: { id: 'sk', col: '#CF9670', a: 0.42, sa: 0.32, h: [null, [2.4, 0.16]] },
-      hair: { id: 'hr', col: '#4A3E35', a: 0.62, sa: 0.35, h: [[2.4, 0.14], [1.6, 0.3]] },
+      coat: { id: 'coat', mono: 0.42, col: '#22324A', a: 0.66, sa: 0.5, h: [[3.4, 0.08], [1.9, 0.3]], x: [2.4, 0.18] },
+      trousers: { id: 'tr', mono: 0.38, col: '#2C2C33', a: 0.6, sa: 0.45, h: [[3.2, 0.08], [1.9, 0.3]], x: [2.4, 0.16] },
+      shoe: { id: 'sh', mono: 0.55, col: '#231D19', a: 0.78, sa: 0.3, h: [null, [1.6, 0.34]] },
+      sole: { id: 'so', mono: 0.6, col: '#1C1714', a: 0.85, sa: 0.1, h: [null, null] },
+      skin: { id: 'sk', mono: 0.06, col: '#CF9670', a: 0.42, sa: 0.32, h: [null, [2.4, 0.16]] },
+      hair: { id: 'hr', mono: 0.45, col: '#3D3029', a: 0.68, sa: 0.35, h: [[1.9, 0.18], [1.4, 0.3]] },
     },
     observer(t) {
       const P = this.pose, M = this.MAT, B = BODY, { fwd, right, up, spine } = P, items = [];
@@ -947,8 +962,8 @@
         return { c: v3.am(hc, hU, z, hF, k < 0 ? 0.015 * -k : -0.006 * k), u: hR, v: hF, a: 0.077 * s * jaw, b: 0.098 * s };
       });
       add(dep(hc) - 0.3, () => {
-        const hairMat = f => { const lz = v3.dot(v3.sub(f.c, hc), hU), lf = v3.dot(v3.sub(f.c, hc), hF); return lz > -0.03 + 0.07 * Math.max(0, lf / 0.098) || (lf < 0 && lz > -0.062 - 0.02 * lf / 0.098) ? M.hair : M.skin; };
-        this.part(headSecs, M.skin, 16400, { n: 24, facetMat: hairMat, hatchAng: Math.PI / 2 - 0.35, sub: 2 });
+        const hairMat = f => { const lz = v3.dot(v3.sub(f.c, hc), hU), lf = v3.dot(v3.sub(f.c, hc), hF); return lz > -0.045 + 0.085 * Math.max(0, (lf - 0.01) / 0.088) || (lf < 0.01 && lz > -0.07 - 0.015 * Math.max(0, -lf) / 0.098) ? M.hair : M.skin; };
+        this.part(headSecs, M.skin, 16400, { n: 40, facetMat: hairMat, hatchAng: Math.PI / 2 - 0.35, sub: 4 });
       });
       // the pencil in his right hand
       if (P.pencil) add(dep(P.wrR) - 0.25, () => { const a = v3.am(P.wrR, P.handDirR, 0.11), b = v3.am(a, v3.norm(v3.am(P.handDirR, up, 0.6)), 0.13); E3.line([a, b], INK, 1.1, 0.9); });
@@ -1072,19 +1087,17 @@
       });
       this.drift.forEach(o => {
         const u = t - o.t0; if (u < 0) return;
-        // the breeze carries it south (1.0-1.3 m/s near the ground), it falls at 0.4 m/s, swaying across its path
-        const vy = -1.15 - 0.15 * Math.sin(o.ph), fall = 0.4;
+        // the breeze carries it toward 200° at 0.9 m/s, it falls at 0.36 m/s, swaying across its path
+        const vx = 0.9 * Math.sin(200 * D2R), vy = 0.9 * Math.cos(200 * D2R), fall = 0.36;
         const zLand = 0.005, tl = (o.p[2] - zLand) / fall, uu = Math.min(u, tl);
         const sway = 0.28 * Math.sin(uu * 2.6 * o.sp + o.ph) * clamp(uu / 0.8);
-        const pos = [o.p[0] + o.lat * uu + sway * 0.6, o.p[1] + vy * uu + sway * 0.4, Math.max(zLand, o.p[2] - fall * uu + 0.06 * Math.sin(uu * 5.2 * o.sp))];
+        const pos = [o.p[0] + vx * uu + sway * 0.6, o.p[1] + vy * uu + sway * 0.3, Math.max(zLand, o.p[2] - fall * uu + 0.06 * Math.sin(uu * 5.2 * o.sp))];
         const landed = u >= tl;
         const spin = landed ? o.ph + tl * 2.3 * o.sp : o.ph + uu * 2.3 * o.sp, tilt = landed ? 0 : 0.9 + 0.6 * Math.sin(uu * 3.1 * o.sp + o.seed);
         const d = E3.depth(pos); if (d < 1) return;
         const lf = this.leafShape(pos, spin, o.s, tilt, Math.sin(uu * 1.7 + o.seed) > 0 ? 1 : -1);
         const sp = lf.outline.map(E3.proj), p = new P(sp, true);
         if (sp.every(q => q[0] < -20 || q[0] > PW + 20)) return;
-        // never above the trees' line
-        if (Math.min(...sp.map(q => q[1])) < hy - 120) return;
         mask(p);
         if (col) fill(p, this.mix('#EBB040', '#C07A32', o.c), 0.8); else fill(p, INK, 0.3);
         stroke(p, 1, INK, 0.6, 0.75);

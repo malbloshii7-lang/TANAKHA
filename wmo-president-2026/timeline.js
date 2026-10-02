@@ -11,7 +11,7 @@ const ROWS = {
   kyrgyz: ['8–11 SEP', 'KYRGYZSTAN', 'II', 'UTC+6'],
   tonga: ['16 SEP', 'TONGA', 'V', 'UTC+13'],
   // the order and the days of Wellington and Melbourne are not public; Jakarta's is (23 September)
-  regionv: ['SEPTEMBER', 'NEW ZEALAND · AUSTRALIA · INDONESIA', 'V', 'UTC+12 +10 +7'],
+  regionv: ['SEPTEMBER', 'NEW ZEALAND · AUSTRALIA · INDONESIA', 'V', 'UTC+7…+12'],
   bucharest: ['30 SEP–2 OCT', 'ROMANIA', 'VI', 'UTC+3'],
 };
 
@@ -61,9 +61,10 @@ const TIMELINE = [
         ar: { kicker: 'جاكرتا · ' + AR('23') + ' سبتمبر', head: 'تسونامي وطقسٌ ومناخ',
           body: 'في مقر وكالة الأرصاد الجوية والمناخ والجيوفيزياء الإندونيسية، غرف عمليات أنظمة الإنذار المبكر بالتسونامي والطقس والمناخ.' } });
       const a = wordsOut(this);
-      print('metservice', 250, 640, 250, 172, -0.04, easeOut(prog(lt, 1.6, 0.9)) * clamp((8.6 - lt) / 0.4) * a, 'MetService, Wellington', { seed: 31 });
-      print('bom', 812, 646, 250, 172, 0.035, easeOut(prog(lt, 2.4, 0.9)) * clamp((8.6 - lt) / 0.4) * a, 'Bureau of Meteorology, Melbourne', { seed: 37 });
-      print('bmkg', 540, 650, 300, 206, 0.02, easeOut(prog(lt, 9.4, 0.9)) * a, 'BMKG headquarters, Jakarta', { seed: 41 });
+      // each print beside its own city on the chart (Melbourne lies west of Wellington), none over a city's name
+      print('bom', 250, 640, 250, 172, -0.04, easeOut(prog(lt, 1.6, 0.9)) * clamp((8.6 - lt) / 0.4) * a, 'Bureau of Meteorology, Melbourne', { seed: 37 });
+      print('metservice', 812, 646, 250, 172, 0.035, easeOut(prog(lt, 2.4, 0.9)) * clamp((8.6 - lt) / 0.4) * a, 'MetService, Wellington', { seed: 31 });
+      print('bmkg', 282, 650, 300, 206, 0.02, easeOut(prog(lt, 9.4, 0.9)) * a, 'BMKG headquarters, Jakarta', { seed: 41 });
     } },
   { id: 'bucharest', start: 58.0, dur: 17.0, xf: 0.9,
     words(t, lt) {

@@ -5,7 +5,7 @@
 const LAY = {
   // the register: one row per mission, as an observer's register is kept. Columns: date, place, WMO Region, local time
   // (the last right-aligned)
-  REG: { top: 50, head: 82, row: 128, rule: 152, x: [64, 276, 778, 1016] },
+  REG: { top: 50, head: 82, row: 128, rule: 152, x: [64, 276, 762, 1016] },
   PLATE: [54, 176, 1026, 900], // the plate's box on the page (972×724); plates draw in their own coordinates, 0..972 × 0..724
   WORDS: { x: 64, kicker: 952, head: 1012, body: 1060, lh: 38, maxW: 952 },
   SAFE: 1147,
@@ -39,14 +39,14 @@ function plateFrame(p = 1) {
 }
 
 // ---- the register ----
-const REG_HEAD = ['DATE', 'PLACE', 'WMO REGION', 'LOCAL TIME'];
+const REG_HEAD = ['DATE', 'PLACE', 'REGION', 'LOCAL TIME'];
 // the ruled band at the top of every page: the same on every scene, so it never dissolves
 function registerRules(p = 1) {
   const R = LAY.REG;
   stroke(ln(54, R.top, 1026, R.top, 401, 0), p, INK, 1.2, 0.7);
   stroke(ln(54, R.rule, 1026, R.rule, 402, 0), p, INK, 1.4, 0.75);
   stroke(ln(54, R.rule + 5, 1026, R.rule + 5, 403, 0), p, INK, 0.7, 0.5);
-  [R.x[1] - 18, R.x[2] - 18, R.x[3] - 150].forEach((x, i) => stroke(ln(x, R.top + 8, x, R.rule - 8, 404 + i, 0), p, INK, 0.7, 0.35));
+  [R.x[1] - 18, R.x[2] - 18, 842].forEach((x, i) => stroke(ln(x, R.top + 8, x, R.rule - 8, 404 + i, 0), p, INK, 0.7, 0.35));
   REG_HEAD.forEach((h, i) => small(h, R.x[i], R.head, p, { size: 13, ls: 4, a: 0.55, weight: 600, align: i === 3 ? 'right' : 'left' }));
 }
 // one row, written in as the observer writes it (left to right, column by column), and taken out before the cut
@@ -55,9 +55,9 @@ function registerRow(row, lt, s, { t0 = 0.5, cps = 30 } = {}) {
   let t = t0;
   row.forEach((cell, i) => {
     if (!cell) return;
-    const size = cell.length > 26 || (i === 0 && cell.length > 9) ? 19 : 22, s0 = SA;
+    const size = cell.length > 26 ? 18 : i === 0 && cell.length > 9 ? 19 : 22, s0 = SA;
     SA = s0 * out; // typeLine sets its own alpha from SA
-    try { typeLine(cell, R.x[i], R.row, t, lt, { size, ls: size > 20 ? 3 : 2, a: 0.9, weight: 600, align: i === 3 ? 'right' : 'left', cps }); } finally { SA = s0; }
+    try { typeLine(cell, R.x[i], R.row, t, lt, { size, ls: size > 20 ? 3 : size > 18 ? 2 : 1.5, a: 0.9, weight: 600, align: i === 3 ? 'right' : 'left', cps }); } finally { SA = s0; }
     t += cell.length / cps + 0.12;
   });
 }

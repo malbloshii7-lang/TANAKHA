@@ -5,36 +5,43 @@
 // research vessels (Belhydromet, 10 September 2026, citing Kyrgyzhydromet); one of them, a small white launch drawn
 // generic (no name, no markings: its real lines were not to hand), puts out across the lake.
 // True 3D (engrave3d.js), metres: x east, y north, z up, the lake at z 0, the eye at the origin 4.5 m above the water.
-//   the eye: 42.6412 N 77.1100 E, standing on the low shore bank east of the Cholpon-Ata cape (its top 2.9 m above the
-//     water, from the terrain tiles and Sentinel-2's view of the shore); heading 172 deg true, a horizontal field of
+//   the eye: 42.6412 N 77.1100 E, on the low bank behind the beach east of the Cholpon-Ata cape (Sentinel-2's 10 m view
+//     of 11 September 2026: a narrow sand beach, the sandy shelf turquoise for some 200 m out), the bank's top taken
+//     2.9 m above the water (the terrain tiles give 3-5 m there, too coarse to say more); heading 172 deg true, a field of
 //     20.0 deg (f 2756 px across the plate's 972), tilted 0.67 deg down so the horizontal falls at plate y 330.
 //   the range (data/kyrgyz.js): every plate pixel's ray traced over the Earth's curvature with refraction (k 0.13) to
-//     the terrain it meets (AWS Terrain Tiles z12, SRTM-derived). The far crest stands 74-88 km away, at most 1.9 deg
-//     above the horizontal (plate y 237); the front ranges of its north slope 55-70 km; the south shore's foothills lie
-//     below the water horizon (dip 0.064 deg, y 333.1) but for their tops. Lit by the morning sun with cast shadows;
+//     the terrain it meets (AWS Terrain Tiles z12, SRTM-derived). The far crest stands 73-82 km away, 1.4-1.9 deg above
+//     the horizontal (plate y 237-263), its summits 3,930-4,560 m; the front ranges of its north slope 54-70 km; the
+//     south shore's foothills lie below the water horizon (dip 0.064 deg, y 333.1) but for their tops. Lit by the
+//     morning sun with cast shadows;
 //     snow and ice where Sentinel-2 saw them on 11 and 13 September 2026 (the gaps under cloud filled above the
 //     snowline those pixels give: half the north-facing ground snow-covered from about 4,000 m, as the glacier
 //     inventory's 3,900-4,000 m for the western part of the north slope), the land's colour zones (red beds, spruce,
 //     meadow, bare rock) from the same scenes.
 //   the sun (NOAA's solar-position equations, after Meeus): azimuth 115.8 deg, 32.4 deg up, east-south-east, 56 deg to
 //     the left of the view: the range's east-facing flanks lit, its west flanks and the steep north faces in shade, the
-//     shadows falling to the west-north-west (right and toward the eye). Its glitter on the lake lies 56 deg left and
-//     32 deg down, outside the frame (a facet would have to tilt some 25 deg to send it into the frame's lower-left
-//     corner, three times the slope spread of ripples under a light breeze): no sun glitter is drawn.
+//     shadows falling to the west-north-west (right and toward the eye). Its glitter on the lake centres 56 deg left of
+//     the view and 32 deg down, 49 deg from the frame's nearest corner: a ripple would have to tilt 47 deg to send the
+//     sun into that corner, against a slope spread of some 7 deg under a 2 m/s breeze (Cox and Munk), so no glitter is
+//     drawn.
 //   the air (GFS 0.25 deg, 9 September 2026 00Z +3 h, 09:00 local): clear over the lake (total cloud 0), the 10 m wind
 //     1.1-2.6 m/s from the east-north-east; mid-level cloud 41 per cent over the crest south of the lake. So: a light
 //     easterly whose cat's paws drift from left to right across the lake (about 2 m/s, toward 247 deg), and a thin bank
 //     of cloud gathering on the crest.
-//   the launch: about 11 m long, 3.4 m in the beam, a wheelhouse forward of midships, a mast, a davit on the open
-//     after deck; she makes 2.6 m/s (5 knots) rising to 3.0 m/s, heading 222 deg (south-west, out across the lake),
-//     240 m off at the start, 262 m at the end: 11.5 px a metre there, her hull about 120 px across, her waterline at y
-//     385. Heading away from the sun, she shows the eye her shaded starboard side and stern; her roof and decks are lit.
-//     Her wake: the Kelvin wedge (19.47 deg each side of her track), its divergent crests feathering out along both arms
-//     and the transverse waves between them (5.8 m apart at 3 m/s), and the white water of her track, spreading and
-//     fading behind her; all of it trails to her left, toward the shore she came from, clear of the print that lies on
-//     the plate's right from lt 9.4 (x 586-931, y 372-614). She stays left of x 560 throughout.
+//   the launch: about 11 m long, 3.4 m in the beam, a wheelhouse forward of midships, a pole mast, a radome, a davit and
+//     a winch on the open after deck; she heads 190 deg (out across the lake, a little west of the line of sight) at
+//     2.6 m/s (5 knots) rising smoothly to 3.1 m/s. 161 m off at lt 0 (17.1 px a metre: her hull 112 px across, her
+//     waterline at y 410), 206 m at lt 17 (13.4 px a metre, 75 px, y 392); her roof (3.1 m) stays under the horizontal,
+//     her masthead (5.5 m) rises just over it (the eye is 4.5 m up). Heading away from the sun, she shows the eye her
+//     shaded stern and starboard quarter; her roof is lit. Her wake: the Kelvin wedge (19.47 deg each side of her
+//     track), its divergent crests in echelon along both arms (they move with her: the pattern is steady in her frame),
+//     the transverse waves between them (2 pi U^2 / g, 4.3-6.2 m apart), and the white water of her track, which lies
+//     still on the water and spreads and fades behind her; all of it trails to her left, toward the shore she came
+//     from. Her hull spans x 76-462 over the beat, clear of the print that lies on the plate's right from lt 9.4
+//     (x 586-931, y 372-614).
 //   the shore: the bank's lip 13.5 m ahead (y about 655); dry golden steppe grass and grey-green wormwood on it, granite
-//     cobbles, the near water over the sandy shelf turquoise, the deep lake beyond deep blue.
+//     cobbles with their shadows thrown to the west-north-west, the near water over the sandy shelf turquoise, the deep
+//     lake beyond deep blue where the breeze roughens it and pale where it lies glassy and mirrors the low sky.
 // Nothing in the sky but cloud: no birds or other small flying shapes.
 const KY_IMG = typeof KYRGYZ !== 'undefined' ? { wash: loadImg(KYRGYZ.band.wash), snow: loadImg(KYRGYZ.band.snow) } : null;
 scene({
@@ -125,17 +132,16 @@ scene({
       const cx = c.x0 + this.WIND[0] * lt, cy = c.y0 + this.WIND[1] * lt, dx = x - cx, dy = y - cy;
       const u = (dx * c.along[0] + dy * c.along[1]) / c.L, v = (dx * c.across[0] + dy * c.across[1]) / c.Wd;
       const q = u * u + v * v;
-      if (q < 1.6) s += c.a * k * k * Math.exp(-2.2 * q);
+      if (q < 1.3) s += c.a * k * k * clamp((1.15 - q) / 0.45);
     }
     return Math.min(1, s);
   },
   drawLake(lt) {
     const WH = this.WH, colr = OPT.colour, q = easeInOut(prog(lt, -0.45, 0.9));
     if (colr) {
-      // the far water takes the pale horizon sky; the deep lake its deep blue; the shelf near the shore turquoise
       // glassy water mirrors the sky low over the far shore (pale), the rippled water the deeper sky overhead and the
       // lake's own deep blue; the shelf near the shore turquoise over sand
-      washFade([0, WH - 0.5, PW, PH], [[0, '#BCD2EC', 0.5], [0.025, '#86AEE2', 0.54], [0.12, '#4C80D2', 0.62], [0.3, '#3168C4', 0.68], [0.55, '#2A5DBA', 0.7], [0.72, '#2A69AE', 0.68], [0.86, '#2C9AAE', 0.62], [1, '#3AAEB0', 0.6]], 0, q);
+      washFade([0, WH - 0.5, PW, PH], [[0, '#BCD2EC', 0.5], [0.025, '#86AEE2', 0.54], [0.12, '#4C80D2', 0.62], [0.3, '#3168C4', 0.68], [0.55, '#2A5DBA', 0.7], [0.7, '#2A6CAE', 0.68], [0.8, '#2B86AE', 0.64], [0.9, '#2C9DAE', 0.62], [1, '#3AAEB0', 0.6]], 0, q);
       // the cat's paws a shade darker (the ripples mirror the deeper sky overhead, not the pale horizon), on the water only
       ctx.save(); ctx.beginPath(); ctx.rect(0, WH + 0.3, PW, PH - WH); ctx.clip();
       this.paws.forEach(c => {
@@ -147,7 +153,7 @@ scene({
         const ra = Math.min(1500, Math.hypot(pa[0] - o[0], pa[1] - o[1])), rb = Math.min(400, Math.hypot(pb[0] - o[0], pb[1] - o[1])), rot = Math.atan2(pa[1] - o[1], pa[0] - o[0]);
         ctx.save(); ctx.translate(o[0], o[1]); ctx.rotate(rot); ctx.scale(1, Math.max(0.02, rb / Math.max(1, ra)));
         const g = ctx.createRadialGradient(0, 0, 0, 0, 0, ra);
-        g.addColorStop(0, `rgba(24,56,150,${0.36 * c.a * k * k})`); g.addColorStop(0.6, `rgba(24,56,150,${0.24 * c.a * k * k})`); g.addColorStop(1, 'rgba(22,58,104,0)');
+        g.addColorStop(0, `rgba(24,56,150,${0.38 * c.a * k * k})`); g.addColorStop(0.62, `rgba(24,56,150,${0.32 * c.a * k * k})`); g.addColorStop(0.85, `rgba(24,56,150,${0.12 * c.a * k * k})`); g.addColorStop(1, 'rgba(24,56,150,0)');
         ctx.globalAlpha = SA * q; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, ra, 0, TAU); ctx.fill(); ctx.restore();
       });
       ctx.restore();
@@ -164,7 +170,7 @@ scene({
       if (show <= 0.01) return;
       const sw = 0.5 + 0.5 * Math.cos(kx * (dir[0] * m.x + dir[1] * m.y) - om * lt + m.ph * 1.1), sw2 = 0.5 + 0.5 * Math.cos(kx2 * (dir2[0] * m.x + dir2[1] * m.y) - om2 * lt + m.ph * 2.3);
       const near = clamp(1 - m.dist / 900), air = 0.35 + 0.65 * Math.exp(-m.dist / 1600);
-      const al = q * show * air * (0.2 + 0.22 * near + 0.6 * pw) * (0.55 + 0.45 * Math.pow(sw, 1.4)) * (0.8 + 0.2 * sw2) * (0.7 + 0.5 * m.ph);
+      const al = q * show * air * (0.2 + 0.22 * near + 0.75 * pw) * (0.55 + 0.45 * Math.pow(sw, 1.4)) * (0.8 + 0.2 * sw2) * (0.7 + 0.5 * m.ph);
       if (al < 0.02) return;
       const a0 = this.W(m.x - R0[0] * m.h, m.y - R0[1] * m.h), b0 = this.W(m.x + R0[0] * m.h, m.y + R0[1] * m.h);
       const s = E3.clipSeg(a0, b0);
@@ -186,7 +192,7 @@ scene({
   drawSky(lt) {
     const WH = this.WH, colr = OPT.colour, q = easeInOut(prog(lt, -0.45, 0.9));
     if (colr) {
-      // a clear mountain sky: deep overhead, paling to the horizon, and paler toward the sun (off the frame's left)
+      // a clear mountain sky: deep overhead, paling to the horizon
       washFade([0, -40, PW, WH + 1], [[0, '#2F6FD0', 0.72], [0.3, '#4A8BE0', 0.66], [0.62, '#6FA6EA', 0.5], [0.86, '#A6C8F0', 0.34], [1, '#D6E4F2', 0.22]], 0, q);
       // paler toward the sun, off the frame's left
       washGrad([0, -40, PW, WH + 1], [0, 0], [PW, 0], [[0, '#FFFFFF', 0.0], [0.5, '#4A8BE0', 0.0], [1, '#2F6FD0', 0.14]], q);
@@ -201,8 +207,9 @@ scene({
   },
   // ---------- the cloud bank gathering on the crest ----------
   initClouds(r) {
-    // a low bank along the crest: its base level at about 4,400 m (plate y 250 at the crest's 78 km), heaped tops a few
-    // hundred metres over it; the peaks stand in front of it. Each puff has its own start and swells over about nine
+    // a low bank along the crest: its base taken at about 4,400 m, just over the summits (plate y 250 at the crest's
+    // 78 km; GFS gives mid-level cloud over the crest that morning, but not its base height), heaped tops a few hundred
+    // metres over it; the peaks stand in front of it. Each puff has its own start and swells over about nine
     // seconds, and a few turrets rise later, so the bank gathers slowly through the beat (a puff grows from nothing,
     // never appears whole)
     this.CB = 250.5;
@@ -214,18 +221,31 @@ scene({
         const rad = (4 + 11 * env * (0.5 + 0.5 * r())) * big;
         puffs.push({ x, rad, lift: rad * (0.1 + 0.6 * r()) * env, t0: -7 + r() * 6, g: 1 });
       }
-      for (let k = 0; k < 4; k++) { const x = lerp(xa, xb, 0.2 + 0.6 * r()); puffs.push({ x, rad: (8 + 7 * r()) * big, lift: (12 + 12 * r()) * big, t0: 0.5 + k * 2.6 + r() * 1.5, g: 1, late: true }); }
+      for (let k = 0; k < 4; k++) { const x = lerp(xa, xb, 0.2 + 0.6 * r()); puffs.push({ x, rad: (6 + 5 * r()) * big, lift: (10 + 10 * r()) * big, t0: 0.5 + k * 2.6 + r() * 1.5, g: 1, late: true }); }
+      // the cauliflower: smaller swellings on the upper rim of the larger puffs, each a little after its parent
+      const n0 = puffs.length;
+      for (let pi = 0; pi < n0; pi++) {
+        const p = puffs[pi]; if (p.rad < 6) continue;
+        const nk = 2 + Math.floor(r() * 3);
+        for (let j = 0; j < nk; j++) puffs.push({ parent: pi, a: -Math.PI * (0.12 + 0.76 * (j + 0.2 + 0.6 * r()) / nk), k: 0.3 + 0.2 * r(), t0: p.t0 + 0.8 + r() * 3, kid: true });
+      }
       this.cells.push({ xa, xb, puffs, seed: 4100 + i * 31 });
     });
   },
   drawClouds(lt) {
     const colr = OPT.colour, q = easeInOut(prog(lt, -0.45, 0.9)), base = this.CB;
     this.cells.forEach(c => {
-      const circ = [];
-      c.puffs.forEach(p => {
-        const u = easeInOut(prog(lt, p.t0, 9)), sc = p.late ? u : lerp(0.5, 1, u);
+      const circ = [], at = [];
+      c.puffs.forEach((p, i) => {
+        const u = easeInOut(prog(lt, p.t0, 9));
+        if (p.kid) {
+          const P0 = at[p.parent]; if (!P0) return;
+          const R = P0[2] * p.k * u; if (R <= 0.3) return;
+          circ.push([P0[0] + Math.cos(p.a) * P0[2] * 0.82, P0[1] + Math.sin(p.a) * P0[2] * 0.82, R]); return;
+        }
+        const sc = p.late ? u : lerp(0.5, 1, u);
         if (sc <= 0.02) return;
-        const R = p.rad * sc; circ.push([p.x, base - R * 0.5 - p.lift * sc, R]);
+        const R = p.rad * sc; at[i] = [p.x, base - R * 0.5 - p.lift * sc, R]; circ.push(at[i]);
       });
       if (!circ.length) return;
       const x0 = Math.min(...circ.map(k => k[0] - k[2])) - 3, x1 = Math.max(...circ.map(k => k[0] + k[2])) + 3, ytop = Math.min(...circ.map(k => k[1] - k[2])) - 2;
@@ -261,7 +281,7 @@ scene({
       }
       ctx.stroke(); ctx.restore();
       // the outline: only the outer arcs of the heaped tops
-      ctx.save(); ctx.globalAlpha = SA * q * 0.36; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = colr ? '#3C4E6A' : INK; ctx.lineWidth = 0.55; ctx.lineCap = 'round';
+      ctx.save(); ctx.globalAlpha = SA * q * 0.3; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = colr ? '#3C4E6A' : INK; ctx.lineWidth = 0.5; ctx.lineCap = 'round';
       ctx.beginPath();
       circ.forEach(([x, y, R], i) => {
         let pen = false;
@@ -361,7 +381,7 @@ scene({
       const a = ST[i], b = ST[i + 1];
       [1, -1].forEach(sg => {
         const f = [B(a[0], sg * a[2], 0), B(b[0], sg * b[2], 0), B(b[0], sg * b[1], b[3]), B(a[0], sg * a[1], a[3])];
-        const n = this.outward(f, [sg * pv[0], sg * pv[1], 0]), lit = Math.max(0, E3.dot(n, E3.sun()));
+        const n = this.outward(f, [sg * pv[0], sg * pv[1], 0]);
         if (this.paint(f, n, [c[0], c[1], 0], 6100 + i)) {
           const bt = 0.13;
           E3.face([B(a[0], sg * a[2], 0), B(b[0], sg * b[2], 0), B(b[0], sg * lerp(b[2], b[1], bt), b[3] * bt), B(a[0], sg * lerp(a[2], a[1], bt), a[3] * bt)], { n, tone: 0.55, shade: 0.25, lw: 0.5, edgeA: 0.0, fillCol: colr ? '#26344E' : INK, fillA: colr ? 0.6 : 0.45, noHatch: true }, 6101);
@@ -388,7 +408,7 @@ scene({
     const prism = (rg, zA, zB, rake = 0) => { const fs = []; for (let i = 0; i < rg.length; i++) { const a = rg[i], b = rg[(i + 1) % rg.length]; fs.push([B(a[0], a[1], zA), B(b[0], b[1], zA), B(b[0] - (b[0] > 2.1 ? rake : 0), b[1], zB), B(a[0] - (a[0] > 2.1 ? rake : 0), a[1], zB)]); } fs.push(rg.map(p => B(p[0] - (p[0] > 2.1 ? rake : 0), p[1], zB))); return fs; };
     { const fs = prism(ring, z0, z1, 0.35), ctr = B(0.7, 0, (z0 + z1) / 2);
       fs.forEach((f, i) => { const n = this.outward(f, E3.sub(E3.centroid(f), ctr)); this.paint(f, n, Math.abs(n[2]) > 0.9 ? [c[0], c[1], 0] : [0, 0, 1], 6120 + i, 0.9); }); }
-    const win = (pa, pb, zA, zB, seed, k = 0) => E3.face([B(pa[0], pa[1], zA), B(pb[0], pb[1], zA), B(pb[0] - k, pb[1], zB), B(pa[0] - k, pa[1], zB)], { tone: 0.75, shade: 0.1, lw: 0.45, edgeA: 0.5, fillCol: colr ? '#1F2A40' : INK, fillA: colr ? 0.78 : 0.6, noHatch: true }, seed);
+    const win = (pa, pb, zA, zB, seed) => E3.face([B(pa[0], pa[1], zA), B(pb[0], pb[1], zA), B(pb[0], pb[1], zB), B(pa[0], pa[1], zB)], { tone: 0.75, shade: 0.1, lw: 0.45, edgeA: 0.5, fillCol: colr ? '#1F2A40' : INK, fillA: colr ? 0.78 : 0.6, noHatch: true }, seed);
     const off = 0.015, zw0 = 2.15, zw1 = 2.76;
     [[-0.75, 0.45], [0.65, 1.85]].forEach(([u0, u1], k) => { win([u0, -hw - off], [u1, -hw - off], zw0, zw1, 6130 + k); win([u1, hw + off], [u0, hw + off], zw0, zw1, 6135 + k); });
     win([-1.0 - off, hw - 0.2], [-1.0 - off, 0.42], zw0, zw1, 6140); win([-1.0 - off, -0.42], [-1.0 - off, -hw + 0.2], zw0, zw1, 6141);
@@ -419,7 +439,7 @@ scene({
     E3.line([B(-5.45, 1.43, 1.88), B(-5.45, -1.43, 1.88)], INK, 0.6, 0.75);
     E3.line([B(3.2, 1.3, 2.0), B(4.4, 0.95, 2.15), B(5.3, 0.25, 2.3), B(5.3, -0.25, 2.3), B(4.4, -0.95, 2.15), B(3.2, -1.3, 2.0)], INK, 0.5, 0.6);
   },
-  // her mirror image, broken by the ripples: her white a pale shimmer under her, her windows and boot-top darker
+  // her mirror image, broken by the ripples: her white a pale shimmer of broken dashes under her
   drawBoatReflection(lt) {
     const o = this.boatAt(lt), ST = this.ST, B = (u, v, w) => this.bp(o, u, v, -w, lt);
     const pts = []; ST.forEach(s2 => { [1, -1].forEach(sg => { pts.push(E3.proj(B(s2[0], sg * s2[1], s2[3]))); pts.push(E3.proj(B(s2[0], sg * s2[2], 0))); }); });
@@ -478,11 +498,13 @@ scene({
     [1, -1].forEach(sg => {
       const a = arm(sg), th = Math.atan2(back[1], back[0]) + sg * (90 - 35.26) * Math.PI / 180, e = [Math.cos(th), Math.sin(th)];
       const nrm = [a[1] * sg, -a[0] * sg]; // out of the wedge
-      for (let k = 0; k < 80; k++) {
-        const jit = (this.hash(k * 9.7 + sg * 3) - 0.5) * 0.5 * lam, s2 = 2.5 + k * lam * 0.55 + jit, age = s2 / U;
-        const al = Math.exp(-age / 24) * (0.45 + 0.55 * this.hash(k * 5.1 + sg * 2));
+      // (the cusps of successive crests lie one transverse wavelength apart along her track: 1.155 wavelengths along the
+      // arm)
+      for (let k = 0; k < 40; k++) {
+        const jit = (this.hash(k * 9.7 + sg * 3) - 0.5) * 0.15 * lam, s2 = 1.155 * lam * (k + 0.6) + jit, age = s2 / U;
+        const al = Math.exp(-age / 26) * (0.55 + 0.45 * this.hash(k * 5.1 + sg * 2));
         if (al < 0.04) break;
-        const p = [stern[0] + a[0] * s2, stern[1] + a[1] * s2], cl = (0.9 + 0.035 * s2) * (0.6 + 0.6 * this.hash(k * 2.7 + sg));
+        const p = [stern[0] + a[0] * s2, stern[1] + a[1] * s2], cl = (0.55 * lam + 0.02 * s2) * (0.75 + 0.5 * this.hash(k * 2.7 + sg));
         // inward along the crest (toward her track) and a little outward of the cusp line, broken in two
         const pa = [p[0] - e[0] * cl * 0.75, p[1] - e[1] * cl * 0.75], pm = [p[0] - e[0] * cl * 0.18, p[1] - e[1] * cl * 0.18], pm2 = [p[0] - e[0] * cl * 0.05, p[1] - e[1] * cl * 0.05], pb = [p[0] + e[0] * cl * 0.25, p[1] + e[1] * cl * 0.25];
         seg(pa, pm, al * 0.8, light, 1.0);
@@ -493,10 +515,12 @@ scene({
     });
     // the transverse waves between the arms, near her
     for (let k = 1; k < 8; k++) {
-      const s2 = k * lam + 1, age = s2 / U, al = Math.exp(-age / 9) * 0.65, hw = s2 * Math.tan(ka) * 0.85;
+      // (each crest bows back toward the cusps: at the cusp it lies 1.089 times as far behind her as on her track, and
+      // 0.385 times that out to the side)
+      const s2 = k * lam, age = s2 / U, al = Math.exp(-age / 9) * 0.65, hw = 0.385 * s2 * 0.92;
       let prev = null;
       for (let j = -5; j <= 5; j++) {
-        const v = j / 5 * hw, bend = 0.1 * s2 * (j / 5) * (j / 5), p = [stern[0] + back[0] * (s2 - bend) + pv[0] * v, stern[1] + back[1] * (s2 - bend) + pv[1] * v];
+        const v = j / 5 * hw, bend = 0.089 * s2 * Math.pow(Math.abs(j) / 5 * 0.92, 2), p = [stern[0] + back[0] * (s2 + bend) + pv[0] * v, stern[1] + back[1] * (s2 + bend) + pv[1] * v];
         if (prev && this.hash(j * 3.3 + k) > 0.25) { seg(prev, p, al * (0.5 + 0.5 * this.hash(j + k * 7)), dark, 0.9); seg([prev[0] - back[0] * 0.5, prev[1] - back[1] * 0.5], [p[0] - back[0] * 0.5, p[1] - back[1] * 0.5], al * 0.55, light, 0.9); }
         prev = p;
       }
@@ -586,8 +610,8 @@ scene({
     this.tufts.forEach(t => items.push({ a: t.a, draw: () => this.tuft(t, lt, q) }));
     items.sort((p, q2) => q2.a - p.a).forEach(o => o.draw());
   },
-  // a rounded granite cobble: an ellipsoid of facets lit from the east-south-east, its shadow on the bank to the
-  // west-north-west
+  // a rounded granite cobble, half sunk in the bank: lit from the east-south-east (its top and left), its shadow on the
+  // bank to the west-north-west
   stone(s, lt, q) {
     const colr = OPT.colour, at = this.at, Z = this.BZ, c = at(s.a, s.l), S = E3.sun();
     const ca = Math.cos(s.rot), sa = Math.sin(s.rot), sink = 0.35;
@@ -601,8 +625,6 @@ scene({
     const bb = [Math.min(...ol.map(p => p[0])), Math.min(...ol.map(p => p[1])), Math.max(...ol.map(p => p[0])), Math.max(...ol.map(p => p[1]))];
     const w = bb[2] - bb[0], h = bb[3] - bb[1];
     mask(outline, q);
-    const sp = E3.projDir([-S[0], -S[1], -S[2] * 0]) || [bb[0] - 100, bb[1]];
-    void sp;
     ctx.save(); ctx.beginPath(); outline.trace(ctx, 1); ctx.clip();
     const g = ctx.createLinearGradient(bb[0] + w * 0.15, bb[1], bb[0] + w * 0.95, bb[3]);
     const t2 = s.tone < 0.5;

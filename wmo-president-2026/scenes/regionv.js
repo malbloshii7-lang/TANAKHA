@@ -9,11 +9,13 @@
 // - the relief and the sea's depth: AWS Terrain Tiles (terrarium, z5); a hillshade lit from the north-west on the land,
 //   the shelf seas pale and the deep ocean and trenches darker.
 // - the isobars: NOAA GFS 0.25-degree analyses of mean sea-level pressure (PRMSL), every 6 h from 15 Sep 2026 00 UTC to
-//   23 Sep 2026 18 UTC (36 analyses), smoothed as an analyst draws (0.6 degree poleward of 25 S, 1.6 in the deep tropics)
-//   and sampled at 1 degree; between analyses the field is interpolated in time (Catmull-Rom), so the systems glide.
-//   Every 4 hPa, the 1012 and 1016 hPa lines heavier; their values in the margin where they leave the chart. H and L
-//   at the analysed centres (closed by at least 1 hPa, tracked from analysis to analysis), each with the analysis'
-//   own central pressure from the unsmoothed field; the stamp and the centres' values are those of the nearest analysis.
+//   23 Sep 2026 18 UTC (36 analyses), smoothed as an analyst draws (0.6 degree poleward of 25 S, 2.2 in the deep tropics)
+//   and sampled at 1 degree; between analyses the field is interpolated in time (Catmull-Rom), so the systems glide over
+//   the beat (the analyses' clock: 15 Sep 00 UTC held while the isobars ink in, 23 Sep 18 UTC reached at 16.2 s and
+//   held). Every 4 hPa, the 1012 and 1016 hPa lines heavier; their values at the chart's left and right edges where the
+//   westerlies' isobars leave it. H and L at the analysed centres (closed by at least 1 hPa, tracked from analysis to
+//   analysis, the track smoothed by at most 0.6 degree), each with the analysis' own central pressure from the
+//   unsmoothed field; the stamp and the centres' values are those of the nearest analysis.
 // - the four cities named beside their true positions (Natural Earth populated places), never marked with a point.
 // No arcs, routes, rings or points; no flags; nothing flies; nothing flashes.
 const RegionV = (() => {
@@ -228,12 +230,6 @@ const RegionV = (() => {
     }
     return V;
   }
-  // the field at a plate point (bilinear on the half-degree grid)
-  function at(V, x, y) {
-    const P = D.p, fi = (lonAt(x) - P.lon0) * 2, fj = (P.lat0 - latAt(y)) * 2;
-    const i = clamp(Math.floor(fi), 0, G.nx2 - 2), j = clamp(Math.floor(fj), 0, G.ny2 - 2), u = fi - i, v = fj - j, n = G.nx2;
-    return lerp(lerp(V[j * n + i], V[j * n + i + 1], u), lerp(V[(j + 1) * n + i], V[(j + 1) * n + i + 1], u), v);
-  }
   // the field at a plate point, bicubic (Catmull-Rom; smooth in its slope, for the values at the chart's edge)
   function atC(V, x, y) {
     const P = D.p, fi = (lonAt(x) - P.lon0) * 2, fj = (P.lat0 - latAt(y)) * 2, n = G.nx2;
@@ -332,7 +328,8 @@ const RegionV = (() => {
     init();
     if (!G) return;
     const tk = tau(lt), V = field(tk);
-    // the field a moment later, for how fast each isobar slides along the chart's edge (px a frame at 30 fps)
+    // a short step of the analyses' clock, and the clock's rate in analyses a frame (for how fast an isobar slides along
+    // the chart's edge, in px a frame at 30 fps)
     const dtk = 0.02, tps = (tau(lt + 0.01) - tau(lt)) / 0.01 / 30;
     // the chart as printed and coloured
     ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(G.base, 0, 0, PW, PH); ctx.restore();
@@ -346,12 +343,12 @@ const RegionV = (() => {
       const found = [];
       // how well the isobar of level L shows where it crosses the edge (at x) nearest to y0 at analysis time t: it must
       // slope along the edge, meet it squarely and slide slowly (one running along the edge slides fast); 0 if it does
-      // not cross within 40 px
-      const quality = (t, x, y0, L, yA, yB) => {
-        let best = null, yp = Math.max(yA, y0 - 40), pp = pAt(t, x, yp);
-        for (let y = yp + 2; y <= Math.min(yB, y0 + 40); y += 2) {
+      // not cross within r px (as far as a value moving slowly enough to show could have moved)
+      const quality = (t, x, y0, L, yA, yB, r) => {
+        let best = null, yp = Math.max(yA, y0 - r), pp = pAt(t, x, yp);
+        for (let y = yp + 2; y <= Math.min(yB, y0 + r); y += 2) {
           const p = pAt(t, x, y);
-          if ((pp - L) * (p - L) < 0) { const yc = y - 2 + 2 * (L - pp) / (p - pp); if (best === null || Math.abs(yc - y0) < Math.abs(best - y0)) best = yc; }
+          if ((pp - L) * (p - L) < 0) { const yc = y - 2 + 2 * (L - pp) / (p - pp); if (Math.abs(yc - y0) <= r && (best === null || Math.abs(yc - y0) < Math.abs(best - y0))) best = yc; }
           yp = y; pp = p;
         }
         if (best === null) return 0;
@@ -361,9 +358,10 @@ const RegionV = (() => {
         const spd = Math.abs((pAt(t + dtk, x, yc) - pAt(t, x, yc)) / dtk * tps) / Math.max(ag, 1e-4);
         return smooth01((ag - 0.01) / 0.035) * smooth01((sq - 0.4) / 0.35) * smooth01((2.8 - spd) / 2.3) * smooth01((g16 - 0.012) / 0.03);
       };
-      // ... judged over a window of the analyses' clock (1.6 analyses, a weighted mean), following the crossing, so a
-      // value fades in and out over a third of a second or more and never pops
-      const WIN = Array.from({ length: 17 }, (_, n) => [(n - 8) * 0.1, 9 - Math.abs(n - 8)]);
+      // ... judged over the 0.8 analysis before and the 0.8 after, following the crossing (the lesser of the two means):
+      // a value shows only where its isobar has crossed well for a while and will go on doing so, and so fades in and
+      // out over a third of a second or more and never pops
+      const WIN = Array.from({ length: 17 }, (_, n) => (n - 8) * 0.1);
       const side = (x, yA, yB, kind) => {
         let pp = atC(V, x, yA);
         for (let y = yA + 2; y <= yB; y += 2) {
@@ -371,9 +369,9 @@ const RegionV = (() => {
           for (let L = Math.ceil(Math.min(pp, p) / 4) * 4; L <= Math.max(pp, p); L += 4) {
             if (L === pp) continue;
             const yc = y - 2 + 2 * (L - pp) / (p - pp);
-            let a = 0, ws = 0;
-            WIN.forEach(([o, w]) => { a += w * quality(clamp(tk + o, 0, NT - 1 - dtk), x, yc, L, yA, yB); ws += w; });
-            found.push({ x, y: yc, L, a: a / ws * smooth01(Math.min(yc - yA, yB - yc) / 24), kind, dbg: [a / ws] });
+            const q = WIN.map(o => quality(clamp(tk + o, 0, NT - 1 - dtk), x, yc, L, yA, yB, 6 + 34 * Math.abs(o)));
+            const past = q.slice(0, 9).reduce((m, v) => m + v, 0) / 9, next = q.slice(8).reduce((m, v) => m + v, 0) / 9;
+            found.push({ x, y: yc, L, a: Math.min(past, next) * smooth01(q[8] / 0.3) * smooth01(Math.min(yc - yA, yB - yc) / 24), kind });
           }
           pp = p;
         }
@@ -385,10 +383,9 @@ const RegionV = (() => {
       found.forEach(l => found.concat(fixed).forEach(o => {
         if (o === l || o.kind !== l.kind) return;
         const d = Math.abs(o.y - l.y);
-        l.a *= 1 - Math.min(1, 4 * o.a0) * (1 - smooth01((d - 14) / 20));
+        l.a *= 1 - Math.min(1, 3 * o.a0) * (1 - smooth01((d - 11) / 7));
       }));
       const f = `500 9.5px ${F_MONO}`;
-      if (window.__RV_FOUND) window.__RV_FOUND.push(found.map(l => [l.L, l.kind, Math.round(l.x), Math.round(l.y), +l.a.toFixed(3), l.dbg.map(v => +v.toFixed(3)), +l.a.toFixed(3)]));
       const gap = (a, b) => Math.max(a[0] - (b[0] + b[2]), b[0] - (a[0] + a[2]), a[1] - (b[1] + b[3]), b[1] - (a[1] + a[3]));
       found.forEach(l => {
         const a = l.a * qa;
@@ -404,7 +401,7 @@ const RegionV = (() => {
     const cq = easeOut(prog(lt, 1.2, 0.8));
     if (cq > 0) D.tracks.forEach(tr => {
       const n = tr.lon.length, k0 = tr.k0, k1 = k0 + n - 1;
-      const a = cq * smooth01((tk - k0 + 0.6) / 1.2) * smooth01((k1 + 0.6 - tk) / 1.2);
+      const a = cq * (k0 === 0 ? 1 : smooth01((tk - k0 + 0.6) / 1.2)) * (k1 === NT - 1 ? 1 : smooth01((k1 + 0.6 - tk) / 1.2));
       if (a <= 0.01) return;
       const u = clamp(tk - k0, 0, n - 1), i = Math.max(0, Math.min(n - 2, Math.floor(u))), f = u - i;
       const cr = arr => { if (n < 2) return arr[0]; const p0 = arr[Math.max(0, i - 1)], p1 = arr[i], p2 = arr[i + 1], p3 = arr[Math.min(n - 1, i + 2)], f2 = f * f, f3 = f2 * f;
@@ -471,10 +468,9 @@ const RegionV = (() => {
     ctx.save(); ctx.globalAlpha = SA; ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(icv, 0, 0, PW, PH); ctx.restore();
     // ---- the lettering that moves, and the running stamp (the nearest of the 6-hourly analyses) ----
     marks.forEach(m => text(m.t, m.x, m.y, m.a * m.ta, m.f, m.ls, m.al, m.col || INK));
-    if (window.__RV_DEBUG) window.__RV_DEBUG.push(marks.map(m => [m.t, Math.round(m.x), Math.round(m.y), +m.a.toFixed(3), m.f.includes('29px') ? 'C' : m.f.includes('10.5px') ? 'cv' : 'v']));
     text(stamp(clamp(Math.round(tk), 0, NT - 1)), STAMP[0], STAMP[1], 0.82, F_STAMP, 1.5, 'left');
   }
-  return { init, draw, tau, stamp, _field: field, _at: at };
+  return { init, draw, tau, stamp };
 })();
 
 scene({

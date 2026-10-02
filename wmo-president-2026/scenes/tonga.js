@@ -23,8 +23,9 @@
 //   the wind: GFS (15 Sep 18Z, 3 h): 7.2 m/s from 129 deg at 10 m, 5.8 m/s from 122 deg at 925 hPa: the cumulus drift to
 //     the west-north-west (right to left here, about 9 px in the 17 s) and the palm streams toward 309 deg.
 // Life: the small waves of the south-east trade (a short fetch over the harbour: about 0.3 m, 2.5 s) spill along the reef
-// edge in sets, peeling from right to left as they run obliquely along it; a fisherman paddles a paopao (a dugout with a
-// single outrigger float to port on two straight booms, after Te Rangi Hīroa's account of the West Polynesian paopao) slowly
+// edge in sets, peeling from right to left as they run obliquely along it; a fisherman paddles a pōpao, Tonga's small
+// outrigger canoe of the quiet lagoon (a dugout hull, katea; two straight booms, kiato; the float, hama, to port; the
+// U-shaped tauama joining them: Tongan Wikipedia, "Pōpao"; proportions after Te Rangi Hīroa's Samoan paopao) slowly
 // across the flat, right to left; the palm's fronds stream and lift in the trade; the cloud drifts. Nothing else in the sky.
 // The print (lt 9.4 on) covers x 581-925, y 367-609: the canoe stays left of x 330, the breakers at y 343-352 and the palm
 // and the cloud above y 250 stay clear of it.
@@ -73,6 +74,14 @@ const TGP = (() => {
     return lerp(cell(Bt[i], s), cell(Bt[i + 1], s), f);
   }
 
+  // the green reflectance (B03, digital number) of the 19 Aug 2025 scene at a local point, on its 10 m grid (land: -1)
+  function gridAt(x, y) {
+    const G = D.grid, u = (x - G.x0) / G.st - 0.5, v = (G.y1 - y) / G.st - 0.5;
+    if (u < 0 || v < 0 || u >= G.nx - 1 || v >= G.ny - 1) return null;
+    const i = Math.floor(u), j = Math.floor(v), fu = u - i, fv = v - j;
+    const at = (ii, jj) => { const c = G.g.charCodeAt(jj * G.nx + ii), k = c >= 97 ? c - 71 : c >= 65 ? c - 65 : c >= 48 ? c + 4 : c === 43 ? 62 : 63; return k === 63 ? 900 : k * G.scale; };
+    return lerp(lerp(at(i, j), at(i + 1, j), fu), lerp(at(i, j + 1), at(i + 1, j + 1), fu), fv);
+  }
   function init() {
     camera();
     const r = rng(1609);
@@ -82,7 +91,7 @@ const TGP = (() => {
     S.clouds = D.clouds.map(c => {
       const n = c.puffs.length, cx = c.puffs.reduce((s, p) => s + p[0], 0) / n, cy = c.puffs.reduce((s, p) => s + p[1], 0) / n;
       const ext = Math.max(60, ...c.puffs.map(p => Math.hypot(p[0] - cx, p[1] - cy) + p[2]));
-      const tur = [], add = (x, y, z, R) => tur.push({ x, y, z, R, ph: r() * TAU, bumps: 5 + Math.floor(r() * 4) });
+      const tur = [], add = (x, y, z, R) => tur.push({ x, y, z, R, ph: r() * TAU, bumps: 6 + Math.floor(r() * 5) });
       if (n > 4) {
         c.puffs.forEach(([x, y, rr]) => {
           const R = rr * 1.5, central = 1 - clamp(Math.hypot(x - cx, y - cy) / ext);
@@ -130,7 +139,7 @@ const TGP = (() => {
     const sc = 2, w = Math.ceil(PW / sc), y0 = Math.floor(HZ) - 1, h = Math.ceil((PH - y0) / sc);
     const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
     const g = cv.getContext('2d'), img = g.createImageData(w, h);
-    const SAND = hex('#4CC7C1'), MIX = hex('#2D9D9B'), GRASS = hex('#2A6E5C'), DEEP = hex('#12558F'), SKYR = hex('#86B6DD'), EDGE = hex('#1FA6B6'), GLARE = hex('#D8E8EC');
+    const SAND = hex('#52CBC2'), MIX = hex('#2F9C93'), GRASS = hex('#2C6A50'), DEEP = hex('#0F4E8C'), SKYR = hex('#86B6DD'), EDGE = hex('#1FA6B6'), GLARE = hex('#D8E8EC');
     const sunX = PW / 2 + F * Math.tan((SUN_AZ - HEAD) * rad);
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
       const px = i * sc + sc / 2, py = y0 + j * sc + sc / 2, gp = ground(px, py), o = (j * w + i) * 4;
@@ -138,15 +147,17 @@ const TGP = (() => {
       const [x, y, s] = gp, b = bearing(x, y), e = edgeAt(b);
       const dep = Math.atan2(EYE, s) / rad, refl = clamp(0.42 * Math.exp(-dep / 4) + 0.05);
       let col, a;
-      if (s > e + 25) { // the harbour's deep water, paling toward the horizon where it mirrors the sky
+      const gv = gridAt(x, y), deepness = gv === null ? (s > e ? 1 : 0) : clamp((470 - gv) / 140);
+      if (deepness >= 1) { // the harbour's deep water, paling toward the horizon where it mirrors the sky
         col = mixc(DEEP, SKYR, 0.75 * Math.pow(clamp((s - e) / 7500), 0.7)); a = 0.72;
-      } else if (s > e - 40) { // the drop-off: clear turquoise over the reef front
-        const u = (s - e + 40) / 65; col = mixc(EDGE, DEEP, clamp(u * 1.3 - 0.3)); a = 0.66;
       } else {
-        let v = bottomAt(b, s) + 1.0 * (noise(x / 7, y / 7, 3) - 0.5) + 0.5 * (noise(x / 2.4, y / 2.4, 5) - 0.5);
+        // the flat: its bottom from the image (seagrass dark, sand bright), broken into the patches the eye sees near it
+        let v = (gv - 560) / 260 + 0.9 * (noise(x / 16, y / 16, 7) - 0.5) + 0.8 * (noise(x / 6, y / 6, 3) - 0.5) + 0.4 * (noise(x / 2.2, y / 2.2, 5) - 0.5);
         if (s < 120) v += 0.3 * (noise(x / 0.9, y / 0.9, 9) - 0.5);
-        col = v < 0.45 ? GRASS : v < 1.35 ? mixc(GRASS, MIX, (v - 0.45) / 0.9) : mixc(MIX, SAND, clamp((v - 1.35) / 0.55));
-        col = mixc(col, SKYR, refl); a = lerp(0.64, 0.5, refl);
+        col = v < 0.55 ? GRASS : v < 1.25 ? mixc(GRASS, MIX, (v - 0.55) / 0.7) : mixc(MIX, SAND, clamp((v - 1.25) / 0.45));
+        col = mixc(col, SKYR, refl); a = lerp(0.7, 0.52, refl) * (1 + 0.1 * clamp((70 - s) / 50));
+        // the reef front, where the flat falls into deep water: clear turquoise, then the deep blue
+        if (deepness > 0) { col = mixc(col, mixc(EDGE, DEEP, deepness), clamp(deepness * 1.6)); a = lerp(a, 0.7, deepness); }
       }
       const glare = Math.exp(-Math.pow((px - sunX) / 330, 2) - Math.pow((PH - py) / 300, 2)) * 0.5;
       col = mixc(col, GLARE, glare); a *= 1 - 0.35 * glare;
@@ -171,6 +182,35 @@ const TGP = (() => {
       yy += gap * (0.75 + 0.5 * r());
     }
     S.sd = sd;
+    // ---- the bottom seen through the shallow water near the wall: tufts of seagrass where the image shows it dark, a few
+    // stones of coral rubble, and the sand's ripple marks (crests along 035 deg, across the trade's waves); fixed on the
+    // bottom (the camera does not move), so laid out once in plate coordinates, fainter where the surface mirrors the sky
+    const bottomV = (x, y) => { const gv = gridAt(x, y); return gv === null ? 1 : (gv - 560) / 260 + 0.9 * (noise(x / 16, y / 16, 7) - 0.5) + 0.8 * (noise(x / 6, y / 6, 3) - 0.5) + 0.4 * (noise(x / 2.2, y / 2.2, 5) - 0.5); };
+    S.grass = []; S.stones = []; S.ripples = [];
+    const wv = dirB(305), cr = dirB(35);
+    for (let k = 0; k < 9000; k++) {
+      const px = r() * PW, py = HZ + 30 + Math.pow(r(), 0.7) * (PH - HZ - 28), gp = ground(px, py);
+      if (!gp || gp[2] > 70 || gp[2] < 12) continue;
+      const [x, y, s] = gp, v = bottomV(x, y), dep = Math.atan2(EYE, s) / rad, vis = clamp(1 - 1.7 * (0.42 * Math.exp(-dep / 4) + 0.05)) * clamp((110 - s) / 50);
+      if (vis < 0.12) continue;
+      if (v < 0.7 && s < 32 && r() < 0.6) { // a tuft of blades, leaning down-wave
+        const blades = [], n = 4 + Math.floor(r() * 5);
+        for (let m = 0; m < n; m++) {
+          const ox = (r() - 0.5) * 0.25, oy = (r() - 0.5) * 0.25, L = 0.08 + r() * 0.12, lean = 0.5 + r() * 0.6;
+          const a = E3.proj([x + ox, y + oy, -0.7]), b = E3.proj([x + ox + wv[0] * L * lean, y + oy + wv[1] * L * lean, -0.7 + L]);
+          blades.push([a, b]);
+        }
+        S.grass.push({ blades, a: vis * (0.5 + 0.5 * clamp((0.75 - v) / 0.5)) });
+      } else if (v > 0.75 && v < 1.15 && s < 55 && noise(x / 1.3, y / 1.3, 17) > 0.78 && r() < 0.25) { // a stone of rubble
+        const R = 0.08 + r() * 0.14, pts = [];
+        for (let m = 0; m < 9; m++) { const a = m / 9 * TAU, q = R * (0.7 + 0.5 * r()); pts.push(E3.proj([x + Math.cos(a) * q, y + Math.sin(a) * q * 0.9, -0.75])); }
+        S.stones.push({ pts, a: vis });
+      } else if (v > 1.3 && s < 40 && r() < 0.25) { // the sand's ripple marks
+        const L = 0.6 + r() * 0.9, pts = [];
+        for (let m = 0; m <= 6; m++) { const u = (m / 6 - 0.5) * L, w = 0.03 * Math.sin(m * 0.9 + k); pts.push(E3.proj([x + cr[0] * u + wv[0] * w, y + cr[1] * u + wv[1] * w, -0.8])); }
+        S.ripples.push({ pts, a: vis * 0.8 });
+      }
+    }
     // ---- the reef edge, as a line along the bearings in view, with its length measured along it (for the sets)
     S.edge = [];
     let acc = 0, prev = null;
@@ -200,9 +240,9 @@ const TGP = (() => {
 
   // ---------------------------------------------------------------------------------------------------- drawing
   function skyWash() {
-    washFade([0, -4, PW, HZ + 1], [[0, '#2C6FBE', 0.72], [0.3, '#4C8ECF', 0.6], [0.7, HUE.sky, 0.44], [0.92, HUE.sky, 0.3], [1, HUE.cloud, 0.16]], 0, 1);
+    washFade([0, -4, PW, HZ + 1], [[0, '#2766B5', 0.68], [0.3, '#4587CB', 0.6], [0.7, HUE.sky, 0.45], [0.92, HUE.sky, 0.3], [1, HUE.cloud, 0.16]], 0, 1);
     // the sky deepens away from the sun (the sun is up and to the left, beyond the plate)
-    washGrad([0, -4, PW, HZ], [0, 0], [PW, 0], [[0, '#2C6FBE', 0], [0.55, '#2C6FBE', 0.06], [1, '#2C6FBE', 0.2]], 1);
+    washGrad([0, -4, PW, HZ], [0, 0], [PW, 0], [[0, '#2766B5', 0], [0.4, '#2766B5', 0.07], [1, '#2766B5', 0.27]], 1);
   }
   function skyRules() {
     let y = 1.2, k = 0;
@@ -212,13 +252,17 @@ const TGP = (() => {
       y += 2.6 + 6.0 * u * u; k++;
     }
   }
-  // a turret's outline points: a circle with a few soft bulges, a little flattened
+  // a turret's outline points: a circle with soft bulges (the cauliflower's lobes), a little flattened
   function turretPts(x, y, rr, n, ph) {
     const pts = [];
-    for (let j = 0; j < 56; j++) { const a = j / 56 * TAU, q = rr * (1 + 0.075 * Math.pow(Math.abs(Math.sin(n * a / 2 + ph)), 0.7) - 0.04); pts.push([x + q * Math.cos(a), y + q * 0.93 * Math.sin(a)]); }
+    for (let j = 0; j < 64; j++) {
+      const a = j / 64 * TAU, lob = Math.pow(Math.abs(Math.sin(n * a / 2 + ph)), 0.6), fine = Math.pow(Math.abs(Math.sin((2 * n + 3) * a / 2 + ph * 1.7)), 0.8);
+      const q = rr * (1 + 0.08 * lob + 0.03 * fine - 0.06);
+      pts.push([x + q * Math.cos(a), y + q * 0.92 * Math.sin(a)]);
+    }
     return pts;
   }
-  const inside = (p, o, k = 0.985) => { const dx = p[0] - o.p[0], dy = (p[1] - o.p[1]) / 0.93; return dx * dx + dy * dy < (o.rr * k) * (o.rr * k); };
+  const inside = (p, o, k = 0.985) => { const dx = p[0] - o.p[0], dy = (p[1] - o.p[1]) / 0.92; return dx * dx + dy * dy < (o.rr * k) * (o.rr * k); };
   function drawClouds(lt) {
     const wind = [-4.92, 3.07], tt = lt - 8.5; // 5.8 m/s from 122 deg; the image was taken about lt 8.5
     const sunP = E3.projDir(E3.sun());
@@ -233,34 +277,29 @@ const TGP = (() => {
       const x0 = Math.min(...items.map(o => o.p[0] - o.rr)), x1 = Math.max(...items.map(o => o.p[0] + o.rr));
       if (x1 - x0 < 16 || x1 < 0 || x0 > PW) return; // too small to read as a cloud on the plate
       const air = R11.air(c.d, 30000), yb = pr(c.cx + ox, c.cy + oy, c.base)[1], small = x1 - x0 < 45;
+      const y0 = Math.min(...items.map(o => o.p[1] - o.rr));
       // far to near; at one depth, the higher turrets first, so the lower ones overlap their feet
       items.sort((a, b) => (b.d - a.d) || (b.T.z - a.T.z));
       items.forEach(o => { o.pts = turretPts(o.p[0], o.p[1], o.rr, o.T.bumps, o.T.ph); o.path = new P(o.pts, true); });
+      const clipU = items.map(o => o.path), box = [x0 - 2, y0 - 2, x1 + 2, yb + 1];
       ctx.save(); ctx.beginPath(); ctx.rect(x0 - 20, -60, x1 - x0 + 40, yb + 60); ctx.clip();
+      // each turret in turn: paper, then a soft shade on its side away from the light (the sun's point on the plate is high
+      // and a little left), so the lobes stand out from one another as they do on a cumulus against the light
       items.forEach((o, i) => {
         const { p, rr, path } = o;
         mask(path);
-        // the light comes from above and a little left (the sun's point on the plate): each turret keeps a lit rim toward it
-        // and turns grey-blue away from it, as cumulus do against the light
         const ux = sunP ? sunP[0] - p[0] : 0, uy = sunP ? sunP[1] - p[1] : -1, ul = Math.hypot(ux, uy) || 1, sx = ux / ul, sy = uy / ul;
+        const low = clamp((p[1] - y0) / Math.max(1, yb - y0)); // 0 at the cloud's top, 1 at its base
         ctx.save(); ctx.beginPath(); path.trace(ctx, 1); ctx.clip();
-        ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.arc(p[0] + sx * rr * 0.38, p[1] + sy * rr * 0.38, rr * 1.0, 0, TAU, true); ctx.clip('evenodd');
-        if (OPT.colour) { ctx.globalAlpha = SA * (small ? 0.22 : 0.3) * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#A3B6CF'; ctx.fillRect(p[0] - rr, p[1] - rr, 2 * rr, 2 * rr); }
-        if (!small) {
-          ctx.globalAlpha = SA * 0.17 * air; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.55; ctx.beginPath();
-          for (let yy = p[1] - rr; yy < p[1] + rr; yy += 2.0) { ctx.moveTo(p[0] - rr, yy); ctx.lineTo(p[0] + rr, yy); }
-          ctx.stroke();
-        }
-        // the deeper shade low in the turret, away from the light
-        ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.arc(p[0] + sx * rr * 0.9, p[1] + sy * rr * 0.9, rr * 1.12, 0, TAU, true); ctx.clip('evenodd');
-        if (OPT.colour) { ctx.globalAlpha = SA * 0.2 * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#8C9FBA'; ctx.fillRect(p[0] - rr, p[1] - rr, 2 * rr, 2 * rr); }
-        if (!small) {
-          ctx.globalAlpha = SA * 0.13 * air; ctx.globalCompositeOperation = BLEND; ctx.beginPath();
-          for (let yy = p[1] - rr; yy < p[1] + rr; yy += 2.4) { ctx.moveTo(p[0] - rr, yy + rr * 0.25); ctx.lineTo(p[0] + rr, yy - rr * 0.25); }
+        ctx.beginPath(); ctx.rect(p[0] - 3 * rr, p[1] - 3 * rr, 6 * rr, 6 * rr); ctx.arc(p[0] + sx * rr * 0.5, p[1] + sy * rr * 0.5, rr * 1.0, 0, TAU, true); ctx.clip('evenodd');
+        if (OPT.colour) { ctx.globalAlpha = SA * (0.14 + 0.16 * low) * air; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#9DB0CA'; ctx.fillRect(p[0] - rr, p[1] - rr, 2 * rr, 2 * rr); }
+        if (!small && low > 0.35) {
+          ctx.globalAlpha = SA * 0.14 * low * air; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.5; ctx.beginPath();
+          for (let yy = p[1] - rr; yy < p[1] + rr; yy += 1.9) { ctx.moveTo(p[0] - rr, yy); ctx.lineTo(p[0] + rr, yy); }
           ctx.stroke();
         }
         ctx.restore();
-        // the outline: the silhouette where no other turret covers it, and the fold where it lies over a turret behind it
+        // its outline: the silhouette where no turret in front covers it, and the fold where it lies over one behind it
         const runs = [], folds = [];
         let cur = null, curF = null;
         o.pts.concat([o.pts[0]]).forEach(q => {
@@ -270,19 +309,23 @@ const TGP = (() => {
         });
         o.runs = runs; o.folds = folds;
       });
+      // the whole cloud darkens from its lit upper left toward its lower right and its base
+      if (OPT.colour) {
+        const g0 = sunP ? [clamp(sunP[0], x0, x1), y0] : [x0, y0];
+        washGrad(box, g0, [x1, yb], [[0, '#A7B9D0', 0], [0.45, '#A7B9D0', 0.12], [1, '#8195B3', small ? 0.3 : 0.42]], air, clipU);
+      }
       items.forEach(o => {
-        o.runs.forEach(rn => { if (rn.length > 1) stroke(new P(rn), 1, INK, small ? 0.5 : 0.75, (small ? 0.22 : 0.48) * air); });
-        o.folds.forEach(rn => { if (rn.length > 2) stroke(new P(rn), 1, INK, 0.55, (small ? 0.12 : 0.26) * air); });
+        o.runs.forEach(rn => { if (rn.length > 1) stroke(new P(rn), 1, INK, small ? 0.45 : 0.65, (small ? 0.2 : 0.38) * air); });
+        o.folds.forEach(rn => { if (rn.length > 8) stroke(new P(rn), 1, INK, 0.5, (small ? 0.06 : 0.13) * air); });
       });
       ctx.restore();
       // the flat base, blue-grey in its own shade
-      const xs = items.filter(o => o.p[1] + o.rr > yb).map(o => { const hh = Math.sqrt(Math.max(0, o.rr * o.rr - ((yb - o.p[1]) / 0.93) ** 2)); return [o.p[0] - hh, o.p[0] + hh]; });
+      const xs = items.filter(o => o.p[1] + o.rr > yb).map(o => { const hh = Math.sqrt(Math.max(0, o.rr * o.rr - ((yb - o.p[1]) / 0.92) ** 2)); return [o.p[0] - hh, o.p[0] + hh]; });
       if (xs.length) {
-        const a0 = Math.min(...xs.map(v => v[0])), a1 = Math.max(...xs.map(v => v[1])), bh = Math.max(2.5, (yb - Math.min(...items.map(o => o.p[1] - o.rr))) * 0.18);
-        const clipU = items.map(o => o.path);
-        if (OPT.colour) washFade([a0, yb - bh, a1, yb + 0.5], [[0, '#8FA3BE', 0], [1, '#6E83A0', (small ? 0.3 : 0.45) * air]], 0, 1, clipU);
-        if (!small) hatch(clipU, [a0, yb - bh, a1, yb], 0, 1.8, 1, INK, 0.5, 0.16 * air, 4300 + c.id);
-        stroke(new P([[a0 + 1.5, yb], [a1 - 1.5, yb]]), 1, INK, small ? 0.5 : 0.75, (small ? 0.2 : 0.4) * air);
+        const a0 = Math.min(...xs.map(v => v[0])), a1 = Math.max(...xs.map(v => v[1])), bh = Math.max(2.5, (yb - y0) * 0.2);
+        if (OPT.colour) washFade([a0, yb - bh, a1, yb + 0.5], [[0, '#8FA3BE', 0], [1, '#6A7F9D', (small ? 0.3 : 0.48) * air]], 0, 1, clipU);
+        if (!small) hatch(clipU, [a0, yb - bh, a1, yb], 0, 1.7, 1, INK, 0.5, 0.18 * air, 4300 + c.id);
+        stroke(new P([[a0 + 1.5, yb], [a1 - 1.5, yb]]), 1, INK, small ? 0.45 : 0.7, (small ? 0.2 : 0.4) * air);
       }
     });
   }
@@ -336,6 +379,17 @@ const TGP = (() => {
       g.forEach(([p, q]) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]), bow = Math.min(2.2, L * 0.07); ctx.moveTo(p[0], p[1]); ctx.quadraticCurveTo((p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - bow, q[0], q[1]); });
       ctx.stroke(); ctx.restore();
     });
+  }
+  // the bottom through the water: seagrass, rubble, the sand's ripple marks (static: the bottom does not move)
+  function drawBottom() {
+    const bands = (list, nb, fn) => { const B = Array.from({ length: nb }, () => []); list.forEach(o => B[Math.min(nb - 1, Math.floor(o.a * nb))].push(o)); B.forEach((g, k) => { if (g.length) fn(g, (k + 0.5) / nb); }); };
+    bands(S.ripples, 5, (g, a) => { ctx.save(); ctx.globalAlpha = SA * a * 0.2; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#2C6B66' : INK; ctx.lineWidth = 0.6; ctx.lineCap = 'round'; ctx.beginPath(); g.forEach(o => { ctx.moveTo(o.pts[0][0], o.pts[0][1]); o.pts.slice(1).forEach(q => ctx.lineTo(q[0], q[1])); }); ctx.stroke(); ctx.restore(); });
+    bands(S.stones, 4, (g, a) => {
+      ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = SA * a * 0.28; ctx.fillStyle = OPT.colour ? '#6A7A5E' : '#9A8F80';
+      ctx.beginPath(); g.forEach(o => { ctx.moveTo(o.pts[0][0], o.pts[0][1]); o.pts.slice(1).forEach(q => ctx.lineTo(q[0], q[1])); ctx.closePath(); }); ctx.fill();
+      ctx.globalAlpha = SA * a * 0.25; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = 0.5; ctx.stroke(); ctx.restore();
+    });
+    bands(S.grass, 6, (g, a) => { ctx.save(); ctx.globalAlpha = SA * a * 0.32; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#1F4A35' : INK; ctx.lineWidth = 0.6; ctx.lineCap = 'round'; ctx.beginPath(); g.forEach(o => o.blades.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); })); ctx.stroke(); ctx.restore(); });
   }
   // the shoals beyond the flat and the islets' reefs: turquoise slivers just under the horizon, a little surf on them
   function drawShoals(lt) {
@@ -404,11 +458,11 @@ const TGP = (() => {
       const a = pts[i], b = pts[i + 1], f = (foam[i] + foam[i + 1]) / 2;
       if ((a[0] < -4 && b[0] < -4) || (a[0] > PW + 4 && b[0] > PW + 4)) continue;
       const d = Math.hypot(E[i].p[0], E[i].p[1]), px = F / d; // px per metre at this distance
-      const up = Math.max(0.5, 0.45 * px * f), dn = Math.max(0.9, (0.3 + 0.7 * f) * px * 1.3);
+      const up = Math.max(0.6, 0.62 * px * f), dn = Math.max(1.1, (0.35 + 0.9 * f) * px * 1.4);
       // the breaker's face, in shade against the light, just under the white
       stroke(new P([[a[0], a[1] + dn + 0.2], [b[0], b[1] + dn + 0.2]]), 1, OPT.colour ? '#0F4A63' : INK, 0.7, 0.18 + 0.4 * f);
       // the white water (paper), its crest a little above the edge line, spreading in toward the eye
-      mask(new P([[a[0], a[1] - up], [b[0], b[1] - up], [b[0], b[1] + dn], [a[0], a[1] + dn]], true), clamp(f * 1.2));
+      mask(new P([[a[0], a[1] - up], [b[0], b[1] - up], [b[0], b[1] + dn], [a[0], a[1] + dn]], true), clamp(0.25 + f * 1.3));
     }
     // the foam that the broken waves leave drifting in over the flat
     for (let i = 0; i < n - 1; i += 2) {
@@ -456,7 +510,7 @@ const TGP = (() => {
     // the far arm to the paddle's lower hand, and the paddle: its shaft and leaf-shaped blade (under water while it pulls)
     E3.line([L(sx + lean, -0.16, 0.68), L(sx + 0.22, -0.3, 0.46), lowHand], skin, 1.7, 0.9);
     const wet = pull ? at(clamp((grip[2] - 0) / (grip[2] - tip[2]))) : tip;
-    E3.line([grip, pull ? wet : bladeRoot], OPT.colour ? '#3F3122' : INK, 1.1, 0.95);
+    E3.line([grip, pull ? wet : bladeRoot], OPT.colour ? '#3A2C1E' : INK, 1.5, 0.95);
     if (!pull) {
       const bp = proj(bladeRoot), bt = proj(tip), nx = bt[1] - bp[1], ny = -(bt[0] - bp[0]), nl = Math.hypot(nx, ny) || 1, bw = Math.max(1.2, F * 0.08 / E3.depth(tip));
       const mid = [lerp(bp[0], bt[0], 0.4), lerp(bp[1], bt[1], 0.4)];
@@ -475,7 +529,7 @@ const TGP = (() => {
     const hc = el(hp[0], hp[1], hr * 0.95, hr * 1.12, 0, TAU, 5131, 0.08);
     mask(hc); if (OPT.colour) wash(hc, '#5E4434', 0.6); stroke(hc, 1, INK, 0.7, 0.85);
     // his hair, short and dark, over the crown and the back of the head
-    const hairP = el(hp[0] + hr * 0.12, hp[1] - hr * 0.25, hr * 0.95, hr * 0.85, Math.PI * 0.95, Math.PI * 2.15, 5133, 0.05);
+    const hairP = el(hp[0] + hr * 0.1, hp[1] - hr * 0.2, hr * 0.95, hr * 0.9, Math.PI * 1.3, Math.PI * 2.3, 5133, 0.05);
     fill(new P(hairP.pts, true), OPT.colour ? '#241B14' : INK, 0.75);
     // the hull's near side over his hips: a dugout's round side, darker toward the water, its gunwale catching the sky
     const side = new P(gunN.concat(wl.slice().reverse()), true);
@@ -489,12 +543,11 @@ const TGP = (() => {
     // his knee just above the gunwale, and his near arm to the paddle's grip
     E3.line([L(sx + 0.1, 0.1, 0.2), L(sx + 0.42, 0.1, 0.33), L(sx + 0.6, 0.1, 0.22)], OPT.colour ? '#3C4E66' : INK, 2.4, 0.85);
     E3.line([L(sx + lean, 0.16, 0.69), L(sx + lean + 0.17, 0.2, 0.52), grip], skin, 1.9, 0.95);
-    // the two straight booms across the gunwales to the float, each on a pair of slanting struts; the float, a log pointed
-    // forward and cut square aft
+    // the two straight booms (kiato) across the gunwales to the float (hama), a log pointed forward and cut square aft
     [0.75, -0.7].forEach(u => {
       E3.line([L(u, -0.22, sheer(u) + 0.05), L(u, FV + 0.12, sheer(u) + 0.08)], INK, 1.3, 0.95);
-      E3.line([L(u - 0.06, FV - 0.18, sheer(u) + 0.07), L(u - 0.02, FV - 0.05, 0.1)], INK, 0.8, 0.9);
-      E3.line([L(u + 0.06, FV + 0.1, sheer(u) + 0.08), L(u + 0.02, FV + 0.04, 0.1)], INK, 0.8, 0.9);
+      // the tauama: a U of stick lashed to the boom on either side of the float, its bight on the float (Tonga's U shape)
+      E3.line([L(u, FV - 0.14, sheer(u) + 0.07), L(u, FV - 0.12, 0.17), L(u, FV - 0.07, 0.11), L(u, FV, 0.1), L(u, FV + 0.07, 0.11), L(u, FV + 0.12, 0.17), L(u, FV + 0.14, sheer(u) + 0.08)], INK, 0.8, 0.9);
     });
     const fl = [];
     for (let k = 0; k <= 16; k++) { const u = lerp(-1.05, 1.85, k / 16), rr = 0.085 * (u > 1.2 ? Math.sqrt(Math.max(0.02, (1.85 - u) / 0.65)) : 1); fl.push([u, rr]); }
@@ -520,7 +573,7 @@ const TGP = (() => {
       const wv = hd[0] * wdir[0] + hd[1] * wdir[1], lift = (0.14 + 0.2 * gust) * (-wv) * (1 - dead);
       for (let j = 1; j <= N; j++) {
         const s = j / N, flut = 0.05 * Math.sin(lt * (1.2 + 0.15 * (k % 5)) + fd.ph + s * 2.2) * s * s;
-        const el = el0 - (fd.sag + dead * 1.4) * Math.pow(s, 1.25) + lift * s + flut, ds = fd.L / N, prev = pts[j - 1];
+        const el = Math.max(-1.48, el0 - (fd.sag + dead * 1.4) * Math.pow(s, 1.25) + lift * s + flut), ds = fd.L / N, prev = pts[j - 1];
         const blow = (0.3 + 0.35 * gust) * s * s * ds * (1 - dead * 0.6);
         pts.push([prev[0] + hd[0] * Math.cos(el) * ds + wdir[0] * blow, prev[1] + hd[1] * Math.cos(el) * ds + wdir[1] * blow, prev[2] + Math.sin(el) * ds]);
       }
@@ -567,6 +620,9 @@ const TGP = (() => {
       mask(e); if (OPT.colour) wash(e, '#7D8A3E', 0.6); stroke(e, 1, INK, 0.7, 0.8);
       hatch([e], [p[0] - rr, p[1], p[0] + rr, p[1] + rr], 0.5, 1.4, 1, INK, 0.5, 0.45, 6210 + i);
     });
+    // the crown's heart: the leaf bases packed where the fronds spring from, in their own shade
+    { const cpt = E3.proj(G.c), rh = F * 0.42 / E3.depth(G.c), hp = el(cpt[0], cpt[1] + rh * 0.15, rh, rh * 0.8, 0, TAU, 6300, 0.2);
+      mask(hp); if (OPT.colour) wash(hp, '#4A5A2C', 0.55); hatch([hp], [cpt[0] - rh, cpt[1] - rh, cpt[0] + rh, cpt[1] + rh], 0.9, 1.3, 1, INK, 0.5, 0.5, 6301); stroke(hp, 1, INK, 0.6, 0.5); }
     // the crown: the fronds far to near (by their middles), each a rachis arching out and down with its drooping leaflets
     const fr = G.fronds.map(f => ({ f, d: E3.depth(f.pts[Math.floor(f.pts.length / 2)]) })).sort((a, b) => b.d - a.d);
     fr.forEach(({ f }) => {
@@ -605,6 +661,7 @@ const TGP = (() => {
       skyRules();
       drawClouds(lt);
       waterColour();
+      drawBottom();
       seaStrokes(lt);
       drawShoals(lt);
       drawIslets(lt);
