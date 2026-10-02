@@ -1,64 +1,59 @@
-# The LinkedIn post (draft)
+# The LinkedIn post
 
-This is written in the President's own voice, to go with the film. Each version is under 3,000 characters, with its
-hook in the first line. Tag the hosts in LinkedIn itself; suggested pages are listed at the end. Upload the Arabic SRT
-(`out/four-weeks-three-regions.ar.srt`) as the video's captions.
+This text goes with the feed cut. It is written in the President's own voice.
 
-## English
+## What the review found
 
-Four weeks. Three WMO Regions. Six countries. One aim: early warnings for everyone on Earth by the end of 2027.
+The review of 2 October 2026 compared his own posts, LinkedIn's guidance and the film itself. Most of the reach will come
+from who sees and answers the post in its first two hours, not from the film. So:
 
-From the shore of Lake Issyk-Kul to the Pacific, and on to Bucharest, I spent these weeks with the national services
-that turn forecasts into warnings people can act on.
+- **Brief WMO, NCM and the hosts a day ahead.** Ask for a plain repost, or a real comment, in the first one to two hours.
+  He replies to every comment in that time.
+  - Do not use like-rings, and do not ask WMO Secretariat staff to like the post: they must stay neutral while he is a
+    candidate.
+  - No paid promotion.
+- **Tag five pages at most**, and only ones that have agreed: WMO, SPREP, MetService, the Bureau of Meteorology, BMKG.
+  - Thank the other hosts by name in the text.
+  - Do not tag HRH the Crown Prince, the Prime Minister or ministers without protocol clearance.
+  - Watch for `dr-abdulla-al-mandoos-3539066b`: that is a different person.
+- **Use one hashtag and no link.** Put the Arabic in the first comment.
+- **Post on Wednesday 7 or Thursday 8 October, at 07:00 UTC (11:00 Abu Dhabi).** Post nothing else for 24 hours either
+  side.
+- **Follow up after 3–5 days with a set of photographs.** The office already has them.
+- **Captions:** upload `four-weeks-three-regions.voice.en.srt` as the video's captions. These are the narrator's words;
+  LinkedIn accepts one caption file.
 
-🇰🇬 Kyrgyzstan. Kyrgyzhydromet marked its centenary, 1926–2026, as the CIS Interstate Council for Hydrometeorology met
-for its 37th session in Cholpon-Ata. In Bishkek, H.E. Kanatbek Chynybaev, Minister of Emergency Situations, and I
-discussed glacier monitoring, sand and dust storm warnings and hydrological forecasting.
+## English (the post)
 
-🇹🇴 Tonga. At the Fourth Pacific Meteorological Ministers Meeting in Nukuʻalofa, ministers adopted the
-Siu-í-Álaimoana-Ki-Likutapu Declaration for stronger national services and multi-hazard early warnings. It was a
-profound honour to be received in audience by His Royal Highness Crown Prince Tupoutoʻa ʻUlukalala.
+Four weeks, six countries, and one aim: early warnings for everyone on Earth by the end of 2027.
 
-🇳🇿 🇦🇺 🇮🇩 New Zealand, Australia and Indonesia:
-- MetService's 24/7 forecast operations centre in Wellington;
-- the Bureau of Meteorology's Operations Centre and Metrology Laboratory in Melbourne;
-- BMKG's tsunami, weather and climate early warning rooms in Jakarta.
+It was a profound honour to be received by His Royal Highness Crown Prince Tupoutoʻa ʻUlukalala in Nukuʻalofa, where
+Pacific ministers adopted the Siu-í-Álaimoana-Ki-Likutapu Declaration for stronger national services and multi-hazard
+early warnings.
 
-🇷🇴 Romania. The Regional Association VI Regional Conference on Early Warnings for All, and the second phase of RA VI-19,
-hosted by the National Meteorological Administration.
+From Lake Issyk-Kul, where Kyrgyzhydromet marked its centenary, to the forecast and warning rooms of MetService, the
+Bureau of Meteorology and BMKG, and on to Bucharest for Regional Association VI, I saw the same thing everywhere: national
+services that never stop watching the sky.
 
-My sincere thanks to every host, and to the WMO Secretariat.
+My thanks to every host:
+- Kyrgyzhydromet and the Ministry of Emergency Situations of the Kyrgyz Republic;
+- the CIS Interstate Council for Hydrometeorology;
+- the Government of Tonga, SPREP and Tonga Meteorological Service;
+- MetService, the Bureau of Meteorology and BMKG;
+- Romania's National Meteorological Administration;
+- the WMO Secretariat.
 
-#EarlyWarningsForAll #WMO #WeatherReadyPacific #ClimateResilience #Meteorology
+#EarlyWarningsForAll
 
-## العربية
+## العربية (the first comment)
 
-أربعة أسابيع. ثلاثة أقاليم للمنظمة العالمية للأرصاد الجوية. ستّ دول. وهدفٌ واحد: إنذارٌ مبكر لكل إنسان على وجه الأرض بحلول
-نهاية عام 2027.
+أربعة أسابيع، وستّ دول، وهدفٌ واحد: إنذارٌ مبكر لكلّ إنسانٍ على وجه الأرض بحلول نهاية عام 2027.
 
-من ضفاف بحيرة إيسيك-كول إلى المحيط الهادئ، ثم إلى بوخارست، أمضيتُ هذه الأسابيع مع المرافق الوطنية للأرصاد الجوية التي تحوّل
-التنبؤات إلى إنذاراتٍ يستطيع الناس العمل بها.
+تشرّفتُ باستقبال صاحب السمو الملكي ولي العهد توبوتوآ أولوكالالا في نوكوألوفا، حيث اعتمد وزراء المحيط الهادئ إعلان
+«سيو-إي-ألايموانا-كي-ليكوتابو» لتعزيز المرافق الوطنية للأرصاد الجوية وأنظمة الإنذار المبكر بالأخطار المتعددة.
 
-🇰🇬 قيرغيزستان: احتفلت هيئة الأرصاد الجوية القيرغيزية بمئويتها (1926–2026)، فيما عقد المجلس المشترك للأرصاد الجوية لرابطة
-الدول المستقلة دورته السابعة والثلاثين في تشولبون-آتا. وفي بيشكيك، بحثتُ مع معالي كاناتبيك تشينيباييف، وزير حالات الطوارئ،
-رصدَ الأنهار الجليدية والإنذارَ بالعواصف الرملية والترابية والتنبؤاتِ الهيدرولوجية.
+من بحيرة إيسيك-كول، حيث احتفلت هيئة الأرصاد الجوية القيرغيزية بمئويتها، إلى غرف التنبؤ والإنذار في هيئة الأرصاد الجوية
+النيوزيلندية ومكتب الأرصاد الجوية الأسترالي ووكالة الأرصاد الجوية والمناخ والجيوفيزياء الإندونيسية، ثم إلى بوخارست مع
+الرابطة الإقليمية السادسة، رأيتُ الأمر نفسه في كل مكان: مرافق وطنية لا تكفّ عن مراقبة السماء.
 
-🇹🇴 تونغا: في الاجتماع الوزاري الرابع للأرصاد الجوية في المحيط الهادئ بنوكوألوفا، اعتمد الوزراء إعلان «سيو-إي-ألايموانا-كي-ليكوتابو»
-لتعزيز المرافق الوطنية وأنظمة الإنذار المبكر بالأخطار المتعددة. وتشرّفتُ باستقبال صاحب السمو الملكي ولي العهد توبوتوآ أولوكالالا.
-
-🇳🇿 🇦🇺 🇮🇩 نيوزيلندا وأستراليا وإندونيسيا:
-- مركز عمليات التنبؤ في هيئة الأرصاد الجوية النيوزيلندية في ولينغتون، العامل على مدار الساعة؛
-- مركز العمليات ومختبر المعايرة في مكتب الأرصاد الجوية الأسترالي في ملبورن؛
-- غرف الإنذار المبكر بالتسونامي والطقس والمناخ في وكالة الأرصاد الجوية والمناخ والجيوفيزياء الإندونيسية في جاكرتا.
-
-🇷🇴 رومانيا: المؤتمر الإقليمي للرابطة الإقليمية السادسة حول مبادرة الإنذار المبكر للجميع، والمرحلة الثانية من الدورة التاسعة عشرة
-للرابطة، باستضافة الإدارة الوطنية للأرصاد الجوية.
-
-خالص شكري لجميع المضيفين، وللأمانة العامة للمنظمة.
-
-#الإنذار_المبكر_للجميع #EarlyWarningsForAll #WMO
-
-## Pages to tag (check each handle in LinkedIn)
-
-World Meteorological Organization · SPREP · MetService · Bureau of Meteorology · BMKG · National Meteorological
-Administration (Romania) · National Center of Meteorology (UAE).
+خالص شكري لجميع المضيفين.

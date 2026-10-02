@@ -1,56 +1,36 @@
-# Voice-over: the script for H.E. Dr Abdulla Al Mandous to record
+# Narration
 
-The film is 93 seconds long. He reads seven short lines in English, about 155 words in all, at a calm pace. The music
-fills the pauses between them. Every fact is in `SOURCES.md`, and the text is in `voiceover.json`, which the build reads.
+**The current narration** is for the feed cut (59.5 s). A narrator reads it in the third person.
+- **Voice:** an AI voice, Higgsfield Seed Audio, preset voice "Holden", at speech rate +15. It was generated on
+  2 October 2026, job `cc210413-e4b1-4d4e-a25d-97feb6a603c5`.
+- **Pace:** 34.6 s for 87 words.
+- **No impersonation:** the President does not appear in the film, and the voice does not speak as him.
+- **Facts:** every one is in `SOURCES.md`.
+- **The text:** in `voiceover.json`, which the build reads. Each line there has its cue, its slot and its Arabic.
 
-## The script
-
-Each line has a time on screen, and that time sets how long it can run. Please time each line with a phone's stopwatch
-before recording. If a line runs long, read it a little faster, or tell us and the picture will be adjusted.
-
-| # | Starts at | Must end within | Line |
+| # | Starts at | Slot | Line |
 |---|---|---|---|
-| 1 | 0:01 | 5.5 s | Four weeks. Three of WMO's regions. Six countries. |
-| 2 | 0:08 | 14 s | On the shore of Lake Issyk-Kul, Kyrgyzhydromet marked a century of service. In Bishkek, we spoke about the glaciers, the dust storms, and the rivers people depend on. |
-| 3 | 0:25 | 14 s | In Nukuʻalofa, Pacific ministers adopted a new declaration for stronger national services and early warnings. I was honoured to be received by His Royal Highness the Crown Prince of Tonga. |
-| 4 | 0:42 | 14 s | In Wellington, Melbourne and Jakarta, I visited the rooms where forecasts and warnings are made, around the clock: for weather, for climate, and for tsunamis. |
-| 5 | 0:59 | 14 s | And in Bucharest, with Europe's services, we turned to the work ahead: early warnings for all, and the plan that will guide WMO from 2028. |
-| 6 | 1:16 | 12.5 s | Every warning begins with a national service, and with people who never stop watching the sky. Our aim: early warnings for everyone on Earth by the end of 2027. |
-| 7 | 1:29 | 3 s | To all our hosts: thank you. |
+| 1 | 0:00.3 | 4.3 s | Four weeks. Three of WMO's regions. Six countries. |
+| 2 | 0:04.6 | 8.6 s | At Lake Issyk-Kul, Kyrgyzstan's weather service turned one hundred. In Bishkek: glaciers, dust storms and rivers. |
+| 3 | 0:14.5 | 10 s | In Tonga, ministers adopted a new declaration for early warnings, and His Royal Highness the Crown Prince received the WMO President. |
+| 4 | 0:25.6 | 9.4 s | In Wellington, Melbourne and Jakarta: the forecast and warning rooms that never close. |
+| 5 | 0:36.6 | 9.4 s | In Bucharest, Europe's services turned to the work ahead: early warnings for all. |
+| 6 | 0:50.7 | 5.4 s | Early warnings for everyone on Earth, by the end of 2027. |
+| 7 | 0:56.4 | 2.6 s | With thanks to every host. |
 
-**Pronunciation:**
+## How the narration goes into the film
 
-| Word | Say it |
-|---|---|
-| Issyk-Kul | ee-SIK KOOL |
-| Kyrgyzhydromet | KEER-giz-HY-dro-met |
-| Bishkek | bish-KEK |
-| Nukuʻalofa | noo-koo-ah-LO-fah |
+- The generated read is one WAV file. It is cut at its pauses into `vo/line-1.wav` … `vo/line-7.wav`, which are not
+  committed.
+- `score.py --vo vo/` then:
+  - trims each line and sets it to one level;
+  - places it on its cue;
+  - lowers the music and the places 9 dB under it;
+  - writes the captions in English and Arabic from the times each line actually runs.
+- A line longer than its slot is reported; nothing is ever sped up silently.
 
-## Recording on a phone, in ten minutes
+## The first-person script (not used)
 
-1. **Room:** a quiet room with soft furnishings, such as an office with curtains, a carpet or a sofa. Avoid bare walls,
-   glass rooms and corridors. Turn off air conditioning and fans while recording.
-2. **Phone:**
-   - Put it in airplane mode.
-   - Use the voice-memo app; on iPhone, set Voice Memos to Lossless in Settings.
-   - Hold the phone or stand it 20–30 cm from his mouth, a little to one side so breaths don't pop.
-3. **Takes:** read each line two or three times, with a two-second pause between takes. Calm and warm, as if speaking to
-   one colleague, not to a hall. Smile slightly on line 7.
-4. **Check:** listen back to one take with headphones. There should be no hum, no echo and no clipping.
-5. **Send:** one file per line, named `line-1` to `line-7` (any format: m4a, wav or mp3). One file with every line in
-   order also works, and I will cut it.
-
-When the recording arrives, I will:
-- choose the best take of each line;
-- trim it, and place it on its cue;
-- set his voice to broadcast level, with the music lowered beneath it;
-- make the English captions from his words, and the Arabic captions from the translation.
-
-The Arabic of every line is in `voiceover.json`.
-
-## Why his own voice
-
-It is his account, so the film speaks in his voice: first person, and thanking the hosts. A recorded human voice also
-gives the film what it lacks most on the feed, a person. An AI clone of his voice is not used: for a UN official that
-would be a synthetic likeness, and a risk to trust if it were ever questioned.
+The first version of this file was a 93 s script for the President to record himself, in the first person. The
+requester chose instead a film in which he does not appear, read by a narrator. That script is in the git history (commit
+b755407).
