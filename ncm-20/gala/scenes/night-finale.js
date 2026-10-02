@@ -26,7 +26,7 @@ const FINALE_VIEW = { az0: 186, pxDeg: 17, hz: 905 };
 //     bank of their own in front of Abu Dhabi's towers
 // The aircraft is drawn at its own distance (FIN11.air): 13.8 px/m, seen 18 degrees up from its right side, nose turned 28
 // degrees toward the eye: its wingtip lights stand 116 px apart and it is 153 x 62 px overall. It flies at scene y 276,
-// under the cloud's base (scene y 140) and over Burj Khalifa's spire (scene y 401) with about 93 px to spare on each side.
+// under the cloud's base (scene y 140) and over Burj Khalifa's spire (scene y 400) with about 95 px to spare on each side.
 const FIN11 = { eye: 14, kT: 0.62, kP: 1.1,
   // centres (scene x): Dubai on the left, Abu Dhabi to the right
   x: { baa: 200, bk: 470, aldar: 715, nation: 955, adnoc: 1215, etihad: 1470, palace: 1180, qasr: 1715 },

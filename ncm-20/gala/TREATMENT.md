@@ -951,6 +951,43 @@ When asked, the requester chose three things:
   - The rev11 cue list is unchanged, so are its subtitles.
   - The new sounds are made without advancing the score's seeded generators, so every other sound renders as before.
 
+**The requester's sixth notes (2 October 2026), on the fifth notes' review copy.**
+> *"no no no, remove all forts, the plane must fly from left to right, zoom in the buildings of landmark, the clouse must
+> be above on the header of the video"*
+
+This supersedes the fifth notes where they differ.
+- **No forts.** The five forts, the near bank, Dhayah's hill and the Hajar crest are gone. The skyline is the landmark
+  buildings only. From left to right:
+
+  | Emirate | Landmarks |
+  |---|---|
+  | Dubai | Burj Al Arab, Burj Khalifa |
+  | Abu Dhabi | Aldar HQ, the Nation Towers, ADNOC HQ, the Etihad Towers, Qasr Al Watan |
+
+  Emirates Palace's long front stands before the Abu Dhabi towers.
+- **Zoomed in.** The towers are drawn at twice the scale (0.62 px/m) and the palaces at 1.1 px/m. The heights stay true
+  to each other.
+  - Burj Khalifa is 513 px tall and stands left of the words. Its spire is 126 px from the Arabic title and 261 px from
+    the lockup.
+- **The clouds at the head of the frame.** A band of cloud runs across the top, inside the corner marks. Its base is
+  26 px above the title's highest mark.
+- **The King Air flies left to right.**
+  - It flies at one height, about 100 px under the cloud base and about 100 px over Burj Khalifa's spire, from 4:01.9
+    to 4:05.7.
+  - We now see its right side, so the near wingtip shows green.
+  - Its sound moves left to right with it.
+- **The rain.** After the aircraft passes, the cloud lets down gentle rain, veil by veil, left to right. It is full by
+  4:09.1.
+  - It stops at least 45 px above every building.
+  - It is drawn behind the words under a feathered mask. The words' contrast matches the approved frame (Arabic title
+    10.6:1 against 10.7:1).
+  - It is heard from the cloud overhead, filling in from the left.
+- **Checked.**
+  - The default cut is byte-identical: wipcheck OK and 46 stills.
+  - The finale passes the flash check (PSE) at 30 fps.
+  - The holds loop seamlessly.
+- **Stills first.** Stills of this layout went to the requester for approval before the full film was rendered.
+
 **Reviewed.** A seven-lens panel (protocol and 2026 context, facts, Arabic, the founding's picture craft, the maritime
 plates, energy and the watch, continuity) reviewed the first build on stills; every blocker and major finding above
 was fixed. **Checked.** Every new plate was rendered in both looks; nothing is drawn right of the picture box and
@@ -1978,7 +2015,7 @@ Every number on screen, its qualifier and its source:
 | 50 | **The locomotive and the wagons (Revision 11, 1 October).** The rail beat's head end is drawn as an EMD SD70ACS, the type Etihad Rail runs, to the dimensions found on 1 October (the maker's brochure and railfan data): 22.63 m, 4.84 m high, 3.12 m wide, truck centres 14.58 m, HTSC-II trucks of 3.81 m wheelbase, the deck at 1.854 m; the nose, cab and hood lengths are scaled. The wagons are CRRC's Stage Two aggregate hoppers (13.7 m, 3.212 m, rounded side sheets, three bottom doors, cool grey; CRRC, 17 Sep 2026), their height estimated. Etihad Rail describes the locomotives' livery as light grey "relieved with broad red bands" with its logo mid-body (2012); the bands are not drawn until their path is seen in a photograph or video (two AI video analyses are queued), and no logo is shown. Since 3 Oct 2024 the company's Arabic name is «قطارات الاتحاد» and its logo is new | A named operator's vehicle must be drawn as it is | NCM communications, with Etihad Rail | As built; the approved cut keeps its v3 drawing |
 | 51 | **The AI narrator (Revision 11, 1 October). Resolved, 1 October: the requester decided the film needs no narration**, so no voice is heard and the review copies no longer carry the narration's subtitles; the record below stands for reference. The narration is voiced by an AI voice (ElevenLabs through Higgsfield, "Jasper"), not a recorded narrator. It speaks the Founders' and the President's names, H.H. Sheikh Mansour's precedence lines and «معالي الدكتور عبدالله أحمد المندوس». Whether an AI voice may be heard at a state gala (and whether it is disclosed), or serves only as the guide track for a human narrator's session, is protocol's call; an Arabic editor checks every line's pronunciation and stress (the names, «جُلْفار», «سُهَيل», «المَنْدوس») | The requester asked for a real voice now; an AI voice at an official ceremony may need approval and disclosure | The protocol office, NCM communications and the Arabic editor | The scratch subtitles with the score alone; the AI lines as a guide track for a human narrator |
 | 52 | **The recorded sound effects (Revision 11, 1 October).** Most effects are CC0 recordings with named recordists (the stream: gluckose; the wind: Felix Blume; the rain and the night: Noisekun's library; the drums: VCSL). Six come from the Moodist collection, under the Pixabay Content License or CC0 without a source named for each file (the sailboat, the gentle waves, the gulls, the train, the keyboards, the gusty wind). Keep them, or replace them with named library recordings (or the studio's own) for the masters | Both licences allow use in a film without credit, but protocol may want every source named | Requester and the post-production studio | Keep; the studio may swap any of the six without changing the cut |
-| 53 | **The seven emirates' skyline (Revision 11, 2 October).** Burj Khalifa, Burj Al Arab and Aldar HQ join ADNOC HQ and Qasr Al Watan (row 48) as recognisable copyrighted architecture. The frieze also picks one landmark per emirate: Al Hisn (Sharjah), Ajman Fort, Al Ali Fort (Umm Al Quwain), Fujairah Fort and Dhayah Fort (Ras Al Khaimah; Jebel Jais appears as the crest behind it). Only some heights are sourced: Al Kabs 12 m, Fujairah's 20 m rock and Dhayah's 70 m hill. The other towers (11–15 m) are estimated from storey counts. Al Hisn, Ajman Fort and Al Ali Fort are assumed floodlit at night. Burj Al Arab's helipad side has not been checked against a photograph | Each emirate should recognise its own landmark, and choosing one per emirate is itself a statement. The King Air carries no livery or registration | The protocol office, each emirate's heritage authority for its fort, and the owners for the towers | As built, drawn only under `?rev11`. Without approval, the finale returns to the approved skyline |
+| 53 | **The UAE's landmark skyline (Revision 11, 2 October; forts removed the same day).** Burj Khalifa, Burj Al Arab and Aldar HQ join ADNOC HQ, Qasr Al Watan and the Abu Dhabi landmarks (row 48) as recognisable copyrighted architecture. Burj Al Arab's helipad side has not been checked against a photograph | A symbolic skyline before the Vice President should show only buildings their owners accept being shown; the King Air carries no livery or registration | The protocol office and the buildings' owners | As built, drawn only under `?rev11`. Without approval, the finale returns to the approved skyline |
 ---
 
 ## Appendix A. Build map for `ncm-20/gala/`

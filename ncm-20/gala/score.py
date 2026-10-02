@@ -238,11 +238,12 @@ def turboprop_far(dur, gain=1.0):
     return A.lp(hum_ * 0.5 + air, 900, 2) * env * 0.05 * gain
 
 
-# Revision 11's finale (scenes/night-finale.js FIN11), on the finale's own clock: NCM's King Air crosses the frieze right
-# to left at one height (its nose enters, its tail leaves, and it crosses the screen's centre), then the rain begins over
-# the Hajar beyond the city, veil by veil, right to left (the first veil at FIN_RAIN, the last 1.1 s later, each full 3 s on)
+# Revision 11's finale (scenes/night-finale.js FIN11), on the finale's own clock: NCM's King Air crosses under the cloud
+# at the head of the frame, left to right at one height (its nose enters, its tail leaves, and it crosses the screen's
+# centre); behind it the cloud lets down its rain, veil by veil, left to right. The first veil starts at 2.54 and the last
+# at 5.12, each over 3 s; the rain reads from FIN_RAIN and is full at FIN_RAIN_FULL
 FIN_AIR = (1.6, 5.0, 3.31)
-FIN_RAIN = 3.77
+FIN_RAIN, FIN_RAIN_FULL = 3.3, 8.12
 
 
 @contextlib.contextmanager
@@ -272,9 +273,9 @@ def finale_pass(dur):
 
 
 def finale_r11(sfx, music, sc, f0, f1):
-    """Revision 11's finale: the King Air's pass, far and faint, carried across the stereo field right to left as it
-    crosses the screen; then distant rain on the left, under the cloud, growing in as the veils do and held to the end
-    (the film's fade takes it out). Each is set against the finale's own music: the aircraft 15 dB under it, the rain
+    """Revision 11's finale: the King Air's pass, far and faint, carried across the stereo field left to right as it
+    crosses the screen; then the rain from the cloud overhead, filling in from the left as the veils do and held to the
+    end (the film's fade takes it out). Each is set against the finale's own music: the aircraft 15 dB under it, the rain
     18 dB under it once full, both well above the night wind and never over the music"""
     ref = A.lufs(music.stereo()[:, int(f0 * A.SR):int(f1 * A.SR)])
     with seeds_aside():
@@ -283,7 +284,7 @@ def finale_r11(sfx, music, sc, f0, f1):
         y = finale_pass(2 * half)
         t = ac - half + np.arange(len(y)) / A.SR
         y = y * np.sin(np.pi * np.clip((t - (ac - half)) / (2 * half), 0, 1))  # swells to the centre, fades as it leaves
-        pan = np.clip(0.75 - 1.5 * (t - a0) / (a1 - a0), -0.75, 0.75)  # right to left with the aircraft
+        pan = np.clip(-0.75 + 1.5 * (t - a0) / (a1 - a0), -0.75, 0.75)  # left to right with the aircraft
         a = (pan + 1) * np.pi / 4
         air = np.vstack([y * np.cos(a), y * np.sin(a)])
         air *= 10 ** ((ref - 15.0 - A.lufs(air)) / 20)
@@ -292,11 +293,12 @@ def finale_r11(sfx, music, sc, f0, f1):
         dur = f1 + 3.0 - r0
         rain = A.rain(dur, gain=0.3, density=0.6)
         rain = np.vstack([A.lp(ch, 2600, 2) for ch in rain])  # far off: its high air lost over the distance
-        k = int(4.2 * A.SR)  # the seven veils fill in over 4.2 s
-        full = rain[:, k:k + int(4.0 * A.SR)] * np.array([[1.0], [0.55]])
+        k = int((sc('finale', FIN_RAIN_FULL) - r0) * A.SR)  # the veils fill in
+        lag = int(1.5 * A.SR)  # from the left: the right of the frame fills 1.5 s after the left
+        full = rain[:, k:k + int(2.5 * A.SR)]
         rain *= 10 ** ((ref - 18.0 - A.lufs(full)) / 20)
-        grow = np.minimum(1.0, np.arange(rain.shape[1]) / k)
-        sfx.add2(rain[0] * grow, rain[1] * grow * 0.55, r0)  # the cloud is on the left of the frame
+        n = np.arange(rain.shape[1])
+        sfx.add2(rain[0] * np.minimum(1.0, n / (k - lag)), rain[1] * np.clip((n - lag) / (k - lag), 0, 1), r0)
     print(f'finale (rev11): the King Air at {A.lufs(air):.1f} LUFS and the rain at {ref - 18.0:.1f}, under the music\'s '
           f'{ref:.1f} (before the mix)')
 
