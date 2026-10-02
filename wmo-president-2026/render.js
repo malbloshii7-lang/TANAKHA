@@ -1,0 +1,128 @@
+// Render "Four Weeks, Three Regions" (film.html, 1080×1350) frame by frame with headless Chromium. A copy of the gala
+// edition's render.js with the 4:5 frame; --scale 2 renders 2160×2700, which ../wmo-president-2026/README.md scales down.
+//
+//   node render.js preview <out-prefix> <seconds...> [--scale 2]          PNG stills at those times
+//   node render.js film <out.mp4> [score.wav] [--scale 2] [--jobs 3]       every frame at 30 fps → H.264 (+ AAC)
+//   node render.js cues <cues.json>                                        the timeline, for score.py and subtitles
+//        [--from S] [--to S] [--afrom S] [--crf 16] [--preset slow] [--x264 params] [--fps 50] [--grade led]   a time range (--afrom 0 only when the audio file itself starts at --from, as part2.wav does); 50 fps; the LED-wall grade
+//        --from split / --to split: the cue-to-cue split between part 1 and part 2, read from the cut itself
+//
+// --scale 2 renders a 2160×2700 frame. --jobs N renders N contiguous chunks in parallel pages and joins
+// them without re-encoding. Needs Playwright (NODE_PATH may point at a global install) and an ffmpeg with
+// libx264: set FFMPEG, e.g. to imageio-ffmpeg's bundled binary.
+//
+// Colour: every film is encoded with the BT.709 matrix, limited range, and tagged BT.709 (primaries, transfer and
+// matrix), because players and media servers decode untagged HD and UHD video as BT.709. --capture png (the default at
+// --scale 2, so for every master) takes each frame losslessly; --capture jpeg (the default at --scale 1) is faster for
+// review copies, and its frames are converted from JPEG's full-range BT.601 to BT.709.
+const { chromium } = require('playwright');
+const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const argv = process.argv.slice(2);
+const opt = (name, dflt) => { const i = argv.indexOf('--' + name); if (i < 0) return dflt; const v = argv[i + 1]; argv.splice(i, 2); return v; };
+const FPS = Number(opt('fps', 30)), SCALE = Number(opt('scale', 1)), JOBS = Number(opt('jobs', 1)), CRF = String(opt('crf', SCALE > 1 ? 18 : 16));
+// --preset: x264's speed preset; --x264: extra x264 parameters; --profile: the H.264 profile. A lossless intermediate
+// (for a stage loop, encoded once afterwards) is --crf 0 --preset ultrafast --profile high444: lossless H.264 needs the
+// High 4:4:4 Predictive profile, even in 4:2:0
+const PRESET = String(opt('preset', 'slow')), X264 = opt('x264', null), PROFILE = String(opt('profile', 'high'));
+// --capture: how each frame leaves the browser (png is lossless; jpeg is quality 95 and faster)
+const CAPTURE = String(opt('capture', SCALE > 1 ? 'png' : 'jpeg'));
+if (!['png', 'jpeg'].includes(CAPTURE)) { console.error('--capture must be png or jpeg'); process.exit(2); }
+// the lossless intermediate keeps full chroma (4:4:4); every other file is 4:2:0
+const PIX_FMT = PROFILE === 'high444' ? 'yuv444p' : 'yuv420p';
+// RGB (PNG) or full-range BT.601 YCbCr (JPEG) in; BT.709 limited range out, with the tags that say so
+const COLOUR_IN = CAPTURE === 'png' ? [] : ['in_color_matrix=bt601', 'in_range=pc'];
+const COLOUR_VF = `scale=${[...COLOUR_IN, 'out_color_matrix=bt709', 'out_range=tv', 'flags=accurate_rnd+full_chroma_int'].join(':')},format=${PIX_FMT}`;
+const COLOUR_TAGS = ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv'];
+const FROM = opt('from', null), TO = opt('to', null), GRADE = opt('grade', 'web'), AFROM = opt('afrom', null); // --afrom: where to start reading the audio file (default --from, right for a full-length mix); 0 for part2.wav, which starts at the split
+const FF = process.env.FFMPEG || 'ffmpeg';
+const run = (args, stdio = ['ignore', 'inherit', 'inherit']) => new Promise((res, rej) => { const p = spawn(FF, args, { stdio }); p.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))); });
+
+async function openPage(browser) {
+  const context = await browser.newContext({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: SCALE });
+  // The fonts are self-hosted (fonts/); any other https request is fetched from Node so TLS is verified normally.
+  await context.route(/^https:\/\//, async route => { try { await route.fulfill({ response: await route.fetch() }); } catch { await route.abort(); } });
+  const page = await context.newPage();
+  page.on('pageerror', e => { console.error('page error:', e.message); process.exitCode = 1; });
+  await page.goto('file://' + path.resolve(__dirname, process.env.FILM_HTML || 'film.html') + `?capture&scale=${SCALE}&grade=${GRADE}` + (process.env.FILM_QUERY ? '&' + process.env.FILM_QUERY : ''), { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.__ready);
+  const clip = { x: 0, y: 0, width: 1080, height: 1350 };
+  // PNG goes straight through the DevTools protocol with Chrome's fast PNG encoder: the same pixels as
+  // page.screenshot (checked bit for bit at 4K), in about a third of the time
+  const cdp = await context.newCDPSession(page);
+  page.frame = async (t, type) => {
+    await page.evaluate(t => window.__render(t), t);
+    if (type !== 'png') return page.screenshot({ clip, type, quality: 95 });
+    const shot = await cdp.send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: true, clip: { ...clip, scale: SCALE }, captureBeyondViewport: false });
+    return Buffer.from(shot.data, 'base64');
+  };
+  return page;
+}
+
+(async () => {
+  const [mode, out, ...rest] = argv;
+  if (mode === 'cues') { // the timeline as JSON, for score.py and the subtitle files
+    const browser = await chromium.launch(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {});
+    const page = await openPage(browser);
+    // with a pace (timeline.js: Revision 11 runs slower than its design) every time is given in real seconds
+    const cues = await page.evaluate(() => { const K = typeof PACE !== 'undefined' ? PACE : 1, k = x => K === 1 ? x : +(x * K).toFixed(4); const c = ({ duration: k(DURATION), scenes: SCENES.map(s => ({ id: s.id, start: k(s.start), dur: k(s.dur), speed: s.speed || 1, offset: s.offset || 0, night: !!s.night, xf: k(s.xf ?? XF), enter: (s.enter && s.enter.type) || 'fade', t20: s.id === 'gauge' ? k(s.t20) : undefined, dt: s.id === 'gauge' ? k(s.dt) : undefined, role: s.role || null, text: s.text || null, sub: s.sub || null })),
+      // every words block with its film times (recorded by calling each scene's words once), and the narration
+      text: (() => { TEXT_REC = []; SCENES.forEach(s => { if (s.words) { ctx.save(); try { s.words.call(s, 0.5 * s.dur); } catch (e) { TEXT_REC.push({ error: s.id + ': ' + e.message }); } ctx.restore(); } }); const r = TEXT_REC; TEXT_REC = null; return r; })(),
+      vo: typeof VO === 'undefined' ? [] : VO.map(v => ({ id: v.id, in: k(v.in), out: k(v.out), ar: v.ar, sub: voSubAr(v), en: v.en })) });
+      if (K !== 1) { c.pace = K; c.text.forEach(r => { if (r.tin != null) { r.tin = k(r.tin); r.tout = k(r.tout); } }); }
+      return c; });
+    fs.writeFileSync(out, JSON.stringify(cues, null, 1)); console.log('wrote', out, cues.scenes.length, 'scenes,', cues.duration, 's');
+    await browser.close(); return;
+  }
+  if (!['preview', 'film'].includes(mode) || !out) {
+    console.error('usage: node render.js preview <prefix> <t...> | film <out.mp4> [score.wav] [--scale 2] [--jobs N] [--from S --to S]');
+    process.exit(2);
+  }
+  const browser = await chromium.launch(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {});
+  if (mode === 'preview') {
+    const page = await openPage(browser);
+    for (const t of rest.map(Number)) {
+      fs.writeFileSync(`${out}-${String(t).replace('.', '_')}.png`, await page.frame(t, 'png'));
+      console.log('still', t);
+    }
+    await browser.close();
+    return;
+  }
+  const probe = await openPage(browser);
+  const duration = await probe.evaluate(() => window.__duration);
+  // 'split' is the cue-to-cue split: the gauge's start less half its dissolve (where part 1 ends and part 2 begins)
+  const split = await probe.evaluate(() => { const g = SCENES.find(s => s.id === 'gauge'); return g ? g.start - (g.xf ?? XF) / 2 : null; });
+  await probe.context().close();
+  const when = v => { if (v !== 'split') return Number(v); if (split == null) throw new Error('--from/--to split: no gauge beat'); return split; };
+  const f0 = Math.round((FROM != null ? when(FROM) : 0) * FPS), f1 = Math.round((TO != null ? when(TO) : duration) * FPS);
+  const audio = rest[0], started = Date.now(), n = f1 - f0;
+  const parts = [], per = Math.ceil(n / JOBS);
+  for (let j = 0; j < JOBS; j++) { const a = f0 + j * per, b = Math.min(f1, a + per); if (b > a) parts.push({ a, b, file: `${out}.part${j}.mp4` }); }
+  let done = 0;
+  await Promise.all(parts.map(async part => {
+    const page = await openPage(browser);
+    const ff = spawn(FF, ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-c:v', CAPTURE === 'png' ? 'png' : 'mjpeg', '-framerate', String(FPS), '-i', '-',
+      '-vf', COLOUR_VF, '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, ...(X264 ? ['-x264-params', X264] : []), '-profile:v', PROFILE, '-pix_fmt', PIX_FMT, ...COLOUR_TAGS, '-r', String(FPS), part.file], { stdio: ['pipe', 'inherit', 'inherit'] });
+    const closed = new Promise((res, rej) => ff.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg exited ' + c)))));
+    for (let i = part.a; i < part.b; i++) {
+      const buf = await page.frame(i / FPS, CAPTURE);
+      if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
+      if (++done % 150 === 0) console.log(`frame ${done}/${n}  ${((Date.now() - started) / 1000).toFixed(0)}s`);
+    }
+    ff.stdin.end(); await closed; await page.context().close();
+  }));
+  await browser.close();
+  // join the chunks without re-encoding, then lay the score under the picture
+  const list = `${out}.parts.txt`;
+  fs.writeFileSync(list, parts.map(p => `file '${path.resolve(p.file)}'`).join('\n') + '\n');
+  const args = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list];
+  if (audio) args.push('-ss', String(AFROM != null ? Number(AFROM) : f0 / FPS), '-i', audio);
+  args.push('-map', '0:v');
+  if (audio) args.push('-map', '1:a', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest');
+  args.push('-c:v', 'copy', '-movflags', '+faststart', out);
+  await run(args);
+  if (!process.env.KEEP_PARTS) { parts.forEach(p => fs.unlinkSync(p.file)); fs.unlinkSync(list); }
+  console.log(`wrote ${out}: ${n} frames at ${1080 * SCALE}×${1350 * SCALE} in ${((Date.now() - started) / 1000).toFixed(0)}s`);
+})().catch(e => { console.error(e); process.exit(1); });

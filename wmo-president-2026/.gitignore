@@ -1,0 +1,4 @@
+out/
+# the office's photographs stay out of the repository: they are placed in photos/ for each render
+photos/*
+!photos/README.md
