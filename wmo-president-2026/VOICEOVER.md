@@ -1,4 +1,8 @@
-# Narration
+# Narration (not used)
+
+The requester decided on 2 October 2026 to publish the feed cut without a voice-over: music and the recorded places
+only, with the words on screen. What follows is kept for the record and for a later edition: `score.py --vo vo/` still
+places a narration from `voiceover.json` if one is wanted.
 
 **The current narration** is for the feed cut (59.5 s). A narrator reads it in the third person.
 - **Voice:** an AI voice, Higgsfield Seed Audio, preset voice "Holden", at speech rate +15. It was generated on

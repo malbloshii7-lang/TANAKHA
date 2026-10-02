@@ -20,8 +20,9 @@ from who sees and answers the post in its first two hours, not from the film. So
 - **Post on Wednesday 7 or Thursday 8 October, at 07:00 UTC (11:00 Abu Dhabi).** Post nothing else for 24 hours either
   side.
 - **Follow up after 3–5 days with a set of photographs.** The office already has them.
-- **Captions:** upload `four-weeks-three-regions.voice.en.srt` as the video's captions. These are the narrator's words;
-  LinkedIn accepts one caption file.
+- **Captions:** the film has no voice; its words are on screen in English. If the office wants captions, upload
+  `four-weeks-three-regions.ar.srt` (the Arabic of the on-screen words), and check on a phone that they do not sit over
+  the English.
 
 ## English (the post)
 
