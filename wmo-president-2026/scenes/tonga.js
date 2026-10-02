@@ -19,7 +19,8 @@
 //   the cloud: the cumulus of the image of the day itself, at their true bearings and distances (k-means puffs of the
 //     cloud's pixels), bases at 0.9 km (GFS 2 m T/Td gives an LCL of 0.95 km; the small clouds' shadows give 0.6-0.9 km),
 //     the big cluster built up to about 1.8 km (its shadow lies 0.8-1 km to the south-west). Elsewhere the sky was clear
-//     (0.6% cloud on the tile); clouds too small to read as cloud on the plate (under 16 px) are left out.
+//     (0.6% cloud on the tile). The small cumulus about 200 m across at 9 km (074 deg) and the specks farther off are left out:
+//     under 40 px wide, alone in a clear sky, they would read at thumbnail size as small flying shapes.
 //   the wind: GFS (15 Sep 18Z, 3 h): 7.2 m/s from 129 deg at 10 m, 5.8 m/s from 122 deg at 925 hPa: the cumulus drift to
 //     the west-north-west (right to left here, about 9 px in the 17 s) and the palm streams toward 309 deg.
 // Life: the small waves of the south-east trade (a short fetch over the harbour: about 0.3 m, 2.5 s) spill along the reef
@@ -27,8 +28,8 @@
 // outrigger canoe of the quiet lagoon (a dugout hull, katea; two straight booms, kiato; the float, hama, to port; the
 // U-shaped tauama joining them: Tongan Wikipedia, "Pōpao"; proportions after Te Rangi Hīroa's Samoan paopao) slowly
 // across the flat, right to left; the palm's fronds stream and lift in the trade; the cloud drifts. Nothing else in the sky.
-// The print (lt 9.4 on) covers x 581-925, y 367-609: the canoe stays left of x 330, the breakers at y 343-352 and the palm
-// and the cloud above y 250 stay clear of it.
+// The print (lt 9.4 on) covers x 581-925, y 367-609: the canoe stays left of x 310 (it is at x 150-180 by lt 9.4), and the
+// breakers (y 343-352), the islets (y 336-341), the palm (above y 260) and the cloud (above y 250) all stay clear of it.
 // Not drawn: the town, the harbour, any building (none is in this field of view), people's faces.
 const TGP = (() => {
   const D = TONGA_DATA, rad = Math.PI / 180;
@@ -205,8 +206,8 @@ const TGP = (() => {
         const R = 0.08 + r() * 0.14, pts = [];
         for (let m = 0; m < 9; m++) { const a = m / 9 * TAU, q = R * (0.7 + 0.5 * r()); pts.push(E3.proj([x + Math.cos(a) * q, y + Math.sin(a) * q * 0.9, -0.75])); }
         S.stones.push({ pts, a: vis });
-      } else if (v > 1.3 && s < 40 && r() < 0.25) { // the sand's ripple marks
-        const L = 0.6 + r() * 0.9, pts = [];
+      } else if (v > 1.3 && s < 40 && r() < 0.06) { // the sand's ripple marks
+        const L = 0.3 + r() * 0.35, pts = [];
         for (let m = 0; m <= 6; m++) { const u = (m / 6 - 0.5) * L, w = 0.03 * Math.sin(m * 0.9 + k); pts.push(E3.proj([x + cr[0] * u + wv[0] * w, y + cr[1] * u + wv[1] * w, -0.8])); }
         S.ripples.push({ pts, a: vis * 0.8 });
       }
@@ -275,7 +276,7 @@ const TGP = (() => {
       }).filter(o => o.d > 10);
       if (!items.length) return;
       const x0 = Math.min(...items.map(o => o.p[0] - o.rr)), x1 = Math.max(...items.map(o => o.p[0] + o.rr));
-      if (x1 - x0 < 16 || x1 < 0 || x0 > PW) return; // too small to read as a cloud on the plate
+      if (x1 - x0 < 40 || x1 < 0 || x0 > PW) return; // a small cumulus would be a speck in the clear sky (at thumbnail size, a small flying shape)
       const air = R11.air(c.d, 30000), yb = pr(c.cx + ox, c.cy + oy, c.base)[1], small = x1 - x0 < 45;
       const y0 = Math.min(...items.map(o => o.p[1] - o.rr));
       // far to near; at one depth, the higher turrets first, so the lower ones overlap their feet
@@ -323,8 +324,8 @@ const TGP = (() => {
       const xs = items.filter(o => o.p[1] + o.rr > yb).map(o => { const hh = Math.sqrt(Math.max(0, o.rr * o.rr - ((yb - o.p[1]) / 0.92) ** 2)); return [o.p[0] - hh, o.p[0] + hh]; });
       if (xs.length) {
         const a0 = Math.min(...xs.map(v => v[0])), a1 = Math.max(...xs.map(v => v[1])), bh = Math.max(2.5, (yb - y0) * 0.2);
-        if (OPT.colour) washFade([a0, yb - bh, a1, yb + 0.5], [[0, '#8FA3BE', 0], [1, '#6A7F9D', (small ? 0.3 : 0.48) * air]], 0, 1, clipU);
-        if (!small) { const hb2 = bh * 0.55; ctx.save(); ctx.beginPath(); ctx.rect(a0, yb - hb2, a1 - a0, hb2); ctx.clip(); hatch(clipU, [a0, yb - hb2, a1, yb], 0, 1.8, 1, INK, 0.5, 0.15 * air, 4300 + c.id); ctx.restore(); }
+        if (OPT.colour) washFade([a0, yb - bh * 1.4, a1, yb + 0.5], [[0, '#8FA3BE', 0], [0.6, '#7F93B0', 0.22 * air], [1, '#6A7F9D', (small ? 0.3 : 0.42) * air]], 0, 1, clipU);
+        
         stroke(new P([[a0 + 1.5, yb], [a1 - 1.5, yb]]), 1, INK, small ? 0.45 : 0.7, (small ? 0.2 : 0.4) * air);
       }
     });
@@ -383,7 +384,7 @@ const TGP = (() => {
   // the bottom through the water: seagrass, rubble, the sand's ripple marks (static: the bottom does not move)
   function drawBottom() {
     const bands = (list, nb, fn) => { const B = Array.from({ length: nb }, () => []); list.forEach(o => B[Math.min(nb - 1, Math.floor(o.a * nb))].push(o)); B.forEach((g, k) => { if (g.length) fn(g, (k + 0.5) / nb); }); };
-    bands(S.ripples, 5, (g, a) => { ctx.save(); ctx.globalAlpha = SA * a * 0.2; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#2C6B66' : INK; ctx.lineWidth = 0.6; ctx.lineCap = 'round'; ctx.beginPath(); g.forEach(o => { ctx.moveTo(o.pts[0][0], o.pts[0][1]); o.pts.slice(1).forEach(q => ctx.lineTo(q[0], q[1])); }); ctx.stroke(); ctx.restore(); });
+    bands(S.ripples, 5, (g, a) => { ctx.save(); ctx.globalAlpha = SA * a * 0.15; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = OPT.colour ? '#2C6B66' : INK; ctx.lineWidth = 0.6; ctx.lineCap = 'round'; ctx.beginPath(); g.forEach(o => { ctx.moveTo(o.pts[0][0], o.pts[0][1]); o.pts.slice(1).forEach(q => ctx.lineTo(q[0], q[1])); }); ctx.stroke(); ctx.restore(); });
     bands(S.stones, 4, (g, a) => {
       ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = SA * a * 0.28; ctx.fillStyle = OPT.colour ? '#6A7A5E' : '#9A8F80';
       ctx.beginPath(); g.forEach(o => { ctx.moveTo(o.pts[0][0], o.pts[0][1]); o.pts.slice(1).forEach(q => ctx.lineTo(q[0], q[1])); ctx.closePath(); }); ctx.fill();
@@ -451,18 +452,22 @@ const TGP = (() => {
     for (let i = 0; i < n; i++) {
       const s = E[i].s, ph = (s + v * lt) / gap, k = Math.floor(ph), f = ph - k;
       const grp = 0.5 + 0.5 * Math.cos(TAU * (k * gap / v) / Tset + 0.8), size = 0.2 + 0.8 * Math.pow(grp, 1.6);
-      const trail = Math.exp(-f / 0.34) * (1 - Math.exp(-f / 0.025)), wobb = 0.8 + 0.2 * noise(s / 23, k * 1.3, 21);
-      foam[i] = clamp(0.16 + size * trail * wobb * 1.15);
+      const trail = Math.exp(-f / 0.34) * (1 - Math.exp(-f / 0.025)), wobb = 0.5 + 0.5 * noise(s / 9, k * 1.3, 21);
+      foam[i] = clamp(0.06 * (0.5 + noise(s / 15, 3, 22)) + size * trail * wobb * 1.3);
+    }
+    // per vertex: the white's height above the edge line (the breaking crest) and below it (the white water spreading in)
+    const up = [], dn = [];
+    for (let i = 0; i < n; i++) {
+      const px = F / Math.hypot(E[i].p[0], E[i].p[1]), f = foam[i]; // px per metre at this distance
+      const rag = 0.7 + 0.6 * noise(E[i].s / 6, 7, 23); up.push(Math.max(0.4, 0.62 * px * f * rag)); dn.push(Math.max(0.7, (0.3 + 0.9 * f) * px * 1.4 * rag));
     }
     for (let i = 0; i < n - 1; i++) {
       const a = pts[i], b = pts[i + 1], f = (foam[i] + foam[i + 1]) / 2;
       if ((a[0] < -4 && b[0] < -4) || (a[0] > PW + 4 && b[0] > PW + 4)) continue;
-      const d = Math.hypot(E[i].p[0], E[i].p[1]), px = F / d; // px per metre at this distance
-      const up = Math.max(0.6, 0.62 * px * f), dn = Math.max(1.1, (0.35 + 0.9 * f) * px * 1.4);
       // the breaker's face, in shade against the light, just under the white
-      stroke(new P([[a[0], a[1] + dn + 0.2], [b[0], b[1] + dn + 0.2]]), 1, OPT.colour ? '#0F4A63' : INK, 0.7, 0.18 + 0.4 * f);
-      // the white water (paper), its crest a little above the edge line, spreading in toward the eye
-      mask(new P([[a[0], a[1] - up], [b[0], b[1] - up], [b[0], b[1] + dn], [a[0], a[1] + dn]], true), clamp(0.25 + f * 1.3));
+      stroke(new P([[a[0], a[1] + dn[i] + 0.2], [b[0], b[1] + dn[i + 1] + 0.2]]), 1, OPT.colour ? '#0F4A63' : INK, 0.7, 0.18 + 0.4 * f);
+      // the white water (paper)
+      if (f > 0.05) mask(new P([[a[0] - 0.3, a[1] - up[i]], [b[0] + 0.3, b[1] - up[i + 1]], [b[0] + 0.3, b[1] + dn[i + 1]], [a[0] - 0.3, a[1] + dn[i]]], true), clamp(0.1 + f * 1.5));
     }
     // the foam that the broken waves leave drifting in over the flat
     for (let i = 0; i < n - 1; i += 2) {

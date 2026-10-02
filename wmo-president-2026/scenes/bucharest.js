@@ -208,6 +208,9 @@
       p.slice().reverse().forEach(q => { while (hi.length > 1 && cr(hi[hi.length - 2], hi[hi.length - 1], q) <= 0) hi.pop(); hi.push(q); });
       return lo.slice(0, -1).concat(hi.slice(0, -1));
     },
+    // the ruling of large polygons clipped at the near plane is anchored to the plate (their own boxes jump as the eye
+    // moves, which would make the lines crawl and shimmer)
+    PB: [-40, -40, 1012, 764],
     bbox(path) { const xs = path.pts.map(p => p[0]), ys = path.pts.map(p => p[1]); return [Math.min(...xs) - 2, Math.min(...ys) - 2, Math.max(...xs) + 2, Math.max(...ys) + 2]; },
     // a shadow cast on the ground (z 0) by a world point
     sh(p) { const s = this.S; return [p[0] - s[0] * p[2] / s[2], p[1] - s[1] * p[2] / s[2], 0]; },
@@ -259,7 +262,7 @@
       }
       const band = new P([[-20, hy + 2], ...pts, [PW + 20, hy + 2]], true);
       if (OPT.colour) wash(band, '#9AAE9A', 0.42);
-      hatch(band, [-20, hy - 40, PW + 20, hy + 3], 0, 2.4, 1, INK, 0.55, 0.13, 15001);
+      hatch(band, this.PB, 0, 2.4, 1, INK, 0.55, 0.13, 15001);
       stroke(new P(pts), 1, INK, 0.6, 0.2);
       // the houses (110-350 m): two storeys under hipped or gabled roofs of clay tile, rendered walls, seen between the
       // trees' trunks
@@ -295,7 +298,7 @@
         const body = new P(top.concat(bot.reverse()), true);
         mask(body);
         if (OPT.colour) wash(body, '#5C7C3E', 0.58);
-        hatch(body, this.bbox(body), -0.25, 2.1, 1, INK, 0.6, 0.34, 15300 + k);
+        hatch(body, this.PB, -0.25, 2.1, 1, INK, 0.6, 0.34, 15300 + k);
         stroke(new P(top), 1, INK, 0.7, 0.45);
       });
     },
@@ -381,9 +384,8 @@
       [[[-Fz, -Fz], [-Fz, Fz]], [[-Fz, -Fz], [Fz, -Fz]]].forEach(([a, b], k) => {
         const q = this.poly([[a[0], a[1], 0.08], [b[0], b[1], 0.08], [b[0], b[1], H], [a[0], a[1], H]]);
         if (!q) return;
-        const bb = this.bbox(q);
-        hatch(q, bb, 0.78, 3.0, 1, INK, 0.45, 0.13, 15400 + k);
-        hatch(q, bb, -0.78, 3.0, 1, INK, 0.45, 0.13, 15410 + k);
+        hatch(q, this.PB, 0.78, 3.0, 1, INK, 0.45, 0.13, 15400 + k);
+        hatch(q, this.PB, -0.78, 3.0, 1, INK, 0.45, 0.13, 15410 + k);
         E3.line([[a[0], a[1], H], [b[0], b[1], H]], INK, 0.9, 0.6);
         E3.line([[a[0], a[1], 0.08], [b[0], b[1], 0.08]], INK, 0.7, 0.45);
         const n = Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2.6);
@@ -409,12 +411,12 @@
         if (!q) return;
         mask(q, 0.85);
         if (OPT.colour) wash(q, '#D9C49A', 0.55);
-        hatch(q, this.bbox(q), 0.05, 2.4, 1, INK, 0.5, 0.12, 15500 + k);
+        hatch(q, this.PB, 0.05, 2.4, 1, INK, 0.5, 0.12, 15500 + k);
         E3.line([[a[0] - nx, a[1] - ny, 0], [b[0] - nx, b[1] - ny, 0]], INK, 0.6, 0.35);
         E3.line([[a[0] + nx, a[1] + ny, 0], [b[0] + nx, b[1] + ny, 0]], INK, 0.6, 0.35);
       });
       const plot = this.poly([[-2, -10.5, 0], [2.5, -10.5, 0], [2.5, -8, 0], [-2, -8, 0]]);
-      if (plot) { mask(plot); if (OPT.colour) wash(plot, '#A7835A', 0.55); hatch(plot, this.bbox(plot), 0.02, 1.8, 1, INK, 0.5, 0.3, 15520); stroke(plot, 1, INK, 0.6, 0.4); }
+      if (plot) { mask(plot); if (OPT.colour) wash(plot, '#A7835A', 0.55); hatch(plot, this.PB, 0.02, 1.8, 1, INK, 0.5, 0.3, 15520); stroke(plot, 1, INK, 0.6, 0.4); }
       const segs = [];
       this.blades.forEach(([x, y, h, lx, ly, w]) => {
         const d = E3.depth([x, y, 0]);
@@ -455,7 +457,7 @@
       const list = this.shadowPolys(t);
       if (!list.length) return;
       if (OPT.colour) { ctx.save(); ctx.beginPath(); list.forEach(p => p.trace(ctx, 1)); ctx.globalAlpha = SA * 0.42; ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#4A6684'; ctx.fill('nonzero'); ctx.restore(); }
-      hatch(list, [0, this.hy, PW, PH], 0.12, 2.2, 1, INK, 0.6, OPT.colour ? 0.22 : 0.34, 15600);
+      hatch(list, this.PB, 0.12, 2.2, 1, INK, 0.6, OPT.colour ? 0.22 : 0.34, 15600);
     },
 
     /* ---------- the instruments and the observer, far to near ---------- */
