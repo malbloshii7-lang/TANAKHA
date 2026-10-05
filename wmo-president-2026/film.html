@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Four Weeks, Three Regions</title>
+<meta name="description" content="A short film for LinkedIn (1080×1350) of the WMO President's missions to Kyrgyzstan, the South-West Pacific and Bucharest, 5 September – 3 October 2026, rendered live on a canvas." />
+<link href="fonts/fonts.css" rel="stylesheet" /><!-- self-hosted (SIL OFL 1.1): the render never needs the network -->
+<style>
+  html,body{margin:0;height:100%;background:#14110e}
+  body{display:grid;place-items:center;overflow:hidden}
+  canvas{display:block;height:min(100vh,calc(100vw * 5 / 4));width:auto;aspect-ratio:4/5}
+</style>
+</head>
+<body>
+<canvas id="film" width="1080" height="1350" aria-label="Four Weeks, Three Regions: the WMO President's missions, September to October 2026"></canvas>
+<script src="engine.js"></script>
+<script src="engrave3d.js"></script>
+<script src="scenes/kit.js"></script>
+<script src="scenes/kit3d.js"></script>
+<script src="scenes/open.js"></script>
+<script src="data/kyrgyz.js"></script>
+<script src="scenes/kyrgyz.js"></script>
+<script src="data/tonga.js"></script>
+<script src="scenes/tonga.js"></script>
+<script src="data/regionv.js"></script>
+<script src="scenes/regionv.js"></script>
+<script src="data/bucharest.js"></script>
+<script src="scenes/bucharest.js"></script>
+<script src="scenes/close.js"></script>
+<script src="timeline.js"></script>
+<script src="start.js"></script>
+</body>
+</html>

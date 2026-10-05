@@ -1,0 +1,963 @@
+'use strict';
+// Etihad Rail near Al Dhaid, Sharjah: a freight train on the double-track embankment across the plain, the Hajar front
+// on the eastern horizon. Drawn in true perspective from one viewpoint, the eye 12 m up on a high dune, looking east,
+// with a 28-degree field across the plate (1805 px a radian); the camera pans to follow the train.
+//   The Hajar front: the computed skyline over UAE ground from 25.29 N, 55.86 E (data/build/rak_skyline.py
+//   25.29 55.86 70 165; the pan looks along bearings to ~163): 0.7-1.5 deg high, 25-36 km away.
+//   The locomotive: an EMD SD70-family diesel-electric as Etihad Rail runs them, 22.6 m long, about 5 m high, six axles
+//   on two three-axle bogies, sand ploughs at both ends; light grey with broad bands (engraved as dense hatching, never
+//   as colour), no logo. Diesel: no overhead wires. In-cab signalling: no lineside signals. No level crossings.
+//   The wagons: open hopper wagons of crushed stone (Etihad Rail carries aggregates and building materials; ADMO 2023),
+//   heading west from the Hajar. No containers: since 20 Sep 2026 a container train on the Fujairah line reads as the
+//   Hormuz bypass. The wagon's size is typical of a four-axle aggregate hopper (15 m, 3 m wide, 3.9 m above the rail);
+//   match it to Etihad Rail's photographs before the master.
+//   The embankment: sand trapped in the ditch on the windward side, clean ballast; the fence along the right of way.
+//   Speed 80 km/h (22.2 m/s). The beat shows the head end only.
+// Revision 11 (?rev11) also sets dromedaries on the plain outside the right of way (camel11; the approved cut draws none):
+//   Etihad Rail fences its corridor, with a wire "camel fence" along each side of the railway where the land is grazed
+//   (Technical Specification CE01.1 General Civil Works, X0231-UAE-EGE-FS-00001-03, s7.6; cattle grids at its gates,
+//   s7.10.4), and built camel, gazelle and reptile crossings under the line: 16 camel underpasses "in alignment with
+//   camel farms", with drift fences leading the animals to them (Gulf News, 11 Sep 2023; The National, 12 Aug 2021: 10
+//   on Stage Two's Package A, 6 on Package B); on the Sharjah-Fujairah line the viaducts also carry the line over camel
+//   crossings (Moreno, Joy and Catalan, IABSE Nanjing 2022) and its last package has 20 animal crossings (Fujairah
+//   Observer, 13 Oct 2022). No crossing is drawn here: this stretch runs on a 2.5 m bank, too low for an underpass (a
+//   camel underpass is about 3.6 m high: The National, 7 Jan 2016). So the camels graze and walk outside the fence, calm
+//   beside a line they know: three cows and a calf beyond the near fence, between it and the eye's dune; a cow and calf,
+//   then three more, far out on the far side, past where that side's fence would stand (it is not drawn).
+//   The dromedary, from body measurements of adult camels (Elbashir et al. 2011, Butana, 256 camels: 1.81 m at the
+//   withers, body 1.57 m from the point of the shoulder to the pin bone, neck 1.19 m, face 0.48 m; Dich et al. 2023,
+//   Algeria: tail 0.58 m) and the brief's 1.8-2.0 m at the shoulder and 2.1 m at the hump: drawn 1.90 m at the withers
+//   and 2.10 m at the hump, the trunk deep and narrow, the hump mid-back, the rump falling to a thin tail, the long
+//   neck dipping forward from the chest and rising to a small head, long legs with knobbed knees and a backward hock,
+//   broad flat pads. A calf is drawn at 0.68 of a cow. Their walk is the camel's lateral gait (both legs of a side
+//   together, the hind a little ahead), slow (0.3-0.5 m/s); the tail swings slowly. Coats: tan, a dark (majaheem) and a
+//   pale (maghateer) camel. Nothing about them reacts to the train.
+// Revision 11, the camels eating the desert's own plants (the requester: "the camel eating desert grass in uae desert
+//   in the rail scene"). The plain is sown with its plants at true size (sow11, one new seeded stream), and most of the
+//   herd eats:
+//   The plants. On camel-grazed gravel plains in the UAE rimth (Haloxylon salicornicum) is the dominant perennial and
+//   thanda (Cyperus conglomeratus) a co-dominant (El-Keblawy, Ksiksi and El Alqamy 2009, J. Arid Environments 73:
+//   347-354); on the Madam plain toward Dhaid, a mixed gravel and sand surface, arta (Calligonum comosum) stands on
+//   small sand mounds of its own, rimth on smaller ones, and thanda takes the open sandy spots (ENHG Bulletin 27, 1985,
+//   "A Botanical Reconnaissance of the Northern Emirates"); thumam (Panicum turgidum), the desert grass camels graze
+//   even when it is dry, grows in Sharjah (UAE Flora, uaeflora.ae) and is the native tuman grass trialled at the Dhaid
+//   Research Station. Thumam: a pale glaucous tussock of stiff, woody, jointed culms with brown sheaths at the swollen
+//   nodes, 0.4-1 m high and about as wide, catching sand into a low hummock (UAE Flora; PROTA, Brink 2006; World Flora
+//   Online); Pennisetum divisum, also called thumam, looks the same out of flower (UAE Flora) and is not drawn apart.
+//   Thanda: a tuft of stiff arching leaves and culms 0.26-0.44 m high (UAE Flora: 30-70 cm; WFO: 4-30 cm),
+//   brown-sheathed at the base, with small brown heads of spikelets. Arta: a leafless broom of thin jointed branches,
+//   1-1.6 m. Rimth as before (shrub11). Outside the fence they are grazed, the thumam cropped even; inside it, out of
+//   the camels' reach, a few stand taller and in seed. More grow where the near herd feeds; the far plain has a sparse
+//   scatter. The ghaf stay as they were (heritage).
+//   How a camel eats (Iqbal and Khan 2001, a review of camel feeding behaviour; Slimani et al. 2013, LRRD 25(12): 1-4
+//   bites a plant, feeding on the move; Dittmann et al. 2017, J. Exp. Zool. 327: 98-109): the split, prehensile upper
+//   lip gathers the culms, the lower incisors close on them against the dental pad, and a pull of the head tears them;
+//   it chews with the lower jaw swinging to the side, a camel changing side with every stroke (Bürger 1966 and
+//   Hendrichs 1965, in Dittmann et al.), more slowly than cattle chew: one stroke in 0.85 s of the scene clock. So the
+//   dark cow nearest the eye grips a thumam tussock (its culms bend to her lips), pulls up and to the side, tears a
+//   mouthful at t 2.05 (the cut stubs spring back; the tussock is shorter where she pulled), lifts her muzzle to about
+//   1.4 m, below her withers, with the torn culms hanging from her lips and chews them in by t 3.8, and lowers it
+//   again; the tan cow crops another tussock a bite at a time (her lips tug the culms, which spring back cropped); the
+//   pale cow browses a rimth bush; her calf crops a thanda tuft; far out, three graze, a calf and a cow walk. The near
+//   herd was brought to 44-53 m from the eye (from 43-62 m) so their eating reads, still outside the fence. Every
+//   motion is a pure function of the scene clock.
+const RAIL = { cx: 1435, hz: 430, f: 1805, eye: 12.0, azC: 90, x0: 985, x1: 1885, y0: 100, y1: 1000 };
+scene({
+  id: 'rail',
+  init() {
+    this.sky = [[70.0,1.032],[70.4,1.034],[70.8,1.001],[71.2,1.056],[71.6,1.14],[72.0,1.179],[72.4,1.2],[72.8,1.181],[73.2,1.262],[73.6,1.335],[74.0,1.275],[74.4,1.229],[74.8,1.227],[75.2,1.223],[75.6,1.226],[76.0,1.283],[76.4,1.145],[76.8,1.178],[77.2,1.064],[77.6,1.099],[78.0,1.113],[78.4,1.133],[78.8,1.098],[79.2,1.098],[79.6,1.264],[80.0,1.268],[80.4,1.195],[80.8,1.127],[81.2,1.254],[81.6,1.18],[82.0,1.195],[82.4,1.238],[82.8,1.221],[83.2,1.222],[83.6,1.25],[84.0,1.274],[84.4,1.192],[84.8,1.26],[85.2,1.256],[85.6,1.424],[86.0,1.403],[86.4,1.359],[86.8,1.212],[87.2,1.176],[87.6,1.189],[88.0,1.096],[88.4,1.106],[88.8,1.084],[89.2,1.15],[89.6,1.022],[90.0,1.067],[90.4,1.054],[90.8,0.998],[91.2,1.015],[91.6,0.977],[92.0,1.037],[92.4,0.939],[92.8,0.839],[93.2,0.843],[93.6,0.821],[94.0,0.792],[94.4,0.75],[94.8,0.716],[95.2,0.743],[95.6,0.731],[96.0,0.732],[96.4,0.692],[96.8,0.596],[97.2,0.626],[97.6,0.765],[98.0,0.671],[98.4,0.894],[98.8,0.901],[99.2,0.819],[99.6,0.9],[100.0,0.805],[100.4,0.877],[100.8,1.078],[101.2,0.889],[101.6,0.891],[102.0,0.904],[102.4,0.985],[102.8,1.109],[103.2,1.067],[103.6,0.982],[104.0,1.114],[104.4,1.015],[104.8,1.033],[105.2,1.069],[105.6,1.138],[106.0,1.072],[106.4,1.05],[106.8,1.012],[107.2,0.973],[107.6,0.933],[108.0,0.97],[108.4,0.975],[108.8,1.118],[109.2,1.035],[109.6,0.993],[110.0,0.957],[110.4,1.11],[110.8,1.141],[111.2,1.143],[111.6,1.055],[112.0,0.936],[112.4,0.957],[112.8,0.893],[113.2,0.967],[113.6,0.872],[114.0,0.794],[114.4,0.694],[114.8,0.649],[115.2,0.661],[115.6,0.683],[116.0,0.72],[116.4,0.767],[116.8,0.911],[117.2,0.9],[117.6,0.963],[118.0,0.983],[118.4,0.978],[118.8,0.968],[119.2,1.0],[119.6,0.938],[120.0,1.033],[120.4,1.122],[120.8,1.186],[121.2,1.211],[121.6,1.175],[122.0,1.152],[122.4,1.038],[122.8,1.033],[123.2,1.176],[123.6,1.22],[124.0,1.145],[124.4,1.185],[124.8,1.154],[125.2,1.013],[125.6,1.055],[126.0,1.031],[126.4,1.088],[126.8,1.117],[127.2,1.067],[127.6,1.0],[128.0,1.096],[128.4,1.078],[128.8,1.128],[129.2,1.084],[129.6,1.045],[130.0,1.054],[130.4,1.062],[130.8,1.071],[131.2,1.08],[131.6,1.083],[132.0,1.08],[132.4,1.075],[132.8,1.155],[133.2,1.066],[133.6,1.061],[134.0,1.056],[134.4,1.049],[134.8,1.041],[135.2,1.036],[135.6,1.044],[136.0,1.052],[136.4,1.06],[136.8,1.067],[137.2,1.075],[137.6,1.082],[138.0,1.088],[138.4,1.072],[138.8,1.055],[139.2,1.039],[139.6,1.023],[140.0,1.0],[140.4,0.975],[140.8,0.95],[141.2,0.924],[141.6,0.899],[142.0,0.874],[142.4,0.848],[142.8,0.823],[143.2,0.939],[143.6,0.937],[144.0,0.955],[144.4,0.789],[144.8,0.827],[145.2,0.748],[145.6,0.837],[146.0,0.742],[146.4,0.701],[146.8,0.684],[147.2,0.668],[147.6,0.651],[148.0,0.634],[148.4,0.617],[148.8,0.599],[149.2,0.582],[149.6,0.638],[150.0,0.696],[150.4,0.751],[150.8,0.695],[151.2,0.645],[151.6,0.714],[152.0,0.718],[152.4,0.614],[152.8,0.613],[153.2,0.53],[153.6,0.683],[154.0,0.705],[154.4,0.589],[154.8,0.624],[155.2,0.66],[155.6,0.698],[156.0,0.738],[156.4,0.779],[156.8,0.823],[157.2,0.866],[157.6,0.906],[158.0,0.947],[158.4,0.997],[158.8,1.04],[159.2,1.057],[159.6,1.084],[160.0,1.11],[160.4,1.135],[160.8,1.149],[161.2,1.137],[161.6,1.124],[162.0,1.109],[162.4,1.099],[162.8,1.12],[163.2,1.162],[163.6,1.218],[164.0,1.273],[164.4,1.329],[164.8,1.385]];
+    const phi = 25 * Math.PI / 180;
+    this.d = [Math.sin(phi), -Math.cos(phi)]; // direction of travel, on the ground plane (x right, y forward)
+    this.n = [Math.cos(phi), Math.sin(phi)]; // across the track, away from the camera
+    this.Q = [14, 95]; // the near track's centre line passes here (metres), where the head is at mid-beat
+    // the consist, from the head back: one locomotive, then open hopper wagons of stone
+    const r = rng(81);
+    this.cars = [{ kind: 'loco', len: 22.6, top: 4.9 }];
+    for (let k = 0; k < 50; k++) this.cars.push({ kind: 'hopper', len: 15.0, top: 3.9, heap: 0.25 + 0.2 * r() });
+    this.posts = []; for (let s = -2400; s < 400; s += 4) this.posts.push(s);
+    this.palms = Array.from({ length: 70 }, () => ({ az: 72 + r() * 18, dist: 2200 + r() * 2600, h: 9 + r() * 7, lean: (r() - 0.5) * 0.3 }));
+    // ?heritage: ghaf trees (Prosopis cineraria, the national tree) on the plain. The browse line (camels keep them bare to
+    // 3.0-3.5 m) and the stands' densities at Dhaid (29.4 trees a hectare on gravel, 93.7 on sand) are from Gallacher and
+    // El-Keblawy 2016; the trees' places are composed, not surveyed, and the plain is drawn far sparser than a stand. None
+    // stands behind the train's roofline or under the far palm grove: [bearing deg, distance m, height m]
+    this.ghaf = [[95.5, 640, 6.5], [98.5, 700, 7], [101.5, 660, 6.5], [117.5, 310, 7], [121, 335, 6.5], [145, 520, 7], [148.5, 545, 6.5]]
+      .map(([b, d, h], i) => ({ X: d * Math.sin((b - 90) * Math.PI / 180), Y: d * Math.cos((b - 90) * Math.PI / 180), h, i,
+        full: RAIL.f * h / d >= 16 })); // its style is fixed from its size, so nothing switches mid-beat
+    // Revision 11 (?rev11): the camels (see camel11) and the plants of the plain (see sow11). Each camel: s along the
+    // track and o across it (metres; the near fence stands at o -22, the eye at o -52.8), hd its heading (radians from
+    // the train's direction of travel, toward the far side positive; each is turned broadside or three-quarters to the
+    // eye, as camels are most often seen and read), sc its size (a cow 1), its coat, what it does (feed: eats from its
+    // food plant, fh m high, by bites, see feed11; walk: at v m/s), ph its own phase. A feeder bites in cycles of P
+    // (nibble: crops the tops; browse: nips a shrub), or by the bites listed in ev (tear: grips, pulls and tears a
+    // mouthful, lifts her head to gL between up and dn and chews it in until chew[1]); lower: [t0, t1, g] brings a raised
+    // head down to feed. The near group, brought to 44-53 m from the eye so their eating reads, is in view to about t
+    // 3.9 (the pan then leaves it), the far cow and calf from about t 2.4 to 4.6, the far three from t 4.5 to the end,
+    // all over the train
+    if (typeof REV11 !== 'undefined' && REV11) {
+      this.herd11 = [
+        { s: 42.5, o: -27.6, hd: 0.42, sc: 1.03, coat: 'dark', act: 'feed', food: 'thumam', fh: 0.78, ph: 1.1, side: 'near',
+          ev: [{ tA: 0.75, tG: 1.4, tC: 2.05, tR: 2.75, pm: 0.2, pl: 0.06, kind: 'tear', up: [2.0, 2.75], dn: [3.55, 4.3], gL: 0.3, chew: [2.15, 3.8] },
+            { tA: 4.3, tG: 4.8, tC: 5.35, tR: 6.0, pm: 0.18, pl: -0.05, kind: 'tear', up: [5.3, 6.0], dn: [7.2, 7.8], gL: 0.3, chew: [5.45, 7.6] }] },
+        { s: 34.5, o: -26.4, hd: -2.18, sc: 1, coat: 'tan', act: 'feed', food: 'thumam', fh: 0.66, bite: 'nibble', P: 1.35, ph: 0.3, side: 'near' },
+        { s: 37.0, o: -32.4, hd: -1.75, sc: 0.98, coat: 'pale', act: 'feed', food: 'rimth', fh: 0.5, bite: 'browse', P: 1.6, ph: 0.15, side: 'near' },
+        { s: 40.6, o: -34.6, hd: 1.2, sc: 0.68, coat: 'pale', act: 'feed', food: 'thanda', fh: 0.36, bite: 'nibble', P: 1.15, ph: 0.62, side: 'near' },
+        { s: -112, o: 118, hd: 0.84, sc: 1, coat: 'tan', act: 'feed', food: 'thumam', fh: 0.6, bite: 'nibble', P: 1.5, ph: 0.4, side: 'far' },
+        { s: -109, o: 120.5, hd: 0.9, sc: 0.68, coat: 'tan', act: 'walk', v: 0.3, ph: 0.9, side: 'far' },
+        { s: -8, o: 128, hd: 0.25, sc: 1, coat: 'tan', act: 'walk', v: 0.5, ph: 1.6, side: 'far' },
+        { s: 12, o: 134, hd: Math.PI + 0.25, sc: 1, coat: 'dark', act: 'feed', food: 'thumam', fh: 0.62, bite: 'nibble', P: 1.4, ph: 0.7, side: 'far' },
+        { s: 30, o: 138, hd: 0.3, sc: 0.97, coat: 'pale', act: 'feed', food: 'thanda', fh: 0.38, bite: 'nibble', P: 1.3, lower: [4.9, 5.9, 0.12], ph: 2.2, side: 'far' }
+      ];
+      this.herd11.forEach(cm => this.plan11(cm));
+      this.flora11 = this.sow11();
+    }
+  },
+  // the head's position along the track (metres from Q) at scene time t, and the camera's pan that keeps it in view
+  headS(t) { return -55 + 22.2 * t; },
+  pan(t) {
+    const [hx, hy] = this.at(this.headS(t), 0);
+    return Math.atan2(hx, hy) - Math.atan2(120, RAIL.f); // the head held about 120 px right of the plate's centre
+  },
+  at(s, o) { return [this.Q[0] + s * this.d[0] + o * this.n[0], this.Q[1] + s * this.d[1] + o * this.n[1]]; },
+  proj(X, Y, Z, psi) { // world (metres) to plate pixels, after panning the camera by psi (radians, to the right)
+    const c = Math.cos(psi), sn = Math.sin(psi), x = X * c - Y * sn, y = X * sn + Y * c;
+    if (y < 1) return null;
+    return [RAIL.cx + RAIL.f * x / y, RAIL.hz - RAIL.f * (Z - RAIL.eye) / y, y];
+  },
+  quad(a, b, psi) { // a face between two points along the track (s, o) pairs, from z0 to z1: [[s,o,z]...]
+    const p = a.map(([s, o, z]) => { const [X, Y] = this.at(s, o); return this.proj(X, Y, z, psi); });
+    return p.some(q => !q) ? null : new P(p.map(q => [q[0], q[1]]), true);
+  },
+  draw(lt) {
+    const psi = this.pan(lt), q = easeInOut(prog(lt, 0.2, 1.2));
+    ctx.save(); ctx.beginPath(); ctx.rect(RAIL.x0, RAIL.y0, RAIL.x1 - RAIL.x0, RAIL.y1 - RAIL.y0); ctx.clip();
+    // the Hajar front on the horizon (at infinity: it moves only with the pan)
+    const mx = az => RAIL.cx + RAIL.f * Math.tan((az - RAIL.azC) * Math.PI / 180 - psi);
+    const ridge = this.sky.map(([az, a]) => [mx(az), RAIL.hz - RAIL.f * Math.tan(a * Math.PI / 180)]);
+    const rp = new P(ridge), rf = new P(ridge.concat([[ridge[ridge.length - 1][0], RAIL.hz], [ridge[0][0], RAIL.hz]]), true);
+    if (OPT.colour) { // a clear sky down to the computed skyline, the Hajar in its rust, the plain in sand (the train keeps no colour:
+      // its livery is not shown until Etihad Rail clears it)
+      const skyP = new P(ridge.concat([[ridge[ridge.length - 1][0], RAIL.y0 - 10], [ridge[0][0], RAIL.y0 - 10]]), true);
+      washFade([RAIL.x0, RAIL.y0, RAIL.x1, RAIL.hz], [[0, HUE.sky, 0.12], [0.6, HUE.sky, 0.36], [1, HUE.dawn, 0.22]], 0, q, skyP);
+      wash(rf, HUE.hill, 0.34 * q);
+      washFade([RAIL.x0, RAIL.hz, RAIL.x1, RAIL.y1], [[0, HUE.sand, 0.3], [1, HUE.dune, 0.45]], 0, q);
+    }
+    hatch(rf, [RAIL.x0, RAIL.hz - 60, RAIL.x1, RAIL.hz], -1.3, 6, q, SEPIA, 0.7, 0.25, 811); stroke(rp, q, INK, 1.1, 0.5);
+    // a faint dust veil along the horizon, nothing more: the day is clear
+    hatch(new P([[RAIL.x0, RAIL.hz - 70], [RAIL.x1, RAIL.hz - 70], [RAIL.x1, RAIL.hz], [RAIL.x0, RAIL.hz]], true), [RAIL.x0, RAIL.hz - 70, RAIL.x1, RAIL.hz], 0, 6, q, OCHRE, 0.7, 0.12, 815);
+    // the date palms of the Al Dhaid oasis, far off
+    this.palms.forEach(p => {
+      const x = mx(p.az), top = RAIL.hz - RAIL.f * (p.h - RAIL.eye) / p.dist, base = RAIL.hz + RAIL.f * RAIL.eye / p.dist;
+      if (x < RAIL.x0 || x > RAIL.x1) return;
+      stroke(new P([[x, base], [x + p.lean * (base - top), top]]), q, OPT.colour ? '#5A3A22' : INK, 1, 0.45);
+      for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + (k - 2) * 0.55; stroke(new P([[x + p.lean * (base - top), top], [x + p.lean * (base - top) + 5 * Math.cos(a), top + 3 + 4 * Math.sin(a) * -0.5]]), q, OPT.colour ? '#3F6A2A' : INK, 0.9, OPT.colour ? 0.7 : 0.45); }
+    });
+    stroke(new P([[RAIL.x0, RAIL.hz + 1], [RAIL.x1, RAIL.hz + 1]]), q, INK, 0.8, 0.35);
+    // the plain: sparse ground hatching that closes up toward the horizon
+    for (let k = 0; k < 26; k++) { const Y = 9 + Math.pow(k, 1.9) * 2.2, y = RAIL.hz + RAIL.f * RAIL.eye / Y; if (y > RAIL.y1) continue; const w = 30 + 200 * (9 / Y); for (let x = RAIL.x0 + (k * 37) % 90; x < RAIL.x1; x += w * 1.9) stroke(new P([[x, y], [x + w, y]]), q, SEPIA, 0.8, 0.28); }
+    if (OPT.heritage) this.ghaf.forEach(g => this.ghafTree(g, psi, q));
+    // Revision 11 (?rev11): the far camels, before the bank and the train that pass in front of them
+    if (typeof REV11 !== 'undefined' && REV11 && this.herd11) this.camels11(psi, lt, q, 'far');
+    // the embankment (formation 2.5 m high, 12 m wide at the top, slopes 1:2) and the ditch on the far, windward side
+    const S0 = -2600, S1 = 500, ez = 2.5;
+    // drawn in 40 m strips so the part behind the camera simply drops out
+    const strips = (o0, z0, o1, z1) => { const out = []; for (let a = S0; a < S1; a += 40) { const f = this.quad([[a, o0, z0], [a + 40, o0, z0], [a + 40, o1, z1], [a, o1, z1]], [], psi); if (f) out.push(f); } return out; };
+    const farSlope = strips(8, ez, 13, 0), berm = strips(13, 0, 16, 0.6), ditch = strips(16, -0.4, 19, -0.4);
+    ditch.forEach(f => fill(f, OCHRE, 0.3 * q));
+    berm.forEach(f => fill(f, SEPIA, 0.12 * q));
+    farSlope.forEach(f => fill(f, SEPIA, 0.1 * q));
+    const nearSlope = strips(-8.5, 0, -3.5, ez), top = strips(-3.5, ez, 8, ez);
+    nearSlope.forEach(f => { mask(f); if (OPT.colour) wash(f, HUE.dune, 0.32 * q); hatch(f, [RAIL.x0, RAIL.hz - 20, RAIL.x1, RAIL.y1], 0.25, 5, q, SEPIA, 0.9, 0.35, 812); });
+    top.forEach(f => fill(f, SEPIA, 0.14 * q));
+    const edge = (o, z) => { const pts = []; for (let a = S0; a <= S1; a += 20) { const [X, Y] = this.at(a, o), p = this.proj(X, Y, z, psi); if (p) pts.push([p[0], p[1]]); } return new P(pts); };
+    stroke(edge(-8.5, 0), q, INK, 1, 0.55); stroke(edge(-3.5, ez), q, INK, 1, 0.6); stroke(edge(8, ez), q, INK, 0.8, 0.45); stroke(edge(16, 0), q, INK, 0.7, 0.35);
+    // the rails of both tracks
+    [[0, -0.72], [0, 0.72], [4.5, -0.72], [4.5, 0.72]].forEach(([tr, g]) => {
+      const pts = []; for (let s = S0; s <= S1; s += 20) { const [X, Y] = this.at(s, tr + g), p = this.proj(X, Y, ez + 0.3, psi); if (p) pts.push([p[0], p[1]]); }
+      if (pts.length > 1) stroke(new P(pts), q, INK, 1.1, 0.8);
+    });
+    // Revision 11 (?rev11): the plants inside the right of way, between the bank and the fence, out of the camels' reach
+    if (typeof REV11 !== 'undefined' && REV11 && this.flora11) this.plants11(psi, lt, q, 'row');
+    // the right-of-way fence on the camera side (posts every 4 m, 1.5 m tall)
+    this.posts.forEach(s => { const [X, Y] = this.at(s, -22), a = this.proj(X, Y, 0, psi), b = this.proj(X, Y, 1.5, psi); if (a && b && a[0] > RAIL.x0 - 5 && a[0] < RAIL.x1 + 5) stroke(new P([[a[0], a[1]], [b[0], b[1]]]), q, INK, Math.min(2, 60 / a[2]), 0.55); });
+    const wire = z => { const pts = []; for (let s = -2400; s <= 400; s += 16) { const [X, Y] = this.at(s, -22), p = this.proj(X, Y, z, psi); if (p) pts.push([p[0], p[1]]); } return new P(pts); };
+    stroke(wire(1.4), q, INK, 0.7, 0.45); stroke(wire(0.8), q, INK, 0.7, 0.35);
+    // the train: vehicles from the far end forward (painter's order), each a box on the near track
+    const tq = easeOut(prog(lt, 0.4, 0.8)), head = this.headS(lt), zr = ez + 0.3;
+    let s = head; const boxes = [];
+    // Revision 11 (?rev11): the CRRC aggregate wagons are 13.7 m over their couplers
+    const R11R = typeof REV11 !== 'undefined' && REV11, carLen = c => (R11R && c.kind === 'hopper' ? 13.7 : c.len), gapAfter = c => (R11R && c.kind === 'hopper' ? 0 : 1.0);
+    this.cars.forEach(c => { boxes.push({ c, s1: s, s0: s - carLen(c) }); s -= carLen(c) + gapAfter(c); });
+    boxes.reverse().forEach(b => this.vehicle(b, psi, zr, tq));
+    // Revision 11 (?rev11): the near camels, outside the near fence, nearer the eye than anything else
+    if (typeof REV11 !== 'undefined' && REV11 && this.herd11) this.camels11(psi, lt, q, 'near');
+    ctx.restore();
+  },
+  // a ghaf tree at its true size from the viewpoint, drawn as a ghaf and not the flat-topped samr: one crooked grey-brown
+  // trunk forking low into two steep limbs; a rounded, deep crown about as wide as it is tall above the browse line, its
+  // lower edge a ragged hem of drooping foliage down to the browse line (the ghaf's weeping habit)
+  ghafTree(g, psi, q) {
+    const base = this.proj(g.X, g.Y, 0, psi), top = this.proj(g.X, g.Y, g.h, psi), br = this.proj(g.X, g.Y, 3.2, psi);
+    if (!base || !top || !br || base[0] < 945 || base[0] > 1925) return;
+    const k = RAIL.f / base[2], xc = base[0], yb = br[1], yt = top[1], w = 1.05 * g.h * k, hh = yb - yt, rr = rng(870 + g.i);
+    const yc = yb - 0.3 * hh, ph = rr() * TAU, n = 20, topPts = [];
+    for (let j = 0; j <= n; j++) {
+      const u = j / n, lump = 0.1 * Math.abs(Math.sin(u * Math.PI * 3 + ph)) + 0.04 * rr();
+      topPts.push([xc - w / 2 + w * u, yc - (yc - yt) * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.65) * (0.9 + lump)]);
+    }
+    // the hem: the foliage hangs in ragged drooping tips down to the browse line, part of the crown's own outline
+    const under = [], teeth = 7;
+    for (let j = 0; j < teeth; j++) {
+      const x0 = xc + w / 2 - w * j / teeth, x1 = x0 - w / teeth, drop = (0.55 + 0.45 * rr()) * (yb - yc);
+      under.push([x0 - 0.35 * (x0 - x1), yc + drop], [x1, yc + 0.15 * (yb - yc) * rr()]);
+    }
+    const crown = new P(topPts.concat(under), true);
+    const bark = OPT.colour ? '#5E574C' : INK, lw = Math.max(1.2, 0.45 * k);
+    fill(el(xc, base[1], w / 2, 1.5, 0, TAU, 1, 0), SEPIA, 0.12 * q); // its shade on the ground, no sun direction implied
+    const fork = [xc + 0.08 * k, base[1] - 0.55 * (base[1] - yc)];
+    stroke(new P([[xc, base[1]], [xc + 0.12 * k, base[1] - 0.3 * (base[1] - yc)], fork]), q, bark, lw, 0.85);
+    stroke(new P([fork, [xc - 0.2 * w, yc + 1]]), q, bark, Math.max(1, lw * 0.7), 0.8);
+    stroke(new P([fork, [xc + 0.17 * w, yc + 1]]), q, bark, Math.max(1, lw * 0.7), 0.8);
+    mask(crown, q);
+    if (OPT.colour) wash(crown, '#6E7F5A', 0.45 * q); else fill(crown, SEPIA, 0.15 * q);
+    if (g.full) hatch(crown, [xc - w / 2, yt - 2, xc + w / 2, yb + 2], -0.2, 3, q, INK, 1, 0.28, 850 + g.i);
+    stroke(crown, q, INK, 1, 0.6);
+  },
+  // Revision 11 (?rev11): one side's camels ('near': outside the near fence, painted over the train; 'far': out on the far
+  // plain, painted before the bank) and that side's plants, far to near. A feeder is painted with its food plant: the
+  // plant's far culms, the camel, then the near culms and what the camel holds in its mouth, so its muzzle is in the plant
+  camels11(psi, lt, q, side) {
+    const items = [];
+    this.herd11.forEach((cm, i) => {
+      if (cm.side !== side) return;
+      const fr = this.camelFrame11(cm, lt), p = this.proj(fr.P[0], fr.P[1], 0, psi);
+      if (!p) return;
+      const pl = cm.act === 'feed' ? this.flora11.find(f => f.food === i) : null;
+      items.push({ d: p[2], draw: () => {
+        if (!pl) { this.camel11(cm, i, fr, psi, lt, q); return; }
+        const st = this.eaten11(pl, cm, fr, psi, lt);
+        this.plant11(pl, psi, q, 'back', st);
+        this.camel11(cm, i, fr, psi, lt, q);
+        this.plant11(pl, psi, q, 'front', st);
+      } });
+    });
+    this.flora11.forEach(pl => { if (pl.side === side && pl.food < 0) { const p = this.proj(pl.X, pl.Y, 0, psi); if (p) items.push({ d: p[2], draw: () => this.plant11(pl, psi, q, 'all', null) }); } });
+    items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
+  },
+  // Revision 11 (?rev11): one region's plants alone ('row': inside the right of way), far to near
+  plants11(psi, lt, q, side) {
+    const items = [];
+    this.flora11.forEach(pl => { if (pl.side === side) { const p = this.proj(pl.X, pl.Y, 0, psi); if (p) items.push({ d: p[2], pl }); } });
+    items.sort((a, b) => b.d - a.d).forEach(it => this.plant11(it.pl, psi, q, 'all', null));
+  },
+  // a camel's place and frame this frame: P its ground point (a walker moves on at v), f forward and l to its left on the
+  // ground, W(a, b, c) a point of its body (a forward, b left, c up, in a cow's metres) in the world
+  camelFrame11(cm, lt) {
+    const f = [Math.cos(cm.hd) * this.d[0] + Math.sin(cm.hd) * this.n[0], Math.cos(cm.hd) * this.d[1] + Math.sin(cm.hd) * this.n[1]], l = [-f[1], f[0]];
+    const [X0, Y0] = this.at(cm.s, cm.o), m = cm.act === 'walk' ? cm.v * (lt - 3.0) : 0, P = [X0 + f[0] * m, Y0 + f[1] * m], k = cm.sc;
+    return { P, f, l, W: (a, b, c) => [P[0] + (a * f[0] + b * l[0]) * k, P[1] + (a * f[1] + b * l[1]) * k, c * k] };
+  },
+  // smoothstep on 0..1
+  ss11(u) { u = clamp(u); return u * u * (3 - 2 * u); },
+  // Revision 11 (?rev11): a feeding camel's plan, fixed once: its bites (each: tA the lips start to work in, tG they
+  // grip, tC the bite or the tear, tR the pull is over; pm the pull's lift of the head (rad), pl its pull to the side
+  // (m)), its chewing between bites, and gF, the neck's lowering that brings its lips to the bite's height on its plant
+  plan11(cm) {
+    if (cm.act !== 'feed') return;
+    cm.chew0 = cm.ev ? 0 : 0.7;
+    if (!cm.ev) {
+      cm.ev = [];
+      const t0 = cm.lower ? cm.lower[1] : -2 * cm.P;
+      for (let k = 0, tA = t0 + (cm.ph % 1) * cm.P; tA < 8; k++, tA += cm.P) {
+        cm.ev.push({ tA, tG: tA + 0.32 * cm.P, tC: tA + 0.6 * cm.P, tR: tA + 0.95 * cm.P, pm: cm.bite === 'browse' ? 0.07 : 0.1, pl: (k % 2 ? 1 : -1) * 0.03, kind: cm.bite });
+      }
+    }
+    // the lips at 0.8 of the plant's height (a shrub's: 0.85); they fall as the neck lowers, so bisect
+    const zt = (cm.food === 'rimth' ? 0.85 : 0.8) * cm.fh / cm.sc;
+    let a = 0, b = 1;
+    for (let k = 0; k < 30; k++) { const m = (a + b) / 2; if (this.neck11(m, 0).lip[1] > zt) a = m; else b = m; }
+    cm.gF = (a + b) / 2;
+  },
+  // Revision 11 (?rev11): the neck and head for a lowering g (0 carried, 1 at the ground) and a lift of the head (rad,
+  // muzzle up): the neck's five segments keep their lengths, their angles (deg, up positive) blended from carried to
+  // grazing; the head 0.48 m from the poll to the muzzle, carried a little nose-down, near vertical when grazing. lip:
+  // where the lips hold a mouthful, near the muzzle's end a little below the head's axis
+  neck11(g, pitch) {
+    const rad = Math.PI / 180, segL = [0.30, 0.27, 0.27, 0.26, 0.18], up = [-28, 0, 40, 68, 80], dn = [-38, -44, -48, -52, -55];
+    const nk = [[0.78, 1.50]];
+    segL.forEach((L, k) => { const A = lerp(up[k], dn[k], g) * rad, [a, c] = nk[k]; nk.push([a + L * Math.cos(A), c + L * Math.sin(A)]); });
+    const HA = lerp(-18, -65, g) * rad + pitch, [pa, pc] = nk[5], hv = [Math.cos(HA), Math.sin(HA)], nv = [-Math.sin(HA), Math.cos(HA)];
+    return { nk, HA, pa, pc, hv, nv, lip: [pa + 0.45 * hv[0] - 0.035 * nv[0], pc + 0.45 * hv[1] - 0.035 * nv[1]] };
+  },
+  // Revision 11 (?rev11): a camel's pose at lt. A walker carries its head (g 0.22, nodding with its stride). A feeder
+  // holds its lips at its plant (gF) and, at each bite, dips them in, grips, pulls up and to the side (the neck rising a
+  // little) and lets the pull go; after a tear it lifts its head to gL and lowers it again; its head sways slowly over
+  // the plant, so each bite takes other culms. sway: the head's sideways offset (m); chew 0..1, and the lower jaw's
+  // swing jawL (m, to the camel's left) and drop jawO (m): the jaw swings to one side and back with each stroke and to
+  // the other side with the next, a stroke in 0.85 s of the scene clock, opening a little at mid-stroke
+  pose11(cm, lt) {
+    let g = 0.22, pitch = 0, sway = 0, chew = 0, G = 0;
+    if (cm.act === 'walk') g = 0.22 + 0.03 * Math.sin(2 * TAU * (lt / (2.0 * Math.pow(cm.sc, 0.8)) + cm.ph));
+    if (cm.act === 'feed') {
+      const ss = u => this.ss11(u);
+      let lat = 0;
+      g = cm.gF; chew = cm.chew0;
+      if (cm.lower) { const [t0, t1, gH] = cm.lower; g = lerp(gH, cm.gF, ss((lt - t0) / (t1 - t0))); }
+      cm.ev.forEach(e => {
+        if (lt <= e.tA) return;
+        const uA = (lt - e.tA) / (e.tG - e.tA), pull = lt < e.tC ? ss((lt - e.tG) / (e.tC - e.tG)) : 1 - ss((lt - e.tC) / (e.tR - e.tC));
+        G += lt < e.tG ? ss(uA) : lt < e.tC ? 1 : 0;
+        g += 0.035 * Math.sin(Math.PI * clamp(uA)) - 0.04 * pull;
+        pitch += e.pm * pull; lat += e.pl * pull;
+        if (e.gL !== undefined) g -= (cm.gF - e.gL) * (ss((lt - e.up[0]) / (e.up[1] - e.up[0])) - ss((lt - e.dn[0]) / (e.dn[1] - e.dn[0])));
+        if (e.chew) chew += clamp((lt - e.chew[0]) / 0.3) - clamp((lt - e.chew[1] + 0.3) / 0.3);
+      });
+      sway = 0.07 * Math.sin(TAU * lt / 4.6 + cm.ph * 3) + lat;
+    }
+    const ps = this.neck11(g, pitch), cp = Math.PI * lt / 0.85 + cm.ph * 5;
+    chew = clamp(chew);
+    return Object.assign(ps, { g, pitch, sway, chew, G: Math.min(1, G), jawL: 0.035 * chew * Math.sin(cp), jawO: 0.014 * chew * Math.pow(Math.sin(2 * cp), 2) });
+  },
+  // Revision 11 (?rev11): where a camel's lips are at lt, in the world
+  mouth11(cm, fr, lt) { const ps = this.pose11(cm, lt); return fr.W(ps.lip[0], ps.sway + 0.6 * ps.jawL, ps.lip[1]); },
+  // Revision 11 (?rev11): the plants of the plain, sown once from their own seeded stream (9101): each feeder's food
+  // plant just beyond its lips at its feeding pose; a patch where the near herd feeds; a sparse scatter over the near
+  // plain outside the fence; a few taller, ungrazed ones inside the right of way; the far plain's scatter, with a patch
+  // round each far feeder. All kept clear of the camels' bodies and of each other. Each: its kind, its ground point (X,
+  // Y), its height h and width w (m), its distance D from the eye and hp, its height in pixels there (its style is fixed
+  // from them, so nothing switches mid-beat), the camel that eats it (food) and, for the grasses, its culms
+  sow11() {
+    const r = rng(9101), out = [];
+    const axes = this.herd11.map(cm => { const fr = this.camelFrame11(cm, 3.0); return [-1.1, -0.4, 0.3, 1.0, 1.7, 2.3, 2.9].map(a => fr.W(a, 0, 0).concat(a > 1.5 ? 1.7 : 1.1)); });
+    // and none just beyond a feeder's head as the eye sees it, where it would read as the plant being eaten
+    const heads = this.herd11.filter(cm => cm.act === 'feed').map(cm => { const fr = this.camelFrame11(cm, 3.0), [x, y] = fr.W(2.3, 0, 0), d = Math.hypot(x, y); return [x, y, x / d, y / d]; });
+    const clearOfHeads = (X, Y, rad) => heads.every(([x, y, vx, vy]) => { const dx = X - x, dy = Y - y, al = dx * vx + dy * vy; return al < -1 || al > 6 || Math.abs(dx * vy - dy * vx) > rad + 1.4; });
+    const free = (X, Y, rad) => clearOfHeads(X, Y, rad) && axes.every(ax => ax.every(([x, y, , m]) => Math.hypot(X - x, Y - y) > rad + m)) && out.every(p => Math.hypot(X - p.X, Y - p.Y) > (rad + p.w / 2) * 1.2);
+    const size = (kind, grazed) => {
+      if (kind === 'thumam') { const h = grazed ? 0.4 + 0.3 * r() : 0.7 + 0.3 * r(); return [h, h * (0.95 + 0.3 * r())]; }
+      if (kind === 'thanda') { const h = 0.26 + 0.18 * r(); return [h, h * (1.1 + 0.3 * r())]; }
+      if (kind === 'rimth') { const h = 0.3 + 0.25 * r(); return [h, 1.8 * h]; }
+      const h = 1.0 + 0.6 * r(); return [h, 1.15 * h];
+    };
+    const pick = mix => { let u = r(), k = 0; while (k < mix.length - 1 && u > mix[k][1]) { u -= mix[k][1]; k++; } return mix[k][0]; };
+    const add = (kind, X, Y, h, w, side, food = -1) => {
+      const D = Math.hypot(X, Y), hp = RAIL.f * h / D, seed = 9200 + out.length, p = { kind, X, Y, h, w, D, hp, side, food, seed };
+      const n = kind === 'thumam' ? (hp > 22 ? 30 : hp > 9 ? 12 : 5) : kind === 'thanda' ? (hp > 12 ? 18 : hp > 6 ? 10 : 5) : 0;
+      if (n) p.culms = this.culms11(kind, h, w, n, rng(seed), side !== 'row');
+      out.push(p);
+    };
+    this.herd11.forEach((cm, i) => {
+      if (cm.act !== 'feed') return;
+      const fr = this.camelFrame11(cm, 3.0), [X, Y] = fr.W(this.neck11(cm.gF, 0).lip[0] + (cm.bite ? 0.1 : 0.2) / cm.sc, 0, 0), h = cm.fh;
+      add(cm.food, X, Y, h, h * { thumam: 1.05, thanda: 1.2, rimth: 1.8 }[cm.food], cm.side, i);
+    });
+    // a region's scatter: n tries over s0..s1 and o0..o1, each kind drawn from its mix
+    const scatter = (n, s0, s1, o0, o1, side, mix, grazed = true) => {
+      for (let k = 0; k < n; k++) {
+        const s = lerp(s0, s1, r()), o = lerp(o0, o1, r()), kind = pick(mix), [h, w] = size(kind, grazed), [X, Y] = this.at(s, o);
+        if (Math.hypot(X, Y) < 340 && free(X, Y, w / 2)) add(kind, X, Y, h, w, side);
+      }
+    };
+    const plain = [['thumam', 0.38], ['thanda', 0.3], ['rimth', 0.24], ['arta', 0.08]];
+    scatter(34, 27, 52, -39, -23.6, 'near', [['thumam', 0.5], ['thanda', 0.3], ['rimth', 0.2]]);
+    scatter(80, -90, 72, -52, -23.6, 'near', plain);
+    scatter(30, -260, 75, -20.5, -10.5, 'row', [['thumam', 0.55], ['thanda', 0.45]], false);
+    this.herd11.forEach(cm => { if (cm.side === 'far' && cm.act === 'feed') scatter(8, cm.s - 9, cm.s + 9, cm.o - 7, cm.o + 7, 'far', plain); });
+    scatter(460, -420, 160, 27, 230, 'far', plain);
+    return out;
+  },
+  // Revision 11 (?rev11): a grass's culms, each nine points [dx, dy, z] (m) from the plant's ground point, rising from
+  // a base narrower than its crown and leaning out more toward the rim. Thumam: stiff, a little bowed, the tops of a
+  // grazed tussock cropped even, an ungrazed one's taller and uneven, some in seed (pan); thanda: a fountain of arching
+  // leaves round a few straighter flowering culms, each with its small head (head). bk: where a pulled culm breaks (a
+  // node), as a fraction of its length; sw: its own phase
+  culms11(kind, h, w, n, r, grazed) {
+    const th = kind === 'thanda', rb0 = (th ? 0.07 : 0.17) * w, out = [];
+    for (let i = 0; i < n; i++) {
+      const u = Math.sqrt(r()), ab = r() * TAU, rb = rb0 * u, bx = rb * Math.cos(ab), by = rb * Math.sin(ab), flower = th && r() < 0.3, az = ab + (r() - 0.5) * 0.9;
+      let a0, a1, top;
+      if (th && !flower) { a0 = 0.15 + 0.45 * u + 0.15 * r(); a1 = a0 + 0.45 + 0.45 * r(); top = h * (0.55 + 0.35 * r()); }
+      else if (th) { a0 = 0.05 + 0.2 * u * r(); a1 = a0 + 0.12; top = h * (0.85 + 0.15 * r()); }
+      else { a0 = 0.05 + 0.5 * u + 0.1 * r(); a1 = a0 + 0.12 + 0.25 * r(); top = h * (grazed ? 0.86 + 0.14 * r() : 0.65 + 0.35 * r()); }
+      let cz = 0;
+      for (let j = 0; j < 8; j++) cz += Math.cos(a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5)) / 8;
+      const L = top / Math.max(0.35, cz), pts = [[bx, by, 0]];
+      for (let j = 0; j < 8; j++) { const a = a0 + (a1 - a0) * Math.pow((j + 0.5) / 8, 1.5), p = pts[j]; pts.push([p[0] + L / 8 * Math.sin(a) * Math.cos(az), p[1] + L / 8 * Math.sin(a) * Math.sin(az), p[2] + L / 8 * Math.cos(a)]); }
+      out.push({ pts, L, bk: 0.36 + 0.2 * r(), head: flower, pan: !th && !grazed && r() < 0.5, sw: r() });
+    }
+    return out;
+  },
+  // Revision 11 (?rev11): a food plant as its feeder eats it at lt. A shrub (rimth): where the lips are on screen and how
+  // hard they grip. A grass (see bites11): its culms and what the mouth holds, as world polylines
+  eaten11(pl, cm, fr, psi, lt) {
+    if (pl.kind === 'rimth') { const m = this.mouth11(cm, fr, lt), p = this.proj(m[0], m[1], m[2], psi); return p ? { m: [p[0], p[1]], G: this.pose11(cm, lt).G } : null; }
+    return pl.culms && pl.hp > 9 ? this.bites11(pl, cm, fr, lt) : null;
+  },
+  // Revision 11 (?rev11): a grass's culms at lt as its feeder bites it. For each bite begun, the culms near the lips
+  // (weight w by their distance from where the lips grip) bend toward the lips as they work in, grip and pull; at the
+  // bite the gripped ones (w over 0.7) are cut where the lips hold them (a nibble) or torn at a node lower down (a tear),
+  // and the rest are let go; every culm let go or cut springs back from where it was (a damped swing of about 0.4 s:
+  // nothing jumps). What is torn off stays in the mouth: a nibble's tops are drawn in at once; a tear's culms hang from
+  // the lips, swing with the jaw and are chewed in until its chewing ends. Returns { stubs, held }: world polylines (each
+  // held one tagged ci, the culm it came from)
+  bites11(pl, cm, fr, lt) {
+    const ss = u => this.ss11(u), thin = pl.kind === 'thanda' ? 0.6 : 1;
+    const spring = t => Math.exp(-t / 0.12) * Math.cos(TAU * t / 0.42);
+    cm.ev.forEach(e => { if (!e.M) { e.M = this.mouth11(cm, fr, e.tG); e.Mc = this.mouth11(cm, fr, e.tC); } });
+    const Mt = this.mouth11(cm, fr, lt), ps = this.pose11(cm, lt), down = [0, 0, -1], stubs = [], held = [];
+    pl.culms.forEach((c, ci) => {
+      // the culm's rest point at fraction u of its first length
+      const P = u => { const x = clamp(u) * 8, j = Math.min(7, Math.floor(x)), f = x - j, a = c.pts[j], b = c.pts[j + 1]; return [pl.X + lerp(a[0], b[0], f), pl.Y + lerp(a[1], b[1], f), lerp(a[2], b[2], f)]; };
+      const sB = (u, ug) => (u >= ug ? 1 : (u / ug) * (u / ug));
+      let lam = 1;
+      const fields = [];
+      for (const e of cm.ev) {
+        if (lt <= e.tA) break;
+        // where the lips take it: at their height, or by its tip if that is only just below them
+        const zm = e.M[2];
+        if (P(lam)[2] < zm - 0.05) continue;
+        let ug = lam;
+        if (P(lam)[2] > zm) { let a = 0, b = lam; for (let k = 0; k < 14; k++) { const m = (a + b) / 2; if (P(m)[2] < zm) a = m; else b = m; } ug = (a + b) / 2; }
+        // a tear takes a mouthful (full grip within 0.2 m of the lips), a nibble a few culms (0.09 m)
+        const R1 = (e.kind === 'tear' ? 0.2 : 0.09) * thin, R2 = (e.kind === 'tear' ? 0.42 : 0.24) * thin;
+        const pg = P(ug), w = 1 - ss((Math.hypot(pg[0] - e.M[0], pg[1] - e.M[1], pg[2] - e.M[2]) - R1) / (R2 - R1));
+        if (w < 0.002) continue;
+        if (lt < e.tC) {
+          const k = w * (lt < e.tG ? ss((lt - e.tA) / (e.tG - e.tA)) : 1);
+          fields.push([[(Mt[0] - pg[0]) * k, (Mt[1] - pg[1]) * k, (Mt[2] - pg[2]) * k], ug]);
+          continue;
+        }
+        const Dc = [(e.Mc[0] - pg[0]) * w, (e.Mc[1] - pg[1]) * w, (e.Mc[2] - pg[2]) * w], tau = lt - e.tC, sp = spring(tau);
+        if (w > 0.7) {
+          const tear = e.kind === 'tear', cut = tear ? Math.max(0.15, Math.min(ug - 0.12, c.bk * lam)) : ug;
+          // the piece in the mouth: its shape at the bite, carried by the lips; a tear's lower part swings down to hang
+          // and is chewed in with its tops; a nibble's tops are drawn straight in
+          const life = tear ? ss((tau - 0.6) / (e.chew[1] - e.tC - 0.6)) : ss(tau / 0.35), lifeTop = tear ? ss(tau / 1.3) : life;
+          if (life < 1 || lifeTop < 1) {
+            const Pc = u => { const p = P(u), s = sB(u, ug); return [p[0] + Dc[0] * s, p[1] + Dc[1] * s, p[2] + Dc[2] * s]; };
+            const anc = Pc(ug), off = [anc[0] - e.Mc[0], anc[1] - e.Mc[1], anc[2] - e.Mc[2]], hold = 1 - ss(tau / 0.3);
+            const fan = (c.sw - 0.5) * 1.1, hd = [0.3 * fr.f[0] + fan * fr.l[0], 0.3 * fr.f[1] + fan * fr.l[1], -1], hn = Math.hypot(hd[0], hd[1], hd[2]);
+            const at = u => {
+              const p = Pc(u), v = [p[0] - anc[0], p[1] - anc[1], p[2] - anc[2]];
+              let o;
+              if (u < ug) {
+                const e2 = ss(tau / 0.45), hang = (ug - u) * c.L * (1 - life), swing = 1.6 * ps.jawL * e2 * (1 - life) * (ug - u) / Math.max(0.05, ug - cut);
+                o = v.map((x, i) => lerp(x * (1 - life), hang * hd[i] / hn, e2) + (i < 2 ? swing * fr.l[i] * cm.sc : 0));
+              } else o = v.map(x => x * (1 - lifeTop));
+              return [Mt[0] + off[0] * hold + o[0], Mt[1] + off[1] * hold + o[1], Mt[2] + off[2] * hold + o[2]];
+            };
+            if (tear && life < 1) held.push(Object.assign([0, 0.25, 0.5, 0.75, 1].map(j => at(lerp(cut, ug, j))), { ci }));
+            if (lifeTop < 1 && lam - ug > 0.01) held.push(Object.assign([0, 0.5, 1].map(j => at(lerp(ug, lam, j))), { ci }));
+          }
+          lam = cut;
+        }
+        fields.push([[Dc[0] * sp, Dc[1] * sp, Dc[2] * sp], ug]);
+      }
+      stubs.push(Array.from({ length: 9 }, (_, j) => {
+        const u = lam * j / 8, p = P(u);
+        fields.forEach(([D, ug]) => { const s = sB(u, ug); p[0] += D[0] * s; p[1] += D[1] * s; p[2] += D[2] * s; });
+        return p;
+      }));
+    });
+    return { stubs, held };
+  },
+  // Revision 11 (?rev11): a plant of the plain, by kind; part 'back', 'front' or 'all' (see camels11), st how it is eaten
+  plant11(pl, psi, q, part, st) {
+    if (pl.kind === 'thumam' || pl.kind === 'thanda') this.tuft11(pl, psi, q, part, st);
+    else if (pl.kind === 'rimth') this.shrub11([pl.X, pl.Y], pl.h, psi, q, pl.seed, part, st);
+    else if (part !== 'front') this.broom11([pl.X, pl.Y], pl.h, psi, q, pl.seed);
+  },
+  // ink lines (screen polylines) in one stroke
+  ink11(lines, lw, a, col = INK) {
+    const ls = lines.filter(l => l.length > 1 && l.every(Boolean));
+    if (!ls.length || a <= 0) return;
+    ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ls.forEach(l => { ctx.moveTo(l[0][0], l[0][1]); for (let i = 1; i < l.length; i++) ctx.lineTo(l[i][0], l[i][1]); }); ctx.stroke(); ctx.restore();
+  },
+  // Revision 11 (?rev11): a thumam tussock or a thanda tuft at true size, its culms in 3D: the low hummock of sand it has
+  // caught and its shade; its body, paper and a pale wash inside the hull of its culms; the culms, darker and denser at
+  // the sheathed base; a thumam's nodes, and the lax panicles of one in seed; thanda's small brown heads. st: its culms
+  // as its feeder bites them (else at rest); part 'back' draws the shade, the body and the culms on the far side,
+  // 'front' the near culms and what the mouth holds
+  tuft11(pl, psi, q, part, st) {
+    const b = this.proj(pl.X, pl.Y, 0, psi);
+    if (!b || b[0] < RAIL.x0 - 40 || b[0] > RAIL.x1 + 40 || b[1] > RAIL.y1 + 70) return;
+    const th = pl.kind === 'thanda', kp = RAIL.f / b[2], full = pl.hp > 22 || (th && pl.hp > 12);
+    const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
+    const lines = (st ? st.stubs : pl.culms.map(c => c.pts.map(p => [pl.X + p[0], pl.Y + p[1], p[2]]))).map(l => l.map(pr));
+    const front = pl.culms.map(c => c.pts[0][0] * pl.X + c.pts[0][1] * pl.Y < 0);
+    const ink = OPT.colour ? '#4E4C32' : INK, lw = clamp(0.012 * kp, 0.45, 0.85);
+    if (part !== 'front') {
+      const rx = 0.62 * pl.w * kp, ry = Math.max(0.8, rx * RAIL.eye / b[2]);
+      fill(el(b[0], b[1] + 0.25 * ry, rx, ry, 0, TAU, pl.seed, 0), SEPIA, 0.13 * q);
+      const pts = lines.flat().filter(Boolean);
+      if (pts.length > 2) {
+        const body = new P(this.hull11(pts), true);
+        if (pl.hp > 9) mask(body, 0.4 * q);
+        if (OPT.colour) wash(body, th ? '#8C9560' : '#A4A679', 0.42 * q); else fill(body, SEPIA, 0.09 * q);
+      }
+    }
+    const sel = lines.filter((_, i) => part === 'all' || (part === 'front') === front[i]);
+    this.ink11(sel, lw, 0.62 * q, ink);
+    this.ink11(sel.map(l => l.slice(0, 3)), lw * 1.7, 0.45 * q, ink);
+    if (full) {
+      pl.culms.forEach((c, i) => {
+        const l = lines[i];
+        if (!(part === 'all' || (part === 'front') === front[i]) || !l[8] || !l[7]) return;
+        if (th && c.head) disc(l[8][0], l[8][1], Math.max(0.7, 0.022 * kp), OPT.colour ? '#5C4128' : INK, 0.75 * q);
+        if (!th && kp > 35 && l[3] && l[6]) [3, 6].forEach(j => disc(l[j][0], l[j][1], Math.max(0.45, 0.006 * kp), ink, 0.5 * q));
+        if (c.pan && kp > 25) {
+          const tip = l[8], dx = tip[0] - l[7][0], dy = tip[1] - l[7][1];
+          this.ink11([-0.5, 0, 0.5].map(a => [tip, [tip[0] + dx * 0.9 + a * 0.05 * kp, tip[1] + dy * 0.9 - 0.02 * kp]]), lw * 0.7, 0.45 * q, ink);
+        }
+      });
+    }
+    if (st && part !== 'back') this.ink11(st.held.map(l => l.map(pr)), lw * 1.5, 0.85 * q, ink);
+  },
+  // a dromedary in true 3D (see the notes at the top), built as rings round its trunk, neck, head, lower jaw, legs and
+  // tail: each pair of neighbouring rings, projected, gives a convex hull, and the hulls of a part together give its
+  // silhouette. The legs on the far side are drawn first, in shade; then the trunk, neck, head, jaw, tail and near legs
+  // as one figure: its hulls inked with a doubled line and then masked with paper, which leaves only the figure's outer
+  // contour, then toned in its coat and hatched under the belly (light from above; no sun direction is implied, as for
+  // the ghaf). Its neck and head take their pose from pose11
+  camel11(cm, idx, fr, psi, lt, q) {
+    const W = fr.W, G0 = fr.P;
+    const pr = v => { const p = this.proj(v[0], v[1], v[2], psi); return p ? [p[0], p[1]] : null; };
+    const p0 = this.proj(G0[0], G0[1], 0, psi);
+    if (!p0 || p0[0] < RAIL.x0 - 60 || p0[0] > RAIL.x1 + 60) return;
+    // its pixels a metre, from its distance (not the panning view's depth), so nothing set by its size switches mid-beat
+    const px = RAIL.f * cm.sc / Math.hypot(G0[0], G0[1]);
+    // which side faces the eye (the eye is at the world's origin)
+    const near = fr.l[0] * -G0[0] + fr.l[1] * -G0[1] > 0 ? 1 : -1;
+    // the pose (pose11): the neck's joints, the head's angle and sway, the jaw; the tail's swing; the gait
+    const walk = cm.act === 'walk', T = 2.0 * Math.pow(cm.sc, 0.8), ph = lt / T + cm.ph;
+    const ps = this.pose11(cm, lt), sway = ps.sway, HA = ps.HA, pa = ps.pa, pc = ps.pc;
+    const tail = 0.07 * Math.sin(TAU * lt / 3.1 + cm.ph * 2);
+    // rings: a list of local points; tube rings (horizontal circles) for the legs and tail
+    const N = 16, ring = (fn) => Array.from({ length: N }, (_, j) => fn(j / N * TAU));
+    const hoop = (a, b, c, r) => ring(t => [a + r * Math.cos(t), b + r * Math.sin(t), c]);
+    // a Catmull-Rom spline through rows of numbers (sections, centres, radii), m steps a span, so the contours run smooth
+    const spl = (rows, m) => {
+      const out = [], at = k => rows[clamp(k, 0, rows.length - 1)];
+      for (let k = 0; k < rows.length - 1; k++) for (let j = 0; j < (k === rows.length - 2 ? m + 1 : m); j++) {
+        const u = j / m, p0 = at(k - 1), p1 = at(k), p2 = at(k + 1), p3 = at(k + 2);
+        out.push(p1.map((_, i) => 0.5 * (2 * p1[i] + (-p0[i] + p2[i]) * u + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * u * u + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * u * u * u)));
+      }
+      return out;
+    };
+    // the trunk: [a, top, bottom, half-width, narrowing of its upper half] from the tail root to the breast
+    const trunk = spl([[-0.88, 1.60, 1.36, 0.15, 0.1], [-0.74, 1.73, 1.22, 0.21, 0.1], [-0.52, 1.84, 1.16, 0.25, 0.15], [-0.30, 1.99, 1.13, 0.27, 0.3],
+      [-0.05, 2.10, 1.10, 0.28, 0.38], [0.22, 2.01, 1.06, 0.28, 0.32], [0.45, 1.90, 1.00, 0.27, 0.18], [0.62, 1.84, 1.00, 0.25, 0.12], [0.78, 1.70, 1.12, 0.21, 0.1], [0.88, 1.55, 1.26, 0.15, 0.1]], 2);
+    const body = trunk.map(([a, t, b, w, k]) => ring(th => [a, w * Math.cos(th) * (1 - k * Math.max(0, Math.sin(th))), (t + b) / 2 + (t - b) / 2 * Math.sin(th)]));
+    const belly = trunk.map(([a, t, b, w]) => ring(th => [a, w * Math.cos(th / 2), (t + b) / 2 - (t - b) / 2 * Math.sin(th / 2) * 0.98]));
+    // the neck: its rings across the curve through its joints (neck11)
+    const nk = ps.nk, nr = [[0.23, 0.15], [0.18, 0.12], [0.14, 0.1], [0.115, 0.085], [0.1, 0.08], [0.095, 0.075]];
+    const tube = (pts, rr, bOff) => pts.map(([a, c], k) => {
+      const p = pts[Math.max(0, k - 1)], n = pts[Math.min(pts.length - 1, k + 1)], A = Math.atan2(n[1] - p[1], n[0] - p[0]), [hv, hw] = rr[k], b0 = bOff(k / (pts.length - 1));
+      return ring(th => [a - Math.sin(A) * hv * Math.sin(th), b0 + hw * Math.cos(th), c + Math.cos(A) * hv * Math.sin(th)]);
+    });
+    const nks = spl(nk.map((v, k) => v.concat(nr[k])), 3);
+    const neck = tube(nks.map(v => [v[0], v[1]]), nks.map(v => [v[2], v[3]]), u => sway * u * u);
+    // the head: from the poll, 0.48 m to the muzzle
+    const hu = [0, 0.14, 0.32, 0.48];
+    const hpts = hu.map(u => [pa + u * Math.cos(HA), pc + u * Math.sin(HA)]);
+    const head = tube(hpts, [[0.1, 0.085], [0.115, 0.085], [0.08, 0.065], [0.06, 0.05]], () => sway);
+    // the lower jaw, from its angle under the eye to the chin and the hanging lower lip: as it chews it drops a little and
+    // swings to the side, the chin most
+    const jpts = [0.14, 0.3, 0.45].map(u => { const dz = 0.055 + ps.jawO * u / 0.45; return [pa + u * ps.hv[0] - dz * ps.nv[0], pc + u * ps.hv[1] - dz * ps.nv[1]]; });
+    const jaw = tube(jpts, [[0.055, 0.06], [0.045, 0.05], [0.035, 0.04]], u => sway + ps.jawL * u);
+    // the tail: from its root under the croup, hanging, its tip swinging
+    const tl = [[-0.89, 0, 1.56], [-0.93, tail * 0.4, 1.32], [-0.95, tail, 1.06]];
+    const tailR = tl.map(([a, b, c], k) => hoop(a, b, c, [0.04, 0.03, 0.045][k]));
+    // the legs: top (inside the trunk), joint, fetlock, pad. Front: the knee (carpus) bends forward; hind: the hock bends
+    // back. A walker's feet move by the lateral gait (stance 0.68 of a stride, the hind of a side 0.1 ahead of the fore)
+    const legs = [];
+    [[1, 0.5, 1.2, 0.5, 0.13, 0.61, 0.54, 0.2, -0.1, [0.09, 0.06, 0.065, 0.035, 0.045]], [-1, -0.52, 1.25, -0.68, 0.13, 0.72, 0.55, 0.16, 0, [0.13, 0.075, 0.06, 0.035, 0.045]]].forEach(([bend, ta, tc, fa, fc, L1, L2, lift, lag, rr]) => {
+      [1, -1].forEach(sd => {
+        let dx = 0, dz = 0;
+        if (walk) {
+          const vl = cm.v / cm.sc, Sh = vl * 0.68 * T / 2, u0 = ph + (sd > 0 ? 0 : 0.5) + lag, u = u0 - Math.floor(u0);
+          if (u < 0.68) dx = Sh * (1 - 2 * u / 0.68);
+          else { const w = (u - 0.68) / 0.32; dx = -Sh + 2 * Sh * (w - Math.sin(TAU * w) / TAU); dz = lift * (1 - Math.cos(TAU * w)) / 2; }
+        }
+        const Tp = [ta, tc], F = [fa + dx, fc + dz], da = F[0] - Tp[0], dc = F[1] - Tp[1], dd = Math.hypot(da, dc);
+        let J;
+        if (dd >= L1 + L2 - 1e-4) J = [Tp[0] + da * L1 / (L1 + L2), Tp[1] + dc * L1 / (L1 + L2)];
+        else { const A = bend * Math.acos(clamp((L1 * L1 + dd * dd - L2 * L2) / (2 * L1 * dd), -1, 1)), ux = da / dd, uc = dc / dd; J = [Tp[0] + L1 * (ux * Math.cos(A) - uc * Math.sin(A)), Tp[1] + L1 * (ux * Math.sin(A) + uc * Math.cos(A))]; }
+        const bT = sd * 0.17, bF = sd * 0.145, mid = (p, r) => [(p[0] + r[0]) / 2, (p[1] + r[1]) / 2];
+        const pts = [Tp, mid(Tp, J), J, mid(J, F), F], bs = [bT, bT, (bT + bF) / 2, bF, bF];
+        const rings = pts.map(([a, c], k) => hoop(a, bs[k], c, rr[k]));
+        // the pad: broad and flat, a little ahead of the fetlock
+        rings.push(ring(t => [F[0] + 0.05 + 0.12 * Math.cos(t), bF + 0.085 * Math.sin(t), F[1] - 0.11]));
+        legs.push({ near: sd === near, rings });
+      });
+    });
+    // project; a part's hulls
+    const P2 = rs => rs.map(r => r.map(v => pr(W(v[0], v[1], v[2]))));
+    const hulls = rs => { const sp = P2(rs), out = []; for (let k = 0; k < sp.length - 1; k++) { const pts = sp[k].concat(sp[k + 1]); if (pts.some(v => !v)) return []; out.push(new P(this.hull11(pts), true)); } return out; };
+    const farLegs = legs.filter(L => !L.near).flatMap(L => hulls(L.rings)), nearLegs = legs.filter(L => L.near).flatMap(L => hulls(L.rings));
+    const fig = hulls(body).concat(hulls(neck), hulls([neck[neck.length - 1]].concat(head)), hulls(jaw), hulls(tailR), nearLegs);
+    if (!fig.length) return;
+    const lw = clamp(px * 0.025, 0.55, 1.1), al = clamp(px / 40, 0.7, 1) * q;
+    const coat = { tan: ['#B08752', 0.5, 0.16], dark: ['#5E4532', 0.62, 0.42], pale: ['#D8C29C', 0.45, 0.06] }[cm.coat];
+    const inkAll = (polys, w, a) => { ctx.save(); ctx.globalAlpha = SA * a; ctx.globalCompositeOperation = BLEND; ctx.strokeStyle = INK; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.beginPath(); polys.forEach(p => p.trace(ctx, 1)); ctx.stroke(); ctx.restore(); };
+    const tone = (polys, k) => { if (OPT.colour) wash(polys, coat[0], coat[1] * k * q); else wash(polys, SEPIA, (0.1 + coat[2]) * k * q); };
+    const bbOf = polys => { const xs = polys.flatMap(p => p.pts.map(v => v[0])), ys = polys.flatMap(p => p.pts.map(v => v[1])); return [Math.min(...xs) - 1, Math.min(...ys) - 1, Math.max(...xs) + 1, Math.max(...ys) + 1]; };
+    // its shadow on the ground, under the trunk
+    const sh = Array.from({ length: 20 }, (_, j) => pr(W(-0.05 + 1.05 * Math.cos(j / 20 * TAU), 0.45 * Math.sin(j / 20 * TAU), 0)));
+    if (sh.every(Boolean)) fill(new P(sh, true), SEPIA, 0.16 * q);
+    // the far legs, in shade
+    if (farLegs.length) { inkAll(farLegs, 2 * lw, al); mask(farLegs, q); tone(farLegs, 1); wash(farLegs, INK, 0.22 * q); }
+    // the figure
+    inkAll(fig, 2 * lw, al);
+    mask(fig, q);
+    tone(fig, 1);
+    if (px > 14) {
+      const bl = hulls(belly);
+      hatch(bl, bbOf(bl), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.5, 0.3, 860 + idx);
+      if (nearLegs.length) hatch(nearLegs, bbOf(nearLegs), 1.15, clamp(px * 0.04, 1.6, 2.6), q, INK, 0.45, 0.22, 870 + idx);
+      // the eye, and the small ears behind it; the line of the mouth between the muzzle and the lower lip
+      const hv = ps.hv, nv = ps.nv;
+      const eye = pr(W(pa + 0.13 * hv[0] + 0.035 * nv[0], sway + near * 0.075, pc + 0.13 * hv[1] + 0.035 * nv[1]));
+      if (eye && px > 22) disc(eye[0], eye[1], clamp(px * 0.012, 0.6, 1.0), INK, 0.8 * q);
+      const e0 = pr(W(pa + 0.02 * hv[0] + 0.09 * nv[0], sway + near * 0.05, pc + 0.02 * hv[1] + 0.09 * nv[1])), e1 = pr(W(pa - 0.06 * hv[0] + 0.17 * nv[0], sway + near * 0.07, pc - 0.06 * hv[1] + 0.17 * nv[1]));
+      if (e0 && e1) stroke(new P([e0, e1]), 1, INK, lw * 1.3, al);
+      if (px > 30) {
+        const m0 = pr(W(pa + 0.3 * hv[0] - 0.05 * nv[0], sway + near * 0.045 + 0.5 * ps.jawL, pc + 0.3 * hv[1] - 0.05 * nv[1]));
+        const m1 = pr(W(pa + 0.47 * hv[0] - (0.04 + ps.jawO) * nv[0], sway + near * 0.03 + ps.jawL, pc + 0.47 * hv[1] - (0.04 + ps.jawO) * nv[1]));
+        if (m0 && m1) stroke(new P([m0, m1]), 1, INK, lw * 0.9, 0.7 * al);
+      }
+    }
+  },
+  // a low desert shrub of the gravel plain (rimth, Haloxylon salicornicum: a rounded cushion of thin jointed grey-green
+  // twigs on a little mound of trapped sand) at ground point G, h tall: a lumpy dome, its twigs drawn upright. Revision
+  // 11: browsed (st: the lips' screen point m and their grip G), the twigs by the lips bend toward them above their
+  // lower 0.6, and part 'front' draws their tips again over the muzzle; a small one far off is drawn without its hatching and twigs
+  shrub11(G, h, psi, q, seed, part = 'all', st = null) {
+    const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
+    if (!b || !t || b[0] < RAIL.x0 - 50 || b[0] > RAIL.x1 + 50 || b[1] > RAIL.y1 + 60) return;
+    const k = RAIL.f / b[2], w = 1.8 * h * k, hh = b[1] - t[1], r = rng(seed), ry = w / 2 * RAIL.eye / b[2], pts = [];
+    for (let j = 0; j <= 18; j++) { const a = Math.PI * j / 18, lump = 0.82 + 0.18 * Math.abs(Math.sin(a * 5 + seed)) + 0.06 * r(); pts.push([b[0] - w / 2 * Math.cos(a) * (0.95 + 0.08 * r()), b[1] - ry * 0.2 - hh * Math.pow(Math.sin(a), 0.7) * lump]); }
+    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; pts.push([b[0] + w / 2 * Math.cos(a), b[1] + ry * Math.sin(a) * 0.5]); }
+    const clump = new P(pts, true);
+    const tw = [];
+    for (let j = 0; j < 16; j++) { const x = b[0] + (r() - 0.5) * w * 0.8, y0 = b[1] + (r() - 0.3) * ry * 0.4, L = hh * (0.35 + 0.5 * r()) * (1 - Math.pow(2 * (x - b[0]) / w, 2)), lean = (x - b[0]) * 0.35 + (r() - 0.5) * w * 0.08; tw.push([[x, y0], [x + lean * L / Math.max(1, hh), y0 - L]]); }
+    // the twigs by the lips: drawn toward them as they grip
+    const rr = 0.3 * w, bit = [];
+    if (st) tw.forEach(tg => {
+      const [p0, p] = tg, d = Math.hypot(p[0] - st.m[0], p[1] - st.m[1]);
+      if (d < rr) { const kk = 0.55 * st.G * (1 - d / rr); tg.splice(1, 1, [lerp(p0[0], p[0], 0.6), lerp(p0[1], p[1], 0.6)], [p[0] + (st.m[0] - p[0]) * kk, p[1] + (st.m[1] - p[1]) * kk]); bit.push(tg); }
+    });
+    if (part === 'front') { bit.forEach(tg => stroke(new P(tg.slice(1)), 1, INK, 0.5, 0.45 * q)); return; }
+    // the sand mound and the shade under it
+    fill(el(b[0], b[1] + ry * 0.2, w * 0.62, ry * 0.95, 0, TAU, seed, 0), SEPIA, 0.13 * q);
+    mask(clump, q);
+    if (OPT.colour) wash(clump, '#8C8A5E', 0.42 * q); else fill(clump, SEPIA, 0.14 * q);
+    if (w > 7) {
+      hatch(clump, [b[0] - w / 2 - 1, b[1] - hh - 2, b[0] + w / 2 + 1, b[1] + ry + 1], 1.25, Math.max(1.4, w * 0.09), q, INK, 0.45, 0.22, seed);
+      tw.forEach(tg => stroke(new P(tg), 1, INK, 0.5, 0.4 * q));
+    }
+    stroke(clump, 1, INK, 0.65, 0.5 * q);
+  },
+  // Revision 11 (?rev11): arta (Calligonum comosum) at ground point G, h tall: a leafless broom of thin jointed green
+  // branches rising and spreading from a short woody base, on the low mound of sand it has caught
+  broom11(G, h, psi, q, seed) {
+    const b = this.proj(G[0], G[1], 0, psi), t = this.proj(G[0], G[1], h, psi);
+    if (!b || !t || b[0] < RAIL.x0 - 60 || b[0] > RAIL.x1 + 60 || b[1] > RAIL.y1 + 90) return;
+    const k = RAIL.f / b[2], w = 1.15 * h * k, hh = b[1] - t[1], r = rng(seed), ry = 0.8 * w * RAIL.eye / b[2], mh = Math.max(0.8, 0.16 * hh);
+    // the mound, a low dome of sand wider than the bush, and its shade
+    const dome = [];
+    for (let j = 0; j <= 16; j++) { const a = Math.PI * j / 16; dome.push([b[0] - 0.8 * w * Math.cos(a), b[1] - mh * Math.sin(a)]); }
+    for (let j = 1; j < 8; j++) { const a = Math.PI * j / 8; dome.push([b[0] + 0.8 * w * Math.cos(a), b[1] + ry * Math.sin(a)]); }
+    const mound = new P(dome, true);
+    fill(mound, SEPIA, 0.12 * q);
+    stroke(new P(dome.slice(0, 17)), 1, INK, 0.5, 0.35 * q);
+    // the branches: from the base, each bowed outward to its tip
+    const br = [], tips = [];
+    for (let j = 0; j < 24; j++) {
+      const s = (r() - 0.5) * 2, x0 = b[0] + s * w * 0.08, y0 = b[1] - mh * 0.7, L = hh * (0.65 + 0.35 * r()) * (1 - 0.25 * s * s);
+      const x1 = x0 + s * w * 0.5 * (0.6 + 0.4 * r()), y1 = y0 - L, cx = x0 + (x1 - x0) * 0.15, cy = y0 - L * 0.6;
+      const pts = []; for (let i = 0; i <= 6; i++) { const u = i / 6, v = 1 - u; pts.push([v * v * x0 + 2 * v * u * cx + u * u * x1, v * v * y0 + 2 * v * u * cy + u * u * y1]); }
+      br.push(pts); tips.push(...pts);
+    }
+    if (tips.length > 2) { const crown = new P(this.hull11(tips), true); mask(crown, 0.3 * q); if (OPT.colour) wash(crown, '#7E8A56', 0.34 * q); else fill(crown, SEPIA, 0.07 * q); }
+    this.ink11(br, w > 12 ? 0.55 : 0.5, 0.55 * q, OPT.colour ? '#4E4C32' : INK);
+  },
+  // a convex hull of screen points (monotone chain)
+  hull11(pts) {
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], hi = [];
+    p.forEach(v => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], v) <= 0) lo.pop(); lo.push(v); });
+    p.slice().reverse().forEach(v => { while (hi.length > 1 && cr(hi[hi.length - 2], hi[hi.length - 1], v) <= 0) hi.pop(); hi.push(v); });
+    return lo.slice(0, -1).concat(hi.slice(0, -1));
+  },
+  // a box on the track from s0 to s1 (along), o0 to o1 (across; the camera is on the o0 side), z0 to z1: its visible faces
+  box(s0, s1, o0, o1, z0, z1, psi) {
+    const f = {};
+    f.side = this.quad([[s0, o0, z0], [s1, o0, z0], [s1, o0, z1], [s0, o0, z1]], [], psi);
+    f.front = this.quad([[s1, o0, z0], [s1, o1, z0], [s1, o1, z1], [s1, o0, z1]], [], psi);
+    f.top = RAIL.eye > z1 ? this.quad([[s0, o0, z1], [s1, o0, z1], [s1, o1, z1], [s0, o1, z1]], [], psi) : null;
+    f.all = [f.side, f.front, f.top].filter(Boolean);
+    return f;
+  },
+  paintBox(f, tq, { side = null, top = null, front = null, lw = 1.2 } = {}) {
+    if (!f.all.length) return;
+    mask(f.all);
+    if (f.top) { if (top) fill(f.top, top[0], top[1] * tq); stroke(f.top, tq, INK, lw * 0.8, 0.8); }
+    if (f.front) { if (front) fill(f.front, front[0], front[1] * tq); stroke(f.front, tq, INK, lw, 0.9); }
+    if (f.side) { if (side) fill(f.side, side[0], side[1] * tq); stroke(f.side, tq, INK, lw, 0.9); }
+  },
+  // Revision 11 (?rev11): the head end drawn as the locomotive Etihad Rail runs, an EMD SD70ACS, the SD70ACe built for
+  // the desert (its first seven delivered in 2013; the 38 'EMD SD70' of the Stage Two fleet from Progress Rail; Railway
+  // Gazette 2011, 2013, 2020; Etihad Rail 2020, 2022): 22.6 m over the couplers and nearly 5 m high (The National, 2011),
+  // an isolated wide-nose cab under a tropical roof (IRJ 2015), the long hood with a walkway and handrail along each side,
+  // the radiator section at the rear wider than the hood with its two big fans on the roof, two three-axle trucks with
+  // their side frames outside the 1,067 mm wheels, the fuel tank slung between them, and sand ploughs at the pilot (two
+  // fixed and a movable one; IRJ 2015). From the references gathered on 1 October 2026 (the maker's brochure and
+  // railfan data): 22.63 m long, 4.84 m high over the tropical roof, 3.12 m wide, truck centres 14.58 m, HTSC-II trucks
+  // of 3.81 m wheelbase, the deck at 1.854 m, the coupler at 0.876 m. The nose, cab and hood lengths are not published
+  // and are scaled from the SD70ACe's proportions. Livery: Etihad Rail describes a light grey body "relieved with broad
+  // red bands" and its logo mid-body (2012); the bands' path is not yet confirmed, so no band and no logo are drawn.
+  // Distances x are metres back from the front coupler's face; o across the track (negative toward the camera); z above
+  // the rail head, written for a 1.70 m deck and a 4.94 m roof and mapped by ZB onto the measured 1.854 m and 4.84 m.
+  loco11(b, psi, zr, tq) {
+    const s1 = b.s1, X = x => s1 - x;
+    // the body's heights onto the measured deck (1.854 m) and roof (4.84 m); the frame's sill keeps its depth
+    const ZB = z => (z >= 1.70 ? 1.854 + (z - 1.70) * 0.9216 : z >= 1.22 ? 1.40 + (z - 1.22) * 0.946 : z);
+    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + ZB(z), psi); return p ? [p[0], p[1]] : null; };
+    const line = (a, e, lw = 0.7, al = 0.7) => { if (a && e) stroke(new P([a, e]), tq, INK, lw, al); };
+    const face = pts => { const p = pts.map(([x, o, z]) => L(x, z, o)); return p.some(q => !q) ? null : new P(p, true); };
+    const B = (x0, x1, o0, o1, z0, z1) => this.box(X(x1), X(x0), o0, o1, zr + ZB(z0), zr + ZB(z1), psi);
+    const bb = f => [Math.min(...f.pts.map(p => p[0])) - 1, Math.min(...f.pts.map(p => p[1])) - 1, Math.max(...f.pts.map(p => p[0])) + 1, Math.max(...f.pts.map(p => p[1])) + 1];
+    // a face laid on paper, toned, finely hatched (the light grey body) and outlined
+    const plate = (f, { tone = null, skin = 0, ang = 0.1, gap = 4.5, lw = 0.9, al = 0.85, seed = 0 } = {}) => {
+      if (!f) return;
+      mask(f);
+      if (tone) fill(f, tone[0], tone[1] * tq);
+      if (skin) hatch(f, bb(f), ang, gap, tq, INK, 0.6, skin, 2100 + seed);
+      stroke(f, tq, INK, lw, al);
+    };
+    const circle = (x, z, o, r, plane = 'side', n = 18) => {
+      const pts = [];
+      for (let k = 0; k < n; k++) {
+        const a = k / n * TAU, p = plane === 'side' ? L(x + r * Math.cos(a), z + r * Math.sin(a), o) : plane === 'roof' ? L(x + r * Math.cos(a), z, o + r * Math.sin(a)) : L(x, z + r * Math.sin(a), o + r * Math.cos(a));
+        if (!p) return null; pts.push(p);
+      }
+      return new P(pts, true);
+    };
+    // the trucks (HTSC-II): centres 14.58 m apart, three axles 1.905 m apart, the wheels (1,067 mm) inside the side
+    // frames, which dip to the journal boxes at each axle and rise between them; a coil-spring nest over each box
+    const AX = 1.905, PS = AX / 2.05;
+    [4.025, 18.605].forEach((xc, ti) => {
+      [-AX, 0, AX].forEach((dx, k) => { const w = circle(xc + dx, 0.533, -0.8, 0.533); if (w) { mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.9, 0.85); } });
+      const prof = [[-2.75, 0.75], [-2.3, 1.02], [2.3, 1.02], [2.75, 0.75], [2.55, 0.5], [2.4, 0.3], [1.7, 0.3], [1.35, 0.62], [0.7, 0.62], [0.35, 0.3], [-0.35, 0.3], [-0.7, 0.62], [-1.35, 0.62], [-1.7, 0.3], [-2.4, 0.3], [-2.55, 0.5]];
+      const sf = face(prof.map(([dx, z]) => [xc + dx * PS, -1.08, z]));
+      plate(sf, { tone: [INK, 0.5], lw: 0.9 });
+      [-AX, 0, AX].forEach(dx => {
+        plate(face([[xc + dx - 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.36], [xc + dx + 0.24, -1.14, 0.72], [xc + dx - 0.24, -1.14, 0.72]]), { tone: [INK, 0.62], lw: 0.7 });
+        for (let z = 0.76; z < 1.0; z += 0.06) line(L(xc + dx - 0.16, z, -1.14), L(xc + dx + 0.16, z + 0.03, -1.14), 0.6, 0.7);
+      });
+      // the traction motors' and brake gear's shadow between the frames, seen through the gaps
+      line(L(xc - 2.1, 1.12, -1.1), L(xc + 2.1, 1.12, -1.1), 1.2, 0.6);
+    });
+    // the fuel tank, 16,655 litres (The National, 2011), between the trucks: deep, its lower edges chamfered
+    const tank = B(7.1, 15.5, -1.35, 1.35, 0.62, 1.22);
+    this.paintBox(tank, tq, { side: [INK, 0.28], front: [INK, 0.36], lw: 0.9 });
+    plate(face([[7.1, -1.35, 0.62], [15.5, -1.35, 0.62], [15.5, -1.0, 0.45], [7.1, -1.0, 0.45]]), { tone: [INK, 0.45], lw: 0.8 });
+    line(L(7.2, 0.92, -1.36), L(15.4, 0.92, -1.36), 0.55, 0.5);
+    // the rear steps (the far end is the hood's end) and the frame with its walkway, full width
+    [21.3, 21.7].forEach(x => line(L(x, 0.45, -1.58), L(x, 1.7, -1.58), 0.8, 0.8));
+    [0.55, 0.95, 1.35].forEach(z => line(L(21.3, z, -1.58), L(21.7, z, -1.58), 0.8, 0.8));
+    const frame = B(0.75, 21.85, -1.55, 1.55, 1.22, 1.70);
+    this.paintBox(frame, tq, { side: [INK, 0.42], top: [SEPIA, 0.2], front: [INK, 0.46], lw: 1 });
+    // the radiator section at the rear: wider than the hood, its radiator cores behind long screens on each side, two
+    // fans on the roof
+    const rad = B(17.25, 21.6, -1.47, 1.47, 1.70, 4.62);
+    if (rad.all.length) {
+      mask(rad.all);
+      if (rad.top) { fill(rad.top, SEPIA, 0.12 * tq); stroke(rad.top, tq, INK, 0.9, 0.8); }
+      if (rad.front) { fill(rad.front, SEPIA, 0.24 * tq); stroke(rad.front, tq, INK, 1, 0.85); }
+      if (rad.side) { hatch(rad.side, bb(rad.side), 0.1, 4.5, tq, INK, 0.6, 0.16, 2111); stroke(rad.side, tq, INK, 1, 0.9); }
+      const scr = face([[17.7, -1.48, 2.65], [21.15, -1.48, 2.65], [21.15, -1.48, 4.35], [17.7, -1.48, 4.35]]);
+      if (scr) { mask(scr); fill(scr, INK, 0.16 * tq); for (let x = 17.82; x < 21.1; x += 0.12) line(L(x, 2.68, -1.48), L(x, 4.32, -1.48), 0.5, 0.55); line(L(17.7, 3.5, -1.48), L(21.15, 3.5, -1.48), 0.7, 0.7); stroke(scr, tq, INK, 0.9, 0.85); }
+      [18.35, 20.45].forEach(x => { const fan = circle(x, 4.63, 0, 0.78, 'roof', 24); if (fan) { fill(fan, INK, 0.22 * tq); stroke(fan, tq, INK, 0.8, 0.8); for (let k = -2; k <= 2; k++) line(L(x - 0.7, 4.64, k * 0.28), L(x + 0.7, 4.64, k * 0.28), 0.45, 0.5); } });
+    }
+    // the long hood, narrower than the frame (a walkway each side): behind the cab its louvred intakes (the filtered air
+    // for the engine and electrics), then the engine room's doors; the exhaust stack and the dynamic brake's roof grille
+    const hood = B(6.45, 17.25, -1.17, 1.17, 1.70, 4.52);
+    if (hood.all.length) {
+      mask(hood.all);
+      if (hood.top) { fill(hood.top, SEPIA, 0.12 * tq); stroke(hood.top, tq, INK, 0.9, 0.8); }
+      if (hood.side) {
+        hatch(hood.side, bb(hood.side), 0.1, 4.5, tq, INK, 0.6, 0.16, 2112); stroke(hood.side, tq, INK, 1, 0.9);
+        const lv = face([[6.75, -1.18, 3.2], [8.75, -1.18, 3.2], [8.75, -1.18, 4.32], [6.75, -1.18, 4.32]]);
+        if (lv) { mask(lv); for (let z = 3.26; z < 4.3; z += 0.09) line(L(6.8, z, -1.18), L(8.7, z, -1.18), 0.5, 0.55); stroke(lv, tq, INK, 0.8, 0.8); }
+        for (let x = 9.2; x < 17.1; x += 2.2) line(L(x, 1.82, -1.18), L(x, 4.32, -1.18), 0.55, 0.5);
+        line(L(6.55, 4.36, -1.18), L(17.15, 4.36, -1.18), 0.55, 0.55);
+      }
+      const stack = B(11.6, 12.4, -0.32, 0.32, 4.52, 4.8);
+      this.paintBox(stack, tq, { side: [INK, 0.5], top: [INK, 0.7], front: [INK, 0.55], lw: 0.8 });
+      const grid = face([[6.9, -0.9, 4.53], [9.6, -0.9, 4.53], [9.6, 0.9, 4.53], [6.9, 0.9, 4.53]]);
+      if (grid) { for (let x = 7.05; x < 9.5; x += 0.18) line(L(x, 4.53, -0.88), L(x, 4.53, 0.88), 0.45, 0.5); stroke(grid, tq, INK, 0.7, 0.7); }
+    }
+    // the walkway's handrail along the camera side: posts every 1.6 m at the deck's edge, one rail at 1.05 m
+    for (let x = 6.7; x <= 21.4; x += 1.6) line(L(x, 1.72, -1.52), L(x, 2.75, -1.52), 0.6, 0.65);
+    line(L(6.7, 2.75, -1.52), L(21.4, 2.75, -1.52), 0.8, 0.8);
+    // the cab, full width, its front raked back above the nose; the tropical roof standing a hand's breadth above its
+    // roof; the windscreens and the side windows
+    const xr = z => 3.25 + 0.35 * (z - 3.45) / 1.3;
+    plate(face([[6.45, -1.55, 1.70], [3.25, -1.55, 1.70], [3.25, -1.55, 3.45], [3.6, -1.55, 4.75], [6.45, -1.55, 4.75]]), { skin: 0.16, seed: 3, lw: 1 });
+    plate(face([[3.25, -1.55, 1.70], [3.25, 1.55, 1.70], [3.25, 1.55, 3.45], [3.25, -1.55, 3.45]]), { tone: [SEPIA, 0.26], lw: 1 });
+    plate(face([[3.25, -1.55, 3.45], [3.25, 1.55, 3.45], [3.6, 1.55, 4.75], [3.6, -1.55, 4.75]]), { tone: [SEPIA, 0.26], lw: 1 });
+    plate(face([[3.6, -1.55, 4.75], [3.6, 1.55, 4.75], [6.45, 1.55, 4.75], [6.45, -1.55, 4.75]]), { tone: [SEPIA, 0.14], lw: 0.9 });
+    const troof = B(3.5, 6.6, -1.62, 1.62, 4.82, 4.94);
+    this.paintBox(troof, tq, { side: [INK, 0.3], top: [SEPIA, 0.16], front: [INK, 0.32], lw: 0.8 });
+    line(L(3.6, 4.79, -1.56), L(6.45, 4.79, -1.56), 1.1, 0.6);
+    [[-1.38, -0.12], [0.12, 1.38]].forEach(([a, e]) => {
+      const ws = face([[xr(3.62), a, 3.62], [xr(3.62), e, 3.62], [xr(4.55), e, 4.55], [xr(4.55), a, 4.55]]);
+      if (ws) { fill(ws, BLUE, 0.4 * tq); stroke(ws, tq, INK, 0.9, 0.9); }
+    });
+    [[3.85, 5.25], [5.45, 6.15]].forEach(([a, e]) => {
+      const sw = face([[a, -1.56, 3.35], [e, -1.56, 3.35], [e, -1.56, 4.35], [a, -1.56, 4.35]]);
+      if (sw) { fill(sw, BLUE, 0.34 * tq); stroke(sw, tq, INK, 0.9, 0.9); }
+    });
+    // the short nose ahead of the cab, a little narrower than it, its top falling toward the front; two headlights
+    // high on its face (lit, as trains run by day)
+    plate(face([[3.25, -1.32, 1.70], [1.95, -1.32, 1.70], [1.95, -1.32, 3.15], [3.25, -1.32, 3.45]]), { skin: 0.16, seed: 4, lw: 1 });
+    plate(face([[1.95, -1.32, 1.70], [1.95, 1.32, 1.70], [1.95, 1.32, 3.15], [1.95, -1.32, 3.15]]), { tone: [SEPIA, 0.28], lw: 1 });
+    plate(face([[1.95, -1.32, 3.15], [1.95, 1.32, 3.15], [3.25, 1.32, 3.45], [3.25, -1.32, 3.45]]), { tone: [SEPIA, 0.14], lw: 0.9 });
+    [-0.3, 0.3].forEach(o => { const h = L(1.94, 2.85, o), e = L(1.94, 2.94, o); if (h && e) disc(h[0], h[1], Math.max(1, Math.hypot(e[0] - h[0], e[1] - h[1])), OCHRE, 0.9 * tq); });
+    // the pilot under the front of the frame, the coupler, the anticlimber along the deck's front edge, the ditch lights
+    // at its corners, and the sand ploughs: a V-blade just clear of the rail heads ahead of the leading wheels
+    plate(face([[0.75, -1.5, 1.22], [0.75, 1.5, 1.22], [0.55, 1.4, 0.5], [0.55, -1.4, 0.5]]), { tone: [INK, 0.42], lw: 0.9 });
+    plate(face([[0.35, 0, 0.08], [1.25, 1.45, 0.08], [1.25, 1.45, 0.5], [0.35, 0, 0.5]]), { tone: [INK, 0.22], lw: 0.7 });
+    plate(face([[0.35, 0, 0.08], [1.25, -1.45, 0.08], [1.25, -1.45, 0.5], [0.35, 0, 0.5]]), { tone: [INK, 0.34], lw: 0.8 });
+    const cpl = B(0.05, 0.75, -0.24, 0.24, 0.72, 1.04);
+    this.paintBox(cpl, tq, { side: [INK, 0.6], top: [INK, 0.5], front: [INK, 0.65], lw: 0.8 });
+    const ac = B(0.66, 0.8, -1.55, 1.55, 1.6, 1.78);
+    this.paintBox(ac, tq, { side: [INK, 0.55], top: [INK, 0.4], front: [INK, 0.55], lw: 0.7 });
+    [-1.2, 1.2].forEach(o => { const h = L(0.62, 1.42, o), e = L(0.62, 1.52, o); if (h && e) disc(h[0], h[1], Math.max(1, Math.hypot(e[0] - h[0], e[1] - h[1])), OCHRE, 0.85 * tq); });
+    // the front steps at the corners and the front deck's handrails
+    [0.88, 1.32].forEach(x => line(L(x, 0.45, -1.58), L(x, 1.7, -1.58), 0.8, 0.8));
+    [0.55, 0.95, 1.35].forEach(z => line(L(0.88, z, -1.58), L(1.32, z, -1.58), 0.8, 0.8));
+    [[-1.5, -0.55], [0.55, 1.5]].forEach(([a, e]) => { line(L(0.9, 2.75, a), L(0.9, 2.75, e), 0.8, 0.85); line(L(0.9, 2.25, a), L(0.9, 2.25, e), 0.6, 0.7); [a, e].forEach(o => line(L(0.9, 1.78, o), L(0.9, 2.75, o), 0.7, 0.8)); });
+    line(L(0.9, 2.75, -1.5), L(1.95, 2.75, -1.5), 0.8, 0.85);
+  },
+  // Revision 11 (?rev11): the aggregate wagon as CRRC built it for Etihad Rail's Stage Two (CRRC, 17 Sep 2026): an open
+  // hopper 13.7 m long and 3.212 m wide, rounded side sheets, three bottom doors, painted cool grey, 75 m3 (103 t) of
+  // crushed stone; its height is not published and is drawn at 3.75 m, inside the 4.72 m gauge. Trains from the Ras Al
+  // Khaimah and Fujairah quarries run 70 of them, about 1 km (Etihad Rail, 2021). Two three-piece freight bogies, their
+  // side frames outside the wheels. x is metres back from the wagon's leading coupler; o and z as for the locomotive.
+  hopper11(b, psi, zr, tq) {
+    const { c, s1 } = b, X = x => s1 - x, LEN = 13.7;
+    const L = (x, z, o) => { const [Xw, Yw] = this.at(X(x), o), p = this.proj(Xw, Yw, zr + z, psi); return p ? [p[0], p[1]] : null; };
+    const line = (a, e, lw = 0.7, al = 0.7) => { if (a && e) stroke(new P([a, e]), tq, INK, lw, al); };
+    const face = pts => { const p = pts.map(([x, o, z]) => L(x, z, o)); return p.some(q => !q) ? null : new P(p, true); };
+    const bb = f => [Math.min(...f.pts.map(p => p[0])) - 1, Math.min(...f.pts.map(p => p[1])) - 1, Math.max(...f.pts.map(p => p[0])) + 1, Math.max(...f.pts.map(p => p[1])) + 1];
+    const grey = OPT.colour ? HUE.steel : null;
+    // the bogies: centres 9.3 m apart, axles 1.83 m apart, wheels 0.92 m
+    [2.2, 11.5].forEach(xc => {
+      [-0.915, 0.915].forEach(dx => {
+        const pts = []; for (let k = 0; k < 16; k++) { const a = k / 16 * TAU, p = L(xc + dx + 0.46 * Math.cos(a), 0.46 + 0.46 * Math.sin(a), -0.78); if (!p) return; pts.push(p); }
+        const w = new P(pts, true); mask(w); fill(w, INK, 0.42 * tq); stroke(w, tq, INK, 0.8, 0.8);
+      });
+      const sf = face([[xc - 1.35, -1.0, 0.55], [xc - 0.9, -1.0, 0.86], [xc + 0.9, -1.0, 0.86], [xc + 1.35, -1.0, 0.55], [xc + 1.05, -1.0, 0.3], [xc + 0.75, -1.0, 0.42], [xc - 0.75, -1.0, 0.42], [xc - 1.05, -1.0, 0.3]]);
+      if (sf) { mask(sf); fill(sf, INK, 0.5 * tq); stroke(sf, tq, INK, 0.8, 0.85); }
+    });
+    // the body's near side: straight end sills over the bogies, the floor falling to the three doors between them; its
+    // upper part bulges out (the rounded side sheet) to 1.606 m and turns back in to the top chord
+    const zt = 3.75, zb = 3.0, sill = 1.2, door = 0.62, x0 = 0.4, x1 = LEN - 0.4;
+    const lower = [[x0, -1.5, sill], [3.0, -1.5, sill], [3.7, -1.5, door], [LEN - 3.7, -1.5, door], [LEN - 3.0, -1.5, sill], [x1, -1.5, sill]];
+    const belly = face(lower.concat([[x1, -1.606, zb], [x0, -1.606, zb]]));
+    const shoulder = face([[x0, -1.606, zb], [x1, -1.606, zb], [x1, -1.52, zt], [x0, -1.52, zt]]);
+    const endF = face([[x0, -1.5, sill], [x0, 1.5, sill], [x0, 1.52, zt], [x0, -1.52, zt]]);
+    if (endF) { mask(endF); if (grey) wash(endF, grey, 0.2 * tq); fill(endF, INK, 0.2 * tq); stroke(endF, tq, INK, 0.8, 0.8); }
+    if (belly) { mask(belly); if (grey) wash(belly, grey, 0.22 * tq); fill(belly, INK, 0.2 * tq); hatch(belly, bb(belly), 1.5708, 2.6, tq, INK, 0.55, 0.3, 2120); stroke(belly, tq, INK, 0.9, 0.85); }
+    if (shoulder) { mask(shoulder); if (grey) wash(shoulder, grey, 0.18 * tq); fill(shoulder, INK, 0.07 * tq); stroke(shoulder, tq, INK, 0.9, 0.85); }
+    for (let x = x0 + 1.1; x < x1 - 0.5; x += 1.1) line(L(x, zb - 0.05, -1.606), L(x, zt - 0.05, -1.52), 0.5, 0.4);
+    // the three bottom doors, hanging between the bogies
+    [4.2, 6.55, 8.9].forEach(x => {
+      const d = face([[x, -1.35, door], [x + 1.6, -1.35, door], [x + 1.25, -1.0, door - 0.42], [x + 0.35, -1.0, door - 0.42]]);
+      if (d) { mask(d); fill(d, INK, 0.38 * tq); stroke(d, tq, INK, 0.7, 0.8); }
+    });
+    // the stone heaped a little above the top chord (the eye, 12 m up, sees over it)
+    const heap = face([[x0 + 0.5, -1.52, zt], [x1 - 0.5, -1.52, zt], [x1 - 1.4, 0, zt + c.heap], [x0 + 1.4, 0, zt + c.heap]]);
+    if (heap) {
+      const hb = bb(heap); mask(heap); fill(heap, OCHRE, 0.35 * tq); hatch(heap, hb, 0.8, 1.8, tq, SEPIA, 0.6, 0.45, 840); hatch(heap, hb, -0.7, 2.2, tq, SEPIA, 0.5, 0.35, 841);
+      stroke(heap, tq, INK, 0.7, 0.6);
+    }
+    line(L(x0, zt, -1.52), L(x1, zt, -1.52), 1, 0.85);
+  },
+  vehicle(b, psi, zr, tq) {
+    const { c, s0, s1 } = b;
+    const probe = this.box(s0, s1, -1.6, 1.6, zr, zr + c.top, psi);
+    if (!probe.all.length) return;
+    const xs = probe.all.flatMap(p => p.pts.map(q => q[0]));
+    if (Math.max(...xs) < RAIL.x0 - 10 || Math.min(...xs) > RAIL.x1 + 10) return;
+    if (c.kind === 'loco' && typeof REV11 !== 'undefined' && REV11) { this.loco11(b, psi, zr, tq); return; }
+    if (c.kind === 'hopper' && typeof REV11 !== 'undefined' && REV11) { this.hopper11(b, psi, zr, tq); return; }
+    const L = (s, z, o) => { const [X, Y] = this.at(s, o), p = this.proj(X, Y, z, psi); return p ? [p[0], p[1]] : null; };
+    const seg = (a, e) => a && e ? new P([a, e]) : null;
+    // bogies and wheels (the near side), under the frame
+    const wheels = c.kind === 'loco' ? [2.3, 4.2, 6.1, s1 - s0 - 6.1, s1 - s0 - 4.2, s1 - s0 - 2.3] : [1.7, 3.5, s1 - s0 - 3.5, s1 - s0 - 1.7];
+    const bog = c.kind === 'loco' ? [[1.5, 6.9], [s1 - s0 - 6.9, s1 - s0 - 1.5]] : [[1.1, 4.1], [s1 - s0 - 4.1, s1 - s0 - 1.1]];
+    bog.forEach(([a, e]) => { const f = this.box(s0 + a, s0 + e, -1.35, 1.35, zr + 0.15, zr + 0.95, psi); this.paintBox(f, tq, { side: [INK, 0.35], top: [INK, 0.3], front: [INK, 0.4], lw: 0.9 }); });
+    wheels.forEach(o => { const cpt = L(s0 + o, zr + 0.48, -1.4), e = L(s0 + o + 0.48, zr + 0.48, -1.4); if (cpt && e) { const rr = Math.hypot(e[0] - cpt[0], e[1] - cpt[1]); stroke(el(cpt[0], cpt[1], rr, rr, 0, TAU, 830, 0), tq, INK, 1, 0.85); } });
+    if (c.kind === 'loco') {
+      // the frame with its walkways, full width; the fuel tank slung between the bogies
+      const tank = this.box(s0 + 7.4, s1 - 7.4, -1.25, 1.25, zr + 0.35, zr + 1.0, psi);
+      this.paintBox(tank, tq, { side: [INK, 0.3], front: [INK, 0.35], top: [INK, 0.2], lw: 0.9 });
+      const frame = this.box(s0 - 0.3, s1, -1.6, 1.6, zr + 1.0, zr + 1.3, psi);
+      this.paintBox(frame, tq, { side: [INK, 0.55], top: [SEPIA, 0.25], front: [INK, 0.6] });
+      // the long hood, narrower than the frame, light grey (open hatching) with a broad band (dense cross-hatching)
+      const hood = this.box(s0 + 0.4, s1 - 6.2, -1.05, 1.05, zr + 1.3, zr + 4.55, psi);
+      this.paintBox(hood, tq, { top: [SEPIA, 0.12] });
+      if (hood.side) {
+        const bb = [Math.min(...hood.side.pts.map(p => p[0])), Math.min(...hood.side.pts.map(p => p[1])), Math.max(...hood.side.pts.map(p => p[0])), Math.max(...hood.side.pts.map(p => p[1]))];
+        hatch(hood.side, bb, 0.12, 5, tq, INK, 0.7, 0.18, 831);
+        const band = this.quad([[s0 + 0.4, -1.05, zr + 1.6], [s1 - 6.2, -1.05, zr + 1.6], [s1 - 6.2, -1.05, zr + 2.4], [s0 + 0.4, -1.05, zr + 2.4]], [], psi);
+        if (band) { hatch(band, bb, 0.9, 2.4, tq, INK, 0.8, 0.5, 832); hatch(band, bb, -0.9, 2.4, tq, INK, 0.8, 0.5, 833); }
+        for (let o = 0.9; o < 5.4; o += 0.32) { const g = seg(L(s0 + o, zr + 2.7, -1.05), L(s0 + o, zr + 4.4, -1.05)); if (g) stroke(g, tq, INK, 0.55, 0.55); } // the radiator grille
+        for (let o = 7; o < s1 - s0 - 7; o += 2.6) { const g = seg(L(s0 + o, zr + 2.6, -1.05), L(s0 + o, zr + 4.4, -1.05)); if (g) stroke(g, tq, INK, 0.6, 0.4); } // access doors
+      }
+      if (hood.top) [1.6, 3.5].forEach(o => { const cpt = L(s0 + o, zr + 4.55, 0), e = L(s0 + o + 0.8, zr + 4.55, 0); if (cpt && e) { const rr = Math.hypot(e[0] - cpt[0], e[1] - cpt[1]); stroke(el(cpt[0], cpt[1], rr, rr * 0.45, 0, TAU, 834, 0), tq, INK, 0.9, 0.7); } }); // the radiator fans
+      // handrails along the walkway
+      const hr = seg(L(s0 + 0.2, zr + 2.3, -1.55), L(s1 - 6.3, zr + 2.3, -1.55)); if (hr) stroke(hr, tq, INK, 0.8, 0.7);
+      for (let o = 0.2; o < s1 - s0 - 6.2; o += 3) { const g = seg(L(s0 + o, zr + 1.3, -1.55), L(s0 + o, zr + 2.3, -1.55)); if (g) stroke(g, tq, INK, 0.6, 0.6); }
+      // the cab, full width, and its windows
+      const cab = this.box(s1 - 6.2, s1 - 2.7, -1.5, 1.5, zr + 1.3, zr + 4.9, psi);
+      this.paintBox(cab, tq, { top: [SEPIA, 0.15] });
+      const cw = this.quad([[s1 - 5.8, -1.5, zr + 3.4], [s1 - 3.1, -1.5, zr + 3.4], [s1 - 3.1, -1.5, zr + 4.4], [s1 - 5.8, -1.5, zr + 4.4]], [], psi);
+      if (cw) { fill(cw, BLUE, 0.35 * tq); stroke(cw, tq, INK, 0.9); }
+      [[-1.35, -0.1], [0.1, 1.35]].forEach(([a, e]) => { const ws = this.quad([[s1 - 2.7, a, zr + 3.5], [s1 - 2.7, e, zr + 3.5], [s1 - 2.7, e, zr + 4.5], [s1 - 2.7, a, zr + 4.5]], [], psi); if (ws) { fill(ws, BLUE, 0.4 * tq); stroke(ws, tq, INK, 0.9); } });
+      // the short nose and the headlights; the sand plough below the front
+      const nose = this.box(s1 - 2.7, s1 - 0.2, -1.0, 1.0, zr + 1.3, zr + 3.3, psi);
+      this.paintBox(nose, tq, { top: [SEPIA, 0.12] });
+      [-0.55, 0.55].forEach(o => { const h = L(s1 - 0.2, zr + 2.6, o); if (h && nose.front) disc(h[0], h[1], 1.6, OCHRE, 0.9 * tq); });
+      const plough = this.quad([[s1 + 0.7, -1.5, zr + 0.12], [s1 + 0.7, 1.5, zr + 0.12], [s1, 1.6, zr + 1.0], [s1, -1.6, zr + 1.0]], [], psi);
+      if (plough) { fill(plough, INK, 0.35 * tq); stroke(plough, tq, INK, 1); }
+      return;
+    }
+    // an open hopper wagon: straight sides from the underframe to the top, the two discharge pockets hanging below it
+    // between the bogies, and the load of crushed stone heaped a little above the rim (the eye, 12 m up, sees over it)
+    const zs = zr + 1.3, zt = zr + c.top, e0 = s0 + 0.3, e1 = s1 - 0.3;
+    [[s0 + 4.5, s0 + 7.3], [s1 - 7.3, s1 - 4.5]].forEach(([a, e]) => {
+      const pk = this.quad([[a, -1.35, zr + 1.0], [e, -1.35, zr + 1.0], [e - 0.8, -1.1, zr + 0.45], [a + 0.8, -1.1, zr + 0.45]], [], psi);
+      if (pk) { mask(pk); fill(pk, INK, 0.3 * tq); stroke(pk, tq, INK, 0.9, 0.8); }
+    });
+    const sill = this.box(e0, e1, -1.45, 1.45, zr + 1.0, zs, psi);
+    this.paintBox(sill, tq, { side: [INK, 0.45], front: [INK, 0.5], lw: 0.8 });
+    const body = this.box(e0, e1, -1.5, 1.5, zs, zt, psi);
+    this.paintBox(body, tq, { side: [SEPIA, 0.16], front: [SEPIA, 0.3], lw: 1.0 });
+    if (body.side) {
+      for (let o = 1.2; o < e1 - e0 - 0.6; o += 1.2) { const g = seg(L(e0 + o, zs, -1.5), L(e0 + o, zt, -1.5)); if (g) stroke(g, tq, INK, 0.55, 0.45); } // the side stakes
+      const ch = seg(L(e0, zt - 0.18, -1.5), L(e1, zt - 0.18, -1.5)); if (ch) stroke(ch, tq, INK, 0.7, 0.6); // the top chord
+    }
+    // the stone: its near slope from the rim up to a low crest along the middle
+    const heap = this.quad([[e0 + 0.5, -1.5, zt], [e1 - 0.5, -1.5, zt], [e1 - 1.4, 0, zt + c.heap], [e0 + 1.4, 0, zt + c.heap]], [], psi);
+    if (heap) {
+      const hb = [Math.min(...heap.pts.map(p => p[0])) - 2, Math.min(...heap.pts.map(p => p[1])) - 2, Math.max(...heap.pts.map(p => p[0])) + 2, Math.max(...heap.pts.map(p => p[1])) + 2];
+      mask(heap); fill(heap, OCHRE, 0.35 * tq); hatch(heap, hb, 0.8, 1.8, tq, SEPIA, 0.6, 0.45, 840); hatch(heap, hb, -0.7, 2.2, tq, SEPIA, 0.5, 0.35, 841);
+      stroke(heap, tq, INK, 0.7, 0.6);
+    }
+  },
+});

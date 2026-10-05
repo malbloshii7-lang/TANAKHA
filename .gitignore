@@ -80,3 +80,7 @@ venv/
 media/
 *.db
 .env
+
+# gala render outputs and QC scratch (masters live on the -masters branch)
+ncm-20/gala/out/
+ncm-20/gala/qc/__pycache__/
