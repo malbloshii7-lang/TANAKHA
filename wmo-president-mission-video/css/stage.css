@@ -1,0 +1,139 @@
+:root{
+  --navy:#0b1d3f; --navy2:#12306b; --blue:#1565c0; --blue2:#1f7fd8; --blue3:#3d9be9;
+  --ink:#24385b; --muted:#506686; --label:#1d6ccb; --org:#1f55a5;
+  --serif:'Merriweather', Georgia, serif; --sans:'Noto Sans', Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+#stage{position:relative;width:1080px;height:1350px;overflow:hidden;background:#f3f8fd;
+  font-family:var(--sans);color:var(--navy);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.abs{position:absolute}
+.layer{position:absolute;left:0;top:0;width:1080px;height:1350px}
+canvas.layer{pointer-events:none}
+
+/* ---------- background ---------- */
+#bg{background:
+  radial-gradient(760px 620px at 92% 10%, rgba(203,224,247,.95), rgba(203,224,247,0) 72%),
+  radial-gradient(620px 420px at -4% 58%, rgba(220,235,251,.95), rgba(220,235,251,0) 70%),
+  radial-gradient(900px 380px at 55% 62%, rgba(255,255,255,.75), rgba(255,255,255,0) 70%),
+  radial-gradient(1300px 520px at 50% 108%, rgba(190,218,246,.95), rgba(190,218,246,0) 70%),
+  linear-gradient(180deg,#f8fbfe 0%,#f2f7fd 45%,#ebf3fc 100%);}
+#mist{background:
+  radial-gradient(520px 120px at 18% 47%, rgba(255,255,255,.9), rgba(255,255,255,0) 70%),
+  radial-gradient(640px 140px at 70% 80%, rgba(255,255,255,.75), rgba(255,255,255,0) 70%);}
+#watermark{position:absolute;left:630px;top:-268px;width:665px;height:687px;
+  -webkit-mask:url(../assets/wmo_emblem_mask.png) center/contain no-repeat;
+  background:linear-gradient(200deg,#9cc4ee 0%,#b2d2f3 55%,#c6def7 100%);opacity:.8}
+#waves{position:absolute;left:0;bottom:0;width:1080px;height:240px}
+
+/* ---------- header ---------- */
+#hdr{position:absolute;left:0;top:0;width:1080px;height:150px}
+#hdr .emb{position:absolute;left:44px;top:25px;width:103px;height:107px}
+#hdr .emb img{width:100%;height:100%;display:block}
+#hdr .glint{position:absolute;left:75px;top:12px;width:44px;height:44px;opacity:0}
+#hdr .org{position:absolute;left:161px;top:57px;font:400 20.2px/26px var(--sans);color:var(--org);letter-spacing:.012em}
+#hdr .org div{white-space:nowrap}
+#hdr .vr{position:absolute;left:370px;top:52px;width:1.4px;height:70px;background:#8fb0d8;transform-origin:50% 50%}
+#hdr .pres{position:absolute;left:398px;top:64px;font:700 24.3px/1 var(--sans);color:#14336e;letter-spacing:.075em;white-space:nowrap}
+#hdr .when{position:absolute;left:398px;top:94px;font:400 20.2px/1 var(--sans);color:var(--org);letter-spacing:.075em;white-space:nowrap}
+
+/* ---------- title block ---------- */
+#title{position:absolute;left:0;top:0;width:1080px;height:600px}
+.hl{position:absolute;left:44px;font-family:var(--serif);font-weight:900;font-variation-settings:'opsz' 144;
+  font-size:106px;font-stretch:106%;line-height:1;letter-spacing:-.024em;word-spacing:.02em;white-space:nowrap;color:var(--navy)}
+.hl .mask{overflow:hidden;padding:0 30px 26px 4px;margin:0 -30px -26px -4px}
+.hl .in{display:block}
+.grad{background:linear-gradient(90deg,#1361c0 0%,#1f7bd6 38%,#2d90e2 70%,#1f79d6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.shine{position:absolute;inset:0;-webkit-background-clip:text;background-clip:text;color:transparent;
+  background:linear-gradient(100deg,rgba(255,255,255,0) 40%,rgba(255,255,255,.85) 50%,rgba(255,255,255,0) 60%) no-repeat;
+  background-size:300% 100%}
+#nm{position:absolute;left:50px;top:457px;font:500 28.4px/1.1 var(--sans);color:#172a4f;letter-spacing:-.003em;white-space:nowrap}
+#rl{position:absolute;left:51px;top:497px;font:400 23px/1.1 var(--sans);color:#23395f;white-space:nowrap}
+
+/* ---------- stats card ---------- */
+#stats{position:absolute;left:762px;top:156px;width:291px;height:359px;border-radius:16px;
+  background:rgba(255,255,255,.93);box-shadow:0 14px 34px rgba(37,92,165,.10),0 2px 6px rgba(37,92,165,.07);
+  border:1px solid rgba(214,229,247,.9)}
+#stats .row{position:absolute;left:0;width:291px;height:120px}
+#stats .ic{position:absolute;left:20px;width:63px;height:63px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#e6f1fc,#cfe3f8 75%);display:flex;align-items:center;justify-content:center}
+#stats .ic svg{width:34px;height:34px}
+#stats .lab{position:absolute;left:102px;font:500 14.4px/1 var(--sans);letter-spacing:.085em;color:#2c4b7f}
+#stats .val{position:absolute;left:101px;font-family:var(--serif);font-weight:900;font-variation-settings:'opsz' 144;
+  font-size:40.5px;line-height:1;letter-spacing:-.02em;color:var(--navy);white-space:nowrap}
+#stats .sep{position:absolute;left:21px;width:249px;height:1.3px;background:#d3e2f3;transform-origin:0 50%}
+.roll{display:inline-block;overflow:hidden;height:1.12em;vertical-align:top;padding:0 .02em}
+.roll span{display:block;line-height:1.12em}
+
+/* ---------- ACT-1 timeline labels ---------- */
+.tl{position:absolute;width:160px;margin-left:-80px;text-align:center;white-space:nowrap}
+.tl .d{font:700 20px/1 var(--sans);color:var(--blue);letter-spacing:.06em}
+.tl .c{font-family:var(--serif);font-weight:900;font-size:23px;line-height:1.25;color:var(--navy);margin-top:6px}
+
+/* ---------- big stop cards (ACT 3) ---------- */
+#strip{position:absolute;left:0;top:0;width:1px;height:1350px}
+.bcard{position:absolute;top:0;width:720px}
+.bcard .sh{position:absolute;left:0;top:0;width:720px;filter:drop-shadow(0 18px 30px rgba(28,78,150,.16)) drop-shadow(0 3px 6px rgba(28,78,150,.10))}
+.bcard .ph{position:absolute;left:0;top:0;width:720px;height:600px;overflow:hidden;background:#cfe3f8}
+.bcard .ph img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 50%}
+.bcard .rim{position:absolute;left:0;top:0;width:720px;height:600px;overflow:visible}
+.bcard .band{position:absolute;left:0;width:720px;height:104px}
+.bcard .band .tx{position:absolute;left:40px;top:28px;font:700 44px/1 var(--sans);color:#fff;letter-spacing:.02em;white-space:nowrap}
+.bcard .panel{position:absolute;left:0;width:720px;background:#fff;border-radius:30px;
+  box-shadow:0 -6px 16px rgba(20,60,120,.06)}
+.bcard .reg{position:absolute;left:44px;top:44px;font:700 25px/1 var(--sans);letter-spacing:.14em;color:var(--label);white-space:nowrap}
+.bcard .city{position:absolute;left:41px;top:84px;font-family:var(--serif);font-weight:900;font-variation-settings:'opsz' 144;
+  font-size:82px;line-height:1.08;letter-spacing:-.022em;color:var(--navy);white-space:nowrap}
+.bcard .desc{position:absolute;left:44px;top:200px;width:632px;font:400 33px/1.36 var(--sans);color:var(--ink)}
+.bcard .desc .w{display:inline-block;white-space:pre}
+.bcard .cnt{position:absolute;right:40px;top:46px;font:600 22px/1 var(--sans);letter-spacing:.12em;color:#8aa7cb}
+.bcard .badge{position:absolute;width:212px;height:212px;border-radius:50%;
+  box-shadow:0 12px 26px rgba(20,70,140,.22),0 0 0 7px #fff}
+.bcard .badge canvas{position:absolute;left:0;top:0;width:212px;height:212px;border-radius:50%}
+
+/* ---------- slogan + pillars (ACT 4 / poster bottom band) ---------- */
+#bottom{position:absolute;left:0;top:0;width:1080px;height:1350px}
+#slogan{position:absolute;left:49px;top:1149px;transform-origin:0 0;font-family:var(--serif);font-weight:900;
+  font-variation-settings:'opsz' 144;font-size:40px;line-height:43px;letter-spacing:-.012em;word-spacing:.05em;white-space:nowrap}
+#slogan .l1{color:var(--navy)} #slogan .l2{color:#1a5fb6} #slogan .l3{color:#1c63b8}
+#slogan .mask{overflow:hidden;padding:0 12px 12px 2px;margin:0 -12px -12px -2px}
+#slogan .in{display:block}
+#pdiv{position:absolute;left:410px;top:1144px;width:1.4px;height:148px;background:#9db9dd;transform-origin:50% 0}
+#prow{position:absolute;left:440px;top:1136px;width:640px;height:200px;transform-origin:0 0}
+.pil{position:absolute;top:0}
+.pil .pi{position:absolute;top:2px;width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 35% 28%,#5aa9ee,#2a82dc 55%,#1766c4);box-shadow:0 6px 14px rgba(30,100,200,.25);
+  display:flex;align-items:center;justify-content:center}
+.pil .pi svg{width:30px;height:30px}
+.pil .pt{position:absolute;top:72px;font:600 20.5px/1 var(--sans);color:#13336a;white-space:nowrap;letter-spacing:-.005em}
+.pil .ps{position:absolute;top:99px;font:400 17.6px/22.4px var(--sans);color:#3f5a82;white-space:nowrap}
+.psep{position:absolute;top:8px;width:1.2px;height:138px;background:#d2e1f2}
+
+/* ---------- poster small cards ---------- */
+.scard{position:absolute;top:0}
+.scard .sh{position:absolute;left:0;top:0;height:480px;width:180px;filter:drop-shadow(0 8px 14px rgba(28,78,150,.13)) drop-shadow(0 1px 3px rgba(28,78,150,.08))}
+.scard .ph{position:absolute;left:0;top:0;overflow:hidden;background:#cfe3f8}
+.scard .ph img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+.scard .rim{position:absolute;left:0;top:0;overflow:visible}
+.scard .band{position:absolute;left:0}
+.scard .band .tx{position:absolute;left:14px;top:9px;font:700 19.5px/1 var(--sans);color:#fff;letter-spacing:.02em;white-space:nowrap}
+.scard .panel{position:absolute;left:0;background:#fff;border-radius:13px;box-shadow:0 -3px 8px rgba(20,60,120,.05)}
+.scard .reg{position:absolute;left:18px;top:17px;font:600 14.4px/1 var(--sans);letter-spacing:.075em;color:var(--label);white-space:nowrap}
+.scard .city{position:absolute;left:17px;top:37px;font-family:var(--serif);font-weight:900;
+  font-size:24.5px;line-height:1.2;letter-spacing:-.022em;color:var(--navy);white-space:nowrap}
+.scard .desc{position:absolute;left:18px;top:73px;font:400 14.3px/21.2px var(--sans);color:#33476a;white-space:nowrap}
+
+/* ---------- globe labels ---------- */
+.glab{position:absolute;white-space:nowrap}
+.glab .c{font-family:var(--serif);font-weight:900;font-size:34px;line-height:1;color:var(--navy);
+  text-shadow:0 0 6px #fff,0 0 12px #fff,0 0 3px #fff}
+.glab .r{font:700 17px/1 var(--sans);letter-spacing:.14em;color:var(--label);margin-top:7px;
+  text-shadow:0 0 6px #fff,0 0 3px #fff}
+.glab.right{text-align:left} .glab.left{text-align:right}
+#kicker{position:absolute;left:0;width:1080px;text-align:center;top:196px;font:700 24px/1 var(--sans);letter-spacing:.18em;color:var(--blue)}
+#kicker b{color:var(--navy)}
+
+.bcard .sheen{position:absolute;inset:0;mix-blend-mode:screen;opacity:0;
+  background:linear-gradient(105deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.42) 50%,rgba(255,255,255,0) 62%) no-repeat;background-size:260% 100%}
+#cam{transform-origin:50% 42%}
