@@ -12,8 +12,8 @@
 // left out, and The Landmark and the World Trade Center stand east of the frame.
 // Revision 11 (?rev11), at the requester's direction (2 Oct 2026), is no longer the view from Marina Mall: it is a symbolic
 // skyline of the UAE's modern landmarks standing together under the same computed sky, zoomed in to fill the frame: Dubai's
-// Burj Al Arab and Burj Khalifa on the left; Abu Dhabi's Aldar HQ, the Nation Towers, ADNOC HQ, the Etihad Towers, Emirates
-// Palace and Qasr Al Watan to the right. Suhail is not drawn in it (nor its halo, rings, label or the ?heritage Sirius
+// Burj Al Arab, Ain Dubai and Burj Khalifa on the left; Abu Dhabi's Aldar HQ, the Nation Towers, ADNOC HQ, the Etihad
+// Towers, Emirates Palace and Qasr Al Watan to the right, Qasr Al Watan whole and nearest (the requester, 5 Oct 2026). Suhail is not drawn in it (nor its halo, rings, label or the ?heritage Sirius
 // halo). A band of engraved cloud crosses the head of the frame; NCM's King Air C90 crosses under it, left to right, at one
 // steady altitude after the dissolve, and leaves as the title arrives; behind it, gentle rain falls from the cloud base,
 // veil by veil, and fades out well above the buildings (ghayth). As the title (twenty years) rises, the rain turns from
@@ -30,7 +30,10 @@ const FINALE_VIEW = { az0: 186, pxDeg: 17, hz: 905 };
 // under the cloud's base (scene y 140) and over Burj Khalifa's spire (scene y 400) with about 95 px to spare on each side.
 const FIN11 = { eye: 14, kT: 0.62, kP: 1.1,
   // centres (scene x): Dubai on the left, Abu Dhabi to the right
-  x: { baa: 200, bk: 470, aldar: 715, nation: 955, adnoc: 1215, etihad: 1470, palace: 1180, qasr: 1715 },
+  x: { baa: 175, ain: 322, bk: 470, aldar: 715, nation: 955, adnoc: 1215, etihad: 1470, palace: 1170, qasr: 1680 },
+  // Qasr Al Watan stands on a bank of its own, nearer still (kQ), so the Presidential Palace reads whole and first among
+  // the palaces: clear of Emirates Palace (about 50 px of water between them) and its dome the higher of the two
+  kQ: 1.25,
   // the King Air: model yaw toward the eye (deg), elevation of the eye's view (deg), focal length (px), path height (scene y),
   // and the scene-clock times its nose enters the frame on the left and its tail leaves on the right (the dissolve into the
   // finale ends at 1.5; the title begins at 5.0)
@@ -40,6 +43,7 @@ const FIN11 = { eye: 14, kT: 0.62, kP: 1.1,
   cloud: { base: 140, x0: 120, x1: 1800 } };
 FIN11.yT = FINALE_VIEW.hz + FIN11.eye * FIN11.kT;
 FIN11.yP = FINALE_VIEW.hz + FIN11.eye * FIN11.kP;
+FIN11.yQ = FINALE_VIEW.hz + FIN11.eye * FIN11.kQ;
 // Burj Khalifa's elevation, from the OpenStreetMap 3D model of its 37 building parts (each wing tier's footprint and
 // height; via Overture Maps 2026-09-23.1 building_part) seen toward azimuth 120: [metres across, metres up], a step outline
 // with its spiral setbacks, the core rising to the spire and the pinnacle at 828 m
@@ -222,6 +226,19 @@ scene({
       win: [] };
     for (let z = 12; z < 192; z += 7) for (let u = back - Dz(z) + fw(z) + 3; u < back - 2; u += 5) if (r() < 0.26) this.baa.win.push([gR.X(u), gR.Y(z), r()]);
     this.baa.bridgeLamps = Array.from({ length: 16 }, (_, i) => this.baa.bridge.at(i / 15));
+    // Ain Dubai (Bluewaters, Dubai; opened 21 October 2021), seen face on: 250 m overall, its rim 240 m across on a hub
+    // about 130 m up, the hub's spindle carried by four legs 126 m long (two A-frames, seen as one inverted V), 192 spoke
+    // cables, 48 cabins outside the rim, the terminal low at its foot (Mammoet; Crane & Transport Briefing, 4 Oct 2021;
+    // TÜV SÜD; WSP). Its lighting is drawn generic: a steady pale rim and cabins, nothing flashing
+    const gD = G(X.ain, F.yT, F.kT), hubZ = 130, rimR = 120, dcx = gD.X(0), dcy = gD.Y(hubZ), drr = rimR * F.kT;
+    this.ain = { g: gD, cx: dcx, cy: dcy, r: drr,
+      rim: el(dcx, dcy, drr, drr, 0, TAU, 870, 0), rimIn: el(dcx, dcy, drr - 2.2, drr - 2.2, 0, TAU, 871, 0),
+      legs: [poly(gD, [[-40, 0], [-34, 0], [1, hubZ - 2], [-1, hubZ + 2]]), poly(gD, [[34, 0], [40, 0], [1, hubZ + 2], [-1, hubZ - 2]])],
+      brace: new P([[gD.X(-22), gD.Y(55)], [gD.X(22), gD.Y(55)]]),
+      hub: el(dcx, dcy, 9 * F.kT, 9 * F.kT, 0, TAU, 872, 0),
+      terminal: poly(gD, [[-70, 0], [-70, 9], [-30, 14], [30, 14], [70, 9], [70, 0]]),
+      spokes: Array.from({ length: 64 }, (_, i) => { const a = (i + 0.5) / 64 * TAU; return new P([[dcx + 9 * F.kT * Math.cos(a), dcy + 9 * F.kT * Math.sin(a)], [dcx + (drr - 1.5) * Math.cos(a), dcy + (drr - 1.5) * Math.sin(a)]]); }),
+      cabins: Array.from({ length: 48 }, (_, i) => { const a = i / 48 * TAU + 0.03; return [dcx + (drr + 2.6) * Math.cos(a), dcy + (drr + 2.6) * Math.sin(a), r()]; }) };
     // Aldar HQ (Al Raha Beach): a circle in elevation, 120.9 m across, its top 110 m up (so the circle runs on below the
     // ground), two convex glazed faces with an external steel diagrid, joined by the "zipper" band round its edge
     const gL = G(X.aldar, F.yT, F.kT), Rl = 60.45, zc = 110 - Rl, a0 = Math.asin(-zc / Rl);
@@ -235,19 +252,20 @@ scene({
       adnoc: { k: kk, px: 1586, base: tmp.base, sx: X.adnoc, b: ab,
         hole: new P([[1569, tmp.base - 334 * 1.155], [1603, tmp.base - 334 * 1.155], [1603, tmp.base - 312 * 1.155], [1569, tmp.base - 312 * 1.155]], true) } };
     this.adnocWin = []; for (let y = tmp.base - 12; y > tmp.base - 312 * 1.155 + 8; y -= 11) for (let xx = 1572; xx < 1601; xx += 7) if (r() < 0.34) this.adnocWin.push([xx, y, r()]);
-    // Emirates Palace: about 1 km long, its wings 14-18 m, the central block 34 m, the great dome to about 60 m (the
-    // approved frame's massing), at kP
-    const pk = F.kP, pcx = X.palace, m = h => F.yP - h * pk, half = 400 * pk;
+    // Emirates Palace: its central block (34 m) and great dome (to about 60 m) with the inner wings (14-18 m) and their
+    // domes, at kP; its full kilometre is not shown, so that it ends about 50 px short of Qasr Al Watan (the requester, 5 Oct)
+    const pk = F.kP, pcx = X.palace, m = h => F.yP - h * pk, half = 245 * pk;
     this.pal11 = new P([[pcx - half, F.yP], [pcx - half, m(14)], [pcx - half * 0.72, m(18)], [pcx - 60 * pk / 0.553, m(18)], [pcx - 60 * pk / 0.553, m(34)], [pcx + 60 * pk / 0.553, m(34)], [pcx + 60 * pk / 0.553, m(18)], [pcx + half * 0.72, m(18)], [pcx + half, m(14)], [pcx + half, F.yP]], true);
     this.palDome11 = el(pcx, m(34), 22 * 1.1 * pk, 26 * 1.1 * pk, Math.PI, TAU, 730, 0.05);
     this.palDomes11 = [-0.62, -0.35, 0.35, 0.62].map((f, i) => el(pcx + f * half, m(18), 7 * pk, 8 * pk, Math.PI, TAU, 732 + i, 0));
     this.palLights11 = Array.from({ length: 120 }, () => [pcx - half * 0.95 + r() * half * 1.9, m(4 + r() * 10), r()]);
-    // Qasr Al Watan: the great dome 37 m across, its crown 60 m up over the Great Hall, a wing to each side, at kP
-    const qk = F.kP, qcx = X.qasr, qm = h => F.yP - h * qk, QX = mm => qcx + mm * qk;
-    this.qasr11 = new P([[QX(-150), F.yP], [QX(-150), qm(15)], [QX(-112), qm(15)], [QX(-112), qm(19)], [QX(-50), qm(19)], [QX(-50), qm(24)],
+    // Qasr Al Watan: the great dome 37 m across, its crown 60 m up over the Great Hall, a wing to each side, at kQ
+    const qk = F.kQ, qcx = X.qasr, qm = h => F.yQ - h * qk, QX = mm => qcx + mm * qk;
+    this.qasr11 = new P([[QX(-150), F.yQ], [QX(-150), qm(15)], [QX(-112), qm(15)], [QX(-112), qm(19)], [QX(-50), qm(19)], [QX(-50), qm(24)],
       [QX(-18.5), qm(24)], [QX(-18.5), qm(41.5)], [QX(18.5), qm(41.5)], [QX(18.5), qm(24)], [QX(50), qm(24)], [QX(50), qm(19)],
-      [QX(112), qm(19)], [QX(112), qm(15)], [QX(150), qm(15)], [QX(150), F.yP]], true);
+      [QX(112), qm(19)], [QX(112), qm(15)], [QX(150), qm(15)], [QX(150), F.yQ]], true);
     this.qasrDome11 = el(qcx, qm(41.5), 18.5 * qk, 18.5 * qk, Math.PI, TAU, 760, 0);
+    this.qasrDrum11 = new P([[QX(-18.5), qm(24)], [QX(-18.5), qm(41.5)], [QX(18.5), qm(41.5)], [QX(18.5), qm(24)]], true);
     this.qasrFinial11 = new P([[qcx - 0.4, qm(60)], [qcx, qm(64)], [qcx + 0.4, qm(60)]], true);
     this.qasrDomes11 = [-86, -64, 64, 86].map((x, i) => el(QX(x), qm(19), 6 * qk, 6.5 * qk, Math.PI, TAU, 761 + i, 0));
     this.qasrLights11 = Array.from({ length: 80 }, () => { const x = -146 + r() * 292; return [QX(x), qm(3 + r() * (Math.abs(x) < 50 ? 18 : 11)), r()]; });
@@ -332,7 +350,7 @@ scene({
     this.wordBoxes = this.measureWords();
     // the buildings' outlines in the scene, for the rain's stops
     const plate = (o, b) => new P(b.body.pts.map(([x, y]) => [o.sx + (x - o.px) * o.k, F.yT - (o.base - y) * o.k]), true);
-    const fronts = [this.bk.body, this.baa.body, this.baa.mast, this.aldar.body, this.pal11, this.palDome11, this.qasr11, this.qasrDome11,
+    const fronts = [this.bk.body, this.baa.body, this.baa.mast, this.ain.rim, this.aldar.body, this.pal11, this.palDome11, this.qasr11, this.qasrDome11,
       ...this.towers.map(b => plate(this.tw11.etihad, b)), ...this.nationT.map(b => plate(this.tw11.nation, b)), plate(this.tw11.adnoc, ab)];
     const topAt = x => { let top = FINALE_VIEW.hz; fronts.forEach(p => { const q = p.pts; for (let i = 0; i < q.length; i++) { const a = q[i], b = q[(i + 1) % q.length]; if ((a[0] - x) * (b[0] - x) <= 0 && a[0] !== b[0]) top = Math.min(top, a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0])); else if (a[0] === x) top = Math.min(top, a[1], b[1]); } }); return top; };
     this.topAt = topAt;
@@ -529,17 +547,28 @@ scene({
     sil(R_.pad, 0.7, DARK, 0.45); sil(R_.muntaha, 0.6, DARK, 0.3);
     lit([R_.muntaha], '#F2C97A', 0.45 * dq, R_.g.Y(201.5), R_.g.Y(196.5), 1);
     lit([R_.mast], '#E6E9F2', 0.3 * dq, R_.g.Y(321), R_.g.Y(252), 0.5);
-    // the two palaces, on their nearer bank in front of the towers. Qasr Al Watan, floodlit: its white granite pale, the dome
-    // brightest (drawn first: Emirates Palace's east wing runs in front of its west wing)
-    sil(this.qasr11, 0.7); sil(this.qasrDome11, 0.7); sil(this.qasrFinial11, 0.5); this.qasrDomes11.forEach(d => sil(d, 0.6));
-    lit([this.qasr11, ...this.qasrDomes11], '#EADDC0', 0.72 * dq, F.yP - 25 * F.kP, F.yP, 0.75);
-    lit([this.qasrDome11, this.qasrFinial11], '#F4EAD2', 0.8 * dq, F.yP - 64 * F.kP, F.yP - 41 * F.kP, 0.85);
-    this.qasrLights11.forEach(([x, y, v]) => { const o = on(v); if (o > 0) lamp(x, y, 0.5 * o * (0.5 + 0.5 * v), 2.2, 1.8); });
-    // Emirates Palace: its long front and the great dome, floodlit gold, the Abu Dhabi towers rising behind it
+    // Ain Dubai: the A-frame legs and the terminal, the spoke cables, the rim, the hub, the 48 cabins lit
+    const D = this.ain;
+    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = SA * 0.5 * cq; ctx.strokeStyle = DARK; ctx.lineWidth = 0.6; ctx.beginPath(); D.spokes.forEach(p => p.trace(ctx, 1)); ctx.stroke(); ctx.restore();
+    lit(D.spokes.map(p => new P([p.pts[0], p.pts[1], [p.pts[1][0] + 0.4, p.pts[1][1] + 0.4], [p.pts[0][0] + 0.4, p.pts[0][1] + 0.4]], true)), '#C9D3E6', 0.18 * dq, D.cy - D.r, D.cy + D.r, 1);
+    D.legs.forEach(l => sil(l, 0.7, DARK, 0.3)); stroke(D.brace, cq, INK, 0.8, 0.25); sil(D.terminal, 0.7, DARK, 0.25);
+    ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = SA * cq; ctx.strokeStyle = DARK; ctx.lineWidth = 3.2; ctx.beginPath(); D.rim.trace(ctx, 1); ctx.stroke(); ctx.restore();
+    stroke(D.rim, cq, '#E6E9F2', 1.0, 0.42 * dq); stroke(D.rimIn, cq, INK, 0.6, 0.22);
+    sil(D.hub, 0.7, DARK, 0.4);
+    D.cabins.forEach(([x, y, v]) => { const o = on(v, 1.0, 2.5); sil(el(x, y, 2.4, 1.6, 0, TAU, 880, 0), 0.5, DARK, 0.3); if (o > 0) lamp(x, y, 0.62 * o, 2.8, 1.6); });
+    // the two palaces, on their nearer banks in front of the towers. Emirates Palace first: its central block, inner wings
+    // and great dome, floodlit gold, the Abu Dhabi towers rising behind it
     sil(this.pal11, 0.7); sil(this.palDome11, 0.7); this.palDomes11.forEach(d => sil(d, 0.6));
-    lit([this.palDome11], '#EDD199', 0.7 * dq, F.yP - 63 * F.kP, F.yP - 34 * F.kP, 0.8);
-    lit([this.pal11, ...this.palDomes11], '#DDBB84', 0.55 * dq, F.yP - 34 * F.kP, F.yP, 0.62);
+    lit([this.palDome11], '#EDD199', 0.62 * dq, F.yP - 63 * F.kP, F.yP - 34 * F.kP, 0.8);
+    lit([this.pal11, ...this.palDomes11], '#DDBB84', 0.48 * dq, F.yP - 34 * F.kP, F.yP, 0.62);
     this.palLights11.forEach(([x, y, v]) => { const o = on(v, 0.8); if (o > 0) lamp(x, y, 0.5 * o * (0.5 + 0.5 * v), 2.2, 1.8); });
+    // then Qasr Al Watan, nearest and whole, clear of every other building: floodlit, its white granite pale and its dome
+    // the brightest thing on the shore
+    sil(this.qasr11, 0.7); sil(this.qasrDome11, 0.7); sil(this.qasrFinial11, 0.5); this.qasrDomes11.forEach(d => sil(d, 0.6));
+    lit([this.qasr11, ...this.qasrDomes11], '#EFE4CA', 0.8 * dq, F.yQ - 25 * F.kQ, F.yQ, 0.8);
+    lit([this.qasrDrum11], '#F4EAD2', 0.4 * dq, F.yQ - 42 * F.kQ, F.yQ - 24 * F.kQ, 1);
+    lit([this.qasrDome11, this.qasrFinial11], '#F7EFDB', 1.0 * dq, F.yQ - 64 * F.kQ, F.yQ - 41 * F.kQ, 0.9);
+    this.qasrLights11.forEach(([x, y, v]) => { const o = on(v); if (o > 0) lamp(x, y, 0.5 * o * (0.5 + 0.5 * v), 2.2, 1.8); });
     // the reflections of the lights: faint, shimmering columns
     const refl = (x, y0, a, len, ph, wd = 2) => { const s = 0.5 + 0.5 * this.tw(t0, ph, 1.7); ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = SA * a * (0.6 + 0.4 * s); const g = ctx.createLinearGradient(0, y0, 0, y0 + len); g.addColorStop(0, '#F2C97A'); g.addColorStop(1, 'rgba(242,201,122,0)'); ctx.fillStyle = g; ctx.fillRect(x - wd / 2, y0 + 1, wd, len); ctx.restore(); };
     const rq = cq * easeOut(prog(t, 2.0, 2.0)), yR = F.yT + 1, yRP = F.yP + 1;
@@ -550,11 +579,12 @@ scene({
     B.win.forEach(([x, y, v], j) => { if (j % 5 === 0) refl(x, yR, 0.14 * rq, 50 + 80 * v, v * 6.28 + 5, 2); });
     R_.win.forEach(([x, y, v], j) => { if (j % 4 === 0) refl(x, yR, 0.12 * rq, 34 + 50 * v, v * 6.28 + 6, 2); });
     refl(R_.g.X(R_.back - 40), yR, 0.16 * rq * dq, 70, 7, 12);
+    D.cabins.forEach(([x, y, v], j) => { if (y > D.cy + D.r * 0.3 && j % 2 === 0) refl(x, yR, 0.12 * rq, 30 + 40 * v, v * 6.28 + 9, 2); });
     refl(AL.cx, yR, 0.12 * rq * dq, 50, 8, 14);
     this.palLights11.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(x, yRP, 0.11 * rq, 30 + 40 * v, v * 6.28 + 4, 2.2); });
-    this.qasrLights11.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(x, yRP, 0.11 * rq, 28 + 36 * v, v * 6.28 + 3, 2.2); });
+    this.qasrLights11.forEach(([x, y, v], j) => { if (j % 3 === 0) refl(x, F.yQ + 1, 0.11 * rq, 28 + 36 * v, v * 6.28 + 3, 2.2); });
     refl(FIN11.x.palace, yRP, 0.12 * rq * dq, 56, 9, 14);
-    refl(FIN11.x.qasr, yRP, 0.12 * rq * dq, 50, 10, 14);
+    refl(FIN11.x.qasr, F.yQ + 1, 0.13 * rq * dq, 56, 10, 14);
     // the King Air, crossing at one altitude: never in the stage holds
     if (!this.hold) this.drawAir(t);
     // hold C (behind speeches): the whole frame dimmed

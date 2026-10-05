@@ -17,10 +17,11 @@ and keeps that film's engraved-plate language, rebuilt for the room:
   - Emirates Palace lies low to the right.
   - Every building is at its true bearing and angular size.
   - Revision 11 (`?rev11`, 2 October, at the requester's direction, reworked the same day) ends instead on a symbolic
-    skyline of the UAE's modern landmarks, zoomed in to fill the lower frame: Burj Al Arab and Burj Khalifa (from its
-    OpenStreetMap 3D parts) on the left, then Aldar HQ, the Nation Towers, ADNOC HQ and the Etihad Towers behind Emirates
-    Palace, and Qasr Al Watan on the right. The towers share one scale (0.62 px/m, Burj Khalifa 513 px) and the palaces
-    another (1.1 px/m), each standing where one eye 14 m up puts it; Burj Khalifa stands left of the words, at least
+    skyline of the UAE's modern landmarks, zoomed in to fill the lower frame: Burj Al Arab, Ain Dubai and Burj Khalifa
+    (from its OpenStreetMap 3D parts) on the left, then Aldar HQ, the Nation Towers, ADNOC HQ and the Etihad Towers behind
+    Emirates Palace, and Qasr Al Watan on the right, whole, nearest and clear of every other building. The towers (and Ain
+    Dubai) share one scale (0.62 px/m, Burj Khalifa 513 px), Emirates Palace another (1.1 px/m) and Qasr Al Watan its own
+    (1.25 px/m), each standing where one eye 14 m up puts it; Burj Khalifa stands left of the words, at least
     80 px from every word box (the boxes are measured from `finaleWords()` itself). Suhail is not drawn. A band of engraved cloud
     crosses the head of the frame inside the corner marks, its base clear of the title. NCM's King Air C90 (the seeding
     plate's model, without its flare racks, seen from its right side) crosses under it left to right at one altitude,
@@ -28,8 +29,8 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     the cloud veil by veil, behind the words (softened round each line of them), and fades out at least 40 px above the
     buildings. As the title rises it turns from silver to the gold of the gauge's 2027 (`GOLD`), and stays gold in the
     stage holds. The stage holds have no aircraft and the rain loops in the hold's length (`FIN11` in
-    `scenes/night-finale.js`). Burj Khalifa, Burj Al Arab and Aldar HQ, like row 48's buildings, may need their owners'
-    clearance.
+    `scenes/night-finale.js`). Burj Khalifa, Burj Al Arab, Ain Dubai and Aldar HQ, like row 48's buildings, may need
+    their owners' clearance.
 - **One device.** A turning circle carries the film: the star wheel, the compass and wind roses, the radar scope, the
   globe, the gauge's rim, and the gold ring around Suhail at the end.
 - **Protocol.**

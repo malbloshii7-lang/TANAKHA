@@ -961,10 +961,22 @@ This supersedes the fifth notes where they differ.
 
   | Emirate | Landmarks |
   |---|---|
-  | Dubai | Burj Al Arab, Burj Khalifa |
-  | Abu Dhabi | Aldar HQ, the Nation Towers, ADNOC HQ, the Etihad Towers, Qasr Al Watan |
+  | Dubai | Burj Al Arab, Ain Dubai, Burj Khalifa |
+  | Abu Dhabi | Aldar HQ, the Nation Towers, ADNOC HQ, the Etihad Towers, Emirates Palace, Qasr Al Watan |
 
-  Emirates Palace's long front stands before the Abu Dhabi towers.
+  Emirates Palace stands before the Abu Dhabi towers.
+- **The requester's notes of 5 October 2026.**
+  - *"The Emirates Palace is overtaking Qasr Al Watan."* Emirates Palace's kilometre-long front ran into Qasr Al Watan's
+    west wing and was drawn in front of it. Now Emirates Palace shows its central block, great dome and inner wings
+    (490 m of its front, at 1.1 px/m) and ends about 50 px short of Qasr Al Watan. Qasr Al Watan stands on a nearer bank of
+    its own (1.25 px/m), whole and in front of everything: its dome (crown 60 m, 75 px) is the higher of the two
+    palaces' and the brightest light on the shore, its drum and wings floodlit white.
+  - *"Add Ain Dubai between Burj Al Arab and Burj Khalifa."* Ain Dubai (Bluewaters; opened 21 October 2021) is seen face
+    on at the towers' scale: 250 m overall, its rim 240 m across on a hub about 130 m up, the spindle on four legs
+    126 m long (two A-frames, seen as one inverted V), its spoke cables (192; 64 drawn), its 48 cabins outside the rim,
+    the terminal at its foot. Sources: Mammoet; Crane & Transport Briefing (4 October 2021); TÜV SÜD; WSP. Its lighting
+    is generic and steady (a pale rim and lit cabins, nothing flashing). Burj Al Arab moves 25 px left to give it room;
+    Burj Khalifa does not move. The rain stops above it like every building.
 - **Zoomed in.** The towers are drawn at twice the scale (0.62 px/m) and the palaces at 1.1 px/m. The heights stay true
   to each other.
   - Burj Khalifa is 513 px tall and stands left of the words. Its spire is 126 px from the Arabic title and 261 px from
