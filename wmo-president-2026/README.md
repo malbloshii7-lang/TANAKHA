@@ -25,7 +25,8 @@ with transparent washes.
   - the Teskey Ala-Too across Issyk-Kul, from the terrain;
   - the Nukuʻalofa lagoon and reef, from Sentinel-2;
   - the week's pressure charts over Region V, from the GFS analyses;
-  - the Bucharest-Băneasa observation garden, in the station's own weather.
+  - the Romanian Athenaeum at dusk in the evening's own weather, with the 50 Members of Region VI coming out over it as
+    lights, each at its national service's seat on a map centred on Bucharest.
 
 **Words and facts.**
 - The screen is English, and the Arabic travels as an SRT.
@@ -46,7 +47,7 @@ The first, 93 s edition (with a slower title and longer holds) is in the git his
 | `score.py` | The score: VSCO-2 CE orchestra and field recordings, from the gala's `audio.py`, `sampler.py` and `foley.py` |
 | `subtitles.js` | Writes the English and Arabic SRT from the build itself |
 | `photos/` | The office's photographs, as named in `photos/README.md`. They are not committed |
-| `data/` | The plates' derived data (skyline, coastlines, pressure grids) |
+| `data/` | The plates' derived data (skyline, coastlines, pressure grids, and Region VI's Members and coasts on the Bucharest chart) |
 | `SOURCES.md` | Every fact, source and computation |
 
 ## Build

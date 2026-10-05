@@ -62,7 +62,7 @@ const TIMELINE = [
       hostLabel('BUREAU OF METEOROLOGY', 560, 690, q(1));
       hostLabel('METSERVICE', 862, 742, q(2));
     } },
-  { id: 'bucharest', start: 36.0, dur: 11.0, xf: 0.7, offset: 3.2,
+  { id: 'bucharest', start: 36.0, dur: 11.0, xf: 0.7,
     words(t, lt) {
       registerRow(ROWS.bucharest, lt, this, { t0: 0.35, cps: 45 });
       wordSet(this, lt, { ...SET,

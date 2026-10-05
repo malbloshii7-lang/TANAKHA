@@ -86,8 +86,14 @@ transfers and security.
 - **RA VI-19's agenda.** It includes the draft WMO Strategic Plan 2028–2031 (item 3.4) and the election of officers
   (item 6). Source: the session notification,
   https://extranet.wmo.int/edistrib_exped/grp_Semicircular/_en/6756760-2026-HRCS-CNFT-RA-VI-19_en.pdf
-- **Not on screen yet.** The President's meetings in Bucharest (the trilateral and bilateral meetings) and the
-  election's outcome stay off screen until WMO, NMA or the office reports them.
+- **The 50 Members.** "The WMO Regional Office for Europe serves the needs of the 50 Member States, covering Europe,
+  South Caucasus, and the Middle East": https://wmo.int/about-us/regions/europe (and the RA VI page,
+  https://community.wmo.int/site/knowledge-hub/governance/regional-association/RA-VI). The plate shows all 50 alike, as
+  the Association's membership; it does not say who attended.
+- **Not on screen yet.** The President's meetings in Bucharest (the trilateral and bilateral meetings), the election's
+  outcome and the session's decisions stay off screen until WMO, NMA or the office reports them. No outcome had been
+  published when the plate was rebuilt (5 October 2026). The venue of the meetings is not shown either: the plate's
+  Athenaeum stands for the city, not for the meeting place.
 
 ## Computed
 
@@ -158,22 +164,50 @@ transfers and security.
 - **Members.** The land of WMO Region V's 24 Members is washed in one colour (WMO Community, "About RA V"). The chart is
   the GFS analysis, not the Bureau's or MetService's own.
 
-### Bucharest (`scenes/bucharest.js`)
+### Bucharest (`scenes/bucharest.js`, `data/bucharest.js`)
 
-- **The station.** The observation garden of the Bucharest-Băneasa station (WMO 15420) lies inside the National
-  Meteorological Administration's grounds at Șos. București-Ploiești 97. Sources:
-  - meteoromania.ro (contact, and the history page: ANM in its present seat since 1961);
-  - OpenStreetMap (© OSM contributors, ODbL): node 742024813, inside way 862523834.
-- **The garden.** Drawn to the Romanian and WMO platform standard: screens with their sensors 1.8–2.0 m up and the
-  doors to the north, a 10 m wind mast. Its actual layout at Băneasa is not public, and ANM's buildings lie behind the
-  eye and are not drawn.
-- **The weather.** From the station's own report for 1 October 2026, 06 UTC, through OGIMET:
-  `AAXX 01061 15420 04970 03602 10118 20053 30192 40304 52006`.
-  - No cloud, 20 km visibility, wind north at 2 m/s, 11.8 °C, 1030.4 hPa.
-  - It agrees with LRBS 010600Z 35007KT CAVOK.
-- **Sun.** Altitude 17.6°, azimuth 113.2°.
-- **The observer.** Walks to the screen at the synoptic hour, reads it and writes the register. He is illustrative:
-  the 06 UTC report is coded as from an automatic station, and ANM keeps classic instruments too.
+The plate (rebuilt 5 October 2026; the earlier observation-garden plate is in the git history) shows the Romanian
+Athenaeum at dusk on 1 October 2026, from its garden, with the Region's 50 Members coming out over it as lights.
+
+- **The building.** Its main front faces west over its garden. Its parts and sizes:
+  - a stair of eight steps, and a portico of six fluted Ionic columns in front and two at the sides, 12 m tall, in the
+    proportions of the Erechtheion's;
+  - a plain triangular pediment;
+  - five mosaic medallions on the peristyle wall above the doors;
+  - the concert hall, 28.5 m across and 16 m high, under the great dome;
+  - the dome sheathed in galvanised sheet over 20 ribs, with 20 windows ornamented with wreaths and lyres, ending in a
+    tripod after the choragic monument of Lysicrates;
+  - the roofs of the four spiral stairs, which make small cupolas round the dome;
+  - 41 m to the top.
+  - Sources: monumenteromania.ro, after Caloianu and Filip, *Monumente Bucureștene* (2009),
+    http://www.monumenteromania.ro/index.php/monumente/detalii/en/Romanian%20Atheneum/1072; Enciclopedia României,
+    http://enciclopediaromaniei.ro/wiki/Ateneul_Rom%C3%A2n (the front to the west, the eight steps); the George Enescu
+    Foundation, https://fundatiaenescu.ro/ro/ateneul-roman/ (the 12 m columns); AGERPRES, 1 July 2019,
+    https://agerpres.ro/documentare/2019/07/01/atunci-si-acum-ateneul-roman--334492 (the four cupolas, the 28.5 m hall).
+  - Drawn generic: the lower round body about the hall, the front block's windows, every moulding, the floodlighting
+    (its colour and aim are not documented here), the garden's trees, walks and lamps, and the city blocks beyond. No
+    sign, lettering or statue is drawn, and the names carved round the dome are not.
+- **The evening.** Bucharest-Băneasa (WMO 15420) SYNOPs for 1 October 2026, 16, 17 and 18 UTC, through OGIMET: no cloud,
+  20 km visibility, wind 050° 2 m/s, then 030° and 010° at 1 m/s, air 19.3 °C falling to 11.3 °C, dew point 4.4 °C,
+  1028.8–1030 hPa. LRBS reported CAVOK through the evening. So a clear, dry, still dusk.
+- **The sky.** Computed with NOAA's solar equations (after Meeus) for 44.4414° N 26.0974° E and checked with PyEphem:
+  - sunset at 18:57 local time, at azimuth 266°;
+  - the sun 2.3° below the horizon at 19:05 and 6.8° below at 19:30; civil dusk ends at 19:26;
+  - the plate runs from 19:04 to 19:31, about 2.4 minutes of dusk to the second;
+  - the eye looks east-north-east (80°), toward the antisolar point (87°–92°), where the Earth's shadow rises under the
+    Belt of Venus;
+  - no Moon (it rose at 21:23).
+- **The lights.** They are a figure, not stars in their real places.
+  - Each Member is placed at the seat of its national meteorological service, on an azimuthal equidistant map centred
+    on Bucharest (ANM, 44.5106° N 26.0781° E; sphere of radius 6,371.0088 km), north up, 0.095 px to the km.
+  - They come out in the order of their great-circle distance from Bucharest: Sofia first (300 km), Reykjavík last
+    (3,665 km).
+  - The coasts are Natural Earth 1:50m land (public domain), simplified to 4.5 km, fading out south of the Levant and
+    east of the Caspian.
+  - No line joins any two Members, nothing spreads from the capital, and no border is drawn: every Member appears
+    alike.
+- **The eye.** In the garden, about 80 m west-south-west of the stair, 1.65 m up, with the camera level (f 770 px); it
+  eases 3 m forward over the beat.
 
 ## Sound
 
