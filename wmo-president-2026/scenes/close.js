@@ -28,10 +28,13 @@ scene({
       row.forEach((c, i) => typeLine(c, R.x[i], y, t0 + i * 0.05, lt, { size: i === 0 && c.length > 9 ? 22 : 26, ls: 3, a: 0.9, weight: 600, align: i === 3 ? 'right' : 'left', cps: 110 }));
       SA = s0;
     });
-    const L1 = 'Six countries · three WMO Regions · four weeks';
-    recText('A', f0 + 1.6, f0 + 3.6, 'ستّ دول · ثلاثة أقاليم للمنظمة · أربعة أسابيع', L1);
-    const pt = easeOut(prog(lt, 1.6, 0.6)) * qa;
-    if (pt > 0) blurIn(off => { setText(`700 40px ${F_HEAD}`, 1, 'ltr', 'center'); ctx.fillStyle = INK; ctx.fillText(L1, cx, 760 + off * 0.3); }, pt, 6, 8);
+    // the page's sum, in two lines: each measured to stay inside the plate with 56 px to spare on either side (in one line
+    // at 40 px it ran 1,079 px, wider than the 972 px plate); a line that will not fit stops the build
+    const L1 = ['Six countries · three WMO Regions', 'four weeks'];
+    recText('A', f0 + 1.6, f0 + 3.6, 'ستّ دول · ثلاثة أقاليم للمنظمة · أربعة أسابيع', L1.join(' · '));
+    const pt = easeOut(prog(lt, 1.6, 0.6)) * qa, maxW = PW - 2 * 56;
+    L1.forEach(l => { if (textWidth(l, `700 40px ${F_HEAD}`, 1) > maxW) throw new Error(`close: "${l}" is wider than the plate`); });
+    if (pt > 0) blurIn(off => { setText(`700 40px ${F_HEAD}`, 1, 'ltr', 'center'); ctx.fillStyle = INK; L1.forEach((l, i) => ctx.fillText(l, cx, 748 + i * 52 + off * 0.3)); }, pt, 6, 8);
     // 2. the aim
     const qb = easeOut(prog(lt, 3.9, 0.7)) * clamp((7.4 - lt) / 0.35);
     recText('A', f0 + 3.9, f0 + 7.4, 'إنذارٌ مبكر لكلّ إنسانٍ على وجه الأرض، بحلول نهاية عام ' + ltr('2027') + '.', 'Early warnings for everyone on Earth, by the end of 2027.');
