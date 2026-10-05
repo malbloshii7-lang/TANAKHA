@@ -16,7 +16,8 @@
 // Palace and Qasr Al Watan to the right. Suhail is not drawn in it (nor its halo, rings, label or the ?heritage Sirius
 // halo). A band of engraved cloud crosses the head of the frame; NCM's King Air C90 crosses under it, left to right, at one
 // steady altitude after the dissolve, and leaves as the title arrives; behind it, gentle rain falls from the cloud base,
-// veil by veil, and fades out well above the buildings (ghayth). See FIN11 below.
+// veil by veil, and fades out well above the buildings (ghayth). As the title (twenty years) rises, the rain turns from
+// silver to the anniversary's gold, the gold of the gauge's 2027 (the requester's idea, 5 October 2026). See FIN11 below.
 const FINALE_VIEW = { az0: 186, pxDeg: 17, hz: 905 };
 // Revision 11's frieze, in depth. One eye 14 m above the water; every object's size and the line it stands on follow from
 // its distance (base = horizon + eye x scale), so the frieze has true perspective although its order is symbolic:
@@ -566,13 +567,21 @@ scene({
     const g = FINALE_RAIN.getContext('2d'), page = ctx, m = page.getTransform();
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, FINALE_RAIN.width, FINALE_RAIN.height); g.setTransform(m);
     g.globalCompositeOperation = 'source-over'; g.lineCap = 'round'; g.lineWidth = 0.7;
+    // the anniversary's gold: as the title (twenty years) rises, from 5.0 on the scene clock, the rain warms from silver to
+    // the film's gold, the gold of the gauge's 2027 and of the twentieth drop (GOLD, #C9973B), paler where it leaves the
+    // cloud; it stays fine, dashed rain (no glow, no sparks), its lines a little stronger and wider so the darker gold reads
+    // as gold over the night sky (screened at the silver's strength it would read as grey)
+    const k = this.hold ? 1 : easeInOut(prog(t, 5.0, 1.6)), gl = parseInt(GOLD.slice(1), 16);
+    const mixc = (a, b) => a.map((c, i) => Math.round(lerp(c, b[i], k))).join(',');
+    const cTop = mixc([183, 203, 239], [240, 200, 112]), cLow = mixc([183, 203, 239], [gl >> 16, (gl >> 8) & 255, gl & 255]), aK = lerp(1, 2.1, k);
+    g.lineWidth = lerp(0.7, 0.9, k);
     live.forEach(({ v, q }) => v.lines.forEach(l => {
       // the rain reaches down over 1.6 s, and fades out over the lower 45% of its fall
       const reach = this.hold ? 1 : easeOut(prog(t, v.ts + 0.25 * l.w, 1.6)), y1 = l.yb + (l.foot - l.yb) * reach;
       if (y1 - l.yb < 2) return;
       const x1 = l.x - 0.12 * (y1 - l.yb), gr = g.createLinearGradient(0, l.yb, 0, l.foot);
-      gr.addColorStop(0, 'rgba(183,203,239,1)'); gr.addColorStop(0.55, 'rgba(183,203,239,0.8)'); gr.addColorStop(1, 'rgba(183,203,239,0)');
-      g.strokeStyle = gr; g.globalAlpha = 0.34 * q * (0.25 + 0.75 * l.w);
+      gr.addColorStop(0, `rgba(${cTop},1)`); gr.addColorStop(0.55, `rgba(${cLow},0.8)`); gr.addColorStop(1, `rgba(${cLow},0)`);
+      g.strokeStyle = gr; g.globalAlpha = Math.min(1, 0.34 * aK * q * (0.25 + 0.75 * l.w));
       g.setLineDash([l.dash, l.gap]); g.lineDashOffset = -this.fall(t0, l);
       g.beginPath(); g.moveTo(l.x, l.yb); g.lineTo(x1, y1); g.stroke();
     }));

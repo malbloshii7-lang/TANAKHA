@@ -26,7 +26,8 @@ and keeps that film's engraved-plate language, rebuilt for the room:
     plate's model, without its flare racks, seen from its right side) crosses under it left to right at one altitude,
     with steady navigation lights only, from just after the dissolve until the title begins. Behind it, rain falls from
     the cloud veil by veil, behind the words (softened round each line of them), and fades out at least 40 px above the
-    buildings. The stage holds have no aircraft and the rain loops in the hold's length (`FIN11` in
+    buildings. As the title rises it turns from silver to the gold of the gauge's 2027 (`GOLD`), and stays gold in the
+    stage holds. The stage holds have no aircraft and the rain loops in the hold's length (`FIN11` in
     `scenes/night-finale.js`). Burj Khalifa, Burj Al Arab and Aldar HQ, like row 48's buildings, may need their owners'
     clearance.
 - **One device.** A turning circle carries the film: the star wheel, the compass and wind roses, the radar scope, the

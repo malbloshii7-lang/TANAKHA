@@ -982,6 +982,11 @@ This supersedes the fifth notes where they differ.
   - It is drawn behind the words under a feathered mask. The words' contrast matches the approved frame (Arabic title
     10.6:1 against 10.7:1).
   - It is heard from the cloud overhead, filling in from the left.
+  - **Gold (5 October 2026, the requester's idea).** As the title rises (scene 5.0, over 1.6 s), the rain turns from
+    silver to the anniversary's gold: the film's `GOLD` (#C9973B), the gold of the gauge's 2027 and of the twentieth drop,
+    paler where it leaves the cloud. It stays fine, dashed rain, with no glow and no sparks, so it reads as rain and never
+    as fire or debris; its lines are a little wider and stronger so the darker gold reads as gold on the night sky. It is
+    gold throughout the stage holds. The title's contrast is unchanged (13.6:1 against 13.5:1, measured the same way).
 - **Checked.**
   - The default cut is byte-identical: wipcheck OK and 46 stills.
   - The finale passes the flash check (PSE) at 30 fps.
