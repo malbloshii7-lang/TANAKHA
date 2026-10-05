@@ -212,5 +212,10 @@ Athenaeum at dusk on 1 October 2026, from its garden, with the Region's 50 Membe
 ## Sound
 
 The music is recorded instruments: VSCO-2 Community Edition, CC0. The places are field recordings: Blanket (Felix
-Blume's wind, CC0) and Moodist (waves, keyboard, wind in trees; Pixabay Content License or CC0). The commits are listed
-in `score.py` and `../ncm-20/gala/foley.py`.
+Blume's wind, CC0) and Moodist (waves, keyboard, and for Bucharest a far road's hum and birds; Pixabay Content License
+or CC0). The commits are listed in `score.py` and `../ncm-20/gala/foley.py`.
+
+- **Bucharest.** A still dusk (the station's wind 1-2 m/s), so no wind in the trees: the city's far hum (Moodist
+  "Highway", low-passed to a murmur, from a stretch steady within 4 dB) and the garden's birds, which fall quiet over
+  the first eight seconds as the dusk deepens. A few glockenspiel notes, each a tone of its bar's chord, mark the lights
+  coming out, the first on Bucharest's own light.

@@ -10,8 +10,8 @@ lands under the name.
 (out/four-weeks-three-regions.voice.{en,ar}.srt) written from the times its lines actually run.
 
 VSCO: a checkout of https://github.com/sgossner/VSCO-2-CE (the folders ../ncm-20/gala/sampler.py lists).
-DIR: the checkouts ../ncm-20/gala/foley.py lists (blanket, noisekun, moodist, vcsl), with Moodist's nature/wind-in-trees.mp3
-from the same commit. The voices are the gala score's (audio.py, sampler.py, foley.py), imported from ../ncm-20/gala.
+DIR: the checkouts ../ncm-20/gala/foley.py lists (blanket, noisekun, moodist, vcsl), with Moodist's urban/highway.mp3 and
+animals/birds.mp3 from the same commit. The voices are the gala score's (audio.py, sampler.py, foley.py), imported from ../ncm-20/gala.
 
 The music, by beat (D major; the regions' colours in the harmony and the voicing, never a borrowed folk idiom):
   - the title (bar 0): a D chord with an added ninth, the harp rising, a glockenspiel glint on the first frame;
@@ -20,7 +20,8 @@ The music, by beat (D major; the regions' colours in the harmony and the voicing
     the lagoon's waves and the reef's surf far off;
   - Wellington, Melbourne, Jakarta (9-12): a pizzicato ostinato in eighths, the clockwork of services that never close,
     Bm - G - D - A; a forecast room's keyboards, low;
-  - Bucharest (13-16): the cellos' line in E minor, Em - C - G - Asus4 A; wind in autumn trees;
+  - Bucharest (13-16): the cellos' line in E minor, Em - C - G - Asus4 A, and a few glockenspiel notes as the Members'
+    lights come out over the Athenaeum; the city's far hum at dusk, and the garden's birds falling quiet;
   - the close (17-20): the horn's theme again, the strings full, G - A - G A - D, a soft timpani into the last cadence
     under the name, which then dies away with the picture.
 """
@@ -117,6 +118,11 @@ def music(H):
             for k, m in enumerate(up):
                 bus.add(H(m, 0.6), at(i, b + k * 0.25), 1.0, 0.2 - 0.1 * k)
     chord(bus, 'A', at(16, 2), BAR / 2, gain=0.36, bright=1800, attack=0.5)
+    # the lights coming out: Bucharest's first (lt 1.35, on bar 13's third beat), then the others, thinning out by bar 16;
+    # each note a tone of its bar's chord
+    for k, (i, b, m) in enumerate([(13, 2.0, 83), (14, 0.5, 88), (14, 1.5, 91), (14, 3.0, 84), (15, 0.5, 86), (15, 1.5, 91),
+                                   (15, 2.5, 83), (15, 3.5, 86), (16, 0.75, 88)]):
+        bus.add(A.bell(m, 2.2, 0.15 if k else 0.2), at(i, b), 1.0, -0.3 + 0.075 * k)
     line(bus, [(0, 0, 59, 2), (0, 2, 57, 1), (0, 3, 55, 1), (1, 0, 55, 2), (1, 2, 52, 2), (2, 0, 50, 2), (2, 2, 55, 2),
                (3, 0, 57, 3), (3, 3, 54, 1)],
          13, 'strings', gain=0.5, pan=-0.2, bright=2200, attack=0.6, release=1.0)
@@ -159,8 +165,13 @@ def places(F):
     put(to_lufs(F.filt(F.bed('lap', 11.8), lp=520), -31), 13.6)
     # the services: a forecast room's keyboards, low
     put(to_lufs(F.filt(F.bed('keys', 11.8), hp=200, lp=6000), -37), 24.6)
-    # Bucharest: wind in autumn trees (Moodist "Wind in Trees")
-    put(to_lufs(F.filt(F.bed('trees', 11.8), hp=150), -30), 35.6)
+    # Bucharest at dusk, a clear and still evening (wind 1-2 m/s): the city's far hum (Moodist "Highway", low-passed to a
+    # murmur) and the garden's birds (Moodist "Birds", high-passed), which fall quiet as the dusk deepens
+    # (each from its steadiest stretch: the hum within 4 dB across the beat, no vehicle passing near)
+    put(to_lufs(F.filt(F.bed('city', 11.8, start=54.0), hp=60, lp=480), -32), 35.6)
+    b = to_lufs(F.filt(F.bed('birds', 11.8, start=19.5), hp=1500), -32)
+    t = np.arange(b.shape[1]) / A.SR
+    put(b * np.clip(1 - (t - 2.8) / 5.0, 0, 1) ** 1.5, 35.6)
     return out
 
 
@@ -224,7 +235,8 @@ def main():
     import sampler
     import foley
     sampler.install(a.samples, SCORE)
-    foley.BEDS['trees'] = 'moodist/public/sounds/nature/wind-in-trees.mp3'
+    foley.BEDS['city'] = 'moodist/public/sounds/urban/highway.mp3'
+    foley.BEDS['birds'] = 'moodist/public/sounds/animals/birds.mp3'
     foley.install(a.foley, SCORE)
     H = lambda m, g=1.0: sampler.harmonic(m, g)
     mus = music(H)
