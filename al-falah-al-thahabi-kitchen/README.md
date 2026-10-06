@@ -4,12 +4,16 @@ Logo and identity for an Emirati kitchen serving banquets and daily meals.
 
 The emblem is a heaped rice platter on a footed serving tray (siniya), with three tapering wisps of steam. It sits inside a gold bezel braided from 108 rice grains. The grains on the heap are laid in a herringbone weave that nods to Al Sadu weaving, and the braid nods to talli embroidery.
 
+## Official logo
+
+**Gold on Ghaf green** is the official logo: `logo-primary-dark.png` for screens and `logo-primary-dark.pdf` for print. Use it wherever the green background can be reproduced. The other versions are only for surfaces where it can't, such as white paper, single-colour stamps, or photos.
+
 ## Files
 
 | File | Use |
 | --- | --- |
 | `al-falah-al-thahabi-kitchen-logo.pdf` | Vector master for printers and sign makers (4 pages: dark, light, signboard, identity sheet) |
-| `logo-primary-dark.png` | Main logo, gold on Ghaf green (2400 px) |
+| `logo-primary-dark.png` / `.pdf` | **Official logo**, gold on Ghaf green (2400 px PNG; single-page vector PDF) |
 | `logo-primary-light.png` | Main logo on ivory, for menus, receipts and light packaging |
 | `logo-gold-transparent.png` | Main logo, no background, for dark surfaces and photos |
 | `logo-light-transparent.png` | Main logo, no background, for light surfaces |

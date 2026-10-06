@@ -264,6 +264,7 @@ const PAGES = [
   }
   await browser.close();
   execFileSync('pdfunite', [...pdfs, path.join(OUT, 'al-falah-al-thahabi-kitchen-logo.pdf')]);
+  fs.copyFileSync(pdfs[0], path.join(OUT, 'logo-primary-dark.pdf')); // the official logo as its own vector file
   fs.rmSync(tmp, { recursive: true });
   console.log('✓ al-falah-al-thahabi-kitchen-logo.pdf →', OUT);
 })();
