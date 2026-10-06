@@ -74,57 +74,40 @@ function circleRing(r1, r2) {
   return c(r1) + c(r2);
 }
 
-// Scene: a faceless chef standing behind the platter, presenting it.
+// Scene: the chef in profile on the right, lifting the lid off a steaming rice platter on the left.
 // The platter (heap + tray) is drawn in its own space and placed with PLATTER; the whole scene
 // is then fitted into the inner field with SCENE. HALO is the negative gap between overlapping forms.
-const PLATTER = { s: 0.9, y: 41.4 };
-const SCENE = { s: 0.95, y: 30 };
-const HALO = 14;
-const platter = ([x, y]) => [x * PLATTER.s * SCENE.s, (y * PLATTER.s + PLATTER.y) * SCENE.s + SCENE.y];
-const scene = ([x, y]) => [x * SCENE.s, y * SCENE.s + SCENE.y];
-
-const circle = (cx, cy, r) => `M${cx - r} ${cy}A${r} ${r} 0 1 0 ${cx + r} ${cy}A${r} ${r} 0 1 0 ${cx - r} ${cy}Z`;
-const ellipse = (cx, cy, rx, ry) => `M${cx - rx} ${cy}A${rx} ${ry} 0 1 0 ${cx + rx} ${cy}A${rx} ${ry} 0 1 0 ${cx - rx} ${cy}Z`;
-
-function chef() {
-  // shoulders sloping out from the neck, right side as cubic segments, mirrored for the left
-  const right = [[40, -62, 90, -58, 125, -48], [160, -38, 178, -12, 182, 20], [184, 80, 186, 140, 186, 200]];
-  const pts = [[22, -78], ...right.map((c) => [c[4], c[5]])];
-  const leftBack = right.map((c, i) => `C${-c[2]} ${c[3]} ${-c[0]} ${c[1]} ${-pts[i][0]} ${pts[i][1]}`).reverse().join('');
-  const torso = `M22 -78${right.map((c) => `C${c.join(' ')}`).join('')}H-186${leftBack}Z`;
-  // head: broad at the brow, tapering to the jaw, with ears
-  const head = 'M0 -214C34 -214 54 -190 54 -154C54 -118 32 -90 0 -88C-32 -90 -54 -118 -54 -154C-54 -190 -34 -214 0 -214Z';
-  // overlapping parts are separate paths so their fills union regardless of winding direction
-  const body = [torso, 'M-20 -104H20V-70H-20Z', head, ellipse(54, -150, 9, 16), ellipse(-54, -150, 9, 16)];
-  // neckerchief: a curved band round the neck, a knot, and two short tails
-  const scarf = 'M-30 -84Q0 -72 30 -84L27 -71Q0 -59 -27 -71Z' + circle(0, -60, 9)
-    + 'M-4 -55L-21 -37L-9 -33L0 -51Z' + 'M4 -55L21 -37L9 -33L0 -51Z';
-  // toque worn on the head: pleated band (pleats cut out) under a puffed crown that overhangs it
-  const band = 'M-56 -192Q0 -184 56 -192L60 -226H-60Z' + [-36, -18, 0, 18, 36].map((x) => `M${x - 2} -220H${x + 2}V-198H${x - 2}Z`).join('');
-  const crown = ['M-70 -232H70V-256H-70Z', circle(-50, -264, 34), circle(50, -264, 34), circle(0, -282, 44)];
-  return { body, scarf, band, crown };
-}
+const { figure } = require('./chef');
+const PLATTER = { s: 0.5, x: -105, y: 128 };
+const SCENE = { s: 1.08, x: 27, y: 38 };
+const HALO = 12;
+const platter = ([x, y]) => [(x * PLATTER.s + PLATTER.x) * SCENE.s + SCENE.x, (y * PLATTER.s + PLATTER.y) * SCENE.s + SCENE.y];
+const scene = ([x, y]) => [x * SCENE.s + SCENE.x, y * SCENE.s + SCENE.y];
 
 let uid = 0;
 // Full emblem as SVG markup, filled with a flat colour or a diagonal metallic gradient.
 function emblem({ paint, gradId, gradient }) {
-  const t = tray(), c = chef(), id = `em${++uid}`;
-  const platterT = `translate(0 ${PLATTER.y}) scale(${PLATTER.s})`;
-  // knockout shapes: everything in front of the chef cuts a HALO-wide gap into what is behind it
+  const t = tray(), c = figure(), id = `em${++uid}`;
+  const platterT = `translate(${PLATTER.x} ${PLATTER.y}) scale(${PLATTER.s})`;
+  // knockout shapes: whatever sits in front cuts a HALO-wide gap into the lines behind it
   const platterHalo = `<g transform="${platterT}" stroke-width="${f((2 * HALO) / PLATTER.s)}"><path d="${domeOutline()}"/><path d="${t.dish}"/><path d="${t.foot}"/></g>`;
+  const lidHalo = `<g transform="${c.lid.t}" stroke-width="${2 * HALO}"><path d="${c.lid.parts[0]}" fill-rule="nonzero"/><path d="${c.lid.parts[1]}"/></g>`;
+  const sleeveHalo = `<path d="${c.sleeve}" stroke-width="${HALO}"/>`;
   const mask = (name, inner) => `<mask id="${id}-${name}" maskUnits="userSpaceOnUse" x="-500" y="-500" width="1000" height="1000">
     <rect x="-500" y="-500" width="1000" height="1000" fill="#fff"/><g fill="#000" stroke="#000" stroke-linejoin="round">${inner}</g></mask>`;
   const grad = gradient
     ? `<linearGradient id="${gradId}" gradientUnits="userSpaceOnUse" x1="-420" y1="-480" x2="420" y2="480">${gradient}</linearGradient>`
     : '';
-  return `<defs>${grad}${mask('body', platterHalo + `<path d="${c.scarf}" stroke-width="${2 * HALO * 0.4}"/><path d="${c.band}" fill-rule="nonzero" stroke-width="${2 * HALO * 0.45}"/>`)}${mask('scarf', platterHalo)}</defs>
+  const paths = (list) => list.map((d) => `<path d="${d}"/>`).join('');
+  return `<defs>${grad}${mask('body', platterHalo + lidHalo + sleeveHalo)}${mask('arm', platterHalo + lidHalo)}${mask('steam', lidHalo)}</defs>
   <g fill="${gradient ? `url(#${gradId})` : paint}" fill-rule="evenodd">
     <path d="${circleRing(490, 482)}"/><path d="${circleRing(470, 467.5)}"/><path d="${grainRing(BRAID)}"/>
     <path d="${circleRing(412.5, 410)}"/><path d="${circleRing(398, 390)}"/>
-    <g transform="translate(0 ${SCENE.y}) scale(${SCENE.s})">
-      <g mask="url(#${id}-body)">${c.body.map((d) => `<path d="${d}"/>`).join('')}</g>
-      <path d="${c.scarf}" fill-rule="nonzero" mask="url(#${id}-scarf)"/>
-      <path d="${c.band}"/>${c.crown.map((d) => `<path d="${d}"/>`).join('')}
+    <g transform="translate(${SCENE.x} ${SCENE.y}) scale(${SCENE.s})">
+      <g mask="url(#${id}-body)">${paths(c.behindArm)}</g>
+      <g mask="url(#${id}-arm)">${paths(c.arm)}</g>
+      <g mask="url(#${id}-steam)">${paths(c.steam)}</g>
+      <g transform="${c.lid.t}">${paths(c.lid.parts)}</g>
       <g transform="${platterT}"><path d="${domeOutline() + domeTexture(WEAVE)}"/><path d="${t.dish}"/><path d="${t.foot}"/></g>
     </g></g>`;
 }

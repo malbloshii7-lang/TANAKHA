@@ -2,7 +2,7 @@
 
 Logo and identity for an Emirati kitchen serving banquets and daily meals.
 
-The emblem shows a chef standing behind a heaped rice platter on a footed serving tray (siniya), presenting it. He is a faceless gold silhouette, with the pleats of his toque and his neckerchief cut out in negative space. It sits inside a gold bezel braided from 108 rice grains. The grains on the heap are laid in a herringbone weave that nods to Al Sadu weaving, and the braid nods to talli embroidery.
+The emblem shows a chef in profile, chin raised with quiet pride, lifting a polished lid off a heaped rice platter on a footed serving tray (siniya) as steam rises. The chef is drawn in tapered gold ink lines, and the platter is solid gold. It sits inside a gold bezel braided from 108 rice grains. The grains on the heap are laid in a herringbone weave that nods to Al Sadu weaving, and the braid nods to talli embroidery.
 
 ## Official logo
 

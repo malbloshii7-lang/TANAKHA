@@ -147,7 +147,7 @@ function brandSheet() {
     { n: '01', at: [-Math.sqrt(486 ** 2 - 290 ** 2), -290], side: -1 },
     { n: '02', at: [Math.sqrt(440 ** 2 - 290 ** 2), -290], side: 1 },
     { n: '03', at: E.platter([-150, 60]), side: -1 },
-    { n: '04', at: E.scene([78, -262]), side: 1 },
+    { n: '04', at: E.scene([206, 100]), side: 1 },
   ];
   const leaders = feats.map(({ n, at, side }) => {
     const [fx, fy] = P(at), mx = cx + side * 520;
@@ -162,7 +162,7 @@ function brandSheet() {
     ['01', 'BEZEL', 'Twin gold rings, the rim of the serving tray'],
     ['02', 'BRAID', '108 rice grains set at 38°, after talli braid'],
     ['03', 'HEAP', 'Six strata of grain in a ±18° sadu weave'],
-    ['04', 'CHEF', 'A faceless chef presenting the platter'],
+    ['04', 'CHEF', 'A proud profile lifting the lid, in ink line'],
   ].map(([n, k, v], i) => {
     const x = 110 + (i % 2) * 520, y = 1290 + Math.floor(i / 2) * 110;
     return `${mono(x, y, n, { fill: C.goldDeep, size: 15 })}${text({ family: 'Cinzel', weight: 600, size: 22, ls: 4, x: x + 52, y, text: k, fill: ink })}
