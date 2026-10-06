@@ -1,4 +1,4 @@
-// Emblem geometry for Al Falah Al Thahab Kitchen.
+// Emblem geometry for Al Falah Al Thahabi Kitchen.
 // Coordinate space: viewBox -500 -500 1000 1000, centred on (0,0).
 // Everything is a filled shape (no strokes) so the mark scales and prints cleanly.
 const f = (n) => +n.toFixed(2);

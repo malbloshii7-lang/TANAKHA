@@ -1,4 +1,4 @@
-// Renders every Al Falah Al Thahab Kitchen logo asset (PNG + vector PDF) with headless Chromium.
+// Renders every Al Falah Al Thahabi Kitchen logo asset (PNG + vector PDF) with headless Chromium.
 // Usage: node gen.js [outDir] [--debug]   (outDir defaults to the folder above this one)
 const fs = require('fs');
 const path = require('path');
@@ -14,8 +14,8 @@ const C = { ghaf: '#0D3A33', gold: '#C9A24D', goldDeep: '#A9822F', ivory: '#F6F0
 const GOLD = `<stop offset="0" stop-color="#F6E7A8"/><stop offset=".32" stop-color="#D9B663"/><stop offset=".58" stop-color="#B68B38"/><stop offset=".8" stop-color="#DDBE6C"/><stop offset="1" stop-color="#9E772F"/>`;
 const GOLD_ON_LIGHT = `<stop offset="0" stop-color="#D8B45F"/><stop offset=".35" stop-color="#B38A35"/><stop offset=".6" stop-color="#94701F"/><stop offset=".82" stop-color="#B9933F"/><stop offset="1" stop-color="#83621C"/>`;
 const TEXT_GOLD = `<stop offset=".18" stop-color="#F3E2A2"/><stop offset=".55" stop-color="#D6B261"/><stop offset=".9" stop-color="#B38A3A"/>`;
-const AR_NAME = 'مطبخ الفلاح الذهب';
-const EN_NAME = 'AL FALAH AL THAHAB';
+const AR_NAME = 'مطبخ الفلاح الذهبي';
+const EN_NAME = 'AL FALAH AL THAHABI';
 
 const head = (w, h, transparent) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:Ruqaa;src:url("${FONTS}/ArefRuqaa-Bold.ttf");font-weight:700}
@@ -124,7 +124,7 @@ function signboard({ W = 3400, H = 1000, bg, emb, nameFill, enFill, ruleFill, de
     <g data-role="ar" data-kind="text">${text({ family: 'Ruqaa', weight: 700, size: 150, text: AR_NAME, rtl: true, fill: nameFill })}</g>
     <g data-role="en">
       <g data-block data-kind="text" data-gap="30">${text({ family: 'Cinzel', weight: 600, size: 104, ls: 16, text: 'AL FALAH', fill: enFill })}</g>
-      <g data-block data-kind="text" data-gap="40" id="en-sign">${text({ family: 'Cinzel', weight: 600, size: 104, ls: 16, text: 'AL THAHAB', fill: enFill })}</g>
+      <g data-block data-kind="text" data-gap="40" id="en-sign">${text({ family: 'Cinzel', weight: 600, size: 104, ls: 16, text: 'AL THAHABI', fill: enFill })}</g>
       <g data-block data-kind="text" data-gap="0" data-rules="en-sign" data-rulegap="30" data-ruleh="2.4">${text({ family: 'Cinzel', weight: 500, size: 38, ls: 22, text: 'KITCHEN', fill: enFill })}<rect fill="${ruleFill}"/><rect fill="${ruleFill}"/></g>
     </g>
   </g></svg>`;
@@ -211,15 +211,15 @@ function brandSheet() {
   ${sw}
   ${rule(736)}
   ${mono(RX, 780, 'TYPE', { size: 13, ls: 3, fill: mute })}
-  ${text({ family: 'Ruqaa', weight: 700, size: 150, x: RX + 240, y: 955, text: 'ذهب', rtl: true, anchor: 'middle', fill: ink })}
-  ${text({ family: 'Cinzel', weight: 600, size: 84, ls: 6, x: RX + 743, y: 955, text: 'THAHAB', anchor: 'middle', fill: ink })}
+  ${text({ family: 'Ruqaa', weight: 700, size: 140, x: RX + 240, y: 955, text: 'ذهبي', rtl: true, anchor: 'middle', fill: ink })}
+  ${text({ family: 'Cinzel', weight: 600, size: 72, ls: 5, x: RX + 743, y: 955, text: 'THAHABI', anchor: 'middle', fill: ink })}
   ${mono(RX, 1050, 'ARABIC · AREF RUQAA BOLD', { size: 13, ls: 2, fill: mute })}
   ${mono(RX + 500, 1050, 'LATIN · CINZEL SEMIBOLD', { size: 13, ls: 2, fill: mute })}
   ${rule(1084)}
   ${mono(RX, 1126, 'COLOURWAYS', { size: 13, ls: 3, fill: mute })}
   ${tiles}
   ${mono(110, 1540, 'MINIMUM SIZE 20 MM / 120 PX FOR THE TEXTURED EMBLEM', { size: 12, ls: 1.8, fill: mute })}
-  ${mono(RX + RW, 1540, 'AL FALAH AL THAHAB KITCHEN', { size: 12, ls: 1.8, fill: mute, anchor: 'end' })}
+  ${mono(RX + RW, 1540, 'AL FALAH AL THAHABI KITCHEN', { size: 12, ls: 1.8, fill: mute, anchor: 'end' })}
   </svg>`;
 }
 
@@ -263,7 +263,7 @@ const PAGES = [
     console.log('✓', pg.name);
   }
   await browser.close();
-  execFileSync('pdfunite', [...pdfs, path.join(OUT, 'al-falah-al-thahab-kitchen-logo.pdf')]);
+  execFileSync('pdfunite', [...pdfs, path.join(OUT, 'al-falah-al-thahabi-kitchen-logo.pdf')]);
   fs.rmSync(tmp, { recursive: true });
-  console.log('✓ al-falah-al-thahab-kitchen-logo.pdf →', OUT);
+  console.log('✓ al-falah-al-thahabi-kitchen-logo.pdf →', OUT);
 })();

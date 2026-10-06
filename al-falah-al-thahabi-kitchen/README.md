@@ -1,4 +1,4 @@
-# Al Falah Al Thahab Kitchen · مطبخ الفلاح الذهب
+# Al Falah Al Thahabi Kitchen · مطبخ الفلاح الذهبي
 
 Logo and identity for an Emirati kitchen serving banquets and daily meals.
 
@@ -8,7 +8,7 @@ The emblem is a heaped rice platter on a footed serving tray (siniya), with thre
 
 | File | Use |
 | --- | --- |
-| `al-falah-al-thahab-kitchen-logo.pdf` | Vector master for printers and sign makers (4 pages: dark, light, signboard, identity sheet) |
+| `al-falah-al-thahabi-kitchen-logo.pdf` | Vector master for printers and sign makers (4 pages: dark, light, signboard, identity sheet) |
 | `logo-primary-dark.png` | Main logo, gold on Ghaf green (2400 px) |
 | `logo-primary-light.png` | Main logo on ivory, for menus, receipts and light packaging |
 | `logo-gold-transparent.png` | Main logo, no background, for dark surfaces and photos |
