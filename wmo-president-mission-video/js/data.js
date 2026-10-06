@@ -1,18 +1,18 @@
-// Content — taken verbatim from the reference infographic.
+// Content — from the reference infographic, with the user's corrections (Bishkek; 18/21/23 SEP).
 window.STOPS = [
-  { id: 'kyrgyzstan', date: '6–11 SEP', region: 'II', city: 'Kyrgyzstan',
+  { id: 'kyrgyzstan', date: '6–11 SEP', region: 'II', city: 'Bishkek',
     desc: 'ICH/CIS 37th session and Kyrgyzhydromet centenary week.',
     lon: 74.59, lat: 42.87, focus: '50% 30%', tab: ['#1458b4', '#2b88de'], node: '#1f86dc' },
   { id: 'nukualofa', date: '16 SEP', region: 'V', city: 'Nuku’alofa',
     desc: 'PMMM-4 adopted the Siu-i-Álaimoana-Ki-Likutapu Declaration.',
     lon: -175.2, lat: -21.14, focus: '50% 40%', tab: ['#0f5aa6', '#1c86cf'], node: '#1f86dc' },
-  { id: 'wellington', date: '23 SEP', region: 'V', city: 'Wellington',
+  { id: 'wellington', date: '18 SEP', region: 'V', city: 'Wellington',
     desc: 'MetService discussions on WMO governance, regional collaboration and 24/7 operations.',
     lon: 174.78, lat: -41.29, focus: '50% 45%', tab: ['#1c6fd2', '#4aa2ec'], node: '#1f86dc' },
-  { id: 'melbourne', date: 'SEP', region: 'V', city: 'Melbourne',
+  { id: 'melbourne', date: '21 SEP', region: 'V', city: 'Melbourne',
     desc: 'Bureau of Meteorology visit: Operations Centre, Metrology Laboratory and space-weather services.',
     lon: 144.96, lat: -37.81, focus: '50% 62%', tab: ['#2a7fd8', '#5aadf0'], node: '#1f86dc' },
-  { id: 'jakarta', date: '30 SEP', region: 'V', city: 'Jakarta',
+  { id: 'jakarta', date: '23 SEP', region: 'V', city: 'Jakarta',
     desc: 'Regional engagements on Early Warnings, climate services and disaster risk reduction.',
     lon: 106.85, lat: -6.21, focus: '50% 55%', tab: ['#2378d6', '#4ea6ee'], node: '#1f86dc' },
   { id: 'bucharest', date: '2 OCT', region: 'VI', city: 'Bucharest',

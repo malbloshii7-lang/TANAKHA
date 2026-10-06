@@ -2,7 +2,7 @@
 
 Four weeks. Three WMO Regions. One line connecting them.
 
-From the ICH/CIS 37th session and Kyrgyzhydromet's centenary week in Kyrgyzstan, to Nuku’alofa, where PMMM-4 adopted the Siu-i-Álaimoana-Ki-Likutapu Declaration; from MetService in Wellington and the Bureau of Meteorology in Melbourne, to regional engagements in Jakarta and the RA VI-19 Phase II and EW4All planning week in Bucharest — one message carried across every stop:
+From the ICH/CIS 37th session and Kyrgyzhydromet's centenary week in Bishkek, to Nuku’alofa, where PMMM-4 adopted the Siu-i-Álaimoana-Ki-Likutapu Declaration; from MetService in Wellington and the Bureau of Meteorology in Melbourne, to regional engagements in Jakarta and the RA VI-19 Phase II and EW4All planning week in Bucharest — one message carried across every stop:
 
 Early warnings. National services. Regional ownership.
 
