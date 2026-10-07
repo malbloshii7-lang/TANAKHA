@@ -16,7 +16,7 @@ September–October 2026 mission infographic and using the same layout, palette 
 |---|---|
 | 0.0–5.9 s | Header, headline *One line / across three / WMO Regions*, name, stats card (4 weeks · II·V·VI · 3 WMO Regions); the route draws as a timeline with all six dates |
 | 5.9–7.3 s | The flat dot-map and the timeline **morph into a 3-D globe**; the line becomes the real great-circle route |
-| 7.3–10.1 s | A pulse travels Bishkek → Nuku’alofa → Wellington → Melbourne → Jakarta → Bucharest; each city and its WMO Region labels in |
+| 7.3–10.1 s | A pulse travels Kyrgyzstan → Tonga → New Zealand → Australia → Indonesia → Romania; each country and its WMO Region labels in |
 | 10.1–11.9 s | The globe shrinks and **docks as the locator badge** of the first card, which builds around it |
 | 11.9–40.4 s | Six stop cards (4.75 s each) along one continuous line, whip-pans with true motion blur, Ken Burns photos, a mini-globe per card tracing the route |
 | 40.4–45.1 s | *Early warnings. National services. Regional ownership.* + EW4All · AIM for Scale · RTC training · Strategic Plan 2028–2031 |

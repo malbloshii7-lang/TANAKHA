@@ -931,6 +931,15 @@ function placeLabels() { // choose label slots that avoid the route, nodes and e
   });
 }
 
+/* shrink a card title only if it would overflow its card (e.g. "New Zealand" on the narrow poster cards) */
+function fitNames() {
+  const fit = (e, avail) => {
+    const fs = parseFloat(getComputedStyle(e).fontSize), w = e.scrollWidth;
+    if (w > avail) e.style.fontSize = (Math.floor(fs * avail / w * 10) / 10) + 'px';
+  };
+  L.small.forEach(c => { const e = c.root.querySelector('.city'), pn = c.root.querySelector('.panel'); fit(e, pn.clientWidth - e.offsetLeft - 8); });
+  L.big.forEach(c => { c.root.style.display = 'block'; fit(c.city, 720 - 41 - 40); });
+}
 window.renderFrame = renderFrame;
 window.speedAt = speedAt;
 window.TL.WAVE_PASS = WAVE_PASS; window.TL.WAVE_RUN = WAVE_RUN;
@@ -940,6 +949,7 @@ window.ready = (async () => {
   await document.fonts.ready;
   await Promise.all([...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
   await Promise.all([...document.images].map(im => im.decode ? im.decode().catch(() => 0) : 0));
+  fitNames();
   READY = true;
   const q = new URLSearchParams(location.search);
   renderFrame(q.has('t') ? parseFloat(q.get('t')) : T.end);
